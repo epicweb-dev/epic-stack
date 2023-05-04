@@ -10,7 +10,7 @@
   </p>
 </div>
 
-![The Epic Stack](https://user-images.githubusercontent.com/1500684/236281980-66d33a85-f5fc-4094-ab73-e8994acc27a3.jpg)
+![The Epic Stack](https://user-images.githubusercontent.com/1500684/236352284-73d92e1d-5233-4cf4-a9aa-8bf33b8a2229.png)
 
 <hr />
 

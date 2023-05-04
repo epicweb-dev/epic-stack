@@ -82,7 +82,8 @@ test('onboarding', async ({ page }) => {
 
 	await expect(page).toHaveURL(`/users/${onboardingData.username}`)
 
-	await page.getByRole('button', { name: /logout/i }).click()
+	await page.getByRole('link', { name: onboardingData.name }).click()
+	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
 
 	// have to do this here because we didn't use insertNewUser (because we're testing user create)
