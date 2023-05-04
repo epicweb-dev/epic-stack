@@ -133,13 +133,24 @@ Prior to your first deployment, you'll need to do a few things:
   following commands:
 
   ```sh
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app epic-stack-template
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app epic-stack-template-staging
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) --app epic-stack-template
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) --app epic-stack-template-staging
   ```
 
   If you don't have openssl installed, you can also use
   [1Password](https://1password.com/password-generator) to generate a random
   secret, just replace `$(openssl rand -hex 32)` with the generated secret.
+
+- Create an account on Mailgun, create a Sending API Key (find it at
+  `https://app.mailgun.com/app/sending/domains/YOUR_SENDING_DOMAIN/sending-keys`
+  replacing `YOUR_SENDING_DOMAIN` with your sending domain) and set
+  `MAILGUN_DOMAIN` and `MAILGUN_SENDING_KEY` environment variables in both prod
+  and staging:
+
+  ```sh
+  fly secrets set MAILGUN_DOMAIN="mg.example.com" MAILGUN_SENDING_KEY="some-api-token-with-dashes" --app epic-stack-template
+  fly secrets set MAILGUN_DOMAIN="mg.example.com" MAILGUN_SENDING_KEY="some-api-token-with-dashes" --app epic-stack-template-staging
+  ```
 
 - Create a persistent volume for the sqlite database for both your staging and
   production environments. Run the following:

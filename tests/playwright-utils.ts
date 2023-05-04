@@ -3,7 +3,7 @@ import { parse } from 'cookie'
 import { authenticator, getPasswordHash } from '~/utils/auth.server'
 import { prisma } from '~/utils/db.server'
 import { commitSession, getSession } from '~/utils/session.server'
-import { createContactInfo, createUser } from '../prisma/seed-utils'
+import { createUser } from '../prisma/seed-utils'
 
 export const dataCleanup = {
 	users: new Set<string>(),
@@ -20,9 +20,6 @@ export async function insertNewUser({ password }: { password?: string } = {}) {
 	const user = await prisma.user.create({
 		data: {
 			...userData,
-			contactInfo: {
-				create: createContactInfo(),
-			},
 			password: {
 				create: {
 					hash: await getPasswordHash(password || userData.username),
