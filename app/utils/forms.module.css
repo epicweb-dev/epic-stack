@@ -1,0 +1,56 @@
+.field {
+	position: relative;
+	min-height: 96px;
+}
+
+.textareaField {
+	position: relative;
+	min-height: 226px;
+}
+
+.field input + label,
+.field textarea + label,
+.textareaField input + label,
+.textareaField textarea + label {
+	@apply absolute left-0 origin-top-left translate-x-4 text-body-xs text-night-200 transition-transform;
+}
+
+.field input:required + label:after,
+.textareaField textarea:required + label:after,
+.checkboxField button:required + label:after {
+	content: ' *';
+}
+
+.field input:placeholder-shown:not(:focus) + label,
+.textareaField textarea:placeholder-shown:not(:focus) + label {
+	@apply translate-y-[1.4rem] scale-100;
+}
+
+.field input:not(:placeholder-shown) + label,
+.field input:focus + label,
+.textareaField textarea:not(:placeholder-shown) + label,
+.textareaField textarea:focus + label {
+	@apply translate-y-2 scale-75;
+}
+
+.checkboxField {
+	min-height: 56px;
+}
+
+.checkboxField button {
+	@apply flex h-6 w-6 items-center justify-center rounded border;
+}
+
+.checkboxField button[aria-checked='false'] {
+	@apply border-night-400 bg-night-700;
+}
+
+.checkboxField button[aria-checked='true'] {
+	@apply border-accent-pink bg-accent-pink;
+}
+
+.field input[aria-invalid='true'],
+.textareaField textarea[aria-invalid='true'],
+.checkboxField button[aria-invalid='true'] {
+	@apply border-accent-red;
+}

@@ -1,0 +1,32 @@
+{
+	"include": [
+		"remix.env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"./other/test-setup/setup-test-env.ts"
+	],
+	"compilerOptions": {
+		"lib": ["DOM", "DOM.Iterable", "ES2019"],
+		"types": ["vitest/globals"],
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"jsx": "react-jsx",
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"target": "ES2019",
+		"strict": true,
+		"noImplicitAny": true,
+		"allowJs": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./app/*"],
+			"tests/*": ["./tests/*"]
+		},
+		"skipLibCheck": true,
+
+		// Remix takes care of building everything in `remix build`.
+		"noEmit": true
+	}
+}

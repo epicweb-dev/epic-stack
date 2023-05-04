@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://epic-stack-template.fly.dev/sitemap.xml
