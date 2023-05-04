@@ -1,4 +1,4 @@
-app = "rocket-rental"
+app = "epic-stack-template"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
