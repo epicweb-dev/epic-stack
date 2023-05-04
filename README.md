@@ -23,7 +23,7 @@
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```sh
-npx create-remix@latest --template remix-run/indie-stack
+npx create-remix@latest --template epicweb-dev/epic-stack
 ```
 
 ## What's in the stack
@@ -226,8 +226,8 @@ to get auto-formatting on save. There's also a `npm run format` script you can
 run to format all files in the project.
 
 <!-- prettier-ignore-start -->
-[build-badge]: https://img.shields.io/github/actions/workflow/status/epicweb-dev/epic-stack/validate.yml?branch=main&logo=github&style=flat-square
-[build]: https://github.com/epicweb-dev/epic-stack/actions?query=workflow%3Avalidate
+[build-badge]: https://img.shields.io/github/actions/workflow/status/epicweb-dev/epic-stack/deploy.yml?branch=main&logo=github&style=flat-square
+[build]: https://github.com/epicweb-dev/epic-stack/actions?query=workflow%3Adeploy
 [license-badge]: https://img.shields.io/badge/license-MIT%20License-blue.svg?style=flat-square
 [license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
