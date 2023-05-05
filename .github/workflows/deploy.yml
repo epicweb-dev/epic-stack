@@ -109,7 +109,7 @@ jobs:
         id: db-cache
         uses: actions/cache@v3
         with:
-          path: prisma/sqlite.db
+          path: prisma/data.db
           key: db-cache
 
       - name: 🏗 Build
