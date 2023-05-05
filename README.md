@@ -1,12 +1,12 @@
 <div>
   <h1 align="center"><a href="https://www.epicweb.dev/stack">The Epic Stack 🚀</a></h1>
-  <strong>
+  <strong align="center">
     A starter project for building Epic web applications
   </strong>
   <p>
-    This is a <a href="https://remix.run/stacks">Remix Stack</a> with the basic
-    things setup and configured for you to hit the ground running on your next
-    Epic idea.
+    This is a <a href="https://remix.run/stacks">Remix Stack</a> with the
+    foundational things setup and configured for you to hit the ground running
+    on your next Epic idea.
   </p>
 </div>
 
