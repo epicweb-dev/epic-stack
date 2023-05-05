@@ -54,7 +54,7 @@ export default function NotesRoute() {
 							{ownerDisplayName}'s Notes
 						</h1>
 					</Link>
-					<ul className="overflow-y-scroll">
+					<ul>
 						<li>
 							<NavLink
 								to="new"
@@ -83,7 +83,7 @@ export default function NotesRoute() {
 						))}
 					</ul>
 				</div>
-				<main className="col-span-3 overflow-y-scroll bg-night-400 px-10 py-12 md:rounded-r-3xl">
+				<main className="col-span-3 bg-night-400 px-10 py-12 md:rounded-r-3xl">
 					<Outlet />
 				</main>
 			</div>
