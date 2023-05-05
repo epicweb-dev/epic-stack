@@ -38,6 +38,8 @@ npx create-remix@latest --template epicweb-dev/epic-stack
   production and staging environments
 - Email/Password Authentication with
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
+  with email sending via [Mailgun](https://www.mailgun.com/) and forgot
+  password/password reset support.
 - Database ORM with [Prisma](https://prisma.io)
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Playwright](https://playwright.dev/)
