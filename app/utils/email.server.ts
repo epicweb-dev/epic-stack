@@ -15,7 +15,7 @@ export async function sendEmail({
 
 	const body = new URLSearchParams({
 		to,
-		from: 'hello@rocketrental.space',
+		from: 'hello@epicstack.dev',
 		subject,
 		text,
 		html,
