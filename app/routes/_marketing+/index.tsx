@@ -64,9 +64,9 @@ export default function Index() {
 								href: 'https://tailwindcss.com',
 							},
 							{
-								src: 'https://user-images.githubusercontent.com/1500684/157764454-48ac8c71-a2a9-4b5e-b19c-edef8b8953d6.svg',
-								alt: 'Cypress',
-								href: 'https://www.cypress.io',
+								src: 'https://user-images.githubusercontent.com/1500684/236356419-d02acd65-0123-46e3-9891-27a36eb55d28.svg',
+								alt: 'Playwright',
+								href: 'https://playwright.dev/',
 							},
 							{
 								src: 'https://user-images.githubusercontent.com/1500684/157772386-75444196-0604-4340-af28-53b236faa182.svg',
@@ -82,6 +82,11 @@ export default function Index() {
 								src: 'https://user-images.githubusercontent.com/1500684/157772662-92b0dd3a-453f-4d18-b8be-9fa6efde52cf.png',
 								alt: 'Testing Library',
 								href: 'https://testing-library.com',
+							},
+							{
+								src: 'https://user-images.githubusercontent.com/1500684/236356589-fd6ad6e6-9510-4ff3-91ad-4836ca1c64f5.png',
+								alt: 'Docker',
+								href: 'https://www.docker.com',
 							},
 							{
 								src: 'https://user-images.githubusercontent.com/1500684/157772934-ce0a943d-e9d0-40f8-97f3-f464c0811643.svg',
