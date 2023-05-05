@@ -92,7 +92,7 @@ async function sendPasswordResetEmail({
 
 	await sendEmail({
 		to: user.email,
-		subject: `Rocket Rental Password Reset`,
+		subject: `Epic Notes Password Reset`,
 		text: `Please open this URL: ${resetPasswordUrl}`,
 		html: `
 		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -101,8 +101,8 @@ async function sendPasswordResetEmail({
 				<meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
 			</head>
 			<body>
-				<h1>Reset your Rocket Rental password.</h1>
-				<p>Click the link below to reset the rocket rental password for ${user.username}.</p>
+				<h1>Reset your Epic Notes password.</h1>
+				<p>Click the link below to reset the Epic Notes password for ${user.username}.</p>
 				<a href="${resetPasswordUrl}">${resetPasswordUrl}</a>
 			</body>
 		`,
@@ -110,7 +110,7 @@ async function sendPasswordResetEmail({
 }
 
 export const meta: V2_MetaFunction = () => {
-	return [{ title: 'Password Recovery for Rocket Rental' }]
+	return [{ title: 'Password Recovery for Epic Notes' }]
 }
 
 export default function SignupRoute() {

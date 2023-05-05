@@ -120,7 +120,7 @@ export async function action({ request }: DataFunctionArgs) {
 }
 
 export const meta: V2_MetaFunction = () => {
-	return [{ title: 'Setup Rocket Rental Account' }]
+	return [{ title: 'Setup Epic Notes Account' }]
 }
 
 export default function OnboardingPage() {
@@ -138,7 +138,7 @@ export default function OnboardingPage() {
 	const redirectTo = searchParams.get('redirectTo') || '/'
 
 	return (
-		<div className="container mx-auto flex min-h-full flex-col justify-center pt-20 pb-32">
+		<div className="container mx-auto flex min-h-full flex-col justify-center pb-32 pt-20">
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard!</h1>

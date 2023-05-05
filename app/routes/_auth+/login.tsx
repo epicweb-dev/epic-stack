@@ -31,7 +31,7 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 export const meta: V2_MetaFunction = () => {
-	return [{ title: 'Login to Rocket Rental' }]
+	return [{ title: 'Login to Epic Notes' }]
 }
 
 export default function LoginPage() {

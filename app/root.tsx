@@ -59,7 +59,7 @@ export const links: LinksFunction = () => {
 
 export const meta: V2_MetaFunction = () => {
 	return [
-		{ title: 'Rocket Rental' },
+		{ title: 'Epic Notes' },
 		{ name: 'description', content: 'Find yourself in outer space' },
 	]
 }
