@@ -247,7 +247,7 @@ function UserDropdown() {
 					<DropdownMenu.Item asChild>
 						<Link
 							prefetch="intent"
-							to="/notes"
+							to={`/users/${user.username}/notes`}
 							className="px-7 py-5 outline-none hover:bg-night-500 radix-highlighted:bg-night-500"
 						>
 							Notes
