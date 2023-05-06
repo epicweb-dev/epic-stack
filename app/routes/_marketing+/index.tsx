@@ -69,7 +69,7 @@ export default function Index() {
 								href: 'https://playwright.dev/',
 							},
 							{
-								src: 'https://user-images.githubusercontent.com/1500684/157772386-75444196-0604-4340-af28-53b236faa182.svg',
+								src: 'https://raw.githubusercontent.com/mswjs/msw/c32241627da09af8b34c4068cc17dd1941ff3b0d/media/msw-logo.svg',
 								alt: 'MSW',
 								href: 'https://mswjs.io',
 							},
