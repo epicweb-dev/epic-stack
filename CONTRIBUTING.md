@@ -68,3 +68,18 @@ npm run dev
 ```
 
 And open up `http://localhost:3000` and rock!
+
+## Help Needed
+
+There's something to be said for custom code and the ability that grants with
+regard to tuning it to be exactly what you need. But there's also something to
+be said for offloading maintenance onto external dependencies. There are likely
+several bits of code in this codebase that could benefit from externalization.
+There could even be some things that could be improved by existing libraries.
+
+Feel free to take any code from within this project and turn it into an open
+source library (appropriate attribution is appreciated). Then come back and make
+a PR to use your new library.
+
+NOTE: Actual adoption of your library is not guaranteed. Offloading maintenance
+and adaptability is a delecate balance.
