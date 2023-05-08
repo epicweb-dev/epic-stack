@@ -6,14 +6,17 @@ const requiredServerEnvs = [
 	'DATABASE_URL',
 	'SESSION_SECRET',
 	'ENCRYPTION_SECRET',
-	'MAILGUN_SENDING_KEY',
-	'MAILGUN_DOMAIN',
+	'INTERNAL_COMMAND_TOKEN',
+	'CACHE_DATABASE_PATH',
+	// If you plan to use Mailgun, uncomment these lines
+	// 'MAILGUN_SENDING_KEY',
+	// 'MAILGUN_DOMAIN',
 ] as const
 
 declare global {
 	namespace NodeJS {
 		interface ProcessEnv
-			extends Record<typeof requiredServerEnvs[number], string> {}
+			extends Record<(typeof requiredServerEnvs)[number], string> {}
 	}
 }
 

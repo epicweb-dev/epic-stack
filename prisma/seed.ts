@@ -1,5 +1,6 @@
+import fs from 'fs'
 import { faker } from '@faker-js/faker'
-import { createPassword, createUser, downloadFile } from './seed-utils'
+import { createPassword, createUser } from './seed-utils'
 import { prisma } from '~/utils/db.server'
 import { deleteAllData } from '../other/test-setup/utils'
 import { getPasswordHash } from '~/utils/auth.server'
@@ -9,22 +10,27 @@ async function seed() {
 	console.time(`🌱 Database has been seeded`)
 
 	console.time('🧹 Cleaned up the database...')
-	await deleteAllData()
+	deleteAllData()
 	console.timeEnd('🧹 Cleaned up the database...')
 
+	console.time(`👑 Created admin role/permission...`)
+	const adminRole = await prisma.role.create({
+		data: {
+			name: 'admin',
+			permissions: {
+				create: { name: 'admin' },
+			},
+		},
+	})
+	console.timeEnd(`👑 Created admin role/permission...`)
 	// hosts with ships and reviews
 	// renters with bookings and reviews
 	// hosts who are renters also
 	const totalUsers = 40
 	console.time(`👤 Created ${totalUsers} users...`)
 	const users = await Promise.all(
-		Array.from({ length: totalUsers }, async () => {
-			const gender = faker.helpers.arrayElement(['female', 'male']) as
-				| 'female'
-				| 'male'
-			const userData = createUser({ gender })
-			const imageGender = gender === 'female' ? 'women' : 'men'
-			const imageNumber = faker.datatype.number({ min: 0, max: 99 })
+		Array.from({ length: totalUsers }, async (_, index) => {
+			const userData = createUser()
 			const user = await prisma.user.create({
 				data: {
 					...userData,
@@ -36,8 +42,8 @@ async function seed() {
 							contentType: 'image/jpeg',
 							file: {
 								create: {
-									blob: await downloadFile(
-										`https://randomuser.me/api/portraits/${imageGender}/${imageNumber}.jpg`,
+									blob: await fs.promises.readFile(
+										`./prisma/fixtures/user-images/${index % 10}.jpg`,
 									),
 								},
 							},
@@ -58,19 +64,22 @@ async function seed() {
 	)
 	console.timeEnd(`👤 Created ${totalUsers} users...`)
 
-	console.time(`🐨 Created user "kody" with the password "kodylovesyou"`)
+	console.time(
+		`🐨 Created user "kody" with the password "kodylovesyou" and admin role`,
+	)
 	await prisma.user.create({
 		data: {
 			email: 'kody@kcd.dev',
 			username: 'kody',
 			name: 'Kody',
+			roles: { connect: { id: adminRole.id } },
 			image: {
 				create: {
 					contentType: 'image/png',
 					file: {
 						create: {
-							blob: await downloadFile(
-								`https://user-images.githubusercontent.com/1500684/236315453-aca298fe-20e1-46d7-9b41-f810b453b068.png`,
+							blob: await fs.promises.readFile(
+								'./prisma/fixtures/user-images/kody.png',
 							),
 						},
 					},
@@ -102,7 +111,9 @@ async function seed() {
 			},
 		},
 	})
-	console.timeEnd(`🐨 Created user "kody" with the password "kodylovesyou"`)
+	console.timeEnd(
+		`🐨 Created user "kody" with the password "kodylovesyou" and admin role`,
+	)
 
 	console.timeEnd(`🌱 Database has been seeded`)
 }

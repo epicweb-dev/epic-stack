@@ -11,13 +11,13 @@ const DeleteFormSchema = z.object({
 })
 
 export async function action({ request }: DataFunctionArgs) {
-	const userId = await requireUserId(request)
+	const userId = await requireUserId(request, { redirectTo: null })
 	const formData = await request.formData()
 	const result = DeleteFormSchema.safeParse(
 		preprocessFormData(formData, DeleteFormSchema),
 	)
 	if (!result.success) {
-		return json({ status: 'error', errors: result.error.issues } as const, {
+		return json({ status: 'error', errors: result.error.flatten() } as const, {
 			status: 400,
 		})
 	}
@@ -30,9 +30,13 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	})
 	if (!image) {
-		return json({ status: 'error', errors: ['Image not found'] } as const, {
-			status: 404,
-		})
+		return json(
+			{
+				status: 'error',
+				errors: { formErrors: ['Image not found'], fieldErrors: {} },
+			} as const,
+			{ status: 404 },
+		)
 	}
 
 	await prisma.image.delete({

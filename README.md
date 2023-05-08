@@ -26,6 +26,9 @@ Learn more about [Remix Stacks](https://remix.run/stacks).
 npx create-remix@latest --template epicweb-dev/epic-stack
 ```
 
+> NOTE: choose "TypeScript" as this starter does not put forth any effort to
+> work without TypeScript.
+
 ## What's in the stack
 
 - [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
@@ -40,12 +43,17 @@ npx create-remix@latest --template epicweb-dev/epic-stack
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
   with email sending via [Mailgun](https://www.mailgun.com/) and forgot
   password/password reset support.
+- Role-based User Permissions.
 - Database ORM with [Prisma](https://prisma.io)
+- Caching via [cachified](https://npm.im/cachified): Both in-memory and
+  SQLite-based (with
+  [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Playwright](https://playwright.dev/)
 - Local third party request mocking with [MSW](https://mswjs.io)
 - Unit testing with [Vitest](https://vitest.dev) and
-  [Testing Library](https://testing-library.com)
+  [Testing Library](https://testing-library.com) with pre-configured Test
+  Database
 - Code formatting with [Prettier](https://prettier.io)
 - Linting with [ESLint](https://eslint.org)
 - Static Types with [TypeScript](https://typescriptlang.org)
@@ -131,19 +139,25 @@ Prior to your first deployment, you'll need to do a few things:
   [your repo secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
   with the name `FLY_API_TOKEN`.
 
-- Add a `SESSION_SECRET` to your fly app secrets, to do this you can run the
-  following commands:
+- Add a `SESSION_SECRET`, `ENCRYPTION_SECRET`, and `INTERNAL_COMMAND_TOKEN` to
+  your fly app secrets, to do this you can run the following commands:
 
   ```sh
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) --app epic-stack-template
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) --app epic-stack-template-staging
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app epic-stack-template
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app epic-stack-template-staging
   ```
 
   If you don't have openssl installed, you can also use
   [1Password](https://1password.com/password-generator) to generate a random
   secret, just replace `$(openssl rand -hex 32)` with the generated secret.
 
-- Create an account on Mailgun, create a Sending API Key (find it at
+- **Create an account on Mailgun.** (Can be deferred to later)
+
+  NOTE: this is an optional step. During development the emails will be logged
+  to the terminal and in production if you haven't set the proper environment
+  variables yet you will get a warning until you set the environment variables.
+
+  Create a Sending API Key (find it at
   `https://app.mailgun.com/app/sending/domains/YOUR_SENDING_DOMAIN/sending-keys`
   replacing `YOUR_SENDING_DOMAIN` with your sending domain) and set
   `MAILGUN_DOMAIN` and `MAILGUN_SENDING_KEY` environment variables in both prod

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { prisma } from '~/utils/db.server'
+import Database from 'better-sqlite3'
 
 /**
  * Deletes all data from all tables in the database, (except for the
@@ -12,17 +12,17 @@ import { prisma } from '~/utils/db.server'
  * NOTE: It's better than deleting the database and recreating it because it
  * doesn't require you to re-run migrations.
  */
-export async function deleteAllData() {
+export function deleteAllData() {
 	const excludedTables = ['_prisma_migrations']
+	const db = new Database(process.env.DATABASE_PATH)
 	// Get a list of all tables in the database
-	const allTableNamesRaw = await prisma.$queryRaw`
-		SELECT name
-		FROM sqlite_master
-		WHERE
-			type='table'
-			AND name NOT IN (${excludedTables.join(',')})
-	`
-
+	const allTableNamesRaw = db
+		.prepare(
+			"SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ($excludedTables)",
+		)
+		.all({
+			excludedTables: excludedTables.join(','),
+		})
 	const allTableNames = z
 		.array(z.object({ name: z.string() }))
 		.parse(allTableNamesRaw)
@@ -30,18 +30,24 @@ export async function deleteAllData() {
 
 	// Get a list of foreign key constraints for each table
 	// p.s. thanks chatgpt...
-	const foreignKeysRaw = await prisma.$queryRaw`
-		SELECT
-			m.name as table_name,
-			p."table" as parent_table_name
-		FROM
-			sqlite_master AS m
-		JOIN
-			pragma_foreign_key_list(m.name) AS p
-		WHERE
-			m.type = 'table' AND
-			m.name NOT IN (${excludedTables.join(',')})
-		`
+	const foreignKeysRaw = db
+		.prepare(
+			/* sql */ `
+			SELECT
+				m.name as table_name,
+				p."table" as parent_table_name
+			FROM
+				sqlite_master AS m
+			JOIN
+				pragma_foreign_key_list(m.name) AS p
+			WHERE
+				m.type = 'table' AND
+				m.name NOT IN ($excludedTables)
+			`,
+		)
+		.all({
+			excludedTables: excludedTables.join(','),
+		})
 	const foreignKeys = z
 		.array(
 			z.object({
@@ -79,8 +85,6 @@ export async function deleteAllData() {
 
 	// Delete all data in each table in the proper order
 	for (const tableName of sortedTableNames) {
-		// For some reason, we need to use Unsafe because the $executeRaw didn't
-		// like this query (resulted in a syntax error). Don't worry, it's safe...
-		await prisma.$executeRawUnsafe(`DELETE FROM ${tableName};`)
+		db.prepare(`DELETE FROM ${tableName}`).run()
 	}
 }

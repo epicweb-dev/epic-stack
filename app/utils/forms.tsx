@@ -4,7 +4,6 @@ import clsx from 'clsx'
 import React, { useEffect, useId, useRef } from 'react'
 import { z } from 'zod'
 import styles from './forms.module.css'
-import { typedBoolean } from './misc'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -163,8 +162,8 @@ function getFieldProps(schema: z.ZodTypeAny): InputValidationProps {
 			const numberProps = allProps as Array<
 				InputValidationProps & { type: 'number' }
 			>
-			const allMins = numberProps.map(p => p.min).filter(typedBoolean)
-			const allMaxs = numberProps.map(p => p.max).filter(typedBoolean)
+			const allMins = numberProps.map(p => p.min).filter(Boolean)
+			const allMaxs = numberProps.map(p => p.max).filter(Boolean)
 			return {
 				type,
 				required,
@@ -175,9 +174,9 @@ function getFieldProps(schema: z.ZodTypeAny): InputValidationProps {
 			const stringProps = allProps as Array<
 				InputValidationProps & { type: 'text' | 'email' | 'url' }
 			>
-			const allMins = stringProps.map(p => p.minLength).filter(typedBoolean)
-			const allMaxs = stringProps.map(p => p.maxLength).filter(typedBoolean)
-			const allPatterns = stringProps.map(p => p.pattern).filter(typedBoolean)
+			const allMins = stringProps.map(p => p.minLength).filter(Boolean)
+			const allMaxs = stringProps.map(p => p.maxLength).filter(Boolean)
+			const allPatterns = stringProps.map(p => p.pattern).filter(Boolean)
 			return {
 				type,
 				required,

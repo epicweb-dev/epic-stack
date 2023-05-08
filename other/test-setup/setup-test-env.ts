@@ -21,9 +21,7 @@ expect.extend(matchers)
 installGlobals()
 fs.copyFileSync(BASE_DATABASE_PATH, DATABASE_PATH)
 
-afterEach(async () => {
-	await deleteAllData()
-})
+afterEach(() => deleteAllData())
 
 afterAll(async () => {
 	await fs.promises.rm(DATABASE_PATH)

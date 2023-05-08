@@ -27,7 +27,7 @@ import { authenticator } from './utils/auth.server'
 import { prisma } from './utils/db.server'
 import { getEnv } from './utils/env.server'
 import { ButtonLink } from './utils/forms'
-import { getUserImgSrc, typedBoolean } from './utils/misc'
+import { getUserImgSrc } from './utils/misc'
 import { useUser } from './utils/user'
 
 export const links: LinksFunction = () => {
@@ -54,7 +54,7 @@ export const links: LinksFunction = () => {
 		{ rel: 'stylesheet', href: '/fonts/nunito-sans/font.css' },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
-	].filter(typedBoolean)
+	].filter(Boolean)
 }
 
 export const meta: V2_MetaFunction = () => {

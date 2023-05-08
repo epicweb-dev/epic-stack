@@ -6,7 +6,7 @@
 		"./other/test-setup/setup-test-env.ts"
 	],
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ES2019"],
+		"lib": ["DOM", "DOM.Iterable", "ES2021"],
 		"types": ["vitest/globals"],
 		"isolatedModules": true,
 		"esModuleInterop": true,

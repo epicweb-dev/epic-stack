@@ -29,6 +29,27 @@ model Image {
   user User?
 }
 
+model Role {
+  id   String @id @unique @default(cuid())
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id   String @id @unique @default(cuid())
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roles Role[]
+}
+
 model User {
   id       String  @id @unique @default(cuid())
   email    String  @unique
@@ -43,6 +64,7 @@ model User {
 
   password Password?
   notes    Note[]
+  roles    Role[]
 }
 
 model Password {

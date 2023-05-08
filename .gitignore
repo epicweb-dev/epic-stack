@@ -17,6 +17,6 @@ node_modules
 /prisma/data.db.bkp
 
 prisma/test
-other/image.db
+other/cache.db
 
 server-build
