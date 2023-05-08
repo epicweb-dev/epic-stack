@@ -59,6 +59,16 @@ export default function Index() {
 								href: 'https://prisma.io',
 							},
 							{
+								src: 'https://user-images.githubusercontent.com/1500684/236854574-17c11137-7fb0-4426-83d7-2c06e6d2bb53.svg',
+								alt: 'GitHub',
+								href: 'https://github.com',
+							},
+							{
+								src: 'https://user-images.githubusercontent.com/1500684/236854590-c3574ee4-0d55-4e96-a6b7-e435969a8c31.png',
+								alt: 'Mailgun',
+								href: 'https://mailgun.com',
+							},
+							{
 								src: 'https://user-images.githubusercontent.com/1500684/157764276-a516a239-e377-4a20-b44a-0ac7b65c8c14.svg',
 								alt: 'Tailwind',
 								href: 'https://tailwindcss.com',
