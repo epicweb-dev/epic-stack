@@ -1,0 +1,5 @@
+{
+  "name": "remix.init",
+  "private": true,
+  "main": "index.js"
+}

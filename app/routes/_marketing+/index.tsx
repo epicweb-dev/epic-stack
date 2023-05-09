@@ -44,6 +44,11 @@ export default function Index() {
 					<div className="flex flex-wrap justify-center gap-8 rounded-3xl bg-day-300 py-4">
 						{[
 							{
+								src: 'https://user-images.githubusercontent.com/1500684/236983921-dd1c4220-002b-4918-86de-28fb00b29461.png',
+								alt: 'Remix',
+								href: 'https://remix.run',
+							},
+							{
 								src: 'https://user-images.githubusercontent.com/1500684/157764397-ccd8ea10-b8aa-4772-a99b-35de937319e1.svg',
 								alt: 'Fly.io',
 								href: 'https://fly.io',
@@ -57,6 +62,11 @@ export default function Index() {
 								src: 'https://user-images.githubusercontent.com/1500684/157764484-ad64a21a-d7fb-47e3-8669-ec046da20c1f.svg',
 								alt: 'Prisma',
 								href: 'https://prisma.io',
+							},
+							{
+								src: 'https://user-images.githubusercontent.com/1500684/236985082-421e7fef-2371-43c2-bbaa-343f8b2a606f.svg',
+								alt: 'Zod',
+								href: 'https://zod.dev/',
 							},
 							{
 								src: 'https://user-images.githubusercontent.com/1500684/236854574-17c11137-7fb0-4426-83d7-2c06e6d2bb53.svg',
@@ -74,6 +84,11 @@ export default function Index() {
 								href: 'https://tailwindcss.com',
 							},
 							{
+								src: 'https://user-images.githubusercontent.com/1500684/236984769-bdcac5cf-022d-4ed9-8240-63460939a454.svg',
+								alt: 'Radix UI',
+								href: 'https://www.radix-ui.com/',
+							},
+							{
 								src: 'https://user-images.githubusercontent.com/1500684/236356419-d02acd65-0123-46e3-9891-27a36eb55d28.svg',
 								alt: 'Playwright',
 								href: 'https://playwright.dev/',
@@ -82,6 +97,11 @@ export default function Index() {
 								src: 'https://raw.githubusercontent.com/mswjs/msw/c32241627da09af8b34c4068cc17dd1941ff3b0d/media/msw-logo.svg',
 								alt: 'MSW',
 								href: 'https://mswjs.io',
+							},
+							{
+								src: 'https://user-images.githubusercontent.com/1500684/236984909-659d8082-c983-418d-b42f-4ce70c4e2cb0.svg',
+								alt: 'Faker.js',
+								href: 'https://fakerjs.dev/',
 							},
 							{
 								src: 'https://user-images.githubusercontent.com/1500684/157772447-00fccdce-9d12-46a3-8bb4-fac612cdc949.svg',
@@ -99,6 +119,11 @@ export default function Index() {
 								href: 'https://www.docker.com',
 							},
 							{
+								src: 'https://user-images.githubusercontent.com/1500684/157773063-20a0ed64-b9f8-4e0b-9d1e-0b65a3d4a6db.svg',
+								alt: 'TypeScript',
+								href: 'https://typescriptlang.org',
+							},
+							{
 								src: 'https://user-images.githubusercontent.com/1500684/157772934-ce0a943d-e9d0-40f8-97f3-f464c0811643.svg',
 								alt: 'Prettier',
 								href: 'https://prettier.io',
@@ -107,11 +132,6 @@ export default function Index() {
 								src: 'https://user-images.githubusercontent.com/1500684/157772990-3968ff7c-b551-4c55-a25c-046a32709a8e.svg',
 								alt: 'ESLint',
 								href: 'https://eslint.org',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157773063-20a0ed64-b9f8-4e0b-9d1e-0b65a3d4a6db.svg',
-								alt: 'TypeScript',
-								href: 'https://typescriptlang.org',
 							},
 						].map(img => (
 							<a

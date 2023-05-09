@@ -25,8 +25,15 @@ export const resetPasswordSessionKey = 'resetPasswordToken'
 const resetPasswordTokenQueryParam = 'token'
 const tokenType = 'forgot-password'
 
-const ForgotPasswordSchema = z.object({
+const forgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([emailSchema, usernameSchema]),
+})
+
+const tokenSchema = z.object({
+	type: z.literal(tokenType),
+	payload: z.object({
+		username: usernameSchema,
+	}),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -34,26 +41,28 @@ export async function loader({ request }: DataFunctionArgs) {
 		resetPasswordTokenQueryParam,
 	)
 	if (resetPasswordTokenString) {
-		const token = JSON.parse(decrypt(resetPasswordTokenString))
-		if (token.type === tokenType && token.payload?.username) {
-			const session = await getSession(request.headers.get('cookie'))
-			session.set(resetPasswordSessionKey, token.payload.username)
-			return redirect('/reset-password', {
-				headers: {
-					'Set-Cookie': await commitSession(session),
-				},
-			})
-		} else {
-			return redirect('/signup')
-		}
+		const result = tokenSchema.safeParse(
+			JSON.parse(decrypt(resetPasswordTokenString)),
+		)
+		if (!result.success) return redirect('/signup')
+		const token = result.data
+
+		const session = await getSession(request.headers.get('cookie'))
+		session.set(resetPasswordSessionKey, token.payload.username)
+		return redirect('/reset-password', {
+			headers: {
+				'Set-Cookie': await commitSession(session),
+			},
+		})
 	}
-	return json({ fieldMetadatas: getFieldsFromSchema(ForgotPasswordSchema) })
+
+	return json({ fieldMetadatas: getFieldsFromSchema(forgotPasswordSchema) })
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const result = await ForgotPasswordSchema.safeParseAsync(
-		preprocessFormData(formData, ForgotPasswordSchema),
+	const result = await forgotPasswordSchema.safeParseAsync(
+		preprocessFormData(formData, forgotPasswordSchema),
 	)
 	if (!result.success) {
 		return json({

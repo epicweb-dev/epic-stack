@@ -23,14 +23,12 @@
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```sh
-npx create-remix@latest --template epicweb-dev/epic-stack
+npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
 ```
-
-> NOTE: choose "TypeScript" as this starter does not put forth any effort to
-> work without TypeScript.
 
 ## What's in the stack
 
+- [Remix](https://remix.run) is the Web Framework of choice
 - [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
 - Multi-region, distributed, production-ready
   [SQLite Database](https://sqlite.org) with
@@ -49,6 +47,8 @@ npx create-remix@latest --template epicweb-dev/epic-stack
   SQLite-based (with
   [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))
 - Styling with [Tailwind](https://tailwindcss.com/)
+- An excellent, customizable styling library with
+  [Radix UI](https://www.radix-ui.com/)
 - End-to-end testing with [Playwright](https://playwright.dev/)
 - Local third party request mocking with [MSW](https://mswjs.io)
 - Unit testing with [Vitest](https://vitest.dev) and

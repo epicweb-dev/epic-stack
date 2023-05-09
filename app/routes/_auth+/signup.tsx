@@ -25,7 +25,7 @@ export const onboardingEmailSessionKey = 'onboardingToken'
 const onboardingTokenQueryParam = 'token'
 const tokenType = 'onboarding'
 
-const SignupSchema = z.object({
+const signupSchema = z.object({
 	email: emailSchema.refine(
 		async email => {
 			const existingUser = await prisma.user.findUnique({
@@ -38,31 +38,39 @@ const SignupSchema = z.object({
 	),
 })
 
+const tokenSchema = z.object({
+	type: z.literal(tokenType),
+	payload: z.object({
+		email: emailSchema,
+	}),
+})
+
 export async function loader({ request }: DataFunctionArgs) {
 	const onboardingTokenString = new URL(request.url).searchParams.get(
 		onboardingTokenQueryParam,
 	)
 	if (onboardingTokenString) {
-		const token = JSON.parse(decrypt(onboardingTokenString))
-		if (token.type === tokenType && token.payload?.email) {
-			const session = await getSession(request.headers.get('cookie'))
-			session.set(onboardingEmailSessionKey, token.payload.email)
-			return redirect('/onboarding', {
-				headers: {
-					'Set-Cookie': await commitSession(session),
-				},
-			})
-		} else {
-			return redirect('/signup')
-		}
+		const result = tokenSchema.safeParse(
+			JSON.parse(decrypt(onboardingTokenString)),
+		)
+		if (!result.success) return redirect('/signup')
+		const token = result.data
+
+		const session = await getSession(request.headers.get('cookie'))
+		session.set(onboardingEmailSessionKey, token.payload.email)
+		return redirect('/onboarding', {
+			headers: {
+				'Set-Cookie': await commitSession(session),
+			},
+		})
 	}
-	return json({ fields: getFieldsFromSchema(SignupSchema) })
+	return json({ fields: getFieldsFromSchema(signupSchema) })
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const result = await SignupSchema.safeParseAsync(
-		preprocessFormData(formData, SignupSchema),
+	const result = await signupSchema.safeParseAsync(
+		preprocessFormData(formData, signupSchema),
 	)
 	if (!result.success) {
 		return json(
@@ -99,7 +107,7 @@ export async function action({ request }: DataFunctionArgs) {
 		`,
 	})
 
-	if (response.ok) {
+	if (response?.ok) {
 		return json({ status: 'success', errors: null } as const)
 	} else {
 		return json(
