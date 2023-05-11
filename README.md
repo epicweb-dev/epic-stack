@@ -10,7 +10,7 @@
   </p>
 </div>
 
-![The Epic Stack](https://user-images.githubusercontent.com/1500684/236352284-73d92e1d-5233-4cf4-a9aa-8bf33b8a2229.png)
+![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)
 
 <hr />
 
@@ -26,38 +26,55 @@ Learn more about [Remix Stacks](https://remix.run/stacks).
 npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
 ```
 
-## What's in the stack
+With that context, here are a few things you get today:
 
-- [Remix](https://remix.run) is the Web Framework of choice
-- [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
+- [Remix](https://remix.run/) is the Web Framework of choice
+- [Fly app deployment](https://fly.io/) with [Docker](https://www.docker.com/)
 - Multi-region, distributed, production-ready
-  [SQLite Database](https://sqlite.org) with
+  [SQLite Database](https://sqlite.org/) with
   [LiteFS](https://fly.io/docs/litefs/).
 - Healthcheck endpoint for
   [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
-- [GitHub Actions](https://github.com/features/actions) for deploy on merge to
-  production and staging environments
+- [Grafana](https://grafana.com/) Dashboards of the running app
+- [GitHub Actions](https://github.com/features/actions) with testing and deploy
+  on merge for both production and staging environments
 - Email/Password Authentication with
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
-  with email sending via [Mailgun](https://www.mailgun.com/) and forgot
+- Transaction email with [Mailgun](https://www.mailgun.com/) and forgot
   password/password reset support.
+- Progressively Enhanced and fully type safe forms with
+  [Conform](https://conform.guid/)
+- Database ORM with [Prisma](https://prisma.io/)
 - Role-based User Permissions.
-- Database ORM with [Prisma](https://prisma.io)
+- Custom built image hosting
 - Caching via [cachified](https://npm.im/cachified): Both in-memory and
   SQLite-based (with
   [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))
 - Styling with [Tailwind](https://tailwindcss.com/)
-- An excellent, customizable styling library with
+- An excellent, customizable component library with
   [Radix UI](https://www.radix-ui.com/)
 - End-to-end testing with [Playwright](https://playwright.dev/)
-- Local third party request mocking with [MSW](https://mswjs.io)
-- Unit testing with [Vitest](https://vitest.dev) and
-  [Testing Library](https://testing-library.com) with pre-configured Test
+- Local third party request mocking with [MSW](https://mswjs.io/)
+- Unit testing with [Vitest](https://vitest.dev/) and
+  [Testing Library](https://testing-library.com/) with pre-configured Test
   Database
-- Code formatting with [Prettier](https://prettier.io)
-- Linting with [ESLint](https://eslint.org)
-- Static Types with [TypeScript](https://typescriptlang.org)
-- Runtime schema validation with [zod](https://zod.dev)
+- Code formatting with [Prettier](https://prettier.io/)
+- Linting with [ESLint](https://eslint.org/)
+- Static Types with [TypeScript](https://typescriptlang.org/)
+- Runtime schema validation with [zod](https://zod.dev/)
+
+And that’s what we have today, here are some things that will likely find their
+way into the Epic Stack in the future:
+
+- Powerful, yet simple sitemap control
+- Error monitoring with [Sentry](https://sentry.io/welcome/)
+- Ecommerce support with [Stripe](https://stripe.com/)
+- Ethical site analytics with [fathom](https://usefathom.com/)
+- Internationalization
+- Image optimization route and component
+- Feature flags
+- Light/Dark/System mode (without a flash of incorrect theme)
+- Documentation on production data seeding process
 
 Not a fan of bits of the stack? Fork it, change it, and use
 `npx create-remix --template your/repo`! Make it your own.
