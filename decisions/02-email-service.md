@@ -13,7 +13,7 @@ own emails through your own mailserver or a third party's SMTP server as well.
 Unfortunately,
 [deliverability will suffer if you're not using a service](https://cfenollosa.com/blog/after-self-hosting-my-email-for-twenty-three-years-i-have-thrown-in-the-towel-the-oligopoly-has-won.html).
 The TL;DR is you either dedicate your company's complete resources to "play the
-game" of email delivrability, or you use a service that does. Otherwise, your
+game" of email deliverability, or you use a service that does. Otherwise, your
 emails won't reliably make it through spam filters (and in some cases it can
 just get deleted altogether).
 
