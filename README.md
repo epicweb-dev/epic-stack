@@ -44,7 +44,7 @@ With that context, here are a few things you get today:
 - Transaction email with [Mailgun](https://www.mailgun.com/) and forgot
   password/password reset support.
 - Progressively Enhanced and fully type safe forms with
-  [Conform](https://conform.guid/)
+  [Conform](https://conform.guide/)
 - Database ORM with [Prisma](https://prisma.io/)
 - Role-based User Permissions.
 - Custom built image hosting
