@@ -5,7 +5,12 @@ import compression from 'compression'
 import morgan from 'morgan'
 import address from 'address'
 import closeWithGrace from 'close-with-grace'
-import { createRequestHandler } from '@remix-run/express'
+import { wrapExpressCreateRequestHandler } from '@sentry/remix'
+import { createRequestHandler as _createRequestHandler } from '@remix-run/express'
+
+const createRequestHandler = wrapExpressCreateRequestHandler(
+	_createRequestHandler,
+)
 
 const BUILD_DIR = path.join(process.cwd(), 'build')
 

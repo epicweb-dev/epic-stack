@@ -22,6 +22,7 @@ import {
 } from '@remix-run/react'
 import clsx from 'clsx'
 import { useState } from 'react'
+import { withSentry } from "@sentry/remix";
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator } from './utils/auth.server'
 import { prisma } from './utils/db.server'
@@ -83,7 +84,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	return json({ user, ENV: getEnv() })
 }
 
-export default function App() {
+function App() {
 	const data = useLoaderData<typeof loader>()
 	const { user } = data
 	return (
@@ -137,6 +138,7 @@ export default function App() {
 		</html>
 	)
 }
+export default withSentry(App);
 
 function ThemeSwitch() {
 	const fetcher = useFetcher()

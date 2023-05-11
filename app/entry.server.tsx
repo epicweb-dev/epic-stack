@@ -12,6 +12,10 @@ const ABORT_DELAY = 5000
 init()
 global.ENV = getEnv()
 
+if (ENV.MODE === 'production') { 
+	import('~/utils/monitoring.server').then(({ init }) => init())
+}
+
 export default async function handleRequest(
 	request: Request,
 	responseStatusCode: number,
