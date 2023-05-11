@@ -22,7 +22,7 @@ discourage services and encourage quick setup.
 
 ## Decision
 
-We will use a service for sending email. If emails don't get delivered then they
+We will use a service for sending email. If emails don't get delivered then
 it defeats the whole purpose of sending email.
 
 We selected [Mailgun](https://www.mailgun.com/) because it has a generous free
