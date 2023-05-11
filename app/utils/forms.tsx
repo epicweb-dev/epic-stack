@@ -12,7 +12,7 @@ export function ErrorList({
 	errors,
 }: {
 	errors?: ListOfErrors
-	id: string
+	id?: string
 }) {
 	const errorsToRender = errors?.filter(Boolean)
 	if (!errorsToRender?.length) return null

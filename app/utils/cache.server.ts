@@ -14,19 +14,11 @@ import LRU from 'lru-cache'
 import { z } from 'zod'
 import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite'
 import { time, type Timings } from './timing.server'
+import { singleton } from './singleton.server'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 
-declare global {
-	// This preserves the LRU cache during development
-	// eslint-disable-next-line
-	var __lruCache: LRU<string, CacheEntry<unknown>> | undefined,
-		__cacheDb: ReturnType<typeof Database> | undefined
-}
-
-const cacheDb = (global.__cacheDb = global.__cacheDb
-	? global.__cacheDb
-	: createDatabase())
+const cacheDb = singleton('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): BetterSqlite3.Database {
 	const db = new Database(CACHE_DATABASE_PATH)
@@ -55,9 +47,10 @@ function createDatabase(tryAgain = true): BetterSqlite3.Database {
 	return db
 }
 
-const lru = (global.__lruCache = global.__lruCache
-	? global.__lruCache
-	: new LRU<string, CacheEntry<unknown>>({ max: 5000 }))
+const lru = singleton(
+	'lru-cache',
+	() => new LRU<string, CacheEntry<unknown>>({ max: 5000 }),
+)
 
 export const lruCache = lruCacheAdapter(lru)
 

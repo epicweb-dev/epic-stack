@@ -53,6 +53,8 @@
     "/server-build"
   ],
   "dependencies": {
+    "@conform-to/react": "^0.6.1",
+    "@conform-to/zod": "^0.6.1",
     "@prisma/client": "^4.13.0",
     "@radix-ui/react-checkbox": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.3",

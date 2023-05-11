@@ -10,7 +10,7 @@ principles:
   possible type of feature is literally impossible. _The starter app is not
   docs_, so to demonstrate a feature or give an example, put that in the docs
   instead of in the starter app.
-- **Reduce Setup Friction:** Try to keep the amount of time it takes to get an
+- **Minimize Setup Friction:** Try to keep the amount of time it takes to get an
   app to production as small as possible. If a service is necessary, see if we
   can defer signup for that service until its services are actually required.
   Additionally, while the target audience for this stack is apps that need scale

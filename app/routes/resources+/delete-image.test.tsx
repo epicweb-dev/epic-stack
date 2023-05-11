@@ -6,7 +6,7 @@ import fs from 'fs'
 import { createPassword, createUser } from 'prisma/seed-utils'
 import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils'
 import invariant from 'tiny-invariant'
-import { expect, test } from 'vitest'
+import { expect } from 'vitest'
 import { prisma } from '~/utils/db.server'
 import { ROUTE_PATH, action } from './delete-image'
 

@@ -1,22 +1,18 @@
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
 	json,
 	redirect,
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { Link, useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary'
 import { prisma } from '~/utils/db.server'
 import { sendEmail } from '~/utils/email.server'
 import { decrypt, encrypt } from '~/utils/encryption.server'
-import {
-	Button,
-	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
-} from '~/utils/forms'
+import { Button, ErrorList, Field } from '~/utils/forms'
 import { getDomainUrl } from '~/utils/misc.server'
 import { commitSession, getSession } from '~/utils/session.server'
 import { emailSchema, usernameSchema } from '~/utils/user-validation'
@@ -41,11 +37,11 @@ export async function loader({ request }: DataFunctionArgs) {
 		resetPasswordTokenQueryParam,
 	)
 	if (resetPasswordTokenString) {
-		const result = tokenSchema.safeParse(
+		const submission = tokenSchema.safeParse(
 			JSON.parse(decrypt(resetPasswordTokenString)),
 		)
-		if (!result.success) return redirect('/signup')
-		const token = result.data
+		if (!submission.success) return redirect('/signup')
+		const token = submission.data
 
 		const session = await getSession(request.headers.get('cookie'))
 		session.set(resetPasswordSessionKey, token.payload.username)
@@ -56,21 +52,25 @@ export async function loader({ request }: DataFunctionArgs) {
 		})
 	}
 
-	return json({ fieldMetadatas: getFieldsFromSchema(forgotPasswordSchema) })
+	return json({})
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const result = await forgotPasswordSchema.safeParseAsync(
-		preprocessFormData(formData, forgotPasswordSchema),
-	)
-	if (!result.success) {
+	const submission = parse(formData, {
+		schema: forgotPasswordSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
 		return json({
 			status: 'error',
-			errors: result.error.flatten(),
+			submission,
 		} as const)
 	}
-	const { usernameOrEmail } = result.data
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
+	}
+	const { usernameOrEmail } = submission.value
 
 	const user = await prisma.user.findFirst({
 		where: { OR: [{ email: usernameOrEmail }, { username: usernameOrEmail }] },
@@ -80,7 +80,7 @@ export async function action({ request }: DataFunctionArgs) {
 		void sendPasswordResetEmail({ request, user })
 	}
 
-	return json({ status: 'success', errors: null } as const)
+	return json({ status: 'success', submission } as const)
 }
 
 async function sendPasswordResetEmail({
@@ -123,13 +123,16 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export default function SignupRoute() {
-	const data = useLoaderData<typeof loader>()
 	const forgotPassword = useFetcher<typeof action>()
 
-	const { form, fields } = useForm({
-		name: 'forgot-password',
-		errors: forgotPassword.data?.errors,
-		fieldMetadatas: data.fieldMetadatas,
+	const [form, fields] = useForm({
+		id: 'forgot-password-form',
+		constraint: getFieldsetConstraint(forgotPasswordSchema),
+		lastSubmission: forgotPassword.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: forgotPasswordSchema })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -159,14 +162,15 @@ export default function SignupRoute() {
 							<div>
 								<Field
 									labelProps={{
-										...fields.usernameOrEmail.labelProps,
+										htmlFor: fields.usernameOrEmail.id,
 										children: 'Username or Email',
 									}}
-									inputProps={fields.usernameOrEmail.props}
+									inputProps={fields.usernameOrEmail}
 									errors={fields.usernameOrEmail.errors}
 								/>
 							</div>
-							{form.errorUI}
+							<ErrorList errors={form.errors} id={form.errorId} />
+
 							<div className="mt-6">
 								<Button
 									className="w-full"
