@@ -1,16 +1,17 @@
-<div>
-  <h1 align="center"><a href="https://www.epicweb.dev/stack">The Epic Stack 🚀</a></h1>
+<div align="center">
+  <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
   <strong align="center">
-    A starter project for building Epic web applications
+    Ditch analysis paralysis and start shipping Epic Web apps.
   </strong>
   <p>
-    This is a <a href="https://remix.run/stacks">Remix Stack</a> with the
-    foundational things setup and configured for you to hit the ground running
-    on your next Epic idea.
+    This is an opinionated project starter and reference that allows teams to
+    ship their ideas to production faster and on a more stable foundation based
+    on the experience of <a href="https://kentcdodds.com">Kent C. Dodds</a> and
+    <a href="https://github.com/epicweb-dev/epic-stack/graphs/contributors">contributors</a>.
   </p>
 </div>
 
-![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)
+[![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)](https://www.epicweb.dev/epic-stack)
 
 <hr />
 
