@@ -123,12 +123,12 @@ Prior to your first deployment, you'll need to do a few things:
   fly auth signup
   ```
 
-  > **Info:** If you have more than one Fly account, ensure that you are signed
+  > **Note**: If you have more than one Fly account, ensure that you are signed
   > into the same account in the Fly CLI as you are in the browser. In your
   > terminal, run `fly auth whoami` and ensure the email matches the Fly account
   > signed into the browser.
 
-  > **Info**: The following instructions will be improved soon. Eventually most
+  > **Note**: The following instructions will be improved soon. Eventually most
   > of these steps will be replaced with a simple `fly launch` command which
   > will prompt you for what you need. For now the steps below are manual.
 
