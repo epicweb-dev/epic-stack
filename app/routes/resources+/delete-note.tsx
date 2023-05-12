@@ -18,15 +18,13 @@ export async function action({ request }: DataFunctionArgs) {
 		schema: DeleteFormSchema, 	
 		acceptMultipleErrors: () => true 
 	})
-	if (!submission.value) {
+	if (!submission.value || submission.intent !== 'submit') {
 		return json({
 			status: 'error',
 			submission,
 		} as const)
 	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
-	}
+	
 	const { noteId } = submission.value
 	
 	const note = await prisma.note.findFirst({

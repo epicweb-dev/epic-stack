@@ -46,7 +46,12 @@ export async function action({ request }: DataFunctionArgs) {
 			return json(
 				{
 					status: 'error',
-					submission,
+					submission: {
+						...submission,
+						error: { // show authorization error as a form level error message.
+							'': error.message
+						}
+					}
 				} as const,
 				{ status: 400 },
 			)
@@ -143,7 +148,6 @@ export function InlineLogin({
 						{...fields.redirectTo}
 						type="hidden"
 					/>
-
 					<ErrorList errors={formError ? [formError] : []} />
 					<ErrorList errors={form.errors} id={form.errorId} />
 

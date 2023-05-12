@@ -15,7 +15,7 @@ import {
 	ErrorList,
 	Field,
 } from '~/utils/forms'
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getDomainUrl } from '~/utils/misc.server'
 import { commitSession, getSession } from '~/utils/session.server'
@@ -25,18 +25,56 @@ export const onboardingEmailSessionKey = 'onboardingToken'
 const onboardingTokenQueryParam = 'token'
 const tokenType = 'onboarding'
 
-const signupSchema = z.object({
-	email: emailSchema.refine(
-		async email => {
-			const existingUser = await prisma.user.findUnique({
-				where: { email },
-				select: { id: true },
+function createSchema(
+	intent: string = "",
+	constraints: {
+		isEmailUnique: (email: string) => Promise<boolean>;
+	} = {
+		isEmailUnique: async () => true,
+	},
+) {
+	const signupSchema = z.object({
+		email: emailSchema
+			.superRefine((email, ctx) => {
+				if (intent !== 'validate/email' && intent !== 'submit') {
+					// Validate only when the email field is changed or when submitting
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: conform.VALIDATION_SKIPPED,
+					});
+				} else if (typeof constraints.isEmailUnique === 'undefined') {
+					// Validate only if the constraint is defined
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: conform.VALIDATION_UNDEFINED,
+					});
+				} else {
+					// Tell zod this is an async validation by returning the promise
+					return constraints.isEmailUnique(email).then((isUnique) => {
+						if (isUnique) {
+							return;
+						}
+
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: 'Email is already used',
+						});
+					});
+				}
 			})
-			return !existingUser
-		},
-		{ message: 'A user already exists with this email' },
-	),
-})
+			.refine(
+				async email => {
+					const existingUser = await prisma.user.findUnique({
+						where: { email },
+						select: { id: true },
+					})
+					return !existingUser
+				},
+				{ message: 'A user already exists with this email' },
+			),
+	})
+	return signupSchema
+}
 
 const tokenSchema = z.object({
 	type: z.literal(tokenType),
@@ -69,18 +107,26 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const submission = parse(formData, {
-		schema: signupSchema,
+	const submission = await parse(formData, {
+		// Retrieve the intent by providing a function instead
+		schema: (intent: string) =>
+			createSchema(intent, {
+				async isEmailUnique(email: string) {
+					const existingUser = await prisma.user.findUnique({
+						where: { email },
+						select: { id: true },
+					})
+					return !existingUser
+				},
+			}),
 		acceptMultipleErrors: () => true,
+		async: true,
 	})
-	if (!submission.value) {
+	if (!submission.value || submission.intent !== 'submit') {
 		return json({
 			status: 'error',
 			submission,
 		} as const)
-	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
 	}
 	const { email } = submission.value
 
@@ -129,10 +175,10 @@ export default function SignupRoute() {
 	const signupFetcher = useFetcher<typeof action>()
 	const [form, fields] = useForm({
 		id: 'signup-form',
-		constraint: getFieldsetConstraint(signupSchema),
+		constraint: getFieldsetConstraint(createSchema()),
 		lastSubmission: signupFetcher.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: signupSchema })
+			return parse(formData, { schema: createSchema() })
 		},
 		shouldRevalidate: 'onBlur',
 	})

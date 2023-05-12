@@ -20,26 +20,46 @@ import {
 	ErrorList,
 	Field,
 } from '~/utils/forms'
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema } from '~/utils/user-validation'
 import { resetPasswordSessionKey } from './forgot-password'
 
-const ResetPasswordSchema = z
-	.object({
-		password: passwordSchema,
-		confirmPassword: passwordSchema,
-	})
-	.superRefine(({ confirmPassword, password }, ctx) => {
-		if (confirmPassword !== password) {
-			ctx.addIssue({
-				path: ['confirmPassword'],
-				code: 'custom',
-				message: 'The passwords did not match',
-			})
-		}
-	})
+function createSchema(
+	constraints: {
+		doPasswordsMatch: (password: string, confirmPassword: string) => boolean;
+	} = {
+			doPasswordsMatch: () => true,
+		},
+) {
+	const ResetPasswordSchema = z
+		.object({
+			password: passwordSchema,
+			confirmPassword: passwordSchema,
+		})
+		.superRefine(({ confirmPassword, password }, ctx) => {
+			if (typeof constraints.doPasswordsMatch === 'undefined') {
+				// Validate only if the constraint is defined
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: conform.VALIDATION_UNDEFINED,
+				});
+			} else {
+				const match = constraints.doPasswordsMatch(password, confirmPassword)
+				if (match) {
+					return;
+				}
+
+				ctx.addIssue({
+					path: ['confirmPassword'],
+					code: 'custom',
+					message: 'The passwords did not match',
+				})
+			}
+		})
+	return ResetPasswordSchema;
+}
 
 export async function loader({ request }: DataFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
@@ -65,17 +85,19 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
-		schema: ResetPasswordSchema,
+		schema: () =>
+			createSchema({
+				doPasswordsMatch(password, confirmPassword) {
+					return password === confirmPassword
+				},
+			}),
 		acceptMultipleErrors: () => true,
 	})
-	if (!submission.value) {
+	if (!submission.value || submission.intent !== 'submit') {
 		return json({
 			status: 'error',
 			submission,
 		} as const)
-	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
 	}
 	const { password } = submission.value
 
@@ -102,12 +124,16 @@ export default function ResetPasswordPage() {
 	const formAction = useFormAction()
 	const navigation = useNavigation()
 
-	const [ form, fields ] = useForm({
+	const [form, fields] = useForm({
 		id: 'reset-password',
-		constraint: getFieldsetConstraint(ResetPasswordSchema),
+		constraint: getFieldsetConstraint(createSchema()),
 		lastSubmission: resetPasswordFetcher.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: ResetPasswordSchema })
+			return parse(formData, { schema: createSchema({
+				doPasswordsMatch(password, confirmPassword) {
+					return password === confirmPassword
+				}
+			}) })
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -158,8 +184,8 @@ export default function ResetPasswordPage() {
 					variant="primary"
 					status={
 						navigation.state === 'submitting' &&
-						navigation.formAction === formAction &&
-						navigation.formMethod === 'POST'
+							navigation.formAction === formAction &&
+							navigation.formMethod === 'POST'
 							? 'pending'
 							: actionData?.status ?? 'idle'
 					}
