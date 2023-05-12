@@ -7,6 +7,7 @@ import {
 import {
 	Form,
 	useActionData,
+	useFetcher,
 	useFormAction,
 	useLoaderData,
 	useNavigation,
@@ -16,11 +17,11 @@ import { GeneralErrorBoundary } from '~/components/error-boundary'
 import { authenticator, resetUserPassword } from '~/utils/auth.server'
 import {
 	Button,
+	ErrorList,
 	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
 } from '~/utils/forms'
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema } from '~/utils/user-validation'
 import { resetPasswordSessionKey } from './forgot-password'
@@ -54,7 +55,6 @@ export async function loader({ request }: DataFunctionArgs) {
 		{
 			formError: error?.message,
 			resetPasswordUsername,
-			fieldMetadatas: getFieldsFromSchema(ResetPasswordSchema),
 		},
 		{
 			headers: { 'Set-Cookie': await commitSession(session) },
@@ -64,16 +64,20 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const result = ResetPasswordSchema.safeParse(
-		preprocessFormData(formData, ResetPasswordSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: ResetPasswordSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
+		return json({
+			status: 'error',
+			submission,
+		} as const)
 	}
-
-	const { password } = result.data
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
+	}
+	const { password } = submission.value
 
 	const session = await getSession(request.headers.get('cookie'))
 	const username = session.get(resetPasswordSessionKey)
@@ -93,14 +97,19 @@ export const meta: V2_MetaFunction = () => {
 
 export default function ResetPasswordPage() {
 	const data = useLoaderData<typeof loader>()
+	const resetPasswordFetcher = useFetcher<typeof action>()
 	const actionData = useActionData<typeof action>()
 	const formAction = useFormAction()
 	const navigation = useNavigation()
 
-	const { form, fields } = useForm({
-		name: 'reset-password',
-		errors: actionData?.errors,
-		fieldMetadatas: data.fieldMetadatas,
+	const [ form, fields ] = useForm({
+		id: 'reset-password',
+		constraint: getFieldsetConstraint(ResetPasswordSchema),
+		lastSubmission: resetPasswordFetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: ResetPasswordSchema })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -118,11 +127,11 @@ export default function ResetPasswordPage() {
 			>
 				<Field
 					labelProps={{
-						...fields.password.labelProps,
+						htmlFor: fields.password.id,
 						children: 'New Password',
 					}}
 					inputProps={{
-						...fields.password.props,
+						...fields.password,
 						type: 'password',
 						autoComplete: 'new-password',
 					}}
@@ -130,18 +139,19 @@ export default function ResetPasswordPage() {
 				/>
 				<Field
 					labelProps={{
-						...fields.confirmPassword.labelProps,
+						htmlFor: fields.confirmPassword.id,
 						children: 'Confirm Password',
 					}}
 					inputProps={{
-						...fields.confirmPassword.props,
+						...fields.confirmPassword,
 						type: 'password',
 						autoComplete: 'new-password',
 					}}
 					errors={fields.confirmPassword.errors}
 				/>
 
-				{form.errorUI}
+				<ErrorList errors={form.errors} id={form.errorId} />
+
 				<Button
 					className="w-full"
 					size="md"
