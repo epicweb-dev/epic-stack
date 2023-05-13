@@ -17,7 +17,7 @@ game" of email deliverability, or you use a service that does. Otherwise, your
 emails won't reliably make it through spam filters (and in some cases it can
 just get deleted altogether).
 
-[The guiding principles](https://github.com/epicweb-dev/epic-stack/blob/main/docs/guiding-principles)
+[The guiding principles](https://github.com/epicweb-dev/epic-stack/blob/main/docs/guiding-principles.md)
 discourage services and encourage quick setup.
 
 ## Decision
