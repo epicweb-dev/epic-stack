@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import address from 'address'
 import closeWithGrace from 'close-with-grace'
 import { createRequestHandler } from '@remix-run/express'
+import { broadcastDevReady } from '@remix-run/node'
 
 const BUILD_DIR = path.join(process.cwd(), 'build')
 
@@ -85,6 +86,10 @@ ${lanUrl ? `${chalk.bold('On Your Network:')}  ${chalk.cyan(lanUrl)}` : ''}
 ${chalk.bold('Press Ctrl+C to stop')}
 	`.trim(),
 		)
+
+		if (process.env.NODE_ENV === 'development') {
+			broadcastDevReady(require(BUILD_DIR))
+		}
 	})
 
 	closeWithGrace(async () => {
@@ -107,5 +112,6 @@ if (process.env.NODE_ENV === 'development') {
 				delete require.cache[key]
 			}
 		}
+		broadcastDevReady(require(BUILD_DIR))
 	})
 }
