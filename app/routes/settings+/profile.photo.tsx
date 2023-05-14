@@ -1,3 +1,5 @@
+import { conform, useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import * as Dialog from '@radix-ui/react-dialog'
 import {
 	type DataFunctionArgs,
@@ -21,17 +23,29 @@ import { authenticator, requireUserId } from '~/utils/auth.server'
 import { prisma } from '~/utils/db.server'
 import {
 	Button,
+	ErrorList,
 	getFieldsFromSchema,
 	LabelButton,
-	preprocessFormData,
-	useForm,
 } from '~/utils/forms'
 import { getUserImgSrc } from '~/utils/misc'
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
+/* 
+The preprocess call is needed because a current bug in @remix-run/web-fetch
+for more info see the bug (https://github.com/remix-run/web-std-io/pull/28)
+and the explanation here: https://conform.guide/file-upload 
+*/
 const PhotoFormSchema = z.object({
-	photoFile: z.instanceof(File),
+	photoFile: z.preprocess(
+		value => (value === '' ? new File([], '') : value),
+		z
+			.instanceof(File)
+			.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
+			.refine(file => {
+				return file.size <= MAX_SIZE
+			}, 'Image size must be less than 3MB'),
+	),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -48,38 +62,21 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const contentLength = Number(request.headers.get('Content-Length'))
-	if (
-		contentLength &&
-		Number.isFinite(contentLength) &&
-		contentLength > MAX_SIZE
-	) {
-		return json(
-			{
-				status: 'error',
-				errors: {
-					formErrors: [],
-					fieldErrors: { photoFile: ['File too large'] },
-				},
-			} as const,
-			{ status: 400 },
-		)
-	}
 	const formData = await unstable_parseMultipartFormData(
 		request,
 		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	const result = PhotoFormSchema.safeParse(
-		preprocessFormData(formData, PhotoFormSchema),
-	)
 
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, { schema: PhotoFormSchema })
+
+	if (!submission.value || submission.intent !== 'submit') {
+		return json({
+			status: 'error',
+			submission,
+		} as const)
 	}
 
-	const { photoFile } = result.data
+	const { photoFile } = submission.value
 
 	const newPrismaPhoto = {
 		contentType: photoFile.type,
@@ -125,10 +122,14 @@ export default function PhotoChooserModal() {
 	const navigate = useNavigate()
 	const deleteImageFetcher = useFetcher<typeof deleteImageRoute.action>()
 	const actionData = useActionData<typeof action>()
-	const { form, fields } = useForm({
-		fieldMetadatas: data.fieldMetadatas,
-		name: 'profile-photo',
-		errors: actionData?.errors,
+	const [form, { photoFile }] = useForm({
+		id: 'profile-photo',
+		constraint: getFieldsetConstraint(PhotoFormSchema),
+		lastSubmission: actionData?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: PhotoFormSchema })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
@@ -151,15 +152,16 @@ export default function PhotoChooserModal() {
 						encType="multipart/form-data"
 						className="mt-8 flex flex-col items-center justify-center gap-10"
 						onReset={() => setNewImageSrc(null)}
+						{...form.props}
 					>
 						<img
 							src={newImageSrc ?? getUserImgSrc(data.user.imageId)}
 							className="h-64 w-64 rounded-full"
 							alt={data.user.name ?? data.user.username}
 						/>
-						{fields.photoFile.errorUI}
+						<ErrorList errors={photoFile.errors} id={photoFile.id} />
 						<input
-							{...fields.photoFile.props}
+							{...conform.input(photoFile, { type: 'file' })}
 							type="file"
 							accept="image/*"
 							className="sr-only"
@@ -186,11 +188,7 @@ export default function PhotoChooserModal() {
 							</div>
 						) : (
 							<div className="flex gap-4">
-								<LabelButton
-									{...fields.photoFile.labelProps}
-									size="md"
-									variant="primary"
-								>
+								<LabelButton htmlFor={photoFile.id} size="md" variant="primary">
 									✏️ Change
 								</LabelButton>
 								{data.user.imageId ? (
@@ -205,7 +203,7 @@ export default function PhotoChooserModal() {
 								) : null}
 							</div>
 						)}
-						{form.errorUI}
+						<ErrorList errors={form.errors} />
 					</Form>
 					<Dialog.Close asChild>
 						<Link
