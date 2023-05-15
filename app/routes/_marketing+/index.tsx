@@ -133,6 +133,11 @@ export default function Index() {
 								alt: 'ESLint',
 								href: 'https://eslint.org',
 							},
+							{
+								src: 'https://svgur.com/i/t9k.svg',
+								alt: 'Sentry',
+								href: 'https://sentry.io',
+							},
 						].map(img => (
 							<a
 								key={img.href}

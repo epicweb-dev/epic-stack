@@ -63,12 +63,12 @@ With that context, here are a few things you get today:
 - Linting with [ESLint](https://eslint.org/)
 - Static Types with [TypeScript](https://typescriptlang.org/)
 - Runtime schema validation with [zod](https://zod.dev/)
+- Error, performance, and replay monitoring with [Sentry](https://sentry.io/)
 
 And that’s what we have today, here are some things that will likely find their
 way into the Epic Stack in the future:
 
 - Powerful, yet simple sitemap control
-- Error monitoring with [Sentry](https://sentry.io/welcome/)
 - Ecommerce support with [Stripe](https://stripe.com/)
 - Ethical site analytics with [fathom](https://usefathom.com/)
 - Internationalization
@@ -199,6 +199,14 @@ Now that everything is set up you can commit and push your changes to your repo.
 Every commit to your `main` branch will trigger a deployment to your production
 environment, and every commit to your `dev` branch will trigger a deployment to
 your staging environment.
+
+- **Create a Sentry account.** (Can be deferred to later)
+
+NOTE: this step is only required if you want to use Sentry for monitoring.
+
+Create a Sentry account with a Remix project [here](https://sentry.io/signup/?project_platform=javascript-remix)
+
+Copy the DSN from the code snippet to your `fly.toml` file in the `env` section and name it `SENTRY_DSN`. 
 
 ### Connecting to your database
 

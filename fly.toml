@@ -12,6 +12,9 @@ auto_rollback = true
 source = "data"
 destination = "/data"
 
+[env]
+# SENTRY_DSN =
+
 [[services]]
 internal_port = 8080
 processes = [ "app" ]
