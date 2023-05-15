@@ -166,8 +166,7 @@ export async function cachified<Value>({
 		...options,
 		reporter: mergeReporters(
 			cachifiedTimingReporter(timings),
-			options.reporter,
-			verboseReporter(),
+			options.reporter ?? verboseReporter(),
 		),
 	})
 }
