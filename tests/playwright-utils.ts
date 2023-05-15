@@ -70,7 +70,7 @@ export async function loginPage({
 	session.set(authenticator.sessionKey, user.id)
 	const cookieValue = await commitSession(session)
 	const { _session } = parse(cookieValue)
-	page.context().addCookies([
+	await page.context().addCookies([
 		{
 			name: '_session',
 			sameSite: 'Lax',

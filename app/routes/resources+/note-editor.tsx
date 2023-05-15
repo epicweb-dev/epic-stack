@@ -14,8 +14,8 @@ import {
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
-	title: z.string(),
-	content: z.string(),
+	title: z.string().nonempty(),
+	content: z.string().nonempty(),
 })
 
 export async function action({ request }: DataFunctionArgs) {
