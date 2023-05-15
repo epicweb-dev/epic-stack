@@ -7,7 +7,6 @@ import {
 import {
 	Form,
 	useActionData,
-	useFetcher,
 	useFormAction,
 	useLoaderData,
 	useNavigation,
@@ -20,7 +19,7 @@ import {
 	ErrorList,
 	Field,
 } from '~/utils/forms'
-import { conform, useForm } from '@conform-to/react'
+import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema } from '~/utils/user-validation'
@@ -38,26 +37,10 @@ function createSchema(
 			password: passwordSchema,
 			confirmPassword: passwordSchema,
 		})
-		.superRefine(({ confirmPassword, password }, ctx) => {
-			if (typeof constraints.doPasswordsMatch === 'undefined') {
-				// Validate only if the constraint is defined
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: conform.VALIDATION_UNDEFINED,
-				});
-			} else {
-				const match = constraints.doPasswordsMatch(password, confirmPassword)
-				if (match) {
-					return;
-				}
-
-				ctx.addIssue({
-					path: ['confirmPassword'],
-					code: 'custom',
-					message: 'The passwords did not match',
-				})
-			}
-		})
+		.refine(({ confirmPassword, password }) => password === confirmPassword, {
+			message: 'The passwords did not match',
+			path: ['confirmPassword'],
+		});
 	return ResetPasswordSchema;
 }
 
@@ -119,7 +102,6 @@ export const meta: V2_MetaFunction = () => {
 
 export default function ResetPasswordPage() {
 	const data = useLoaderData<typeof loader>()
-	const resetPasswordFetcher = useFetcher<typeof action>()
 	const actionData = useActionData<typeof action>()
 	const formAction = useFormAction()
 	const navigation = useNavigation()
@@ -127,7 +109,7 @@ export default function ResetPasswordPage() {
 	const [form, fields] = useForm({
 		id: 'reset-password',
 		constraint: getFieldsetConstraint(createSchema()),
-		lastSubmission: resetPasswordFetcher.data?.submission,
+		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
 			return parse(formData, { schema: createSchema({
 				doPasswordsMatch(password, confirmPassword) {
