@@ -157,6 +157,7 @@ export async function searchCacheKeys(search: string, limit: number) {
 export async function cachified<Value>({
 	request,
 	timings,
+	reporter = verboseReporter(),
 	...options
 }: CachifiedOptions<Value> & {
 	request?: Request
@@ -164,9 +165,6 @@ export async function cachified<Value>({
 }): Promise<Value> {
 	return baseCachified({
 		...options,
-		reporter: mergeReporters(
-			cachifiedTimingReporter(timings),
-			options.reporter ?? verboseReporter(),
-		),
+		reporter: mergeReporters(cachifiedTimingReporter(timings), reporter),
 	})
 }
