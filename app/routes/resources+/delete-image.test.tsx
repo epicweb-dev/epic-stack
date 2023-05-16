@@ -45,6 +45,7 @@ async function setupUser() {
 test('allows users to delete their own images', async () => {
 	const { user, cookie } = await setupUser()
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('imageId', user.imageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -63,6 +64,7 @@ test('allows users to delete their own images', async () => {
 
 test('requires auth', async () => {
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('imageId', faker.datatype.uuid())
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -80,6 +82,7 @@ test('requires auth', async () => {
 test('validates the form', async () => {
 	const { user, cookie } = await setupUser()
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('somethingElse', user.imageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -88,13 +91,17 @@ test('validates the form', async () => {
 	})
 	const response = await action({ request, params: {}, context: {} })
 	expect(await response.json()).toEqual({
-		errors: {
-			fieldErrors: {
-				imageId: ['Required'],
-			},
-			formErrors: [],
-		},
 		status: 'error',
+		submission: {
+			error: {
+				imageId: 'Required',
+			},
+			intent: 'submit',
+			payload: {
+				intent: 'submit',
+				somethingElse: user.imageId,
+			},
+		},
 	})
 	expect(response.status).toBe(400)
 })
@@ -102,7 +109,9 @@ test('validates the form', async () => {
 test('cannot delete an image that does not exist', async () => {
 	const { cookie } = await setupUser()
 	const form = new FormData()
-	form.set('imageId', faker.datatype.uuid())
+	form.set('intent', 'submit')
+	const fakeImageId = faker.datatype.uuid()
+	form.set('imageId', fakeImageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
 		headers: { cookie },
@@ -110,11 +119,17 @@ test('cannot delete an image that does not exist', async () => {
 	})
 	const response = await action({ request, params: {}, context: {} })
 	expect(await response.json()).toEqual({
-		errors: {
-			fieldErrors: {},
-			formErrors: ['Image not found'],
-		},
 		status: 'error',
+		submission: {
+			error: {
+				imageId: ['Image not found'],
+			},
+			intent: 'submit',
+			payload: {
+				intent: 'submit',
+				imageId: fakeImageId,
+			},
+		},
 	})
 	expect(response.status).toBe(404)
 })

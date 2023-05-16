@@ -1,3 +1,5 @@
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -16,13 +18,7 @@ import {
 	verifyLogin,
 } from '~/utils/auth.server'
 import { prisma } from '~/utils/db.server'
-import {
-	Button,
-	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
-} from '~/utils/forms'
+import { Button, ErrorList, Field } from '~/utils/forms'
 import { getUserImgSrc } from '~/utils/misc'
 import {
 	emailSchema,
@@ -31,43 +27,23 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation'
 
-const ProfileFormSchema = z
-	.object({
-		name: nameSchema.optional(),
-		username: usernameSchema,
-		email: emailSchema.optional(),
-		phone: z.string().optional(),
-		address: z.string().optional(),
-		city: z.string().optional(),
-		state: z.string().optional(),
-		zip: z.string().optional(),
-		country: z.string().optional(),
-		hostBio: z.string().optional(),
-		renterBio: z.string().optional(),
-		currentPassword: z
-			.union([passwordSchema, z.string().min(0).max(0)])
-			.optional(),
-		newPassword: z.union([passwordSchema, z.string().min(0).max(0)]).optional(),
-	})
-	.superRefine(async ({ username, currentPassword, newPassword }, ctx) => {
-		if (newPassword && !currentPassword) {
-			ctx.addIssue({
-				path: ['newPassword'],
-				code: 'custom',
-				message: 'Must provide current password to change password.',
-			})
-		}
-		if (currentPassword && newPassword) {
-			const user = await verifyLogin(username, currentPassword)
-			if (!user) {
-				ctx.addIssue({
-					path: ['currentPassword'],
-					code: 'custom',
-					message: 'Incorrect password.',
-				})
-			}
-		}
-	})
+const ProfileFormSchema = z.object({
+	name: nameSchema.optional(),
+	username: usernameSchema,
+	email: emailSchema.optional(),
+	phone: z.string().optional(),
+	address: z.string().optional(),
+	city: z.string().optional(),
+	state: z.string().optional(),
+	zip: z.string().optional(),
+	country: z.string().optional(),
+	hostBio: z.string().optional(),
+	renterBio: z.string().optional(),
+	currentPassword: z
+		.union([passwordSchema, z.string().min(0).max(0)])
+		.optional(),
+	newPassword: z.union([passwordSchema, z.string().min(0).max(0)]).optional(),
+})
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
@@ -84,23 +60,50 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!user) {
 		throw await authenticator.logout(request, { redirectTo: '/' })
 	}
-	return json({ user, fieldMetadatas: getFieldsFromSchema(ProfileFormSchema) })
+	return json({ user })
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const result = await ProfileFormSchema.safeParseAsync(
-		preprocessFormData(formData, ProfileFormSchema),
-	)
-
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = await parse(formData, {
+		async: true,
+		schema: ProfileFormSchema.superRefine(
+			async ({ username, currentPassword, newPassword }, ctx) => {
+				if (newPassword && !currentPassword) {
+					ctx.addIssue({
+						path: ['newPassword'],
+						code: 'custom',
+						message: 'Must provide current password to change password.',
+					})
+				}
+				if (currentPassword && newPassword) {
+					const user = await verifyLogin(username, currentPassword)
+					if (!user) {
+						ctx.addIssue({
+							path: ['currentPassword'],
+							code: 'custom',
+							message: 'Incorrect password.',
+						})
+					}
+				}
+			},
+		),
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
-
-	const { name, username, email, newPassword } = result.data
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
+	}
+	const { name, username, email, newPassword } = submission.value
 
 	if (email) {
 		// TODO: send a confirmation email
@@ -136,10 +139,14 @@ export default function EditUserProfile() {
 		navigation.formAction === formAction &&
 		navigation.formMethod === 'POST'
 
-	const { form, fields } = useForm({
-		name: 'edit-profile',
-		errors: actionData?.status === 'error' ? actionData.errors : null,
-		fieldMetadatas: data.fieldMetadatas,
+	const [form, fields] = useForm({
+		id: 'edit-profile',
+		constraint: getFieldsetConstraint(ProfileFormSchema),
+		lastSubmission: actionData?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: ProfileFormSchema })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -174,29 +181,29 @@ export default function EditUserProfile() {
 						<Field
 							className="col-span-3"
 							labelProps={{
-								...fields.username.labelProps,
+								htmlFor: fields.username.id,
 								children: 'Username',
 							}}
 							inputProps={{
-								...fields.username.props,
+								...fields.username,
 								defaultValue: data.user.username,
 							}}
 							errors={fields.username.errors}
 						/>
 						<Field
 							className="col-span-3"
-							labelProps={{ ...fields.name.labelProps, children: 'Name' }}
+							labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
 							inputProps={{
-								...fields.name.props,
+								...fields.name,
 								defaultValue: data.user.name ?? '',
 							}}
 							errors={fields.name.errors}
 						/>
 						<Field
 							className="col-span-3"
-							labelProps={{ ...fields.email.labelProps, children: 'Email' }}
+							labelProps={{ htmlFor: fields.email.id, children: 'Email' }}
 							inputProps={{
-								...fields.email.props,
+								...fields.email,
 								defaultValue: data.user.email ?? '',
 								// TODO: support changing your email address
 								disabled: true,
@@ -213,11 +220,11 @@ export default function EditUserProfile() {
 								<Field
 									className="flex-1"
 									labelProps={{
-										...fields.currentPassword.labelProps,
+										htmlFor: fields.currentPassword.id,
 										children: 'Current Password',
 									}}
 									inputProps={{
-										...fields.currentPassword.props,
+										...fields.currentPassword,
 										type: 'password',
 										autoComplete: 'current-password',
 									}}
@@ -226,11 +233,11 @@ export default function EditUserProfile() {
 								<Field
 									className="flex-1"
 									labelProps={{
-										...fields.newPassword.labelProps,
+										htmlFor: fields.newPassword.id,
 										children: 'New Password',
 									}}
 									inputProps={{
-										...fields.newPassword.props,
+										...fields.newPassword,
 										type: 'password',
 										autoComplete: 'new-password',
 									}}
@@ -240,7 +247,7 @@ export default function EditUserProfile() {
 						</fieldset>
 					</div>
 
-					{form.errorUI}
+					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="mt-3 flex justify-center">
 						<Button

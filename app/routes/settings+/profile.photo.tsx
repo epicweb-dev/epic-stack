@@ -21,12 +21,7 @@ import { z } from 'zod'
 import * as deleteImageRoute from '~/routes/resources+/delete-image'
 import { authenticator, requireUserId } from '~/utils/auth.server'
 import { prisma } from '~/utils/db.server'
-import {
-	Button,
-	ErrorList,
-	getFieldsFromSchema,
-	LabelButton,
-} from '~/utils/forms'
+import { Button, ErrorList, LabelButton } from '~/utils/forms'
 import { getUserImgSrc } from '~/utils/misc'
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
@@ -57,7 +52,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!user) {
 		throw await authenticator.logout(request, { redirectTo: '/' })
 	}
-	return json({ user, fieldMetadatas: getFieldsFromSchema(PhotoFormSchema) })
+	return json({ user })
 }
 
 export async function action({ request }: DataFunctionArgs) {
@@ -70,10 +65,13 @@ export async function action({ request }: DataFunctionArgs) {
 	const submission = parse(formData, { schema: PhotoFormSchema })
 
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 
 	const { photoFile } = submission.value
@@ -142,7 +140,7 @@ export default function PhotoChooserModal() {
 					onEscapeKeyDown={dismissModal}
 					onInteractOutside={dismissModal}
 					onPointerDownOutside={dismissModal}
-					className="fixed top-1/2 left-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
+					className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
 				>
 					<Dialog.Title asChild className="text-center">
 						<h2 className="text-h2">Profile photo</h2>
@@ -221,6 +219,7 @@ export default function PhotoChooserModal() {
 				id={deleteProfilePhotoFormId}
 				action={deleteImageRoute.ROUTE_PATH}
 			>
+				<input name="intent" value="submit" />
 				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
 			</deleteImageFetcher.Form>
 		</Dialog.Root>

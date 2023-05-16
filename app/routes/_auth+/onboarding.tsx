@@ -85,10 +85,13 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value) {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 	if (submission.intent !== 'submit') {
 		return json({ status: 'success', submission } as const)

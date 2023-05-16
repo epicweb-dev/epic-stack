@@ -14,17 +14,12 @@ import {
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary'
 import { authenticator, resetUserPassword } from '~/utils/auth.server'
-import {
-	Button,
-	ErrorList,
-	Field,
-} from '~/utils/forms'
+import { Button, ErrorList, Field } from '~/utils/forms'
 import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema } from '~/utils/user-validation'
 import { resetPasswordSessionKey } from './forgot-password'
-
 
 const ResetPasswordSchema = z
 	.object({
@@ -34,7 +29,7 @@ const ResetPasswordSchema = z
 	.refine(({ confirmPassword, password }) => password === confirmPassword, {
 		message: 'The passwords did not match',
 		path: ['confirmPassword'],
-	});
+	})
 
 export async function loader({ request }: DataFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
@@ -64,10 +59,13 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 	const { password } = submission.value
 
@@ -149,8 +147,8 @@ export default function ResetPasswordPage() {
 					variant="primary"
 					status={
 						navigation.state === 'submitting' &&
-							navigation.formAction === formAction &&
-							navigation.formMethod === 'POST'
+						navigation.formAction === formAction &&
+						navigation.formMethod === 'POST'
 							? 'pending'
 							: actionData?.status ?? 'idle'
 					}
