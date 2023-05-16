@@ -21,3 +21,5 @@ principles:
   So while we try to keep things simple, we want to ensure teams using the Epic
   Stack are able to adapt by switching between third party services to
   custom-built services and vice-versa.
+- **Only one way:** Avoid providing more than one way to do the same thing. This
+  applies to both the pre-configured code and the documentation.

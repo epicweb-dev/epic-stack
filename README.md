@@ -123,10 +123,21 @@ Prior to your first deployment, you'll need to do a few things:
   fly auth signup
   ```
 
-  > **Note:** If you have more than one Fly account, ensure that you are signed
+  > **Note**: If you have more than one Fly account, ensure that you are signed
   > into the same account in the Fly CLI as you are in the browser. In your
   > terminal, run `fly auth whoami` and ensure the email matches the Fly account
   > signed into the browser.
+
+  > **Note**: The following instructions will be improved soon. Eventually most
+  > of these steps will be replaced with a simple `fly launch` command which
+  > will prompt you for what you need. For now the steps below are manual.
+
+  > **Warning**: This template is currently only configured to work for Fly v1
+  > apps. If you just created your account you are probably running on Fly v2
+  > which is ultimately preferable, but will require a few changes. This is
+  > temporary and will be fixed soon. See
+  > [#22](https://github.com/epicweb-dev/epic-stack/discussions/22) for more
+  > info.
 
 - Create two apps on Fly, one for staging and one for production:
 
@@ -264,7 +275,7 @@ run to format all files in the project.
 [build-badge]: https://img.shields.io/github/actions/workflow/status/epicweb-dev/epic-stack/deploy.yml?branch=main&logo=github&style=flat-square
 [build]: https://github.com/epicweb-dev/epic-stack/actions?query=workflow%3Adeploy
 [license-badge]: https://img.shields.io/badge/license-MIT%20License-blue.svg?style=flat-square
-[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE
+[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE.md
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
 [coc]: https://kentcdodds.com/conduct
 <!-- prettier-ignore-end -->
