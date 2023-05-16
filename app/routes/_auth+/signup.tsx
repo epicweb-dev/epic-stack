@@ -15,7 +15,7 @@ import {
 	ErrorList,
 	Field,
 } from '~/utils/forms'
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getDomainUrl } from '~/utils/misc.server'
 import { commitSession, getSession } from '~/utils/session.server'
@@ -35,7 +35,14 @@ function createSchema(
 	const signupSchema = z.object({
 		email: emailSchema
 			.superRefine((email, ctx) => {
-				// Tell zod this is an async validation by returning the promise
+				// if constraint is not defined, throw an error
+				if (typeof constraints.isEmailUnique === 'undefined') {
+					ctx.addIssue({
+					  code: z.ZodIssueCode.custom,
+					  message: conform.VALIDATION_UNDEFINED,
+					});
+				}
+				// if constraint is defined, validate uniqueness
 				return constraints.isEmailUnique(email).then((isUnique) => {
 					if (isUnique) {
 						return;

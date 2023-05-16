@@ -25,24 +25,16 @@ import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema } from '~/utils/user-validation'
 import { resetPasswordSessionKey } from './forgot-password'
 
-function createSchema(
-	constraints: {
-		doPasswordsMatch: (password: string, confirmPassword: string) => boolean;
-	} = {
-			doPasswordsMatch: () => true,
-		},
-) {
-	const ResetPasswordSchema = z
-		.object({
-			password: passwordSchema,
-			confirmPassword: passwordSchema,
-		})
-		.refine(({ confirmPassword, password }) => password === confirmPassword, {
-			message: 'The passwords did not match',
-			path: ['confirmPassword'],
-		});
-	return ResetPasswordSchema;
-}
+
+const ResetPasswordSchema = z
+	.object({
+		password: passwordSchema,
+		confirmPassword: passwordSchema,
+	})
+	.refine(({ confirmPassword, password }) => password === confirmPassword, {
+		message: 'The passwords did not match',
+		path: ['confirmPassword'],
+	});
 
 export async function loader({ request }: DataFunctionArgs) {
 	await authenticator.isAuthenticated(request, {
@@ -68,12 +60,7 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
-		schema: () =>
-			createSchema({
-				doPasswordsMatch(password, confirmPassword) {
-					return password === confirmPassword
-				},
-			}),
+		schema: ResetPasswordSchema,
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
@@ -108,14 +95,10 @@ export default function ResetPasswordPage() {
 
 	const [form, fields] = useForm({
 		id: 'reset-password',
-		constraint: getFieldsetConstraint(createSchema()),
+		constraint: getFieldsetConstraint(ResetPasswordSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: createSchema({
-				doPasswordsMatch(password, confirmPassword) {
-					return password === confirmPassword
-				}
-			}) })
+			return parse(formData, { schema: ResetPasswordSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})

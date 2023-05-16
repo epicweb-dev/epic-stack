@@ -20,7 +20,7 @@ export const LoginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
-	remember: z.boolean().default(false),
+	remember: z.preprocess(value => value === 'on', z.boolean()),
 })
 
 export async function action({ request }: DataFunctionArgs) {
