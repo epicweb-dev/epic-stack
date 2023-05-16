@@ -7,11 +7,11 @@ import { authenticator } from '~/utils/auth.server'
 import {
 	Button,
 	CheckboxField,
-	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
+	ErrorList,
+	Field
 } from '~/utils/forms'
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { safeRedirect } from '~/utils/misc'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation'
@@ -20,20 +20,22 @@ export const LoginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
-	remember: z.boolean(),
+	remember: z.preprocess(value => value === 'on', z.boolean()),
 })
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.clone().formData()
-	const result = LoginFormSchema.safeParse(
-		preprocessFormData(formData, LoginFormSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: LoginFormSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value || submission.intent !== 'submit') {
+		return json({
+			status: 'error',
+			submission,
+		} as const)
 	}
-
+	
 	let userId: string | null = null
 	try {
 		userId = await authenticator.authenticate(FormStrategy.name, request, {
@@ -44,10 +46,12 @@ export async function action({ request }: DataFunctionArgs) {
 			return json(
 				{
 					status: 'error',
-					errors: {
-						formErrors: [error.message],
-						fieldErrors: {},
-					},
+					submission: {
+						...submission,
+						error: { // show authorization error as a form level error message.
+							'': error.message
+						}
+					}
 				} as const,
 				{ status: 400 },
 			)
@@ -57,7 +61,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const session = await getSession(request.headers.get('cookie'))
 	session.set(authenticator.sessionKey, userId)
-	const { remember, redirectTo } = result.data
+	const { remember, redirectTo } = submission.value
 	const newCookie = await commitSession(session, {
 		maxAge: remember
 			? 60 * 60 * 24 * 7 // 7 days
@@ -68,7 +72,7 @@ export async function action({ request }: DataFunctionArgs) {
 			headers: { 'Set-Cookie': newCookie },
 		})
 	}
-	return json({ status: 'success', errors: null } as const, {
+	return json({ status: 'success', submission } as const, {
 		headers: { 'Set-Cookie': newCookie },
 	})
 }
@@ -82,16 +86,14 @@ export function InlineLogin({
 }) {
 	const loginFetcher = useFetcher<typeof action>()
 
-	const { form, fields } = useForm({
-		name: 'inline-login',
-		errors: {
-			...loginFetcher.data?.errors,
-			formErrors: [
-				formError,
-				...(loginFetcher.data?.errors?.formErrors ?? []),
-			].filter(Boolean),
+	const [ form, fields ] = useForm({
+		id: 'inline-login',
+		constraint: getFieldsetConstraint(LoginFormSchema),
+		lastSubmission: loginFetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: LoginFormSchema })
 		},
-		fieldMetadatas: getFieldsFromSchema(LoginFormSchema),
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -104,31 +106,30 @@ export function InlineLogin({
 					{...form.props}
 				>
 					<Field
-						labelProps={{ ...fields.username.labelProps, children: 'Username' }}
-						inputProps={{
-							...fields.username.props,
-							autoComplete: 'username',
+						labelProps={{
+							htmlFor: fields.username.id,
+							children: 'Username',
 						}}
+						inputProps={fields.username}
 						errors={fields.username.errors}
 					/>
 
 					<Field
-						labelProps={{ ...fields.password.labelProps, children: 'Password' }}
-						inputProps={{
-							...fields.password.props,
-							autoComplete: 'password',
-							type: 'password',
+						labelProps={{
+							htmlFor: fields.password.id,
+							children: 'Password',
 						}}
+						inputProps={fields.password}
 						errors={fields.password.errors}
 					/>
 
 					<div className="flex justify-between">
 						<CheckboxField
 							labelProps={{
-								...fields.remember.labelProps,
+								htmlFor: fields.remember.id,
 								children: 'Remember me',
 							}}
-							buttonProps={fields.remember.props}
+							buttonProps={fields.remember}
 							errors={fields.remember.errors}
 						/>
 
@@ -144,11 +145,11 @@ export function InlineLogin({
 
 					<input
 						value={redirectTo}
-						{...fields.redirectTo.props}
+						{...fields.redirectTo}
 						type="hidden"
 					/>
-
-					{form.errorUI}
+					<ErrorList errors={formError ? [formError] : []} />
+					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6 pt-3">
 						<Button

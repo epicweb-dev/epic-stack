@@ -4,7 +4,7 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary'
 import { prisma } from '~/utils/db.server'
@@ -12,11 +12,11 @@ import { sendEmail } from '~/utils/email.server'
 import { decrypt, encrypt } from '~/utils/encryption.server'
 import {
 	Button,
+	ErrorList,
 	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
 } from '~/utils/forms'
+import { conform, useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getDomainUrl } from '~/utils/misc.server'
 import { commitSession, getSession } from '~/utils/session.server'
 import { emailSchema } from '~/utils/user-validation'
@@ -25,18 +25,37 @@ export const onboardingEmailSessionKey = 'onboardingToken'
 const onboardingTokenQueryParam = 'token'
 const tokenType = 'onboarding'
 
-const signupSchema = z.object({
-	email: emailSchema.refine(
-		async email => {
-			const existingUser = await prisma.user.findUnique({
-				where: { email },
-				select: { id: true },
-			})
-			return !existingUser
+function createSchema(
+	constraints: {
+		isEmailUnique: (email: string) => Promise<boolean>;
+	} = {
+			isEmailUnique: async () => true,
 		},
-		{ message: 'A user already exists with this email' },
-	),
-})
+) {
+	const signupSchema = z.object({
+		email: emailSchema
+			.superRefine((email, ctx) => {
+				// if constraint is not defined, throw an error
+				if (typeof constraints.isEmailUnique === 'undefined') {
+					ctx.addIssue({
+					  code: z.ZodIssueCode.custom,
+					  message: conform.VALIDATION_UNDEFINED,
+					});
+				}
+				// if constraint is defined, validate uniqueness
+				return constraints.isEmailUnique(email).then((isUnique) => {
+					if (isUnique) {
+						return;
+					}
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'A user already exists with this email',
+					});
+				});
+			})
+	})
+	return signupSchema
+}
 
 const tokenSchema = z.object({
 	type: z.literal(tokenType),
@@ -64,24 +83,32 @@ export async function loader({ request }: DataFunctionArgs) {
 			},
 		})
 	}
-	return json({ fields: getFieldsFromSchema(signupSchema) })
+	return json({})
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const result = await signupSchema.safeParseAsync(
-		preprocessFormData(formData, signupSchema),
-	)
-	if (!result.success) {
-		return json(
-			{
-				status: 'error',
-				errors: result.error.flatten(),
-			} as const,
-			{ status: 400 },
-		)
+	const submission = await parse(formData, {
+		schema: () =>
+			createSchema({
+				async isEmailUnique(email: string) {
+					const existingUser = await prisma.user.findUnique({
+						where: { email },
+						select: { id: true },
+					})
+					return !existingUser
+				},
+			}),
+		acceptMultipleErrors: () => true,
+		async: true,
+	})
+	if (!submission.value || submission.intent !== 'submit') {
+		return json({
+			status: 'error',
+			submission,
+		} as const)
 	}
-	const { email } = result.data
+	const { email } = submission.value
 
 	const onboardingToken = encrypt(
 		JSON.stringify({ type: tokenType, payload: { email } }),
@@ -108,15 +135,12 @@ export async function action({ request }: DataFunctionArgs) {
 	})
 
 	if (response?.ok) {
-		return json({ status: 'success', errors: null } as const)
+		return json({ status: 'success', submission } as const)
 	} else {
 		return json(
 			{
 				status: 'error',
-				errors: {
-					formErrors: ['Email not sent successfully'],
-					fieldErrors: {},
-				},
+				submission,
 			} as const,
 			{ status: 500 },
 		)
@@ -128,12 +152,15 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export default function SignupRoute() {
-	const data = useLoaderData<typeof loader>()
 	const signupFetcher = useFetcher<typeof action>()
-	const { form, fields } = useForm({
-		name: 'signup-form',
-		fieldMetadatas: data.fields,
-		errors: signupFetcher.data?.errors,
+	const [form, fields] = useForm({
+		id: 'signup-form',
+		constraint: getFieldsetConstraint(createSchema()),
+		lastSubmission: signupFetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: createSchema() })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -160,10 +187,14 @@ export default function SignupRoute() {
 						{...form.props}
 					>
 						<Field
-							labelProps={{ ...fields.email.labelProps, children: 'Email' }}
-							inputProps={{ ...fields.email.props, type: 'email' }}
+							labelProps={{
+								htmlFor: fields.email.id,
+								children: 'Email',
+							}}
+							inputProps={fields.email}
+							errors={fields.email.errors}
 						/>
-						{form.errorUI}
+						<ErrorList errors={form.errors} id={form.errorId} />
 						<Button
 							className="w-full"
 							size="md"

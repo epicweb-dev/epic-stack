@@ -4,8 +4,10 @@ import { prisma } from '~/utils/db.server'
 import clsx from 'clsx'
 import { GeneralErrorBoundary } from '~/components/error-boundary'
 import { getUserImgSrc } from '~/utils/misc'
+import { requireUserId } from '~/utils/auth.server'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params, request }: DataFunctionArgs) {
+	await requireUserId(request, { redirectTo: null })
 	const owner = await prisma.user.findUnique({
 		where: {
 			username: params.username,
