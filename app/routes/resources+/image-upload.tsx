@@ -59,7 +59,3 @@ export function ImageUpload() {
 		</fetcher.Form>
 	)
 }
-
-export default function ImageUploader() {
-	return <ImageUpload />
-}
