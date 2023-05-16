@@ -3,12 +3,12 @@
  */
 import { faker } from '@faker-js/faker'
 import fs from 'fs'
-import { createPassword, createUser } from 'prisma/seed-utils'
-import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils'
+import { createPassword, createUser } from 'prisma/seed-utils.ts'
+import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils.ts'
 import invariant from 'tiny-invariant'
 import { expect } from 'vitest'
-import { prisma } from '~/utils/db.server'
-import { ROUTE_PATH, action } from './delete-image'
+import { prisma } from '~/utils/db.server.ts'
+import { ROUTE_PATH, action } from './delete-image.tsx'
 
 const RESOURCE_URL = `${BASE_URL}${ROUTE_PATH}`
 

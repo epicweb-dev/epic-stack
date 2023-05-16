@@ -4,7 +4,7 @@ import {
 	useRouteError,
 } from '@remix-run/react'
 import { type ErrorResponse } from '@remix-run/router'
-import { getErrorMessage } from '~/utils/misc'
+import { getErrorMessage } from '~/utils/misc.ts'
 
 type StatusHandler = (info: {
 	error: ErrorResponse

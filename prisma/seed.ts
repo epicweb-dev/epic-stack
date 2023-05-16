@@ -1,9 +1,9 @@
 import fs from 'fs'
 import { faker } from '@faker-js/faker'
-import { createPassword, createUser } from './seed-utils'
-import { prisma } from '~/utils/db.server'
-import { deleteAllData } from '../other/test-setup/utils'
-import { getPasswordHash } from '~/utils/auth.server'
+import { createPassword, createUser } from './seed-utils.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { deleteAllData } from '../other/test-setup/utils.ts'
+import { getPasswordHash } from '~/utils/auth.server.ts'
 
 async function seed() {
 	console.log('🌱 Seeding...')

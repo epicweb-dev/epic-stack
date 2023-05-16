@@ -1,8 +1,8 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
 import {
 	Button,
 	Field,
@@ -10,7 +10,7 @@ import {
 	getFieldsFromSchema,
 	preprocessFormData,
 	useForm,
-} from '~/utils/forms'
+} from '~/utils/forms.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),

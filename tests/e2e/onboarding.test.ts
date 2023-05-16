@@ -6,7 +6,7 @@ import {
 	insertNewUser,
 	readEmail,
 	test,
-} from '../playwright-utils'
+} from '../playwright-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {

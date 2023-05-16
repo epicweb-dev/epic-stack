@@ -1,12 +1,10 @@
-import './setup-env-vars'
+import './setup-env-vars.ts'
 import { installGlobals } from '@remix-run/node'
-import matchers, {
-	type TestingLibraryMatchers,
-} from '@testing-library/jest-dom/matchers'
+import { matchers, type TestingLibraryMatchers } from './matchers.cjs'
 import 'dotenv/config'
 import fs from 'fs'
-import { BASE_DATABASE_PATH, DATABASE_PATH } from './paths'
-import { deleteAllData } from './utils'
+import { BASE_DATABASE_PATH, DATABASE_PATH } from './paths.ts'
+import { deleteAllData } from './utils.ts'
 
 declare global {
 	namespace Vi {

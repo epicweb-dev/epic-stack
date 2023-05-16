@@ -4,11 +4,11 @@ import {
 	type V2_MetaFunction,
 } from '@remix-run/node'
 import { useLoaderData, useSearchParams } from '@remix-run/react'
-import { GeneralErrorBoundary } from '~/components/error-boundary'
-import { Spacer } from '~/components/spacer'
-import { authenticator } from '~/utils/auth.server'
-import { commitSession, getSession } from '~/utils/session.server'
-import { InlineLogin } from '../resources+/login'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { Spacer } from '~/components/spacer.tsx'
+import { authenticator } from '~/utils/auth.server.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { InlineLogin } from '../resources+/login.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
 	await authenticator.isAuthenticated(request, {

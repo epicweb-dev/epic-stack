@@ -1,8 +1,8 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { preprocessFormData } from '~/utils/forms'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { preprocessFormData } from '~/utils/forms.tsx'
 
 export const ROUTE_PATH = '/resources/delete-image'
 

@@ -12,9 +12,9 @@ import fs from 'fs'
 import { getInstanceInfo, getInstanceInfoSync } from 'litefs-js'
 import LRU from 'lru-cache'
 import { z } from 'zod'
-import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite'
-import { time, type Timings } from './timing.server'
-import { singleton } from './singleton.server'
+import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite.tsx'
+import { time, type Timings } from './timing.server.ts'
+import { singleton } from './singleton.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 

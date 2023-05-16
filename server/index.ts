@@ -1,4 +1,5 @@
 import path from 'path'
+import { pathToFileURL } from 'url'
 import express from 'express'
 import chokidar from 'chokidar'
 import compression from 'compression'
@@ -8,7 +9,10 @@ import closeWithGrace from 'close-with-grace'
 import { createRequestHandler } from '@remix-run/express'
 import { broadcastDevReady } from '@remix-run/node'
 
-const BUILD_DIR = path.join(process.cwd(), 'build')
+const pathParts = [process.cwd(), 'build']
+if (process.env.NODE_ENV === 'production') pathParts.push('index.js')
+const BUILD_DIR = path.join(...pathParts)
+const BUILD_DIR_FILE_URL = pathToFileURL(BUILD_DIR).href
 
 async function start() {
 	const { default: getPort, portNumbers } = await import('get-port')
@@ -35,14 +39,14 @@ async function start() {
 	app.all(
 		'*',
 		process.env.NODE_ENV === 'development'
-			? (req, res, next) => {
+			? async (req, res, next) => {
 					return createRequestHandler({
-						build: require(BUILD_DIR),
+						build: await import(BUILD_DIR_FILE_URL),
 						mode: process.env.NODE_ENV,
 					})(req, res, next)
 			  }
 			: createRequestHandler({
-					build: require(BUILD_DIR),
+					build: await import(BUILD_DIR_FILE_URL),
 					mode: process.env.NODE_ENV,
 			  }),
 	)
@@ -88,7 +92,7 @@ ${chalk.bold('Press Ctrl+C to stop')}
 		)
 
 		if (process.env.NODE_ENV === 'development') {
-			broadcastDevReady(require(BUILD_DIR))
+			notifyRemixDevReady()
 		}
 	})
 
@@ -101,17 +105,18 @@ ${chalk.bold('Press Ctrl+C to stop')}
 
 start()
 
+async function notifyRemixDevReady() {
+	const build = await import(
+		`${BUILD_DIR_FILE_URL}/index.js?update=${Date.now()}`
+	)
+	broadcastDevReady(build)
+}
+
 // during dev, we'll keep the build module up to date with the changes
 if (process.env.NODE_ENV === 'development') {
-	const watcher = chokidar.watch(BUILD_DIR, {
+	// avoid watching the folder itself, just watch its content
+	const watcher = chokidar.watch(`${BUILD_DIR.replace(/\\/g, '/')}/**.*`, {
 		ignored: ['**/**.map'],
 	})
-	watcher.on('all', () => {
-		for (const key in require.cache) {
-			if (key.startsWith(BUILD_DIR)) {
-				delete require.cache[key]
-			}
-		}
-		broadcastDevReady(require(BUILD_DIR))
-	})
+	watcher.on('all', notifyRemixDevReady)
 }

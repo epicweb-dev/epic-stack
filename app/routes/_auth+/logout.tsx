@@ -1,5 +1,5 @@
 import { redirect, type DataFunctionArgs } from '@remix-run/node'
-import { authenticator } from '~/utils/auth.server'
+import { authenticator } from '~/utils/auth.server.ts'
 
 export async function action({ request }: DataFunctionArgs) {
 	await authenticator.logout(request, { redirectTo: '/' })
