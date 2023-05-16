@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
-import { react } from './other/test-setup/vitejs_plugin_react.cjs'
+import { react } from './other/test-setup/vitejs-plugin-react.cjs'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 

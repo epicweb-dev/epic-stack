@@ -9,9 +9,7 @@ import closeWithGrace from 'close-with-grace'
 import { createRequestHandler } from '@remix-run/express'
 import { broadcastDevReady } from '@remix-run/node'
 
-const pathParts = [process.cwd(), 'build']
-if (process.env.NODE_ENV === 'production') pathParts.push('index.js')
-const BUILD_DIR = path.join(...pathParts)
+const BUILD_DIR = path.join(process.cwd(), 'build', 'index.js')
 const BUILD_DIR_FILE_URL = pathToFileURL(BUILD_DIR).href
 
 async function start() {
@@ -34,6 +32,7 @@ async function start() {
 	// more aggressive with this caching.
 	app.use(express.static('public', { maxAge: '1h' }))
 
+	morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
 	app.use(morgan('tiny'))
 
 	app.all(
@@ -106,17 +105,18 @@ ${chalk.bold('Press Ctrl+C to stop')}
 start()
 
 async function notifyRemixDevReady() {
-	const build = await import(
-		`${BUILD_DIR_FILE_URL}/index.js?update=${Date.now()}`
-	)
+	const build = await import(`${BUILD_DIR_FILE_URL}?update=${Date.now()}`)
 	broadcastDevReady(build)
 }
 
 // during dev, we'll keep the build module up to date with the changes
 if (process.env.NODE_ENV === 'development') {
 	// avoid watching the folder itself, just watch its content
-	const watcher = chokidar.watch(`${BUILD_DIR.replace(/\\/g, '/')}/**.*`, {
-		ignored: ['**/**.map'],
-	})
+	const watcher = chokidar.watch(
+		`${path.dirname(BUILD_DIR).replace(/\\/g, '/')}/**.*`,
+		{
+			ignored: ['**/**.map'],
+		},
+	)
 	watcher.on('all', notifyRemixDevReady)
 }
