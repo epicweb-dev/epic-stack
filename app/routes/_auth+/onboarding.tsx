@@ -26,7 +26,7 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation'
 import { onboardingEmailSessionKey } from './signup'
-import { checkboxSchema } from '~/utils/zodExtensions'
+import { checkboxSchema } from '~/utils/zod-extensions'
 
 const OnboardingFormSchema = z
 	.object({

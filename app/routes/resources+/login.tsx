@@ -10,7 +10,7 @@ import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
 import { safeRedirect } from '~/utils/misc'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation'
-import { checkboxSchema } from '~/utils/zodExtensions'
+import { checkboxSchema } from '~/utils/zod-extensions'
 
 export const LoginFormSchema = z.object({
 	username: usernameSchema,
