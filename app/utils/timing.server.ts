@@ -1,7 +1,24 @@
+import { type CreateReporter } from 'cachified'
+
 export type Timings = Record<
 	string,
 	Array<{ desc?: string; type: string; time: number }>
 >
+
+function createTimer(type: string, desc?: string) {
+	const start = performance.now()
+	return {
+		end(timings: Timings) {
+			let timingType = timings[type]
+
+			if (!timingType) {
+				// eslint-disable-next-line no-multi-assign
+				timingType = timings[type] = []
+			}
+			timingType.push({ desc, type, time: performance.now() - start })
+		},
+	}
+}
 
 export async function time<ReturnType>(
 	fn: Promise<ReturnType> | (() => ReturnType | Promise<ReturnType>),
@@ -15,17 +32,13 @@ export async function time<ReturnType>(
 		timings?: Timings
 	},
 ): Promise<ReturnType> {
-	const start = performance.now()
+	const timer = createTimer(type, desc)
 	const promise = typeof fn === 'function' ? fn() : fn
 	if (!timings) return promise
-	const result = await promise
-	let timingType = timings[type]
-	if (!timingType) {
-		// eslint-disable-next-line no-multi-assign
-		timingType = timings[type] = []
-	}
 
-	timingType.push({ desc, type, time: performance.now() - start })
+	const result = await promise
+
+	timer.end(timings)
 	return result
 }
 
@@ -48,4 +61,34 @@ export function getServerTimeHeader(timings: Timings) {
 				.join(';')
 		})
 		.join(',')
+}
+
+export function cachifiedTimingReporter<Value>(
+	timings?: Timings,
+): undefined | CreateReporter<Value> {
+	if (!timings) return
+
+	return ({ key }) => {
+		const cacheRetrievalTimer = createTimer(
+			`cache:${key}`,
+			`${key} cache retrieval`,
+		)
+		let getFreshValueTimer: ReturnType<typeof createTimer> | undefined
+		return event => {
+			switch (event.name) {
+				case 'getFreshValueStart':
+					getFreshValueTimer = createTimer(
+						`getFreshValue:${key}`,
+						`request forced to wait for a fresh ${key} value`,
+					)
+					break
+				case 'getFreshValueSuccess':
+					getFreshValueTimer?.end(timings)
+					break
+				case 'done':
+					cacheRetrievalTimer.end(timings)
+					break
+			}
+		}
+	}
 }

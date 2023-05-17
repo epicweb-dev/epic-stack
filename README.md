@@ -275,7 +275,7 @@ run to format all files in the project.
 [build-badge]: https://img.shields.io/github/actions/workflow/status/epicweb-dev/epic-stack/deploy.yml?branch=main&logo=github&style=flat-square
 [build]: https://github.com/epicweb-dev/epic-stack/actions?query=workflow%3Adeploy
 [license-badge]: https://img.shields.io/badge/license-MIT%20License-blue.svg?style=flat-square
-[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE
+[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE.md
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
 [coc]: https://kentcdodds.com/conduct
 <!-- prettier-ignore-end -->

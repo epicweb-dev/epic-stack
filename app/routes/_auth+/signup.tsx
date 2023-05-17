@@ -10,11 +10,7 @@ import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
 import { decrypt, encrypt } from '~/utils/encryption.server.ts'
-import {
-	Button,
-	ErrorList,
-	Field,
-} from '~/utils/forms.tsx'
+import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getDomainUrl } from '~/utils/misc.server.ts'
@@ -27,32 +23,31 @@ const tokenType = 'onboarding'
 
 function createSchema(
 	constraints: {
-		isEmailUnique: (email: string) => Promise<boolean>;
+		isEmailUnique: (email: string) => Promise<boolean>
 	} = {
-			isEmailUnique: async () => true,
-		},
+		isEmailUnique: async () => true,
+	},
 ) {
 	const signupSchema = z.object({
-		email: emailSchema
-			.superRefine((email, ctx) => {
-				// if constraint is not defined, throw an error
-				if (typeof constraints.isEmailUnique === 'undefined') {
-					ctx.addIssue({
-					  code: z.ZodIssueCode.custom,
-					  message: conform.VALIDATION_UNDEFINED,
-					});
+		email: emailSchema.superRefine((email, ctx) => {
+			// if constraint is not defined, throw an error
+			if (typeof constraints.isEmailUnique === 'undefined') {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: conform.VALIDATION_UNDEFINED,
+				})
+			}
+			// if constraint is defined, validate uniqueness
+			return constraints.isEmailUnique(email).then(isUnique => {
+				if (isUnique) {
+					return
 				}
-				// if constraint is defined, validate uniqueness
-				return constraints.isEmailUnique(email).then((isUnique) => {
-					if (isUnique) {
-						return;
-					}
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: 'A user already exists with this email',
-					});
-				});
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'A user already exists with this email',
+				})
 			})
+		}),
 	})
 	return signupSchema
 }
@@ -103,10 +98,13 @@ export async function action({ request }: DataFunctionArgs) {
 		async: true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 	const { email } = submission.value
 

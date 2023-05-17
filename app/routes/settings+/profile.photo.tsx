@@ -21,12 +21,7 @@ import { z } from 'zod'
 import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import {
-	Button,
-	ErrorList,
-	getFieldsFromSchema,
-	LabelButton,
-} from '~/utils/forms.tsx'
+import { Button, ErrorList, LabelButton } from '~/utils/forms.tsx'
 import { getUserImgSrc } from '~/utils/misc.ts'
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
@@ -57,7 +52,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!user) {
 		throw await authenticator.logout(request, { redirectTo: '/' })
 	}
-	return json({ user, fieldMetadatas: getFieldsFromSchema(PhotoFormSchema) })
+	return json({ user })
 }
 
 export async function action({ request }: DataFunctionArgs) {
@@ -70,10 +65,13 @@ export async function action({ request }: DataFunctionArgs) {
 	const submission = parse(formData, { schema: PhotoFormSchema })
 
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 
 	const { photoFile } = submission.value
@@ -221,6 +219,7 @@ export default function PhotoChooserModal() {
 				id={deleteProfilePhotoFormId}
 				action={deleteImageRoute.ROUTE_PATH}
 			>
+				<input name="intent" value="submit" />
 				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
 			</deleteImageFetcher.Form>
 		</Dialog.Root>
