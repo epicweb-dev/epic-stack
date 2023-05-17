@@ -8,6 +8,7 @@ module.exports = {
 	ignoredRouteFiles: ['**/*'],
 	serverModuleFormat: 'cjs',
 	postcss: true,
+	watchPaths: ['./tailwind.config.ts'],
 	future: {
 		v2_meta: true,
 		v2_errorBoundary: true,
