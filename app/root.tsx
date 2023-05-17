@@ -24,6 +24,7 @@ import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
+import { ClientHintCheck } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
@@ -91,6 +92,7 @@ export default function App() {
 	return (
 		<html lang="en" className="dark h-full">
 			<head>
+				<ClientHintCheck />
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
