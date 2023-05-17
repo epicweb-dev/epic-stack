@@ -10,12 +10,13 @@ import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
 import { safeRedirect } from '~/utils/misc'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation'
+import { checkboxSchema } from '~/utils/zodExtensions'
 
 export const LoginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
-	remember: z.preprocess(value => value === 'on', z.boolean()),
+	remember: checkboxSchema(),
 })
 
 export async function action({ request }: DataFunctionArgs) {
