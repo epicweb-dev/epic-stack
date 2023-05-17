@@ -83,3 +83,9 @@ this again until they change their preferences.
 
 The user will not experience content layout shift for any user preferences our
 app depends on for the server render. This is a huge win for user experience.
+
+If a user has cookies disabled, then we need to detect that and fallback to
+default values. Users in this situation will experience content layout shift,
+but there's nothing else we can do about that. Additionally, users who have
+cookies disabled will not be able to authenticate which is a separate concern
+that should be addressed in a different decision document.

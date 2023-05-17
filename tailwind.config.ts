@@ -1,6 +1,7 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+import type { Config } from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme'
+import tailwindcssRadix from 'tailwindcss-radix'
 
-/** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./app/**/*.{ts,tsx,jsx,js}'],
 	darkMode: 'class',
@@ -75,5 +76,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require('tailwindcss-radix')],
-}
+	plugins: [tailwindcssRadix],
+} satisfies Config
