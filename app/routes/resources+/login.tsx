@@ -1,17 +1,12 @@
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher } from '@remix-run/react'
 import { AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
 import { z } from 'zod'
 import { authenticator } from '~/utils/auth.server'
-import {
-	Button,
-	CheckboxField,
-	ErrorList,
-	Field
-} from '~/utils/forms'
-import { useForm } from '@conform-to/react'
-import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
 import { safeRedirect } from '~/utils/misc'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation'
@@ -30,12 +25,15 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
-	
+
 	let userId: string | null = null
 	try {
 		userId = await authenticator.authenticate(FormStrategy.name, request, {
@@ -48,10 +46,11 @@ export async function action({ request }: DataFunctionArgs) {
 					status: 'error',
 					submission: {
 						...submission,
-						error: { // show authorization error as a form level error message.
-							'': error.message
-						}
-					}
+						error: {
+							// show authorization error as a form level error message.
+							'': error.message,
+						},
+					},
 				} as const,
 				{ status: 400 },
 			)
@@ -86,7 +85,7 @@ export function InlineLogin({
 }) {
 	const loginFetcher = useFetcher<typeof action>()
 
-	const [ form, fields ] = useForm({
+	const [form, fields] = useForm({
 		id: 'inline-login',
 		constraint: getFieldsetConstraint(LoginFormSchema),
 		lastSubmission: loginFetcher.data?.submission,
@@ -119,7 +118,7 @@ export function InlineLogin({
 							htmlFor: fields.password.id,
 							children: 'Password',
 						}}
-						inputProps={fields.password}
+						inputProps={{ ...fields.password, type: 'password' }}
 						errors={fields.password.errors}
 					/>
 
@@ -143,11 +142,7 @@ export function InlineLogin({
 						</div>
 					</div>
 
-					<input
-						value={redirectTo}
-						{...fields.redirectTo}
-						type="hidden"
-					/>
+					<input value={redirectTo} {...fields.redirectTo} type="hidden" />
 					<ErrorList errors={formError ? [formError] : []} />
 					<ErrorList errors={form.errors} id={form.errorId} />
 

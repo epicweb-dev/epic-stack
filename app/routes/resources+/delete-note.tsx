@@ -14,19 +14,22 @@ const DeleteFormSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const submission = parse(formData, { 
-		schema: DeleteFormSchema, 	
-		acceptMultipleErrors: () => true 
+	const submission = parse(formData, {
+		schema: DeleteFormSchema,
+		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
-	
+
 	const { noteId } = submission.value
-	
+
 	const note = await prisma.note.findFirst({
 		select: { id: true, owner: { select: { username: true } } },
 		where: {
@@ -35,12 +38,10 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	})
 	if (!note) {
-		return json(
-			{ status: 'error', errors: { formErrors: ['Note not found'] } } as const,
-			{
-				status: 404,
-			},
-		)
+		submission.error.noteId = ['Note not found']
+		return json({ status: 'error', submission } as const, {
+			status: 404,
+		})
 	}
 
 	await prisma.note.delete({
@@ -56,8 +57,8 @@ export function DeleteNote({ id }: { id: string }) {
 	const [form] = useForm({
 		id: 'delete-note',
 		constraint: getFieldsetConstraint(DeleteFormSchema),
-		onValidate({formData}) {
-			return parse(formData, {schema: DeleteFormSchema})
+		onValidate({ formData }) {
+			return parse(formData, { schema: DeleteFormSchema })
 		},
 	})
 
