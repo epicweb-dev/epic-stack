@@ -54,7 +54,10 @@ they are not, then we instead send a minimal document that includes a tiny bit
 of JavaScript that sets the cookies and then reloads the page. This is not
 ideal, however it's effectively as harmful to the user as a redirect which many
 websites do anyway (for example, go to `https://youtube.com` and you instantly
-get redirected to `https://www.youtube.com`).
+get redirected to `https://www.youtube.com`). Additionally, this is effectively
+how
+[the draft specification](https://wicg.github.io/user-preference-media-features-headers/#usage-example)
+for the web platform's solution works as well.
 
 To solve the second problem, we can simply keep a tiny bit of JS in the head of
 the document that does a quick check of the cookie values and if they are stale,
