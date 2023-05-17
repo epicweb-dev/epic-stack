@@ -117,6 +117,7 @@ async function sendPasswordResetEmail({
 				<p>Click the link below to reset the Epic Notes password for ${user.username}.</p>
 				<a href="${resetPasswordUrl}">${resetPasswordUrl}</a>
 			</body>
+		</html>
 		`,
 	})
 }
