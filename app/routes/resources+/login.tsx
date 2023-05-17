@@ -1,3 +1,5 @@
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher } from '@remix-run/react'
 import { AuthorizationError } from 'remix-auth'
@@ -5,8 +7,6 @@ import { FormStrategy } from 'remix-auth-form'
 import { z } from 'zod'
 import { authenticator } from '~/utils/auth.server'
 import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
-import { useForm } from '@conform-to/react'
-import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { safeRedirect } from '~/utils/misc'
 import { commitSession, getSession } from '~/utils/session.server'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation'
@@ -118,7 +118,7 @@ export function InlineLogin({
 							htmlFor: fields.password.id,
 							children: 'Password',
 						}}
-						inputProps={fields.password}
+						inputProps={{ ...fields.password, type: 'password' }}
 						errors={fields.password.errors}
 					/>
 
