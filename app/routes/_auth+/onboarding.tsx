@@ -15,18 +15,18 @@ import {
 	useSearchParams,
 } from '@remix-run/react'
 import { z } from 'zod'
-import { Spacer } from '~/components/spacer'
-import { authenticator, createUser } from '~/utils/auth.server'
-import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
-import { safeRedirect } from '~/utils/misc'
-import { commitSession, getSession } from '~/utils/session.server'
+import { Spacer } from '~/components/spacer.tsx'
+import { authenticator, createUser } from '~/utils/auth.server.ts'
+import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
+import { safeRedirect } from '~/utils/misc.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
 import {
 	nameSchema,
 	passwordSchema,
 	usernameSchema,
-} from '~/utils/user-validation'
-import { onboardingEmailSessionKey } from './signup'
-import { checkboxSchema } from '~/utils/zod-extensions'
+} from '~/utils/user-validation.ts'
+import { onboardingEmailSessionKey } from './signup.tsx'
+import { checkboxSchema } from '~/utils/zod-extensions.ts'
 
 const OnboardingFormSchema = z
 	.object({

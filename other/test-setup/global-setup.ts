@@ -1,7 +1,7 @@
 import path from 'path'
 import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
-import { BASE_DATABASE_PATH, BASE_DATABASE_URL } from './paths'
+import { BASE_DATABASE_PATH, BASE_DATABASE_URL } from './paths.ts'
 
 export async function setup() {
 	await fsExtra.ensureDir(path.dirname(BASE_DATABASE_PATH))

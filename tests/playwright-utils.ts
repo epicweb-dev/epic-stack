@@ -1,15 +1,15 @@
 import { test as base, type Page } from '@playwright/test'
 import { parse } from 'cookie'
-import { authenticator, getPasswordHash } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { commitSession, getSession } from '~/utils/session.server'
-import { createUser } from '../prisma/seed-utils'
+import { authenticator, getPasswordHash } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { createUser } from '../prisma/seed-utils.ts'
 
 export const dataCleanup = {
 	users: new Set<string>(),
 }
 
-export { readEmail } from '../mocks/utils'
+export { readEmail } from '../mocks/utils.ts'
 
 export function deleteUserByUsername(username: string) {
 	return prisma.user.delete({ where: { username } })

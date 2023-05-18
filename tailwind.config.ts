@@ -1,8 +1,8 @@
 import type { Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
+import defaultTheme from 'tailwindcss/defaultTheme.js'
 import tailwindcssRadix from 'tailwindcss-radix'
 
-module.exports = {
+export default {
 	content: ['./app/**/*.{ts,tsx,jsx,js}'],
 	darkMode: 'class',
 	theme: {

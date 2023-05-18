@@ -5,12 +5,12 @@ import { Link, useFetcher } from '@remix-run/react'
 import { AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
 import { z } from 'zod'
-import { authenticator } from '~/utils/auth.server'
-import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms'
-import { safeRedirect } from '~/utils/misc'
-import { commitSession, getSession } from '~/utils/session.server'
-import { passwordSchema, usernameSchema } from '~/utils/user-validation'
-import { checkboxSchema } from '~/utils/zod-extensions'
+import { authenticator } from '~/utils/auth.server.ts'
+import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
+import { safeRedirect } from '~/utils/misc.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
+import { checkboxSchema } from '~/utils/zod-extensions.ts'
 
 export const LoginFormSchema = z.object({
 	username: usernameSchema,

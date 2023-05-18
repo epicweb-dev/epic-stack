@@ -3,9 +3,9 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { Button, ErrorList, Field, TextareaField } from '~/utils/forms'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { Button, ErrorList, Field, TextareaField } from '~/utils/forms.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),

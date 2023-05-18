@@ -12,14 +12,14 @@ import {
 	useNavigation,
 } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '~/components/error-boundary'
-import { authenticator, resetUserPassword } from '~/utils/auth.server'
-import { Button, ErrorList, Field } from '~/utils/forms'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { authenticator, resetUserPassword } from '~/utils/auth.server.ts'
+import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { commitSession, getSession } from '~/utils/session.server'
-import { passwordSchema } from '~/utils/user-validation'
-import { resetPasswordSessionKey } from './forgot-password'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { passwordSchema } from '~/utils/user-validation.ts'
+import { resetPasswordSessionKey } from './forgot-password.tsx'
 
 const ResetPasswordSchema = z
 	.object({

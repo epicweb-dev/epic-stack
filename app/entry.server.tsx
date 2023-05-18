@@ -4,7 +4,7 @@ import { type EntryContext, Response } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import isbot from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
-import { init, getEnv } from './utils/env.server'
+import { init, getEnv } from './utils/env.server.ts'
 import { getInstanceInfo } from 'litefs-js'
 
 const ABORT_DELAY = 5000

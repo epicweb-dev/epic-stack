@@ -16,16 +16,16 @@ import {
 	getPasswordHash,
 	requireUserId,
 	verifyLogin,
-} from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { Button, ErrorList, Field } from '~/utils/forms'
-import { getUserImgSrc } from '~/utils/misc'
+} from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { getUserImgSrc } from '~/utils/misc.ts'
 import {
 	emailSchema,
 	nameSchema,
 	passwordSchema,
 	usernameSchema,
-} from '~/utils/user-validation'
+} from '~/utils/user-validation.ts'
 
 const ProfileFormSchema = z.object({
 	name: nameSchema.optional(),

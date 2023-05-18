@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
-import { expect, insertNewUser, test } from '../playwright-utils'
-import { createUser } from '../../prisma/seed-utils'
-import { verifyLogin } from '~/utils/auth.server'
+import { expect, insertNewUser, test } from '../playwright-utils.ts'
+import { createUser } from '../../prisma/seed-utils.ts'
+import { verifyLogin } from '~/utils/auth.server.ts'
 
 test('Users can update their basic info', async ({ login, page }) => {
 	await login()

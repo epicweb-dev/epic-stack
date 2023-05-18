@@ -3,8 +3,8 @@ import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
 import invariant from 'tiny-invariant'
-import { prisma } from '~/utils/db.server'
-import { sessionStorage } from './session.server'
+import { prisma } from '~/utils/db.server.ts'
+import { sessionStorage } from './session.server.ts'
 
 export type { User }
 
