@@ -54,7 +54,7 @@ export const links: LinksFunction = () => {
 		{ rel: 'stylesheet', href: '/fonts/nunito-sans/font.css' },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
-	].filter(Boolean)
+	].filter((value): value is NonNullable<typeof value> => Boolean(value))
 }
 
 export const meta: V2_MetaFunction = () => {
