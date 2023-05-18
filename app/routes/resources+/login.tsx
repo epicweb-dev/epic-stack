@@ -10,12 +10,13 @@ import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
 import { safeRedirect } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
+import { checkboxSchema } from '~/utils/zod-extensions.ts'
 
 export const LoginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
-	remember: z.preprocess(value => value === 'on', z.boolean()),
+	remember: checkboxSchema(),
 })
 
 export async function action({ request }: DataFunctionArgs) {

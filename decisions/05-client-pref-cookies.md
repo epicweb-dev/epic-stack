@@ -54,7 +54,10 @@ they are not, then we instead send a minimal document that includes a tiny bit
 of JavaScript that sets the cookies and then reloads the page. This is not
 ideal, however it's effectively as harmful to the user as a redirect which many
 websites do anyway (for example, go to `https://youtube.com` and you instantly
-get redirected to `https://www.youtube.com`).
+get redirected to `https://www.youtube.com`). Additionally, this is effectively
+how
+[the draft specification](https://wicg.github.io/user-preference-media-features-headers/#usage-example)
+for the web platform's solution works as well.
 
 To solve the second problem, we can simply keep a tiny bit of JS in the head of
 the document that does a quick check of the cookie values and if they are stale,
@@ -83,3 +86,9 @@ this again until they change their preferences.
 
 The user will not experience content layout shift for any user preferences our
 app depends on for the server render. This is a huge win for user experience.
+
+If a user has cookies disabled, then we need to detect that and fallback to
+default values. Users in this situation will experience content layout shift,
+but there's nothing else we can do about that. Additionally, users who have
+cookies disabled will not be able to authenticate which is a separate concern
+that should be addressed in a different decision document.

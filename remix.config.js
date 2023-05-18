@@ -10,6 +10,7 @@ export default {
 	serverPlatform: 'node',
 	tailwind: true,
 	postcss: true,
+	watchPaths: ['./tailwind.config.ts'],
 	future: {
 		v2_meta: true,
 		v2_errorBoundary: true,

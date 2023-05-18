@@ -26,6 +26,7 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation.ts'
 import { onboardingEmailSessionKey } from './signup.tsx'
+import { checkboxSchema } from '~/utils/zod-extensions.ts'
 
 const OnboardingFormSchema = z
 	.object({
@@ -33,13 +34,11 @@ const OnboardingFormSchema = z
 		name: nameSchema,
 		password: passwordSchema,
 		confirmPassword: passwordSchema,
-		agreeToTermsOfServiceAndPrivacyPolicy: z
-			.preprocess(value => value === 'on', z.boolean())
-			.refine(val => val, {
-				message: 'You must agree to the terms of service and privacy policy',
-			}),
-		agreeToMailingList: z.preprocess(value => value === 'on', z.boolean()),
-		remember: z.preprocess(value => value === 'on', z.boolean()),
+		agreeToTermsOfServiceAndPrivacyPolicy: checkboxSchema(
+			'You must agree to the terms of service and privacy policy',
+		),
+		agreeToMailingList: checkboxSchema(),
+		remember: checkboxSchema(),
 		redirectTo: z.string().optional(),
 	})
 	.superRefine(({ confirmPassword, password }, ctx) => {
