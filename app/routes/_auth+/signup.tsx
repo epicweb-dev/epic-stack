@@ -129,6 +129,7 @@ export async function action({ request }: DataFunctionArgs) {
 				<p>Click the link below to get started:</p>
 				<a href="${onboardingUrl}">${onboardingUrl}</a>
 			</body>
+		</html>
 		`,
 	})
 
