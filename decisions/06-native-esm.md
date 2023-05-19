@@ -19,7 +19,7 @@ anywhere, but it's a good idea to stay on top of the latest.
 
 Sadly, this is a bit of a "who moved my cheese" situation. Developers who are
 familiar with CommonJS modules will be annoyed by things they were used to doing
-in CJS that they can't do the same way in CJS. The biggest is dynamic (and
+in CJS that they can't do the same way in ESM. The biggest is dynamic (and
 synchronous) requires. Another is the way that module resolution changes. There
 are some packages which aren't quite prepared for ESM and therefore you end up
 having to import their exports directly from the files (like radix for example).
