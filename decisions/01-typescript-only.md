@@ -8,7 +8,7 @@ Status: accepted
 
 The `create-remix` CLI allows users to select whether they want to use
 JavaScript instead of TypeScript. This will auto-convert everything to
-TypeScript.
+JavaScript.
 
 There is (currently) no way to control this behavior.
 
