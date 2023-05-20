@@ -7,7 +7,7 @@
 	],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
-		"types": ["vitest/globals"],
+		"types": [],
 		"isolatedModules": true,
 		"esModuleInterop": true,
 		"jsx": "react-jsx",

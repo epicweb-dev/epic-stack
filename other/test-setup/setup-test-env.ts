@@ -1,4 +1,5 @@
 import './setup-env-vars.ts'
+import { afterAll, afterEach, expect } from 'vitest'
 import { installGlobals } from '@remix-run/node'
 import { matchers, type TestingLibraryMatchers } from './matchers.cjs'
 import 'dotenv/config'
