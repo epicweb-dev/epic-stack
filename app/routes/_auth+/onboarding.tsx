@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
 	json,
@@ -160,27 +160,25 @@ export default function OnboardingPage() {
 					<Field
 						labelProps={{ htmlFor: fields.username.id, children: 'Username' }}
 						inputProps={{
-							...fields.username,
+							...conform.input(fields.username),
 							autoComplete: 'username',
-							autoFocus: true,
+							autoFocus: typeof actionData === 'undefined' || typeof fields.username.initialError !== 'undefined',
 						}}
 						errors={fields.username.errors}
 					/>
 					<Field
 						labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
 						inputProps={{
-							...fields.name,
+							...conform.input(fields.name),
 							autoComplete: 'name',
-							autoFocus: true,
 						}}
 						errors={fields.name.errors}
 					/>
 					<Field
 						labelProps={{ htmlFor: fields.password.id, children: 'Password' }}
 						inputProps={{
-							...fields.password,
+							...conform.input(fields.password, { type: 'password' }),
 							autoComplete: 'new-password',
-							type: 'password',
 						}}
 						errors={fields.password.errors}
 					/>
@@ -191,9 +189,8 @@ export default function OnboardingPage() {
 							children: 'Confirm Password',
 						}}
 						inputProps={{
-							...fields.confirmPassword,
+							...conform.input(fields.confirmPassword, { type: 'password' }),
 							autoComplete: 'new-password',
-							type: 'password',
 						}}
 						errors={fields.confirmPassword.errors}
 					/>
@@ -204,7 +201,7 @@ export default function OnboardingPage() {
 							children:
 								'Do you agree to our Terms of Service and Privacy Policy?',
 						}}
-						buttonProps={fields.agreeToTermsOfServiceAndPrivacyPolicy}
+						buttonProps={conform.input(fields.agreeToTermsOfServiceAndPrivacyPolicy, { type: 'checkbox' })}
 						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
 					/>
 
@@ -214,7 +211,7 @@ export default function OnboardingPage() {
 							children:
 								'Would you like to receive special discounts and offers?',
 						}}
-						buttonProps={fields.agreeToMailingList}
+						buttonProps={conform.input(fields.agreeToMailingList, { type: 'checkbox' })}
 						errors={fields.agreeToMailingList.errors}
 					/>
 
@@ -223,11 +220,11 @@ export default function OnboardingPage() {
 							htmlFor: fields.remember.id,
 							children: 'Remember me',
 						}}
-						buttonProps={fields.remember}
+						buttonProps={conform.input(fields.remember, { type: 'checkbox' })}
 						errors={fields.remember.errors}
 					/>
 
-					<input {...fields.redirectTo} type="hidden" value={redirectTo} />
+					<input name={fields.redirectTo.name} type="hidden" value={redirectTo} />
 
 					<ErrorList errors={data.formError ? [data.formError] : []} />
 					<ErrorList errors={form.errors} id={form.errorId} />

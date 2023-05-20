@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
@@ -146,6 +146,10 @@ export default function EditUserProfile() {
 		onValidate({ formData }) {
 			return parse(formData, { schema: ProfileFormSchema })
 		},
+		defaultValue: {
+			name: data.user.name ?? '',
+			email: data.user.email,
+		},
 		shouldRevalidate: 'onBlur',
 	})
 
@@ -193,18 +197,14 @@ export default function EditUserProfile() {
 						<Field
 							className="col-span-3"
 							labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
-							inputProps={{
-								...fields.name,
-								defaultValue: data.user.name ?? '',
-							}}
+							inputProps={conform.input(fields.name)}
 							errors={fields.name.errors}
 						/>
 						<Field
 							className="col-span-3"
 							labelProps={{ htmlFor: fields.email.id, children: 'Email' }}
 							inputProps={{
-								...fields.email,
-								defaultValue: data.user.email ?? '',
+								...conform.input(fields.email),
 								// TODO: support changing your email address
 								disabled: true,
 							}}
@@ -224,8 +224,7 @@ export default function EditUserProfile() {
 										children: 'Current Password',
 									}}
 									inputProps={{
-										...fields.currentPassword,
-										type: 'password',
+										...conform.input(fields.currentPassword, { type: 'password' }),
 										autoComplete: 'current-password',
 									}}
 									errors={fields.currentPassword.errors}
@@ -237,8 +236,7 @@ export default function EditUserProfile() {
 										children: 'New Password',
 									}}
 									inputProps={{
-										...fields.newPassword,
-										type: 'password',
+										...conform.input(fields.newPassword, { type: 'password' }),
 										autoComplete: 'new-password',
 									}}
 									errors={fields.newPassword.errors}
