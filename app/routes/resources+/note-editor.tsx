@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
@@ -89,6 +89,10 @@ export function NoteEditor({
 		onValidate({ formData }) {
 			return parse(formData, { schema: NoteEditorSchema })
 		},
+		defaultValue: {
+			title: note?.title,
+			content: note?.content,
+		},
 		shouldRevalidate: 'onBlur',
 	})
 
@@ -102,18 +106,16 @@ export function NoteEditor({
 			<Field
 				labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
 				inputProps={{
-					...fields.title,
+					...conform.input(fields.title),
 					autoComplete: 'title',
-					defaultValue: note?.title,
 				}}
 				errors={fields.title.errors}
 			/>
 			<TextareaField
 				labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
 				textareaProps={{
-					...fields.content,
+					...conform.textarea(fields.content),
 					autoComplete: 'content',
-					defaultValue: note?.content,
 				}}
 				errors={fields.content.errors}
 			/>

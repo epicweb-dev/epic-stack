@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
 	json,
@@ -169,7 +169,7 @@ export default function SignupRoute() {
 										htmlFor: fields.usernameOrEmail.id,
 										children: 'Username or Email',
 									}}
-									inputProps={fields.usernameOrEmail}
+									inputProps={conform.input(fields.usernameOrEmail)}
 									errors={fields.usernameOrEmail.errors}
 								/>
 							</div>

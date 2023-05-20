@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher } from '@remix-run/react'
@@ -110,7 +110,7 @@ export function InlineLogin({
 							htmlFor: fields.username.id,
 							children: 'Username',
 						}}
-						inputProps={fields.username}
+						inputProps={conform.input(fields.username)}
 						errors={fields.username.errors}
 					/>
 
@@ -119,7 +119,7 @@ export function InlineLogin({
 							htmlFor: fields.password.id,
 							children: 'Password',
 						}}
-						inputProps={{ ...fields.password, type: 'password' }}
+						inputProps={conform.input(fields.password, { type: 'password' })}
 						errors={fields.password.errors}
 					/>
 
@@ -129,7 +129,7 @@ export function InlineLogin({
 								htmlFor: fields.remember.id,
 								children: 'Remember me',
 							}}
-							buttonProps={fields.remember}
+							buttonProps={conform.input(fields.remember, { type: 'checkbox' })}
 							errors={fields.remember.errors}
 						/>
 
