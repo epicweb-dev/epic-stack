@@ -6,6 +6,15 @@ module.exports = {
 		'@remix-run/eslint-config/jest-testing-library',
 		'prettier',
 	],
+	overrides: [
+		{
+			files: ['*.test.ts', '*.test.tsx', '*.test.js', '*.test.jsx'],
+			rules: {
+				'testing-library/prefer-screen-queries': 'off',
+				'testing-library/no-await-sync-query': 'off',
+			},
+		},
+	],
 	rules: {
 		'@typescript-eslint/consistent-type-imports': [
 			'warn',
