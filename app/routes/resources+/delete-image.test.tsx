@@ -6,7 +6,7 @@ import fs from 'fs'
 import { createPassword, createUser } from 'prisma/seed-utils.ts'
 import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils.ts'
 import invariant from 'tiny-invariant'
-import { expect } from 'vitest'
+import { expect, test } from 'vitest'
 import { prisma } from '~/utils/db.server.ts'
 import { ROUTE_PATH, action } from './delete-image.tsx'
 
