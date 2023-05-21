@@ -29,8 +29,6 @@ app.use(compression())
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
-// Everything else (like favicon.ico) is cached for an hour. You may want to be
-// more aggressive with this caching.
 
 // Remix fingerprints its assets so we can cache forever.
 app.use(
