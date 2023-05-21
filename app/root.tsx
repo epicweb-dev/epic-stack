@@ -29,6 +29,7 @@ import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useUser } from './utils/user.ts'
+import { useNonce } from './utils/nonce-provider.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -85,6 +86,7 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function App() {
 	const data = useLoaderData<typeof loader>()
+  const nonce = useNonce()
 	const { user } = data
 	return (
 		<html lang="en" className="dark h-full">
@@ -94,7 +96,7 @@ export default function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-night-700 text-white">
+			<body suppressHydrationWarning className="flex h-full flex-col justify-between bg-night-700 text-white">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
@@ -125,14 +127,16 @@ export default function App() {
 					<ThemeSwitch />
 				</div>
 				<div className="h-5" />
-				<ScrollRestoration />
-				<Scripts />
+				<ScrollRestoration nonce={nonce}/>
+				<Scripts nonce={nonce}/>
 				<script
+          nonce={nonce}
+          suppressHydrationWarning
 					dangerouslySetInnerHTML={{
 						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
 					}}
 				/>
-				<LiveReload />
+				<LiveReload nonce={nonce}/>
 			</body>
 		</html>
 	)
