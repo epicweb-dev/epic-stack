@@ -23,3 +23,7 @@ principles:
   custom-built services and vice-versa.
 - **Only one way:** Avoid providing more than one way to do the same thing. This
   applies to both the pre-configured code and the documentation.
+- **Offline Development:** We want to enable offline development as much as
+  possible. Naturally we need to use third party services for some things (like
+  email), but for those we'll strive to provide a way to mock them out for local
+  development.
