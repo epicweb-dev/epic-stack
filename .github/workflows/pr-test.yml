@@ -1,0 +1,100 @@
+name: Auto - PR Testing
+on:
+  pull_request:
+    types: [assigned, opened, synchronize]
+    branches:
+      - 'main'
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 18
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  installation:
+    name: Setting up a pre-installed environment
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'automerge') != true
+    outputs:
+      cypress-matrix: ${{ steps.build-matrix.outputs.cypress-matrix }}
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📥 Download deps
+        run: bahmutov/npm-install@v1
+
+      - name: Finalizing the installation process
+        run: |-
+          tar -czf /tmp/installation.tar.gz .
+
+      - name: Uploading this installation for further use
+        uses: actions/upload-artifact@v3
+        with:
+          name: installation
+          path: /tmp/installation.tar.gz
+          retention-days: 1
+
+  lint:
+    name: ⬣ ESLint
+    runs-on: ubuntu-latest
+    needs: [installation]
+    steps:
+      - name: Get pre-installed package
+        uses: actions/download-artifact@v3
+        with:
+          name: installation
+
+      - name: Inflating pre-installation
+        run: |-
+          tar -xzf installation.tar.gz
+          rm -f installation.tar.gz
+
+      - name: 🔬 Lint
+        run: npm run lint
+
+  typecheck:
+    name: ʦ TypeScript
+    runs-on: ubuntu-latest
+    needs: [installation]
+    steps:
+      - name: Fetch pre-installed package
+        uses: actions/download-artifact@v3
+        with:
+          name: installation
+
+      - name: Inflating pre-installation
+        run: |-
+          tar -xzf installation.tar.gz
+          rm -f installation.tar.gz
+
+      - name: 🔎 Type check
+        run: npm run typecheck --if-present
+
+
+  finish:
+    name: Verify Check for Pull Request
+    needs:
+      [
+        installation,
+        typecheck,
+        lint
+      ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: OK
+        run: echo 'OK'
