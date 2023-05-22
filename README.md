@@ -200,7 +200,7 @@ Prior to your first deployment, you'll need to do a few things:
 - Create a persistent volume for the sqlite database for both your staging and
   production environments. Run the following (feel free to change the GB size
   based on your needs and the region of your choice
-  (`https://fly.io/docs/reference/regions/`). NB. If you do change the region,
+  (`https://fly.io/docs/reference/regions/`). If you do change the region,
   make sure you change the `primary_region` in fly.toml as well):
 
   ```sh
