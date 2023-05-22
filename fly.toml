@@ -1,4 +1,5 @@
 app = "epic-stack-template"
+primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
