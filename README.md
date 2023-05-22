@@ -204,7 +204,7 @@ Prior to your first deployment, you'll need to do a few things:
   make sure you change the `primary_region` in fly.toml as well):
 
   ```sh
-  fly volumes create data --region sjc --size 1  --app epic-stack-template
+  fly volumes create data --region sjc --size 1 --app epic-stack-template
   fly volumes create data --region sjc --size 1 --app epic-stack-template-staging
   ```
 
