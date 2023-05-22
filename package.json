@@ -7,6 +7,7 @@
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "type": "module",
   "scripts": {
+    "adr:update": "adr-log -d docs/decisions -i",
     "build": "run-s build:*",
     "build:remix": "remix build",
     "build:server": "tsx ./other/build-server.ts",
@@ -107,6 +108,7 @@
     "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^4.0.0",
     "@vitest/coverage-c8": "^0.31.0",
+    "adr-log": "^2.2.0",
     "autoprefixer": "^10.4.14",
     "c8": "^7.13.0",
     "chalk": "^4.1.2",
@@ -116,6 +118,7 @@
     "execa": "^7.1.1",
     "glob": "^7.2.3",
     "jsdom": "^22.0.0",
+    "madr": "^3.0.0",
     "msw": "^1.2.1",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.23",

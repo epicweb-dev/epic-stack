@@ -12,7 +12,7 @@ const getRandomString = length => crypto.randomBytes(length).toString('hex')
 const main = async ({ isTypeScript, rootDirectory }) => {
 	if (!isTypeScript) {
 		// not throwing an error because the stack trace doesn't do anything to help the user
-		throw `Sorry, this template only supports TypeScript. Please run the command again and select "TypeScript". Learn more about why in https://github.com/epicweb-dev/epic-stack/blob/main/decisions/01-typescript-only.md`
+		throw `Sorry, this template only supports TypeScript. Please run the command again and select "TypeScript". Learn more about why in https://github.com/epicweb-dev/epic-stack/blob/main/docs/decisions/01-typescript-only.md`
 	}
 	const README_PATH = path.join(rootDirectory, 'README.md')
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
@@ -70,7 +70,6 @@ const main = async ({ isTypeScript, rootDirectory }) => {
 		),
 		fs.rm(path.join(rootDirectory, 'LICENSE.md')),
 		fs.rm(path.join(rootDirectory, 'CONTRIBUTING.md')),
-		fs.rm(path.join(rootDirectory, 'decisions'), { recursive: true }),
 		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
 	]
 
