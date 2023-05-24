@@ -1,8 +1,8 @@
+# Use Markdown Architectural Decision Records
+
 Date: 2023-05-22
 
 Status: proposed
-
-# Use Markdown Architectural Decision Records
 
 ## Context and Problem Statement
 
