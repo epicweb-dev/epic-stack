@@ -3,7 +3,7 @@
 Date: YYYY-MM-DD when the decision was last updated <!-- optional -->
 
 Status: proposed | rejected | accepted | deprecated | … | superseded by
-[0005](0005-example.md) <!-- optional -->
+[00](05-example.md) <!-- optional -->
 
 ## Context
 
@@ -22,5 +22,5 @@ Status: proposed | rejected | accepted | deprecated | … | superseded by
 
 ## Links <!-- optional -->
 
-* [Link type] [Link to ADR] <!-- example: Refined by [ADR-0005](0005-example.md) -->
+* [Link type] [Link to ADR] <!-- example: Refined by [ADR-05](05-example.md) -->
 * … <!-- numbers of links can vary -->
