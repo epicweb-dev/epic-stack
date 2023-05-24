@@ -1,24 +1,24 @@
-import { type Request } from '@remix-run/node'
+/**
+ * This file contains utilities for using client hints for user preference which
+ * are needed by the server, but are only known by the browser.
+ */
 
-const colorSchemeHint = {
-	name: 'CH-prefers-color-scheme',
+export const colorSchemeHint = {
+	name: 'theme',
+	cookieName: 'CH-prefers-color-scheme',
 	getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
 	fallback: 'light',
 	transform(value: any) {
 		return value === 'dark' ? 'dark' : 'light'
 	},
+	// "as const" is necessary for inference to work.
+	// PRs welcome to improve the typings for all this.
 } as const
 
-const clockOffsetHint = {
-	name: 'CH-clock-offset',
-	getValueCode: `new Date().getTimezoneOffset() * -1`,
-	fallback: '0',
-	transform(value: any) {
-		return !isNaN(Number(value)) ? Number(value) : 0
-	},
-} as const
-
-const clientHints = [colorSchemeHint, clockOffsetHint] as const
+const clientHints = [
+	colorSchemeHint,
+	// add other hints here
+] as const
 
 type ClientHintNames = (typeof clientHints)[number]['name']
 
@@ -30,40 +30,34 @@ function getCookieValue(cookieString: string, name: ClientHintNames) {
 	const value = cookieString
 		.split(';')
 		.map(c => c.trim())
-		.find(c => c.startsWith(name + '='))
+		.find(c => c.startsWith(hint.cookieName + '='))
 		?.split('=')[1]
 
 	return value ?? null
 }
 
-function getCookieString(request?: Request) {
-	return typeof document !== 'undefined'
-		? document.cookie
-		: typeof request !== 'undefined'
-		? request.headers.get('Cookie') ?? ''
-		: ''
-}
-
 /**
  *
  * @param request {Request} - optional request object (only used on server)
- * @returns the theme value of "light" or "dark"
+ * @returns an object with the client hints and their values
  */
-export function getThemeHint(request?: Request) {
-	const cookieString = getCookieString(request)
-	return colorSchemeHint.transform(
-		getCookieValue(cookieString, colorSchemeHint.name),
-	)
-}
-
-/**
- * @param request {Request} - optional request object (only used on server)
- * @returns the clock offset value in minutes
- */
-export function getClockOffsetHint(request?: Request) {
-	const cookieString = getCookieString(request)
-	return clockOffsetHint.transform(
-		getCookieValue(cookieString, clockOffsetHint.name),
+export function getHints(request?: Request) {
+	const cookieString =
+		typeof document !== 'undefined'
+			? document.cookie
+			: typeof request !== 'undefined'
+			? request.headers.get('Cookie') ?? ''
+			: ''
+	return clientHints.reduce(
+		(acc, hint) => {
+			acc[hint.name] = hint.transform(getCookieValue(cookieString, hint.name))
+			return acc
+		},
+		{} as {
+			[name in ClientHintNames]: ReturnType<
+				(typeof clientHints)[number]['transform']
+			>
+		},
 	)
 }
 
@@ -86,8 +80,8 @@ let cookieChanged = false;
 const hints = [
 ${clientHints
 	.map(hint => {
-		const name = JSON.stringify(hint.name)
-		return `{ name: ${name}, actual: String(${hint.getValueCode}), cookie: cookies[${name}] }`
+		const cookieName = JSON.stringify(hint.cookieName)
+		return `{ name: ${cookieName}, actual: String(${hint.getValueCode}), cookie: cookies[${cookieName}] }`
 	})
 	.join(',\n')}
 ];

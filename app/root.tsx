@@ -1,4 +1,3 @@
-import * as Checkbox from '@radix-ui/react-checkbox'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
@@ -16,20 +15,20 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useFetcher,
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { useState } from 'react'
-import { twMerge } from 'tailwind-merge'
+import { ThemeSwitch } from './routes/resources+/theme.tsx'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
-import { ClientHintCheck } from './utils/client-hints.tsx'
+import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
+import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
+import { getSession, getTheme } from './utils/session.server.ts'
 import { useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
@@ -67,6 +66,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
+	const cookieSession = await getSession(request.headers.get('Cookie'))
 	const userId = await getUserId(request)
 
 	const user = userId
@@ -82,15 +82,27 @@ export async function loader({ request }: DataFunctionArgs) {
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
 
-	return json({ user, ENV: getEnv() })
+	return json({
+		user,
+		requestInfo: {
+			hints: getHints(request),
+			origin: getDomainUrl(request),
+			path: new URL(request.url).pathname,
+			session: {
+				theme: getTheme(cookieSession),
+			},
+		},
+		ENV: getEnv(),
+	})
 }
 
 export default function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
 	const { user } = data
+	const theme = data.requestInfo.session.theme ?? data.requestInfo.hints.theme
 	return (
-		<html lang="en" className="dark h-full">
+		<html lang="en" className={`${theme} h-full`}>
 			<head>
 				<ClientHintCheck />
 				<Meta />
@@ -98,7 +110,7 @@ export default function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-night-700 text-white">
+			<body className="flex h-full flex-col justify-between bg-day-300 text-black dark:bg-night-700 dark:text-white">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
@@ -126,7 +138,7 @@ export default function App() {
 						<div className="font-light">epic</div>
 						<div className="font-bold">notes</div>
 					</Link>
-					<ThemeSwitch />
+					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
 				<ScrollRestoration nonce={nonce} />
@@ -140,73 +152,6 @@ export default function App() {
 				<LiveReload nonce={nonce} />
 			</body>
 		</html>
-	)
-}
-
-function ThemeSwitch() {
-	const fetcher = useFetcher()
-	const [mode, setMode] = useState<'system' | 'dark' | 'light'>('system')
-	const checked: boolean | 'indeterminate' =
-		mode === 'system' ? 'indeterminate' : mode === 'dark'
-	const theme = mode === 'system' ? 'dark' : mode
-	return (
-		<fetcher.Form>
-			<label>
-				<Checkbox.Root
-					className={twMerge(
-						'bg-gray-night-500 h-10 w-20 rounded-full p-1',
-						theme === 'dark' && 'bg-night-500',
-						theme === 'light' && 'bg-white',
-					)}
-					checked={checked}
-					name="theme"
-					value={mode}
-					onCheckedChange={() =>
-						setMode(oldMode =>
-							oldMode === 'system'
-								? 'light'
-								: oldMode === 'light'
-								? 'dark'
-								: 'system',
-						)
-					}
-					aria-label={
-						mode === 'system'
-							? 'System Theme'
-							: mode === 'dark'
-							? 'Dark Theme'
-							: 'Light Theme'
-					}
-				>
-					<span
-						className={twMerge(
-							'flex justify-between rounded-full',
-							mode === 'system' && theme === 'dark' && 'bg-white',
-							mode === 'system' && theme === 'light' && 'theme-switch-light',
-						)}
-					>
-						<span
-							className={twMerge(
-								'theme-switch-light',
-								'flex h-8 w-8 items-center justify-center rounded-full',
-								mode === 'light' && 'text-white',
-							)}
-						>
-							🔆
-						</span>
-						<span
-							className={twMerge(
-								'theme-switch-dark',
-								'flex h-8 w-8 items-center justify-center rounded-full',
-								mode === 'dark' && 'text-white',
-							)}
-						>
-							🌙
-						</span>
-					</span>
-				</Checkbox.Root>
-			</label>
-		</fetcher.Form>
 	)
 }
 
