@@ -1,5 +1,5 @@
 import path from 'path'
-import { pathToFileURL } from 'url'
+import { fileURLToPath } from 'url'
 import express from 'express'
 import chokidar from 'chokidar'
 import compression from 'compression'
@@ -7,15 +7,17 @@ import morgan from 'morgan'
 import address from 'address'
 import closeWithGrace from 'close-with-grace'
 import { createRequestHandler } from '@remix-run/express'
-import { broadcastDevReady } from '@remix-run/node'
+import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
 
-const BUILD_DIR = path.join(process.cwd(), 'build', 'index.js')
-const BUILD_DIR_FILE_URL = pathToFileURL(BUILD_DIR).href
+// @ts-expect-error - when we get here the file exist
+import * as remixBuild from '../build/index.js'
 
-let update = Date.now()
-const getLatestBuild = () => import(`${BUILD_DIR_FILE_URL}?update=${update}`)
+const BUILD_PATH = '../build/index.js'
+
+const build = remixBuild as unknown as ServerBuild
+let devBuild = build
 
 const app = express()
 
@@ -42,12 +44,12 @@ app.all(
 	process.env.NODE_ENV === 'development'
 		? async (req, res, next) => {
 				return createRequestHandler({
-					build: await getLatestBuild(),
+					build: devBuild,
 					mode: process.env.NODE_ENV,
 				})(req, res, next)
 		  }
 		: createRequestHandler({
-				build: await getLatestBuild(),
+				build,
 				mode: process.env.NODE_ENV,
 		  }),
 )
@@ -93,7 +95,7 @@ ${chalk.bold('Press Ctrl+C to stop')}
 	)
 
 	if (process.env.NODE_ENV === 'development') {
-		notifyRemixDevReady()
+		broadcastDevReady(build)
 	}
 })
 
@@ -103,20 +105,15 @@ closeWithGrace(async () => {
 	})
 })
 
-async function notifyRemixDevReady() {
-	update = Date.now()
-	const build = await getLatestBuild()
-	broadcastDevReady(build)
-}
-
 // during dev, we'll keep the build module up to date with the changes
 if (process.env.NODE_ENV === 'development') {
-	// avoid watching the folder itself, just watch its content
-	const watcher = chokidar.watch(
-		`${path.dirname(BUILD_DIR).replace(/\\/g, '/')}/**.*`,
-		{
-			ignored: ['**/**.map'],
-		},
-	)
-	watcher.on('all', notifyRemixDevReady)
+	async function reloadBuild() {
+		devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
+		broadcastDevReady(devBuild)
+	}
+
+	const dirname = path.dirname(fileURLToPath(import.meta.url))
+	const watchPath = path.join(dirname, BUILD_PATH).replace(/\\/g, '/')
+	const watcher = chokidar.watch(watchPath, { ignoreInitial: true })
+	watcher.on('all', reloadBuild)
 }
