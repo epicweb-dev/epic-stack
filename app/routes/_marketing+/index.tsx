@@ -1,4 +1,5 @@
 import type { V2_MetaFunction } from '@remix-run/node'
+import { logos, kodyRocket, stars } from './logos/logos.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
 
@@ -9,11 +10,7 @@ export default function Index() {
 				<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
 					<div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
 						<div className="absolute inset-0">
-							<img
-								className="h-full w-full object-cover"
-								src="https://user-images.githubusercontent.com/1500684/236281980-66d33a85-f5fc-4094-ab73-e8994acc27a3.jpg"
-								alt=""
-							/>
+							<img className="h-full w-full object-cover" src={stars} alt="" />
 							<div className="absolute inset-0 bg-[color:rgba(30,23,38,0.5)] mix-blend-multiply" />
 						</div>
 						<div className="lg:pt-18 relative px-4 pb-8 pt-8 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8 lg:pb-20">
@@ -31,7 +28,7 @@ export default function Index() {
 							</p>
 							<a href="https://www.epicweb.dev">
 								<img
-									src="https://user-images.githubusercontent.com/1500684/236284990-8f98679b-6fc2-4f7a-9a8f-ea3f5b32d56e.png"
+									src={kodyRocket}
 									alt="Illustration of a Koala riding a rocket"
 									className="mx-auto mt-8 w-full max-w-[12rem] md:max-w-[16rem]"
 								/>
@@ -42,98 +39,7 @@ export default function Index() {
 
 				<div className="mx-auto mt-8 max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
 					<div className="flex flex-wrap justify-center gap-8 rounded-3xl bg-day-300 py-4">
-						{[
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236983921-dd1c4220-002b-4918-86de-28fb00b29461.png',
-								alt: 'Remix',
-								href: 'https://remix.run',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157764397-ccd8ea10-b8aa-4772-a99b-35de937319e1.svg',
-								alt: 'Fly.io',
-								href: 'https://fly.io',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157764395-137ec949-382c-43bd-a3c0-0cb8cb22e22d.svg',
-								alt: 'SQLite',
-								href: 'https://sqlite.org',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157764484-ad64a21a-d7fb-47e3-8669-ec046da20c1f.svg',
-								alt: 'Prisma',
-								href: 'https://prisma.io',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236985082-421e7fef-2371-43c2-bbaa-343f8b2a606f.svg',
-								alt: 'Zod',
-								href: 'https://zod.dev/',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236854574-17c11137-7fb0-4426-83d7-2c06e6d2bb53.svg',
-								alt: 'GitHub',
-								href: 'https://github.com',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236854590-c3574ee4-0d55-4e96-a6b7-e435969a8c31.png',
-								alt: 'Mailgun',
-								href: 'https://mailgun.com',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157764276-a516a239-e377-4a20-b44a-0ac7b65c8c14.svg',
-								alt: 'Tailwind',
-								href: 'https://tailwindcss.com',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236984769-bdcac5cf-022d-4ed9-8240-63460939a454.svg',
-								alt: 'Radix UI',
-								href: 'https://www.radix-ui.com/',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236356419-d02acd65-0123-46e3-9891-27a36eb55d28.svg',
-								alt: 'Playwright',
-								href: 'https://playwright.dev/',
-							},
-							{
-								src: 'https://raw.githubusercontent.com/mswjs/msw/c32241627da09af8b34c4068cc17dd1941ff3b0d/media/msw-logo.svg',
-								alt: 'MSW',
-								href: 'https://mswjs.io',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236984909-659d8082-c983-418d-b42f-4ce70c4e2cb0.svg',
-								alt: 'Faker.js',
-								href: 'https://fakerjs.dev/',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157772447-00fccdce-9d12-46a3-8bb4-fac612cdc949.svg',
-								alt: 'Vitest',
-								href: 'https://vitest.dev',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157772662-92b0dd3a-453f-4d18-b8be-9fa6efde52cf.png',
-								alt: 'Testing Library',
-								href: 'https://testing-library.com',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/236356589-fd6ad6e6-9510-4ff3-91ad-4836ca1c64f5.png',
-								alt: 'Docker',
-								href: 'https://www.docker.com',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157773063-20a0ed64-b9f8-4e0b-9d1e-0b65a3d4a6db.svg',
-								alt: 'TypeScript',
-								href: 'https://typescriptlang.org',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157772934-ce0a943d-e9d0-40f8-97f3-f464c0811643.svg',
-								alt: 'Prettier',
-								href: 'https://prettier.io',
-							},
-							{
-								src: 'https://user-images.githubusercontent.com/1500684/157772990-3968ff7c-b551-4c55-a25c-046a32709a8e.svg',
-								alt: 'ESLint',
-								href: 'https://eslint.org',
-							},
-						].map(img => (
+						{logos.map(img => (
 							<a
 								key={img.href}
 								href={img.href}

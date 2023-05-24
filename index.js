@@ -1,7 +1,7 @@
 import 'dotenv/config'
 
 if (process.env.MOCKS === 'true') {
-	await import('./mocks/index.ts')
+	await import('./tests/mocks/index.ts')
 }
 
 if (process.env.NODE_ENV === 'production') {

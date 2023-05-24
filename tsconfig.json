@@ -3,7 +3,7 @@
 		"remix.env.d.ts",
 		"**/*.ts",
 		"**/*.tsx",
-		"./other/test-setup/setup-test-env.ts"
+		"./tests/setup/setup-test-env.ts"
 	],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],

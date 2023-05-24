@@ -3,7 +3,7 @@
  */
 import { faker } from '@faker-js/faker'
 import fs from 'fs'
-import { createPassword, createUser } from 'prisma/seed-utils.ts'
+import { createPassword, createUser } from 'tests/db-utils.ts'
 import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils.ts'
 import invariant from 'tiny-invariant'
 import { expect, test } from 'vitest'
