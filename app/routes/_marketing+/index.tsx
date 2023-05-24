@@ -1,5 +1,5 @@
 import type { V2_MetaFunction } from '@remix-run/node'
-import { logos, kodyRocket } from './logos/logos.ts'
+import { logos, kodyRocket, stars } from './logos/logos.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
 
@@ -10,11 +10,7 @@ export default function Index() {
 				<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
 					<div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
 						<div className="absolute inset-0">
-							<img
-								className="h-full w-full object-cover"
-								src="https://user-images.githubusercontent.com/1500684/236281980-66d33a85-f5fc-4094-ab73-e8994acc27a3.jpg"
-								alt=""
-							/>
+							<img className="h-full w-full object-cover" src={stars} alt="" />
 							<div className="absolute inset-0 bg-[color:rgba(30,23,38,0.5)] mix-blend-multiply" />
 						</div>
 						<div className="lg:pt-18 relative px-4 pb-8 pt-8 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8 lg:pb-20">
