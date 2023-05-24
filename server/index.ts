@@ -63,9 +63,7 @@ app.use(
           'data:',
           'user-images.githubusercontent.com',
           'raw.githubusercontent.com',
-          ...(MODE === 'development' ? ['cloudflare-ipfs.com'] : []),
         ],
-        'media-src': ["'self'", 'res.cloudinary.com', 'data:', 'blob:'],
         'script-src': [
           "'strict-dynamic'",
           "'self'",

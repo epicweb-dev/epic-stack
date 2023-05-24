@@ -44,24 +44,16 @@ export default async function handleRequest(
         <RemixServer context={remixContext} url={request.url} />
       </NonceProvider>,
 			{
-        nonce,
-        [callbackName]: () => {
-          const body = new PassThrough()
+				[callbackName]: () => {
+					const body = new PassThrough()
 					responseHeaders.set('Content-Type', 'text/html')
-          const dataEvtTransform = new Transform({
-            transform(chunk, _, callback) {
-              const string = chunk.toString()
-              const replaced = string.replace(/data-evt-/g, `nonce="${nonce}" `)
-              callback(null, replaced)
-            },
-          })
-          pipe(dataEvtTransform).pipe(body)
 					resolve(
 						new Response(body, {
 							headers: responseHeaders,
 							status: didError ? 500 : responseStatusCode,
 						}),
 					)
+					pipe(body)
 				},
 				onShellError: (err: unknown) => {
 					reject(err)

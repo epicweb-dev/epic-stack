@@ -96,7 +96,7 @@ export default function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body suppressHydrationWarning className="flex h-full flex-col justify-between bg-night-700 text-white">
+			<body className="flex h-full flex-col justify-between bg-night-700 text-white">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
@@ -131,7 +131,6 @@ export default function App() {
 				<Scripts nonce={nonce}/>
 				<script
           nonce={nonce}
-          suppressHydrationWarning
 					dangerouslySetInnerHTML={{
 						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
 					}}
