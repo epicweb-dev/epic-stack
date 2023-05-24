@@ -4,9 +4,9 @@ import {
 	deleteUserByUsername,
 	expect,
 	insertNewUser,
-	readEmail,
 	test,
 } from '../playwright-utils.ts'
+import { readEmail } from '../mocks/utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
