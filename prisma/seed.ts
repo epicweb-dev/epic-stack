@@ -1,9 +1,9 @@
 import fs from 'fs'
 import { faker } from '@faker-js/faker'
-import { createPassword, createUser } from './seed-utils'
-import { prisma } from '~/utils/db.server'
-import { deleteAllData } from '../other/test-setup/utils'
-import { getPasswordHash } from '~/utils/auth.server'
+import { createPassword, createUser } from 'tests/db-utils.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { deleteAllData } from 'tests/setup/utils.ts'
+import { getPasswordHash } from '~/utils/auth.server.ts'
 
 async function seed() {
 	console.log('🌱 Seeding...')
@@ -43,7 +43,7 @@ async function seed() {
 							file: {
 								create: {
 									blob: await fs.promises.readFile(
-										`./prisma/fixtures/user-images/${index % 10}.jpg`,
+										`./tests/fixtures/images/user/${index % 10}.jpg`,
 									),
 								},
 							},
@@ -79,7 +79,7 @@ async function seed() {
 					file: {
 						create: {
 							blob: await fs.promises.readFile(
-								'./prisma/fixtures/user-images/kody.png',
+								'./tests/fixtures/images/user/kody.png',
 							),
 						},
 					},

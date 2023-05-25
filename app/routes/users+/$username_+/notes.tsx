@@ -1,11 +1,13 @@
 import { useLoaderData, Outlet, NavLink, Link } from '@remix-run/react'
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { prisma } from '~/utils/db.server'
-import clsx from 'clsx'
-import { GeneralErrorBoundary } from '~/components/error-boundary'
-import { getUserImgSrc } from '~/utils/misc'
+import { prisma } from '~/utils/db.server.ts'
+import { clsx } from 'clsx'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { getUserImgSrc } from '~/utils/misc.ts'
+import { requireUserId } from '~/utils/auth.server.ts'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params, request }: DataFunctionArgs) {
+	await requireUserId(request, { redirectTo: null })
 	const owner = await prisma.user.findUnique({
 		where: {
 			username: params.username,

@@ -1,40 +1,45 @@
+import { conform, useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import {
-	Button,
-	Field,
-	TextareaField,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
-} from '~/utils/forms'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { Button, ErrorList, Field, TextareaField } from '~/utils/forms.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().nonempty(),
-	content: z.string().nonempty(),
+	title: z.string().min(1),
+	content: z.string().min(1),
 })
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const result = NoteEditorSchema.safeParse(
-		preprocessFormData(formData, NoteEditorSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: NoteEditorSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
+	}
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
 	}
 	let note: { id: string; owner: { username: string } }
 
+	const { title, content, id } = submission.value
+
 	const data = {
 		ownerId: userId,
-		title: result.data.title,
-		content: result.data.content,
+		title: title,
+		content: content,
 	}
 
 	const select = {
@@ -45,22 +50,22 @@ export async function action({ request }: DataFunctionArgs) {
 			},
 		},
 	}
-	if (result.data.id) {
+	if (id) {
 		const existingNote = await prisma.note.findFirst({
-			where: { id: result.data.id, ownerId: userId },
+			where: { id, ownerId: userId },
 			select: { id: true },
 		})
 		if (!existingNote) {
 			return json(
 				{
 					status: 'error',
-					errors: { formErrors: ['Note not found'] },
+					submission,
 				} as const,
 				{ status: 404 },
 			)
 		}
 		note = await prisma.note.update({
-			where: { id: result.data.id },
+			where: { id },
 			data,
 			select,
 		})
@@ -77,13 +82,18 @@ export function NoteEditor({
 }) {
 	const noteEditorFetcher = useFetcher<typeof action>()
 
-	const { form, fields } = useForm({
-		name: 'note-editor',
-		errors: {
-			...noteEditorFetcher.data?.errors,
-			formErrors: noteEditorFetcher.data?.errors?.formErrors,
+	const [form, fields] = useForm({
+		id: 'note-editor',
+		constraint: getFieldsetConstraint(NoteEditorSchema),
+		lastSubmission: noteEditorFetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: NoteEditorSchema })
 		},
-		fieldMetadatas: getFieldsFromSchema(NoteEditorSchema),
+		defaultValue: {
+			title: note?.title,
+			content: note?.content,
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	return (
@@ -94,24 +104,22 @@ export function NoteEditor({
 		>
 			<input name="id" type="hidden" value={note?.id} />
 			<Field
-				labelProps={{ ...fields.title.labelProps, children: 'Title' }}
+				labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
 				inputProps={{
-					...fields.title.props,
+					...conform.input(fields.title),
 					autoComplete: 'title',
-					defaultValue: note?.title,
 				}}
 				errors={fields.title.errors}
 			/>
 			<TextareaField
-				labelProps={{ ...fields.content.labelProps, children: 'Content' }}
+				labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
 				textareaProps={{
-					...fields.content.props,
+					...conform.textarea(fields.content),
 					autoComplete: 'content',
-					defaultValue: note?.content,
 				}}
 				errors={fields.content.errors}
 			/>
-			{form.errorUI}
+			<ErrorList errors={form.errors} id={form.errorId} />
 			<div className="flex justify-end gap-4">
 				<Button size="md" variant="secondary" type="reset">
 					Reset

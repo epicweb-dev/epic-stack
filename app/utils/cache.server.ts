@@ -4,6 +4,7 @@ import {
 	cachified as baseCachified,
 	lruCacheAdapter,
 	verboseReporter,
+	mergeReporters,
 	type CacheEntry,
 	type Cache as CachifiedCache,
 	type CachifiedOptions,
@@ -12,9 +13,9 @@ import fs from 'fs'
 import { getInstanceInfo, getInstanceInfoSync } from 'litefs-js'
 import LRU from 'lru-cache'
 import { z } from 'zod'
-import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite'
-import { time, type Timings } from './timing.server'
-import { singleton } from './singleton.server'
+import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite.tsx'
+import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
+import { singleton } from './singleton.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 
@@ -154,36 +155,14 @@ export async function searchCacheKeys(search: string, limit: number) {
 }
 
 export async function cachified<Value>({
-	request,
 	timings,
+	reporter = verboseReporter(),
 	...options
 }: CachifiedOptions<Value> & {
-	request?: Request
 	timings?: Timings
 }): Promise<Value> {
-	let cachifiedResolved = false
-	const cachifiedPromise = baseCachified({
-		reporter: verboseReporter(),
+	return baseCachified({
 		...options,
-		getFreshValue: async context => {
-			// if we've already retrieved the cached value, then this may be called
-			// after the response has already been sent so there's no point in timing
-			// how long this is going to take
-			if (!cachifiedResolved && timings) {
-				return time(() => options.getFreshValue(context), {
-					timings,
-					type: `getFreshValue:${options.key}`,
-					desc: `request forced to wait for a fresh ${options.key} value`,
-				})
-			}
-			return options.getFreshValue(context)
-		},
+		reporter: mergeReporters(cachifiedTimingReporter(timings), reporter),
 	})
-	const result = await time(cachifiedPromise, {
-		timings,
-		type: `cache:${options.key}`,
-		desc: `${options.key} cache retrieval`,
-	})
-	cachifiedResolved = true
-	return result
 }

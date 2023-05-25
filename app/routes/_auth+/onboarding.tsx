@@ -1,3 +1,5 @@
+import { conform, useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
 	json,
 	redirect,
@@ -13,24 +15,18 @@ import {
 	useSearchParams,
 } from '@remix-run/react'
 import { z } from 'zod'
-import { Spacer } from '~/components/spacer'
-import { authenticator, createUser } from '~/utils/auth.server'
-import {
-	Button,
-	CheckboxField,
-	Field,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
-} from '~/utils/forms'
-import { safeRedirect } from '~/utils/misc'
-import { commitSession, getSession } from '~/utils/session.server'
+import { Spacer } from '~/components/spacer.tsx'
+import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
+import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
+import { safeRedirect } from '~/utils/misc.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
 import {
 	nameSchema,
 	passwordSchema,
 	usernameSchema,
-} from '~/utils/user-validation'
-import { onboardingEmailSessionKey } from './signup'
+} from '~/utils/user-validation.ts'
+import { checkboxSchema } from '~/utils/zod-extensions.ts'
+import { onboardingEmailSessionKey } from './signup.tsx'
 
 const OnboardingFormSchema = z
 	.object({
@@ -38,11 +34,11 @@ const OnboardingFormSchema = z
 		name: nameSchema,
 		password: passwordSchema,
 		confirmPassword: passwordSchema,
-		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean().refine(val => val, {
-			message: 'You must agree to the terms of service and privacy policy',
-		}),
-		agreeToMailingList: z.boolean(),
-		remember: z.boolean(),
+		agreeToTermsOfServiceAndPrivacyPolicy: checkboxSchema(
+			'You must agree to the terms of service and privacy policy',
+		),
+		agreeToMailingList: checkboxSchema(),
+		remember: checkboxSchema(),
 		redirectTo: z.string().optional(),
 	})
 	.superRefine(({ confirmPassword, password }, ctx) => {
@@ -56,9 +52,7 @@ const OnboardingFormSchema = z
 	})
 
 export async function loader({ request }: DataFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
-		successRedirect: '/',
-	})
+	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
 	const error = session.get(authenticator.sessionErrorKey)
 	const onboardingEmail = session.get(onboardingEmailSessionKey)
@@ -66,11 +60,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		return redirect('/signup')
 	}
 	return json(
-		{
-			formError: error?.message,
-			onboardingEmail,
-			fieldMetadatas: getFieldsFromSchema(OnboardingFormSchema),
-		},
+		{ formError: error?.message },
 		{
 			headers: {
 				'Set-Cookie': await commitSession(session),
@@ -80,20 +70,28 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 export async function action({ request }: DataFunctionArgs) {
-	const session = await getSession(request.headers.get('cookie'))
-	const email = session.get(onboardingEmailSessionKey)
+	const cookieSession = await getSession(request.headers.get('cookie'))
+	const email = cookieSession.get(onboardingEmailSessionKey)
 	if (typeof email !== 'string' || !email) {
 		return redirect('/signup')
 	}
 
 	const formData = await request.formData()
-	const result = OnboardingFormSchema.safeParse(
-		preprocessFormData(formData, OnboardingFormSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: OnboardingFormSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
+	}
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
 	}
 	const {
 		username,
@@ -103,16 +101,15 @@ export async function action({ request }: DataFunctionArgs) {
 		// agreeToMailingList,
 		remember,
 		redirectTo,
-	} = result.data
+	} = submission.value
 
-	const user = await createUser({ email, username, password, name })
-	session.set(authenticator.sessionKey, user.id)
-	session.unset(onboardingEmailSessionKey)
+	const session = await signup({ email, username, password, name })
 
-	const newCookie = await commitSession(session, {
-		maxAge: remember
-			? 60 * 60 * 24 * 7 // 7 days
-			: undefined,
+	cookieSession.set(authenticator.sessionKey, session.id)
+	cookieSession.unset(onboardingEmailSessionKey)
+
+	const newCookie = await commitSession(cookieSession, {
+		expires: remember ? session.expirationDate : undefined,
 	})
 	return redirect(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
@@ -129,10 +126,15 @@ export default function OnboardingPage() {
 	const actionData = useActionData<typeof action>()
 	const navigation = useNavigation()
 	const formAction = useFormAction()
-	const { form, fields } = useForm({
-		name: 'onboarding',
-		fieldMetadatas: data.fieldMetadatas,
-		errors: actionData?.errors,
+
+	const [form, fields] = useForm({
+		id: 'onboarding',
+		constraint: getFieldsetConstraint(OnboardingFormSchema),
+		lastSubmission: actionData?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: OnboardingFormSchema })
+		},
+		shouldRevalidate: 'onBlur',
 	})
 
 	const redirectTo = searchParams.get('redirectTo') || '/'
@@ -153,82 +155,87 @@ export default function OnboardingPage() {
 					{...form.props}
 				>
 					<Field
-						labelProps={{ ...fields.username.labelProps, children: 'Username' }}
+						labelProps={{ htmlFor: fields.username.id, children: 'Username' }}
 						inputProps={{
-							...fields.username.props,
+							...conform.input(fields.username),
 							autoComplete: 'username',
-							autoFocus: true,
+							autoFocus:
+								typeof actionData === 'undefined' ||
+								typeof fields.username.initialError !== 'undefined',
 						}}
 						errors={fields.username.errors}
 					/>
 					<Field
-						labelProps={{ ...fields.name.labelProps, children: 'Name' }}
+						labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
 						inputProps={{
-							...fields.name.props,
+							...conform.input(fields.name),
 							autoComplete: 'name',
-							autoFocus: true,
 						}}
 						errors={fields.name.errors}
 					/>
 					<Field
-						labelProps={{ ...fields.password.labelProps, children: 'Password' }}
+						labelProps={{ htmlFor: fields.password.id, children: 'Password' }}
 						inputProps={{
-							...fields.password.props,
+							...conform.input(fields.password, { type: 'password' }),
 							autoComplete: 'new-password',
-							type: 'password',
 						}}
 						errors={fields.password.errors}
 					/>
 
 					<Field
 						labelProps={{
-							...fields.confirmPassword.labelProps,
+							htmlFor: fields.confirmPassword.id,
 							children: 'Confirm Password',
 						}}
 						inputProps={{
-							...fields.confirmPassword.props,
+							...conform.input(fields.confirmPassword, { type: 'password' }),
 							autoComplete: 'new-password',
-							type: 'password',
 						}}
 						errors={fields.confirmPassword.errors}
 					/>
 
 					<CheckboxField
 						labelProps={{
-							...fields.agreeToTermsOfServiceAndPrivacyPolicy.labelProps,
+							htmlFor: fields.agreeToTermsOfServiceAndPrivacyPolicy.id,
 							children:
 								'Do you agree to our Terms of Service and Privacy Policy?',
 						}}
-						buttonProps={fields.agreeToTermsOfServiceAndPrivacyPolicy.props}
+						buttonProps={conform.input(
+							fields.agreeToTermsOfServiceAndPrivacyPolicy,
+							{ type: 'checkbox' },
+						)}
 						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
 					/>
 
 					<CheckboxField
 						labelProps={{
-							...fields.agreeToMailingList.labelProps,
+							htmlFor: fields.agreeToMailingList.id,
 							children:
 								'Would you like to receive special discounts and offers?',
 						}}
-						buttonProps={fields.agreeToMailingList.props}
+						buttonProps={conform.input(fields.agreeToMailingList, {
+							type: 'checkbox',
+						})}
 						errors={fields.agreeToMailingList.errors}
 					/>
 
 					<CheckboxField
 						labelProps={{
-							...fields.remember.labelProps,
+							htmlFor: fields.remember.id,
 							children: 'Remember me',
 						}}
-						buttonProps={fields.remember.props}
+						buttonProps={conform.input(fields.remember, { type: 'checkbox' })}
 						errors={fields.remember.errors}
 					/>
 
 					<input
-						{...fields.redirectTo.props}
+						name={fields.redirectTo.name}
 						type="hidden"
 						value={redirectTo}
 					/>
 
-					{form.errorUI}
+					<ErrorList errors={data.formError ? [data.formError] : []} />
+					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6">
 						<Button

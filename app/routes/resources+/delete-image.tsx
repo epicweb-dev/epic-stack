@@ -1,8 +1,8 @@
+import { parse } from '@conform-to/zod'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { preprocessFormData } from '~/utils/forms'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
 
 export const ROUTE_PATH = '/resources/delete-image'
 
@@ -13,15 +13,23 @@ const DeleteFormSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request, { redirectTo: null })
 	const formData = await request.formData()
-	const result = DeleteFormSchema.safeParse(
-		preprocessFormData(formData, DeleteFormSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: DeleteFormSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value) {
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
-	const { imageId } = result.data
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
+	}
+	const { imageId } = submission.value
 	const image = await prisma.image.findFirst({
 		select: { fileId: true },
 		where: {
@@ -30,10 +38,11 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	})
 	if (!image) {
+		submission.error.imageId = ['Image not found']
 		return json(
 			{
 				status: 'error',
-				errors: { formErrors: ['Image not found'], fieldErrors: {} },
+				submission,
 			} as const,
 			{ status: 404 },
 		)

@@ -1,5 +1,5 @@
-const { spawn } = require('child_process')
-const { getInstanceInfo } = require('litefs-js')
+import { spawn } from 'child_process'
+import { getInstanceInfo } from 'litefs-js'
 
 async function go() {
 	const { currentInstance, currentIsPrimary, primaryInstance } =

@@ -3,48 +3,60 @@
  */
 import { faker } from '@faker-js/faker'
 import fs from 'fs'
-import { createPassword, createUser } from 'prisma/seed-utils'
-import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils'
+import { createPassword, createUser } from 'tests/db-utils.ts'
+import { BASE_URL, getSessionSetCookieHeader } from 'tests/vitest-utils.ts'
 import invariant from 'tiny-invariant'
-import { expect } from 'vitest'
-import { prisma } from '~/utils/db.server'
-import { ROUTE_PATH, action } from './delete-image'
+import { expect, test } from 'vitest'
+import { prisma } from '~/utils/db.server.ts'
+import { ROUTE_PATH, action } from './delete-image.tsx'
 
 const RESOURCE_URL = `${BASE_URL}${ROUTE_PATH}`
 
 async function setupUser() {
 	const userData = createUser()
-	const user = await prisma.user.create({
+	const session = await prisma.session.create({
 		data: {
-			...userData,
-			password: {
-				create: createPassword(userData.username),
-			},
-			image: {
+			expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+			user: {
 				create: {
-					contentType: 'image/jpeg',
-					file: {
+					...userData,
+					password: {
+						create: createPassword(userData.username),
+					},
+					image: {
 						create: {
-							blob: await fs.promises.readFile(
-								'./tests/fixtures/test-profile.jpg',
-							),
+							contentType: 'image/jpeg',
+							file: {
+								create: {
+									blob: await fs.promises.readFile(
+										'./tests/fixtures/test-profile.jpg',
+									),
+								},
+							},
 						},
 					},
 				},
 			},
 		},
-		select: { id: true, imageId: true },
+		select: {
+			id: true,
+			user: {
+				select: { id: true, imageId: true },
+			},
+		},
 	})
+	const { user } = session
 	invariant(user.imageId, 'User should have an image')
 	return {
 		user: { ...user, imageId: user.imageId },
-		cookie: await getUserSetCookieHeader(user),
+		cookie: await getSessionSetCookieHeader(session),
 	}
 }
 
 test('allows users to delete their own images', async () => {
 	const { user, cookie } = await setupUser()
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('imageId', user.imageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -63,6 +75,7 @@ test('allows users to delete their own images', async () => {
 
 test('requires auth', async () => {
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('imageId', faker.datatype.uuid())
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -80,6 +93,7 @@ test('requires auth', async () => {
 test('validates the form', async () => {
 	const { user, cookie } = await setupUser()
 	const form = new FormData()
+	form.set('intent', 'submit')
 	form.set('somethingElse', user.imageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
@@ -88,13 +102,17 @@ test('validates the form', async () => {
 	})
 	const response = await action({ request, params: {}, context: {} })
 	expect(await response.json()).toEqual({
-		errors: {
-			fieldErrors: {
-				imageId: ['Required'],
-			},
-			formErrors: [],
-		},
 		status: 'error',
+		submission: {
+			error: {
+				imageId: 'Required',
+			},
+			intent: 'submit',
+			payload: {
+				intent: 'submit',
+				somethingElse: user.imageId,
+			},
+		},
 	})
 	expect(response.status).toBe(400)
 })
@@ -102,7 +120,9 @@ test('validates the form', async () => {
 test('cannot delete an image that does not exist', async () => {
 	const { cookie } = await setupUser()
 	const form = new FormData()
-	form.set('imageId', faker.datatype.uuid())
+	form.set('intent', 'submit')
+	const fakeImageId = faker.datatype.uuid()
+	form.set('imageId', fakeImageId)
 	const request = new Request(RESOURCE_URL, {
 		method: 'POST',
 		headers: { cookie },
@@ -110,11 +130,17 @@ test('cannot delete an image that does not exist', async () => {
 	})
 	const response = await action({ request, params: {}, context: {} })
 	expect(await response.json()).toEqual({
-		errors: {
-			fieldErrors: {},
-			formErrors: ['Image not found'],
-		},
 		status: 'error',
+		submission: {
+			error: {
+				imageId: ['Image not found'],
+			},
+			intent: 'submit',
+			payload: {
+				intent: 'submit',
+				imageId: fakeImageId,
+			},
+		},
 	})
 	expect(response.status).toBe(404)
 })

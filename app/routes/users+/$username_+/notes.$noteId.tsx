@@ -1,10 +1,10 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { GeneralErrorBoundary } from '~/components/error-boundary'
-import { DeleteNote } from '~/routes/resources+/delete-note'
-import { getUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
-import { ButtonLink } from '~/utils/forms'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { DeleteNote } from '~/routes/resources+/delete-note.tsx'
+import { getUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { ButtonLink } from '~/utils/forms.tsx'
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	const userId = await getUserId(request)

@@ -1,5 +1,5 @@
-import * as Checkbox from '@radix-ui/react-checkbox'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import Checkbox from '@radix-ui/react-checkbox/dist/index.js'
+import DropdownMenu from '@radix-ui/react-dropdown-menu/dist/index.js'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -20,16 +20,16 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useState } from 'react'
 import { withSentry } from "@sentry/remix";
 import tailwindStylesheetUrl from './styles/tailwind.css'
-import { authenticator } from './utils/auth.server'
-import { prisma } from './utils/db.server'
-import { getEnv } from './utils/env.server'
-import { ButtonLink } from './utils/forms'
-import { getUserImgSrc } from './utils/misc'
-import { useUser } from './utils/user'
+import { authenticator, getUserId } from './utils/auth.server.ts'
+import { prisma } from './utils/db.server.ts'
+import { getEnv } from './utils/env.server.ts'
+import { ButtonLink } from './utils/forms.tsx'
+import { getUserImgSrc } from './utils/misc.ts'
+import { useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -66,7 +66,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const userId = await authenticator.isAuthenticated(request)
+	const userId = await getUserId(request)
 
 	const user = userId
 		? await prisma.user.findUnique({

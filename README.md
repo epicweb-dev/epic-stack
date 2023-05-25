@@ -199,11 +199,13 @@ Prior to your first deployment, you'll need to do a few things:
 
 - Create a persistent volume for the sqlite database for both your staging and
   production environments. Run the following (feel free to change the GB size
-  based on your needs):
+  based on your needs and the region of your choice
+  (`https://fly.io/docs/reference/regions/`). If you do change the region,
+  make sure you change the `primary_region` in fly.toml as well):
 
   ```sh
-  fly volumes create data --size 1 --app epic-stack-template
-  fly volumes create data --size 1 --app epic-stack-template-staging
+  fly volumes create data --region sjc --size 1 --app epic-stack-template
+  fly volumes create data --region sjc --size 1 --app epic-stack-template-staging
   ```
 
 Now that everything is set up you can commit and push your changes to your repo.
@@ -283,7 +285,7 @@ run to format all files in the project.
 [build-badge]: https://img.shields.io/github/actions/workflow/status/epicweb-dev/epic-stack/deploy.yml?branch=main&logo=github&style=flat-square
 [build]: https://github.com/epicweb-dev/epic-stack/actions?query=workflow%3Adeploy
 [license-badge]: https://img.shields.io/badge/license-MIT%20License-blue.svg?style=flat-square
-[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE
+[license]: https://github.com/epicweb-dev/epic-stack/blob/main/LICENSE.md
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
 [coc]: https://kentcdodds.com/conduct
 <!-- prettier-ignore-end -->

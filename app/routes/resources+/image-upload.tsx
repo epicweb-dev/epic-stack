@@ -6,7 +6,7 @@ import {
 } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import invariant from 'tiny-invariant'
-import { prisma } from '~/utils/db.server'
+import { prisma } from '~/utils/db.server.ts'
 
 const MAX_SIZE = 1024 * 1024 * 5 // 5MB
 
@@ -58,8 +58,4 @@ export function ImageUpload() {
 			<button type="submit">Upload</button>
 		</fetcher.Form>
 	)
-}
-
-export default function ImageUploader() {
-	return <ImageUpload />
 }

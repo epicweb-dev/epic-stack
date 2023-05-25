@@ -7,18 +7,18 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { getAllInstances, getInstanceInfo } from 'litefs-js'
-import { ensureInstance } from 'litefs-js/remix'
+import { ensureInstance } from 'litefs-js/remix.js'
 import invariant from 'tiny-invariant'
-import { Spacer } from '~/components/spacer'
+import { Spacer } from '~/components/spacer.tsx'
 import {
 	cache,
 	getAllCacheKeys,
 	lruCache,
 	searchCacheKeys,
-} from '~/utils/cache.server'
-import { Button, Field } from '~/utils/forms'
-import { useDebounce, useDoubleCheck } from '~/utils/misc'
-import { requireAdmin } from '~/utils/permissions.server'
+} from '~/utils/cache.server.ts'
+import { Button, Field } from '~/utils/forms.tsx'
+import { useDebounce, useDoubleCheck } from '~/utils/misc.ts'
+import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
 	await requireAdmin(request)
@@ -99,7 +99,7 @@ export default function CacheAdminRoute() {
 					<div className="flex flex-1 gap-4">
 						<button
 							type="submit"
-							className="flex h-16 items-center justify-center"
+							className="flex items-center justify-center h-16"
 						>
 							🔎
 						</button>
@@ -112,7 +112,7 @@ export default function CacheAdminRoute() {
 								defaultValue: query,
 							}}
 						/>
-						<div className="flex h-16 w-14 items-center text-lg font-medium text-slate-500">
+						<div className="flex items-center h-16 text-lg font-medium w-14 text-slate-500">
 							<span title="Total results shown">
 								{data.cacheKeys.sqlite.length + data.cacheKeys.lru.length}
 							</span>

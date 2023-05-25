@@ -2,7 +2,7 @@ import type { DataFunctionArgs } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { z } from 'zod'
 import { getInstanceInfo, getInternalInstanceDomain } from 'litefs-js'
-import { cache } from '~/utils/cache.server'
+import { cache } from '~/utils/cache.server.ts'
 
 export async function action({ request }: DataFunctionArgs) {
 	const { currentIsPrimary, primaryInstance } = await getInstanceInfo()

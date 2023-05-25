@@ -7,13 +7,15 @@ node_modules
 
 /prisma/data.db
 /prisma/data.db-journal
-/prisma/test
+/tests/prisma
 
-*.local.*
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/mocks/fixtures/email/*.json
+/tests/fixtures/email/
 /coverage
 
 /other/cache.db
+
+# Easy way to create temporary files/folders that won't accidentally be added to git
+*.local.*

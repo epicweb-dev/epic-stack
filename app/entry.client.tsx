@@ -3,7 +3,7 @@ import { startTransition } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
 if (ENV.MODE === 'development') {
-	import('~/utils/devtools').then(({ init }) => init())
+	import('~/utils/devtools.tsx').then(({ init }) => init())
 }
 if (ENV.MODE === 'production') { 
 	import('~/utils/monitoring.client').then(({ init }) => init())

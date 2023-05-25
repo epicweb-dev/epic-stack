@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react'
+import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
 	json,
@@ -8,14 +8,14 @@ import {
 } from '@remix-run/node'
 import { Link, useFetcher } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '~/components/error-boundary'
-import { prisma } from '~/utils/db.server'
-import { sendEmail } from '~/utils/email.server'
-import { decrypt, encrypt } from '~/utils/encryption.server'
-import { Button, ErrorList, Field } from '~/utils/forms'
-import { getDomainUrl } from '~/utils/misc.server'
-import { commitSession, getSession } from '~/utils/session.server'
-import { emailSchema, usernameSchema } from '~/utils/user-validation'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { prisma } from '~/utils/db.server.ts'
+import { sendEmail } from '~/utils/email.server.ts'
+import { decrypt, encrypt } from '~/utils/encryption.server.ts'
+import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { getDomainUrl } from '~/utils/misc.server.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 
 export const resetPasswordSessionKey = 'resetPasswordToken'
 const resetPasswordTokenQueryParam = 'token'
@@ -62,10 +62,13 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value) {
-		return json({
-			status: 'error',
-			submission,
-		} as const)
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
 	if (submission.intent !== 'submit') {
 		return json({ status: 'success', submission } as const)
@@ -114,6 +117,7 @@ async function sendPasswordResetEmail({
 				<p>Click the link below to reset the Epic Notes password for ${user.username}.</p>
 				<a href="${resetPasswordUrl}">${resetPasswordUrl}</a>
 			</body>
+		</html>
 		`,
 	})
 }
@@ -165,7 +169,7 @@ export default function SignupRoute() {
 										htmlFor: fields.usernameOrEmail.id,
 										children: 'Username or Email',
 									}}
-									inputProps={fields.usernameOrEmail}
+									inputProps={conform.input(fields.usernameOrEmail)}
 									errors={fields.usernameOrEmail.errors}
 								/>
 							</div>

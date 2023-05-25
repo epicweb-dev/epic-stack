@@ -1,14 +1,11 @@
 import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
-import {
-	Button,
-	getFieldsFromSchema,
-	preprocessFormData,
-	useForm,
-} from '~/utils/forms'
+import { Button, ErrorList } from '~/utils/forms.tsx'
+import { useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { z } from 'zod'
-import { requireUserId } from '~/utils/auth.server'
-import { prisma } from '~/utils/db.server'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
 
 const DeleteFormSchema = z.object({
 	noteId: z.string(),
@@ -17,15 +14,22 @@ const DeleteFormSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const result = DeleteFormSchema.safeParse(
-		preprocessFormData(formData, DeleteFormSchema),
-	)
-	if (!result.success) {
-		return json({ status: 'error', errors: result.error.flatten() } as const, {
-			status: 400,
-		})
+	const submission = parse(formData, {
+		schema: DeleteFormSchema,
+		acceptMultipleErrors: () => true,
+	})
+	if (!submission.value || submission.intent !== 'submit') {
+		return json(
+			{
+				status: 'error',
+				submission,
+			} as const,
+			{ status: 400 },
+		)
 	}
-	const { noteId } = result.data
+
+	const { noteId } = submission.value
+
 	const note = await prisma.note.findFirst({
 		select: { id: true, owner: { select: { username: true } } },
 		where: {
@@ -34,12 +38,10 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	})
 	if (!note) {
-		return json(
-			{ status: 'error', errors: { formErrors: ['Note not found'] } } as const,
-			{
-				status: 404,
-			},
-		)
+		submission.error.noteId = ['Note not found']
+		return json({ status: 'error', submission } as const, {
+			status: 404,
+		})
 	}
 
 	await prisma.note.delete({
@@ -52,20 +54,19 @@ export async function action({ request }: DataFunctionArgs) {
 export function DeleteNote({ id }: { id: string }) {
 	const noteDeleteFetcher = useFetcher<typeof action>()
 
-	const { form } = useForm({
-		name: 'delete-note',
-		errors: {
-			...noteDeleteFetcher.data?.errors,
-			formErrors: noteDeleteFetcher.data?.errors?.formErrors,
+	const [form] = useForm({
+		id: 'delete-note',
+		constraint: getFieldsetConstraint(DeleteFormSchema),
+		onValidate({ formData }) {
+			return parse(formData, { schema: DeleteFormSchema })
 		},
-		fieldMetadatas: getFieldsFromSchema(DeleteFormSchema),
 	})
 
 	return (
 		<noteDeleteFetcher.Form
 			method="post"
 			action="/resources/delete-note"
-			{...form}
+			{...form.props}
 		>
 			<input type="hidden" name="noteId" value={id} />
 			<Button
@@ -81,7 +82,7 @@ export function DeleteNote({ id }: { id: string }) {
 			>
 				Delete
 			</Button>
-			{form.errorUI}
+			<ErrorList errors={form.errors} id={form.errorId} />
 		</noteDeleteFetcher.Form>
 	)
 }

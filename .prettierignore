@@ -8,7 +8,7 @@ node_modules
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/mocks/fixtures/email/*.json
+/tests/mocks/fixtures/email/*.json
 /coverage
 
 package.json

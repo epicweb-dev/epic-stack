@@ -1,22 +1,22 @@
-const { flatRoutes } = require('remix-flat-routes')
+import { flatRoutes } from 'remix-flat-routes'
 
 /**
  * @type {import('@remix-run/dev').AppConfig}
  */
-module.exports = {
+export default {
 	cacheDirectory: './node_modules/.cache/remix',
 	ignoredRouteFiles: ['**/*'],
-	serverModuleFormat: 'cjs',
+	serverModuleFormat: 'esm',
+	serverPlatform: 'node',
+	tailwind: true,
 	postcss: true,
+	watchPaths: ['./tailwind.config.ts'],
 	future: {
 		v2_meta: true,
 		v2_errorBoundary: true,
 		v2_normalizeFormMethod: true,
 		v2_routeConvention: true,
-		unstable_dev: {
-			port: '', // let it choose a random port
-			appServerPort: process.env.APP_SERVER_PORT || process.env.PORT || 3000,
-		},
+		unstable_dev: true,
 	},
 	routes: async defineRoutes => {
 		return flatRoutes('routes', defineRoutes, {
