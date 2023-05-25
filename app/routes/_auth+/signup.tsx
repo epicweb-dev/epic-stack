@@ -190,7 +190,7 @@ export default function SignupRoute() {
 								htmlFor: fields.email.id,
 								children: 'Email',
 							}}
-							inputProps={fields.email}
+							inputProps={conform.input(fields.email)}
 							errors={fields.email.errors}
 						/>
 						<ErrorList errors={form.errors} id={form.errorId} />
