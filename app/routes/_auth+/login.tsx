@@ -6,14 +6,12 @@ import {
 import { useLoaderData, useSearchParams } from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
-import { authenticator } from '~/utils/auth.server.ts'
+import { authenticator, requireAnonymous } from '~/utils/auth.server.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { InlineLogin } from '../resources+/login.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
-		successRedirect: '/',
-	})
+	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
 	const error = session.get(authenticator.sessionErrorKey)
 	let errorMessage: string | null = null

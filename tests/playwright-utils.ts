@@ -63,10 +63,17 @@ export async function loginPage({
 				},
 		  })
 		: await insertNewUser()
+	const session = await prisma.session.create({
+		data: {
+			expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+			userId: user.id,
+		},
+		select: { id: true },
+	})
 
-	const session = await getSession()
-	session.set(authenticator.sessionKey, user.id)
-	const cookieValue = await commitSession(session)
+	const cookieSession = await getSession()
+	cookieSession.set(authenticator.sessionKey, session.id)
+	const cookieValue = await commitSession(cookieSession)
 	const { _session } = parse(cookieValue)
 	await page.context().addCookies([
 		{

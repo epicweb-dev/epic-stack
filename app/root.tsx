@@ -23,7 +23,7 @@ import {
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import tailwindStylesheetUrl from './styles/tailwind.css'
-import { authenticator } from './utils/auth.server.ts'
+import { authenticator, getUserId } from './utils/auth.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
@@ -65,7 +65,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const userId = await authenticator.isAuthenticated(request)
+	const userId = await getUserId(request)
 
 	const user = userId
 		? await prisma.user.findUnique({

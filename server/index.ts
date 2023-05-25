@@ -11,7 +11,8 @@ import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
 
-// @ts-expect-error - when we get here the file exist
+// @ts-ignore - this file may not exist if you haven't built yet, but it will
+// definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
 
 const BUILD_PATH = '../build/index.js'

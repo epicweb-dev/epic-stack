@@ -16,7 +16,7 @@ import {
 } from '@remix-run/react'
 import { z } from 'zod'
 import { Spacer } from '~/components/spacer.tsx'
-import { authenticator, createUser } from '~/utils/auth.server.ts'
+import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
 import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
 import { safeRedirect } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
@@ -25,8 +25,8 @@ import {
 	passwordSchema,
 	usernameSchema,
 } from '~/utils/user-validation.ts'
-import { onboardingEmailSessionKey } from './signup.tsx'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
+import { onboardingEmailSessionKey } from './signup.tsx'
 
 const OnboardingFormSchema = z
 	.object({
@@ -52,9 +52,7 @@ const OnboardingFormSchema = z
 	})
 
 export async function loader({ request }: DataFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
-		successRedirect: '/',
-	})
+	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
 	const error = session.get(authenticator.sessionErrorKey)
 	const onboardingEmail = session.get(onboardingEmailSessionKey)
@@ -72,8 +70,8 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 export async function action({ request }: DataFunctionArgs) {
-	const session = await getSession(request.headers.get('cookie'))
-	const email = session.get(onboardingEmailSessionKey)
+	const cookieSession = await getSession(request.headers.get('cookie'))
+	const email = cookieSession.get(onboardingEmailSessionKey)
 	if (typeof email !== 'string' || !email) {
 		return redirect('/signup')
 	}
@@ -105,14 +103,13 @@ export async function action({ request }: DataFunctionArgs) {
 		redirectTo,
 	} = submission.value
 
-	const user = await createUser({ email, username, password, name })
-	session.set(authenticator.sessionKey, user.id)
-	session.unset(onboardingEmailSessionKey)
+	const session = await signup({ email, username, password, name })
 
-	const newCookie = await commitSession(session, {
-		maxAge: remember
-			? 60 * 60 * 24 * 7 // 7 days
-			: undefined,
+	cookieSession.set(authenticator.sessionKey, session.id)
+	cookieSession.unset(onboardingEmailSessionKey)
+
+	const newCookie = await commitSession(cookieSession, {
+		expires: remember ? session.expirationDate : undefined,
 	})
 	return redirect(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
@@ -162,7 +159,9 @@ export default function OnboardingPage() {
 						inputProps={{
 							...conform.input(fields.username),
 							autoComplete: 'username',
-							autoFocus: typeof actionData === 'undefined' || typeof fields.username.initialError !== 'undefined',
+							autoFocus:
+								typeof actionData === 'undefined' ||
+								typeof fields.username.initialError !== 'undefined',
 						}}
 						errors={fields.username.errors}
 					/>
@@ -201,7 +200,10 @@ export default function OnboardingPage() {
 							children:
 								'Do you agree to our Terms of Service and Privacy Policy?',
 						}}
-						buttonProps={conform.input(fields.agreeToTermsOfServiceAndPrivacyPolicy, { type: 'checkbox' })}
+						buttonProps={conform.input(
+							fields.agreeToTermsOfServiceAndPrivacyPolicy,
+							{ type: 'checkbox' },
+						)}
 						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
 					/>
 
@@ -211,7 +213,9 @@ export default function OnboardingPage() {
 							children:
 								'Would you like to receive special discounts and offers?',
 						}}
-						buttonProps={conform.input(fields.agreeToMailingList, { type: 'checkbox' })}
+						buttonProps={conform.input(fields.agreeToMailingList, {
+							type: 'checkbox',
+						})}
 						errors={fields.agreeToMailingList.errors}
 					/>
 
@@ -224,7 +228,11 @@ export default function OnboardingPage() {
 						errors={fields.remember.errors}
 					/>
 
-					<input name={fields.redirectTo.name} type="hidden" value={redirectTo} />
+					<input
+						name={fields.redirectTo.name}
+						type="hidden"
+						value={redirectTo}
+					/>
 
 					<ErrorList errors={data.formError ? [data.formError] : []} />
 					<ErrorList errors={form.errors} id={form.errorId} />

@@ -65,6 +65,7 @@ model User {
   password Password?
   notes    Note[]
   roles    Role[]
+  Session  Session[]
 }
 
 model Password {
@@ -72,6 +73,14 @@ model Password {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique
+}
+
+model Session {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  expirationDate DateTime
 }
 
 model Note {

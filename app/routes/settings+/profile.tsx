@@ -147,6 +147,7 @@ export default function EditUserProfile() {
 			return parse(formData, { schema: ProfileFormSchema })
 		},
 		defaultValue: {
+			username: data.user.username,
 			name: data.user.name ?? '',
 			email: data.user.email,
 		},
@@ -188,10 +189,7 @@ export default function EditUserProfile() {
 								htmlFor: fields.username.id,
 								children: 'Username',
 							}}
-							inputProps={{
-								...fields.username,
-								defaultValue: data.user.username,
-							}}
+							inputProps={conform.input(fields.username)}
 							errors={fields.username.errors}
 						/>
 						<Field
@@ -224,7 +222,9 @@ export default function EditUserProfile() {
 										children: 'Current Password',
 									}}
 									inputProps={{
-										...conform.input(fields.currentPassword, { type: 'password' }),
+										...conform.input(fields.currentPassword, {
+											type: 'password',
+										}),
 										autoComplete: 'current-password',
 									}}
 									errors={fields.currentPassword.errors}

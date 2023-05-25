@@ -5,12 +5,15 @@ import { FormStrategy } from 'remix-auth-form'
 import invariant from 'tiny-invariant'
 import { prisma } from '~/utils/db.server.ts'
 import { sessionStorage } from './session.server.ts'
+import { redirect } from '@remix-run/node'
 
 export type { User }
 
 export const authenticator = new Authenticator<string>(sessionStorage, {
-	sessionKey: 'userId',
+	sessionKey: 'sessionId',
 })
+
+const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
 
 authenticator.use(
 	new FormStrategy(async ({ form }) => {
@@ -27,8 +30,15 @@ authenticator.use(
 		if (!user) {
 			throw new Error('Invalid username or password')
 		}
+		const session = await prisma.session.create({
+			data: {
+				expirationDate: new Date(Date.now() + SESSION_EXPIRATION_TIME),
+				userId: user.id,
+			},
+			select: { id: true },
+		})
 
-		return user.id
+		return session.id
 	}),
 	FormStrategy.name,
 )
@@ -48,14 +58,35 @@ export async function requireUserId(
 	const failureRedirect = ['/login', loginParams?.toString()]
 		.filter(Boolean)
 		.join('?')
-	const userId = await authenticator.isAuthenticated(request, {
+	const sessionId = await authenticator.isAuthenticated(request, {
 		failureRedirect,
 	})
-	return userId
+	const session = await prisma.session.findFirst({
+		where: { id: sessionId },
+		select: { userId: true, expirationDate: true },
+	})
+	if (!session) {
+		throw redirect(failureRedirect)
+	}
+	console.log(session.expirationDate, session.expirationDate > new Date())
+	return session.userId
 }
 
 export async function getUserId(request: Request) {
-	return authenticator.isAuthenticated(request)
+	const sessionId = await authenticator.isAuthenticated(request)
+	if (!sessionId) return null
+	const session = await prisma.session.findUnique({
+		where: { id: sessionId },
+		select: { userId: true },
+	})
+	if (!session) return null
+	return session.userId
+}
+
+export async function requireAnonymous(request: Request) {
+	await authenticator.isAuthenticated(request, {
+		successRedirect: '/',
+	})
 }
 
 export async function resetUserPassword({
@@ -78,7 +109,7 @@ export async function resetUserPassword({
 	})
 }
 
-export async function createUser({
+export async function signup({
 	email,
 	username,
 	password,
@@ -91,18 +122,25 @@ export async function createUser({
 }) {
 	const hashedPassword = await getPasswordHash(password)
 
-	return prisma.user.create({
+	const session = await prisma.session.create({
 		data: {
-			email,
-			username,
-			name,
-			password: {
+			expirationDate: new Date(Date.now() + SESSION_EXPIRATION_TIME),
+			user: {
 				create: {
-					hash: hashedPassword,
+					email,
+					username,
+					name,
+					password: {
+						create: {
+							hash: hashedPassword,
+						},
+					},
 				},
 			},
 		},
+		select: { id: true, expirationDate: true },
 	})
+	return session
 }
 
 export async function getPasswordHash(password: string) {

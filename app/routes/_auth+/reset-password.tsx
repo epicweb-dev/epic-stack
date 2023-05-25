@@ -13,7 +13,11 @@ import {
 } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { authenticator, resetUserPassword } from '~/utils/auth.server.ts'
+import {
+	authenticator,
+	requireAnonymous,
+	resetUserPassword,
+} from '~/utils/auth.server.ts'
 import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
@@ -32,9 +36,7 @@ const ResetPasswordSchema = z
 	})
 
 export async function loader({ request }: DataFunctionArgs) {
-	await authenticator.isAuthenticated(request, {
-		successRedirect: '/',
-	})
+	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
 	const error = session.get(authenticator.sessionErrorKey)
 	const resetPasswordUsername = session.get(resetPasswordSessionKey)

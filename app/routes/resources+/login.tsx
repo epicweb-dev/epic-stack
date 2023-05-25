@@ -35,9 +35,9 @@ export async function action({ request }: DataFunctionArgs) {
 		)
 	}
 
-	let userId: string | null = null
+	let sessionId: string | null = null
 	try {
-		userId = await authenticator.authenticate(FormStrategy.name, request, {
+		sessionId = await authenticator.authenticate(FormStrategy.name, request, {
 			throwOnError: true,
 		})
 	} catch (error) {
@@ -60,7 +60,7 @@ export async function action({ request }: DataFunctionArgs) {
 	}
 
 	const session = await getSession(request.headers.get('cookie'))
-	session.set(authenticator.sessionKey, userId)
+	session.set(authenticator.sessionKey, sessionId)
 	const { remember, redirectTo } = submission.value
 	const newCookie = await commitSession(session, {
 		maxAge: remember
@@ -143,7 +143,11 @@ export function InlineLogin({
 						</div>
 					</div>
 
-					<input value={redirectTo} {...fields.redirectTo} type="hidden" />
+					<input
+						value={redirectTo}
+						{...conform.input(fields.redirectTo)}
+						type="hidden"
+					/>
 					<ErrorList errors={formError ? [formError] : []} />
 					<ErrorList errors={form.errors} id={form.errorId} />
 
