@@ -10,7 +10,7 @@
     "build": "run-s build:*",
     "build:remix": "remix build --sourcemap",
     "build:server": "tsx ./other/build-server.ts",
-    "build:sentry": "sentry-upload-sourcemaps",
+    "upload:sentry": "sentry-upload-sourcemaps",
     "dev": "remix dev -c \"npm run dev:server\" --no-restart",
     "dev:server": "cross-env MOCKS=true tsx watch --clear-screen=false --ignore \"app/**\" --ignore \"build/**\" --ignore \"node_modules/**\" ./index.js",
     "prisma:studio": "prisma studio",
