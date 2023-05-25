@@ -4,7 +4,7 @@
 import { faker } from '@faker-js/faker'
 import fs from 'fs'
 import { createPassword, createUser } from 'tests/db-utils.ts'
-import { BASE_URL, getUserSetCookieHeader } from 'tests/vitest-utils.ts'
+import { BASE_URL, getSessionSetCookieHeader } from 'tests/vitest-utils.ts'
 import invariant from 'tiny-invariant'
 import { expect, test } from 'vitest'
 import { prisma } from '~/utils/db.server.ts'
@@ -14,31 +14,42 @@ const RESOURCE_URL = `${BASE_URL}${ROUTE_PATH}`
 
 async function setupUser() {
 	const userData = createUser()
-	const user = await prisma.user.create({
+	const session = await prisma.session.create({
 		data: {
-			...userData,
-			password: {
-				create: createPassword(userData.username),
-			},
-			image: {
+			expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+			user: {
 				create: {
-					contentType: 'image/jpeg',
-					file: {
+					...userData,
+					password: {
+						create: createPassword(userData.username),
+					},
+					image: {
 						create: {
-							blob: await fs.promises.readFile(
-								'./tests/fixtures/test-profile.jpg',
-							),
+							contentType: 'image/jpeg',
+							file: {
+								create: {
+									blob: await fs.promises.readFile(
+										'./tests/fixtures/test-profile.jpg',
+									),
+								},
+							},
 						},
 					},
 				},
 			},
 		},
-		select: { id: true, imageId: true },
+		select: {
+			id: true,
+			user: {
+				select: { id: true, imageId: true },
+			},
+		},
 	})
+	const { user } = session
 	invariant(user.imageId, 'User should have an image')
 	return {
 		user: { ...user, imageId: user.imageId },
-		cookie: await getUserSetCookieHeader(user),
+		cookie: await getSessionSetCookieHeader(session),
 	}
 }
 

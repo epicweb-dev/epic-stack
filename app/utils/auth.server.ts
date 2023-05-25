@@ -68,7 +68,6 @@ export async function requireUserId(
 	if (!session) {
 		throw redirect(failureRedirect)
 	}
-	console.log(session.expirationDate, session.expirationDate > new Date())
 	return session.userId
 }
 
