@@ -3,13 +3,9 @@
 It’s important to update your packages to get new features, bug fixes, and
 security patches.
 [NPM Check Updates](https://www.npmjs.com/package/npm-check-updates) is a CLI
-that will help you safely make those updates.
-
-## Install npm-check-updates
-
-```sh
-npm i -D npm-check-updates
-```
+that will help you safely make those updates. You can watch
+[this youtube video](https://www.youtube.com/watch?v=0XQXGx3lLaU) for a
+demonstration of how to do this.
 
 ## See a list of packages that can be updated
 
@@ -18,7 +14,7 @@ show you which packages can be updated and which major, minor, or patch versions
 are available.
 
 ```sh
-npx ncu
+npx npm-check-updates
 ```
 
 Notice the colors:
@@ -33,24 +29,23 @@ Since green patch version updates are meant for backward-compatible bug fixes,
 it's ok to update them all at once.
 
 ```sh
-npx ncu -u -filter <package-with-green-patch-update>
-npx ncu -u -filter <package-with-green-patch-update>
-npx ncu -u -filter <package-with-green-patch-update>
+npx npm-check-updates -u --target patch
 ...
 npm i
 ```
 
-> Note: `npx ncu -u -t patch` updates all patch versions, including major
-> version zero patch versions, which can break your code. If all your patch
-> updates are green, feel free to use this command instead to update them all at
-> once.
+> Note: `npx npm-check-updates -u -t patch` updates all patch versions,
+> including major version zero patch versions, which can break your code. If all
+> your patch updates are green, feel free to use this command instead to update
+> them all at once.
 
 Assuming package maintainers follow semantic versioning, updating patch versions
 shouldn't break anything, but it's good practice to re-run your tests before
 committing these changes.
 
 ```sh
-npm run test
+npm run test -- run
+npm run test:e2e:run
 ```
 
 If all tests pass, commit your changes.
@@ -74,7 +69,7 @@ To check for the new package's features, check its release notes on GitHub.
 > package is for your project when choosing which to update first.
 
 ```sh
-npx ncu -u -filter <package-with-cyan-minor-update>
+npx npm-check-updates -u -filter <package-with-cyan-minor-update>
 npm i
 ```
 
@@ -83,7 +78,8 @@ versions shouldn't break anything, but it's good practice to re-run your tests
 to make sure.
 
 ```sh
-npm run test
+npm run test -- run
+npm run test:e2e:run
 ```
 
 If all tests pass, commit your changes.
@@ -104,19 +100,22 @@ accordingly.
 > for your project when choosing which to update first.
 
 ```sh
-npx ncu -u -f <package-with-red-version-update>
+npx npm-check-updates -u -f <package-with-red-version-update>
 npm i
 ```
 
 Make sure you've made all relevant changes and that the tests pass.
 
 ```sh
-npm run test
+npm run test -- run
+npm run test:e2e:run
 ```
 
 If all tests pass, commit your changes.
 
 ```sh
 git add .
-git commit -m "Updated <package-with-red-version-update> patch/minot/major version"
+git commit -m "Updated <package-with-red-version-update> major version"
 ```
+
+Then continue for each package.
