@@ -2,11 +2,14 @@
 
 ## Test Plan
 
-## Platform update
-- [ ] Node Dependencies - bumping versions or adding a new dependency
+<!-- What steps need to be taken to verify this works as expected? -->
 
 ## Checklist
-- [ ] Testing - Tests have been added to cover my changes.
-- [ ] `data-testid` - Make sure that testIDs have been added or updated, more info at [testing library docs](https://testing-library.com/docs/queries/bytestid/).
+
+- [ ] Tests updated
+- [ ] Docs updated
 
 ## Screenshots
+
+<!-- If what you're changing is within the app, please show before/after.
+You can provide a video as well if that makes more sense -->
