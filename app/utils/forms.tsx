@@ -1,4 +1,4 @@
-import Checkbox from '@radix-ui/react-checkbox/dist/index.js'
+import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
 import { clsx } from 'clsx'
 import React, { useId } from 'react'
