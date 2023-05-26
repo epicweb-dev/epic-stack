@@ -61,6 +61,9 @@ export async function action({ request }: DataFunctionArgs) {
 		schema: forgotPasswordSchema,
 		acceptMultipleErrors: () => true,
 	})
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
 	if (!submission.value) {
 		return json(
 			{
@@ -69,9 +72,6 @@ export async function action({ request }: DataFunctionArgs) {
 			} as const,
 			{ status: 400 },
 		)
-	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
 	}
 	const { usernameOrEmail } = submission.value
 

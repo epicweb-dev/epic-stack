@@ -64,7 +64,10 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const submission = parse(formData, { schema: PhotoFormSchema })
 
-	if (!submission.value || submission.intent !== 'submit') {
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
 		return json(
 			{
 				status: 'error',
