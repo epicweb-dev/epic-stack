@@ -60,7 +60,10 @@ export async function action({ request }: DataFunctionArgs) {
 		schema: ResetPasswordSchema,
 		acceptMultipleErrors: () => true,
 	})
-	if (!submission.value || submission.intent !== 'submit') {
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const);
+	}
+	if (!submission.value) {
 		return json(
 			{
 				status: 'error',

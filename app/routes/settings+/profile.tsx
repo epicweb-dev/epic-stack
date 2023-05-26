@@ -91,6 +91,9 @@ export async function action({ request }: DataFunctionArgs) {
 		),
 		acceptMultipleErrors: () => true,
 	})
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
 	if (!submission.value) {
 		return json(
 			{
@@ -99,9 +102,6 @@ export async function action({ request }: DataFunctionArgs) {
 			} as const,
 			{ status: 400 },
 		)
-	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
 	}
 	const { name, username, email, newPassword } = submission.value
 

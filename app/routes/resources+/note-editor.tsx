@@ -20,6 +20,9 @@ export async function action({ request }: DataFunctionArgs) {
 		schema: NoteEditorSchema,
 		acceptMultipleErrors: () => true,
 	})
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
 	if (!submission.value) {
 		return json(
 			{
@@ -28,9 +31,6 @@ export async function action({ request }: DataFunctionArgs) {
 			} as const,
 			{ status: 400 },
 		)
-	}
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
 	}
 	let note: { id: string; owner: { username: string } }
 

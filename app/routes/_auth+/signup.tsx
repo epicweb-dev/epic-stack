@@ -96,7 +96,10 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 		async: true,
 	})
-	if (!submission.value || submission.intent !== 'submit') {
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
 		return json(
 			{
 				status: 'error',
