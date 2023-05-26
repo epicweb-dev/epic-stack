@@ -1,5 +1,5 @@
-import Checkbox from '@radix-ui/react-checkbox/dist/index.js'
-import DropdownMenu from '@radix-ui/react-dropdown-menu/dist/index.js'
+import * as Checkbox from '@radix-ui/react-checkbox'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,

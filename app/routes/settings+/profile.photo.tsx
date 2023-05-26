@@ -1,6 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import Dialog from '@radix-ui/react-dialog/dist/index.js'
+import * as Dialog from '@radix-ui/react-dialog'
 import {
 	type DataFunctionArgs,
 	json,
