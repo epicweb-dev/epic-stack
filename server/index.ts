@@ -32,72 +32,67 @@ app.disable('x-powered-by')
 
 // Remix fingerprints its assets so we can cache forever.
 app.use(
-  '/build',
-  express.static('public/build', { immutable: true, maxAge: '1y' }),
+	'/build',
+	express.static('public/build', { immutable: true, maxAge: '1y' }),
 )
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
 app.use(express.static('public', { maxAge: '1h' }))
 
+morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
 app.use(morgan('tiny'))
 
-morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
-
 app.use((_, res, next) => {
-  res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
-  next()
+	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
+	next()
 })
 
 app.use(
-  helmet({
-    crossOriginEmbedderPolicy: false,
-    contentSecurityPolicy: {
-      directives: {
-        'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
-        'font-src': ["'self'"],
-        'frame-src': [
-          "'self'",
-        ],
-        'img-src': [
-          "'self'",
-          'data:',
-          'user-images.githubusercontent.com',
-          'raw.githubusercontent.com',
-        ],
-        'script-src': [
-          "'strict-dynamic'",
-          "'self'",
-          // @ts-expect-error
-          (_, res) => `'nonce-${res.locals.cspNonce}'`,
-        ],
-        'script-src-attr': [
-          // @ts-expect-error
-          (_, res) => `'nonce-${res.locals.cspNonce}'`,
-        ],
-        'upgrade-insecure-requests': null,
-      },
-    },
-  }),
+	helmet({
+		crossOriginEmbedderPolicy: false,
+		contentSecurityPolicy: {
+			directives: {
+				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
+				'font-src': ["'self'"],
+				'frame-src': ["'self'"],
+				'img-src': ["'self'"],
+				'script-src': [
+					"'strict-dynamic'",
+					"'self'",
+					// @ts-expect-error
+					(_, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'script-src-attr': [
+					// @ts-expect-error
+					(_, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'upgrade-insecure-requests': null,
+			},
+		},
+	}),
 )
 
-async function getRequestHandlerOptions(build: ServerBuild): Promise<Parameters<
-  typeof createRequestHandler
->[0]> {
-  function getLoadContext(_: any, res: any) {
-    return {cspNonce: res.locals.cspNonce}
-  }
-  return {build, mode: MODE, getLoadContext}
+async function getRequestHandlerOptions(
+	build: ServerBuild,
+): Promise<Parameters<typeof createRequestHandler>[0]> {
+	function getLoadContext(_: any, res: any) {
+		return { cspNonce: res.locals.cspNonce }
+	}
+	return { build, mode: MODE, getLoadContext }
 }
 
 app.all(
-  '*',
-  process.env.NODE_ENV === 'development'
-    ? async (req, res, next) => {
-        return createRequestHandler(await getRequestHandlerOptions(devBuild))(req, res, next)
-      }
-    : createRequestHandler(await getRequestHandlerOptions(build)),
+	'*',
+	process.env.NODE_ENV === 'development'
+		? async (req, res, next) => {
+				return createRequestHandler(await getRequestHandlerOptions(devBuild))(
+					req,
+					res,
+					next,
+				)
+		  }
+		: createRequestHandler(await getRequestHandlerOptions(build)),
 )
-
 
 const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({

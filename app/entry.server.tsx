@@ -1,11 +1,11 @@
-import 'dotenv/config'
-import { PassThrough, Transform } from 'stream'
 import { Response, type HandleDocumentRequestFunction } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
+import 'dotenv/config'
 import isbot from 'isbot'
-import { renderToPipeableStream } from 'react-dom/server'
-import { init, getEnv } from './utils/env.server.ts'
 import { getInstanceInfo } from 'litefs-js'
+import { renderToPipeableStream } from 'react-dom/server'
+import { PassThrough } from 'stream'
+import { getEnv, init } from './utils/env.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 
 const ABORT_DELAY = 5000
@@ -15,16 +15,14 @@ global.ENV = getEnv()
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
-export default async function handleRequest(
-	...args: DocRequestArgs
-) {
-  const [
-    request,
-    responseStatusCode,
-    responseHeaders,
-    remixContext,
-    loadContext,
-  ] = args
+export default async function handleRequest(...args: DocRequestArgs) {
+	const [
+		request,
+		responseStatusCode,
+		responseHeaders,
+		remixContext,
+		loadContext,
+	] = args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
 	responseHeaders.set('fly-region', process.env.FLY_REGION ?? 'unknown')
 	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
@@ -35,14 +33,14 @@ export default async function handleRequest(
 		? 'onAllReady'
 		: 'onShellReady'
 
-  const nonce = String(loadContext.cspNonce) ?? undefined
+	const nonce = String(loadContext.cspNonce) ?? undefined
 	return new Promise((resolve, reject) => {
 		let didError = false
 
 		const { pipe, abort } = renderToPipeableStream(
-      <NonceProvider value={nonce}>
-        <RemixServer context={remixContext} url={request.url} />
-      </NonceProvider>,
+			<NonceProvider value={nonce}>
+				<RemixServer context={remixContext} url={request.url} />
+			</NonceProvider>,
 			{
 				[callbackName]: () => {
 					const body = new PassThrough()
