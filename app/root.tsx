@@ -29,6 +29,7 @@ import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useUser } from './utils/user.ts'
+import { useNonce } from './utils/nonce-provider.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -85,6 +86,7 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function App() {
 	const data = useLoaderData<typeof loader>()
+	const nonce = useNonce()
 	const { user } = data
 	return (
 		<html lang="en" className="dark h-full">
@@ -125,14 +127,15 @@ export default function App() {
 					<ThemeSwitch />
 				</div>
 				<div className="h-5" />
-				<ScrollRestoration />
-				<Scripts />
+				<ScrollRestoration nonce={nonce} />
+				<Scripts nonce={nonce} />
 				<script
+					nonce={nonce}
 					dangerouslySetInnerHTML={{
 						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
 					}}
 				/>
-				<LiveReload />
+				<LiveReload nonce={nonce} />
 			</body>
 		</html>
 	)

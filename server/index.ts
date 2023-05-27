@@ -6,6 +6,8 @@ import compression from 'compression'
 import morgan from 'morgan'
 import address from 'address'
 import closeWithGrace from 'close-with-grace'
+import helmet from 'helmet'
+import crypto from 'crypto'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
@@ -14,6 +16,7 @@ import chalk from 'chalk'
 // @ts-ignore - this file may not exist if you haven't built yet, but it will
 // definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
+const MODE = process.env.NODE_ENV
 
 const BUILD_PATH = '../build/index.js'
 
@@ -32,7 +35,6 @@ app.use(
 	'/build',
 	express.static('public/build', { immutable: true, maxAge: '1y' }),
 )
-
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
 app.use(express.static('public', { maxAge: '1h' }))
@@ -40,19 +42,56 @@ app.use(express.static('public', { maxAge: '1h' }))
 morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
 app.use(morgan('tiny'))
 
+app.use((_, res, next) => {
+	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
+	next()
+})
+
+app.use(
+	helmet({
+		crossOriginEmbedderPolicy: false,
+		contentSecurityPolicy: {
+			directives: {
+				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
+				'font-src': ["'self'"],
+				'frame-src': ["'self'"],
+				'img-src': ["'self'"],
+				'script-src': [
+					"'strict-dynamic'",
+					"'self'",
+					// @ts-expect-error
+					(_, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'script-src-attr': [
+					// @ts-expect-error
+					(_, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'upgrade-insecure-requests': null,
+			},
+		},
+	}),
+)
+
+async function getRequestHandlerOptions(
+	build: ServerBuild,
+): Promise<Parameters<typeof createRequestHandler>[0]> {
+	function getLoadContext(_: any, res: any) {
+		return { cspNonce: res.locals.cspNonce }
+	}
+	return { build, mode: MODE, getLoadContext }
+}
+
 app.all(
 	'*',
 	process.env.NODE_ENV === 'development'
 		? async (req, res, next) => {
-				return createRequestHandler({
-					build: devBuild,
-					mode: process.env.NODE_ENV,
-				})(req, res, next)
+				return createRequestHandler(await getRequestHandlerOptions(devBuild))(
+					req,
+					res,
+					next,
+				)
 		  }
-		: createRequestHandler({
-				build,
-				mode: process.env.NODE_ENV,
-		  }),
+		: createRequestHandler(await getRequestHandlerOptions(build)),
 )
 
 const desiredPort = Number(process.env.PORT || 3000)
