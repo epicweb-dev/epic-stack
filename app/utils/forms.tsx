@@ -1,7 +1,8 @@
+import { useInputEvent } from '@conform-to/react'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
 import { clsx } from 'clsx'
-import React, { useId } from 'react'
+import React, { useId, useRef } from 'react'
 import styles from './forms.module.css'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
@@ -98,25 +99,42 @@ export function CheckboxField({
 	errors,
 }: {
 	labelProps: Omit<JSX.IntrinsicElements['label'], 'className'>
-	buttonProps: Omit<
-		React.ComponentPropsWithoutRef<typeof Checkbox.Root>,
-		'type' | 'className'
-	> & {
-		type?: string
-	}
+	buttonProps: Omit<JSX.IntrinsicElements['input'], 'className'>
 	errors?: ListOfErrors
 }) {
 	const fallbackId = useId()
 	const id = buttonProps.id ?? buttonProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
+	// To emulate naitve input events that Conform listen to:
+	// See https://conform.guide/integrations
+	const [ref, control] = useInputEvent()
+	const buttonRef = useRef<HTMLButtonElement>(null)
 	return (
 		<div className={styles.checkboxField}>
+			<input
+				{...buttonProps}
+				ref={ref}
+				id={undefined /* buttonProps.id should be assigned to the Radix checkbox instead */}
+				autoComplete="off"
+				className="sr-only"
+				aria-hidden
+				tabIndex={-1}
+				onFocus={() => buttonRef.current?.focus()}
+			/>
 			<div className="flex gap-2">
 				<Checkbox.Root
 					id={id}
+					ref={buttonRef}
 					aria-invalid={errorId ? true : undefined}
 					aria-describedby={errorId}
-					{...buttonProps}
+					defaultChecked={buttonProps.defaultChecked}
+					onCheckedChange={state => {
+						if (ref.current && ref.current.checked !== Boolean(state.valueOf())) {
+							ref.current.click()
+						}
+					}}
+					onFocus={control.focus}
+					onBlur={control.blur}
 					type="button"
 				>
 					<Checkbox.Indicator className="h-4 w-4">
