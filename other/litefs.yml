@@ -21,7 +21,7 @@ proxy:
 # You must specify "experiement.enable_consul" for FLY_CONSUL_URL to be available.
 lease:
   type: 'consul'
-  candidate: ${FLY_REGION == 'sjc'}
+  candidate: ${FLY_REGION == PRIMARY_REGION}
   promote: true
   advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'
 
