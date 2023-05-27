@@ -1,6 +1,6 @@
+import 'dotenv/config'
 import { Response, type HandleDocumentRequestFunction } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
-import 'dotenv/config'
 import isbot from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
 import { renderToPipeableStream } from 'react-dom/server'
