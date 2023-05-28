@@ -33,4 +33,4 @@ exec:
   - cmd: npx prisma migrate deploy
     if-candidate: true
 
-  - cmd: npm start
+  - cmd: echo "Starting app..." && npm start
