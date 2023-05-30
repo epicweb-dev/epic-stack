@@ -25,6 +25,33 @@ let devBuild = build
 
 const app = express()
 
+const getHost = (req: { get: (key: string) => string | undefined }) =>
+	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
+
+// ensure HTTPS only (X-Forwarded-Proto comes from Fly)
+app.use((req, res, next) => {
+	const proto = req.get('X-Forwarded-Proto')
+	const host = getHost(req)
+	if (proto === 'http') {
+		res.set('X-Forwarded-Proto', 'https')
+		res.redirect(`https://${host}${req.originalUrl}`)
+		return
+	}
+	next()
+})
+
+// no ending slashes for SEO reasons
+// https://github.com/epicweb-dev/epic-stack/discussions/108
+app.use((req, res, next) => {
+	if (req.path.endsWith('/') && req.path.length > 1) {
+		const query = req.url.slice(req.path.length)
+		const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
+		res.redirect(301, safepath + query)
+	} else {
+		next()
+	}
+})
+
 app.use(compression())
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
