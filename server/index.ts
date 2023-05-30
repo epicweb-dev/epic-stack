@@ -8,7 +8,7 @@ import address from 'address'
 import closeWithGrace from 'close-with-grace'
 import helmet from 'helmet'
 import crypto from 'crypto'
-import { createRequestHandler } from '@remix-run/express'
+import { type RequestHandler, createRequestHandler } from '@remix-run/express'
 import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
@@ -99,26 +99,18 @@ app.use(
 	}),
 )
 
-async function getRequestHandlerOptions(
-	build: ServerBuild,
-): Promise<Parameters<typeof createRequestHandler>[0]> {
+function getRequestHandler(build: ServerBuild): RequestHandler {
 	function getLoadContext(_: any, res: any) {
 		return { cspNonce: res.locals.cspNonce }
 	}
-	return { build, mode: MODE, getLoadContext }
+	return createRequestHandler({ build, mode: MODE, getLoadContext })
 }
 
 app.all(
 	'*',
 	process.env.NODE_ENV === 'development'
-		? async (req, res, next) => {
-				return createRequestHandler(await getRequestHandlerOptions(devBuild))(
-					req,
-					res,
-					next,
-				)
-		  }
-		: createRequestHandler(await getRequestHandlerOptions(build)),
+		? (...args) => getRequestHandler(devBuild)(...args)
+		: getRequestHandler(build),
 )
 
 const desiredPort = Number(process.env.PORT || 3000)
