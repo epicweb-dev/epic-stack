@@ -44,7 +44,9 @@ You can redirect root domain traffic to your www subdomain or vice versa.
 
 [DNS level redirects do not work with Fly](https://community.fly.io/t/how-to-redirect-from-non-www-to-www/5795/2). The recommended way to implement this redirect is in your application code.
 
-First, you will need to register SSL certificates for both the www and the root domain. That allows traffic from either source to hit your application, and then you can redirect to your preferred format in code. 
+First, you will need to register SSL certificates for both the www and the root domain. You can [register an SSL certificate for your domains in the terminal](https://fly.io/docs/getting-started/working-with-fly-apps/#fly-io-and-custom-domains) or in your [Fly dashboard](https://fly.io/dashboard/) by navigating to your app and selecting "Certificates" on the sidebar.
+
+After registering the two SSL certificates, Fly will allow traffic from either source to hit your application, and then you can redirect to your preferred domain in code. 
 
 **To redirect non-www traffic to www**
 ```ts
