@@ -16,7 +16,7 @@
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
+    "setup": "prisma generate && prisma migrate deploy && prisma db seed && playwright install",
     "start": "cross-env NODE_ENV=production node .",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
     "test": "vitest",
@@ -39,12 +39,9 @@
     "@conform-to/react": "^0.6.1",
     "@conform-to/zod": "^0.6.1",
     "@prisma/client": "^4.14.1",
-    "@radix-ui/react-checkbox": "^1.0.3",
-    "@radix-ui/react-dialog": "^1.0.3",
-    "@radix-ui/react-dropdown-menu": "^2.0.4",
-    "@radix-ui/react-popover": "^1.0.5",
-    "@radix-ui/react-separator": "^1.0.2",
-    "@radix-ui/react-tabs": "^1.0.3",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.4",
+    "@radix-ui/react-dropdown-menu": "^2.0.5",
     "@reach/dialog": "^0.18.0",
     "@remix-run/css-bundle": "1.16.1",
     "@remix-run/express": "^1.16.1",
@@ -68,6 +65,7 @@
     "express": "^4.18.2",
     "fs-extra": "^11.1.1",
     "get-port": "^6.1.2",
+    "helmet": "^7.0.0",
     "isbot": "^3.6.10",
     "litefs-js": "^1.1.2",
     "lru-cache": "^7.18.3",
@@ -140,5 +138,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "volta": {
+    "node": "18.16.0"
   }
 }

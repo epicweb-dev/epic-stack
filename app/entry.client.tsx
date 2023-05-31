@@ -6,7 +6,7 @@ if (ENV.MODE === 'development') {
 	import('~/utils/devtools.tsx').then(({ init }) => init())
 }
 if (ENV.MODE === 'production') { 
-	import('~/utils/monitoring.client').then(({ init }) => init())
+	import('~/utils/monitoring.client.tsx').then(({ init }) => init())
 }
 startTransition(() => {
 	hydrateRoot(document, <RemixBrowser />)

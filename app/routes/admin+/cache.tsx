@@ -99,7 +99,7 @@ export default function CacheAdminRoute() {
 					<div className="flex flex-1 gap-4">
 						<button
 							type="submit"
-							className="flex items-center justify-center h-16"
+							className="flex h-16 items-center justify-center"
 						>
 							🔎
 						</button>
@@ -112,7 +112,7 @@ export default function CacheAdminRoute() {
 								defaultValue: query,
 							}}
 						/>
-						<div className="flex items-center h-16 text-lg font-medium w-14 text-slate-500">
+						<div className="flex h-16 w-14 items-center text-lg font-medium text-slate-500">
 							<span title="Total results shown">
 								{data.cacheKeys.sqlite.length + data.cacheKeys.lru.length}
 							</span>

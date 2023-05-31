@@ -21,12 +21,16 @@ proxy:
 # You must specify "experiement.enable_consul" for FLY_CONSUL_URL to be available.
 lease:
   type: 'consul'
-  candidate: true
-  # If you'd like to control the candidate's possible region, you can use some
-  # simple expressions for this value, like so:
-  # candidate: ${FLY_REGION == 'sjc'}
+  candidate: ${FLY_REGION == PRIMARY_REGION}
+  promote: true
   advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'
 
   consul:
     url: '${FLY_CONSUL_URL}'
     key: 'litefs/${FLY_APP_NAME}'
+
+exec:
+  - cmd: npx prisma migrate deploy
+    if-candidate: true
+
+  - cmd: npm start

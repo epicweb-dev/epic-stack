@@ -1,6 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import Dialog from '@radix-ui/react-dialog/dist/index.js'
+import * as Dialog from '@radix-ui/react-dialog'
 import {
 	type DataFunctionArgs,
 	json,
@@ -64,7 +64,10 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const submission = parse(formData, { schema: PhotoFormSchema })
 
-	if (!submission.value || submission.intent !== 'submit') {
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
 		return json(
 			{
 				status: 'error',

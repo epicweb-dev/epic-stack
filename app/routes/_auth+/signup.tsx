@@ -23,10 +23,8 @@ const tokenType = 'onboarding'
 
 function createSchema(
 	constraints: {
-		isEmailUnique: (email: string) => Promise<boolean>
-	} = {
-		isEmailUnique: async () => true,
-	},
+		isEmailUnique?: (email: string) => Promise<boolean>
+	} = {},
 ) {
 	const signupSchema = z.object({
 		email: emailSchema.superRefine((email, ctx) => {
@@ -36,6 +34,7 @@ function createSchema(
 					code: z.ZodIssueCode.custom,
 					message: conform.VALIDATION_UNDEFINED,
 				})
+				return;
 			}
 			// if constraint is defined, validate uniqueness
 			return constraints.isEmailUnique(email).then(isUnique => {
@@ -97,7 +96,10 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 		async: true,
 	})
-	if (!submission.value || submission.intent !== 'submit') {
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
 		return json(
 			{
 				status: 'error',
@@ -190,7 +192,7 @@ export default function SignupRoute() {
 								htmlFor: fields.email.id,
 								children: 'Email',
 							}}
-							inputProps={fields.email}
+							inputProps={conform.input(fields.email)}
 							errors={fields.email.errors}
 						/>
 						<ErrorList errors={form.errors} id={form.errorId} />
