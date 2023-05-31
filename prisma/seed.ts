@@ -51,7 +51,7 @@ async function seed() {
 					},
 					notes: {
 						create: Array.from({
-							length: faker.datatype.number({ min: 0, max: 10 }),
+							length: faker.number.int({ min: 0, max: 10 }),
 						}).map(() => ({
 							title: faker.lorem.sentence(),
 							content: faker.lorem.paragraphs(),
