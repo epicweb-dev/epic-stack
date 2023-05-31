@@ -11,7 +11,7 @@ import {
 } from 'cachified'
 import fs from 'fs'
 import { getInstanceInfo, getInstanceInfoSync } from 'litefs-js'
-import LRU from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
 import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite.tsx'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
@@ -50,7 +50,7 @@ function createDatabase(tryAgain = true): BetterSqlite3.Database {
 
 const lru = singleton(
 	'lru-cache',
-	() => new LRU<string, CacheEntry<unknown>>({ max: 5000 }),
+	() => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }),
 )
 
 export const lruCache = lruCacheAdapter(lru)

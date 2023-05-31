@@ -66,7 +66,7 @@
     "helmet": "^7.0.0",
     "isbot": "^3.6.10",
     "litefs-js": "^1.1.2",
-    "lru-cache": "^7.18.3",
+    "lru-cache": "^9.1.1",
     "morgan": "^1.10.0",
     "prisma": "^4.14.1",
     "react": "^18.2.0",
