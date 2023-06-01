@@ -85,6 +85,14 @@ Prior to your first deployment, you'll need to do a few things:
   fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]-staging
   ```
 
+- Attach consul to your app. Consul is a fly-managed service that manages your
+  primary instance for data replication
+  ([learn more about configuring consul](https://fly.io/docs/litefs/getting-started/#lease-configuration)).
+
+  ```sh
+  fly consul attach --app [YOUR_APP_NAME]
+  ```
+
 Now that everything is set up you can commit and push your changes to your repo.
 Every commit to your `main` branch will trigger a deployment to your production
 environment, and every commit to your `dev` branch will trigger a deployment to
