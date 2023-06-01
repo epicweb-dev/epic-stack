@@ -234,6 +234,9 @@ async function setupDeployment({ rootDirectory }) {
 			},
 		])
 		if (commitAndPush) {
+			// have to delete the remix.init directory before committing
+			await fs.remove(path.join(rootDirectory, 'remix.init'))
+
 			console.log(`📦 Committing and pushing...`)
 			await $I`git add -A`
 			// $I doesn't like the quotes
