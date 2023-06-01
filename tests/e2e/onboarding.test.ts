@@ -38,9 +38,18 @@ test('onboarding', async ({ page }) => {
 	await expect(page).toHaveURL(`/signup`)
 
 	const emailTextbox = page.getByRole('textbox', { name: /email/i })
+
+	// Check for the error message
+	await emailTextbox.click()
+	await emailTextbox.fill('kody@kcd.dev')
+	await page.getByRole('button', { name: /launch/i }).click()
+	await expect(
+		page.getByText(/user already exists with this email/i),
+	).toBeVisible()
+
+	// continue the test with valid email...
 	await emailTextbox.click()
 	await emailTextbox.fill(onboardingData.email)
-
 	await page.getByRole('button', { name: /launch/i }).click()
 	await expect(
 		page.getByRole('button', { name: /launch/i, disabled: true }),

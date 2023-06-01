@@ -140,6 +140,9 @@ test('cannot delete an image that does not exist', async () => {
 				intent: 'submit',
 				imageId: fakeImageId,
 			},
+			value: {
+				imageId: fakeImageId,
+			}
 		},
 	})
 	expect(response.status).toBe(404)
