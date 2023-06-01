@@ -51,6 +51,10 @@ function createSchema(
 	return signupSchema
 }
 
+const emailFieldSchema = z.object({
+	email: emailSchema,
+})
+
 const tokenSchema = z.object({
 	type: z.literal(tokenType),
 	payload: z.object({
@@ -156,10 +160,10 @@ export default function SignupRoute() {
 	const signupFetcher = useFetcher<typeof action>()
 	const [form, fields] = useForm({
 		id: 'signup-form',
-		constraint: getFieldsetConstraint(createSchema()),
+		constraint: getFieldsetConstraint(emailFieldSchema),
 		lastSubmission: signupFetcher.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: createSchema() })
+			return parse(formData, { schema: emailFieldSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
