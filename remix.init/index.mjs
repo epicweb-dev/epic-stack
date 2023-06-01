@@ -83,9 +83,14 @@ const main = async ({ isTypeScript, rootDirectory }) => {
 	})
 
 	console.log(
-		`Setup is complete. You're now ready to rock and roll 🐨
+		`
+Setup is complete. You're now ready to rock and roll 🐨
 
-Start development with \`npm run dev\`
+What's next?
+
+- Start development with \`npm run dev\`
+- Run tests with \`npm run test\` and \`npm run test:e2e\`
+- Follow the docs to get deployment ready to roll: https://github.com/epicweb-dev/epic-stack/blob/main/docs/deployment.md
 		`.trim(),
 	)
 }
