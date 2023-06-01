@@ -217,7 +217,7 @@ async function setupDeployment({ rootDirectory }) {
 		}
 
 		console.log(`🔗 Adding remote...`)
-		await $I`git remote add origin git@github.com:${githubParts.owner}/${githubParts.repo}.git`
+		await $I`git remote add origin git@github.com:${githubParts.repo}.git`
 
 		console.log(
 			`Opening Fly Tokens Dashboard and GitHub Action Secrets pages. Please create a new token on Fly and set it as the value for a new secret called FLY_API_TOKEN on GitHub.`,
