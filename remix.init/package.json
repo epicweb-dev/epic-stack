@@ -1,5 +1,11 @@
 {
   "name": "remix.init",
   "private": true,
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "execa": "^7.1.1",
+    "inquirer": "^9.2.6",
+    "parse-github-url": "^1.0.2",
+    "toml": "^3.0.0"
+  }
 }
