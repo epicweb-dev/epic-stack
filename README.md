@@ -11,6 +11,10 @@
   </p>
 </div>
 
+```sh
+npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
+```
+
 [![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)](https://www.epicweb.dev/epic-stack)
 
 [The Epic Stack](https://www.epicweb.dev/epic-stack)
