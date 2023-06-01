@@ -142,7 +142,7 @@ test('cannot delete an image that does not exist', async () => {
 			},
 			value: {
 				imageId: fakeImageId,
-			}
+			},
 		},
 	})
 	expect(response.status).toBe(404)

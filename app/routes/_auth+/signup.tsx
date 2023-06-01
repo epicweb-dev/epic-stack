@@ -34,7 +34,7 @@ function createSchema(
 					code: z.ZodIssueCode.custom,
 					message: conform.VALIDATION_UNDEFINED,
 				})
-				return;
+				return
 			}
 			// if constraint is defined, validate uniqueness
 			return constraints.isEmailUnique(email).then(isUnique => {

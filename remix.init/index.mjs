@@ -77,7 +77,7 @@ const main = async ({ isTypeScript, rootDirectory }) => {
 
 	execSync('npm run setup', { cwd: rootDirectory, stdio: 'inherit' })
 
-	execSync('npm run format --loglevel warn', {
+	execSync('npm run format -- --loglevel warn', {
 		cwd: rootDirectory,
 		stdio: 'inherit',
 	})
