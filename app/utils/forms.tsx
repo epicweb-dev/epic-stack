@@ -1,8 +1,8 @@
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
-import { clsx } from 'clsx'
 import React, { useId } from 'react'
 import styles from './forms.module.css'
+import { consolidate } from './misc.ts'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -41,7 +41,7 @@ export function Field({
 	const id = inputProps.id ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={clsx(styles.field, className)}>
+		<div className={consolidate(styles.field, className)}>
 			<input
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -74,7 +74,7 @@ export function TextareaField({
 	const id = textareaProps.id ?? textareaProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={clsx(styles.textareaField, className)}>
+		<div className={consolidate(styles.textareaField, className)}>
 			<textarea
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -161,15 +161,16 @@ export function getButtonClassName({
 	const mediumClassName = 'px-14 py-5 text-lg'
 	const mediumWideClassName = 'px-24 py-5 text-lg'
 	const pillClassName = 'px-12 py-3 leading-3'
-	const className = clsx(baseClassName, {
-		[primaryClassName]: variant === 'primary',
-		[secondaryClassName]: variant === 'secondary',
-		[extraSmallClassName]: size === 'xs',
-		[smallClassName]: size === 'sm',
-		[mediumClassName]: size === 'md',
-		[mediumWideClassName]: size === 'md-wide',
-		[pillClassName]: size === 'pill',
-	})
+	const className = consolidate(
+		baseClassName,
+		variant === 'primary' && primaryClassName,
+		variant === 'secondary' && secondaryClassName,
+		size === 'xs' && extraSmallClassName,
+		size === 'sm' && smallClassName,
+		size === 'md' && mediumClassName,
+		size === 'md-wide' && [mediumWideClassName],
+		size === 'pill' && pillClassName,
+	)
 	return className
 }
 
@@ -191,7 +192,7 @@ export function Button({
 	return (
 		<button
 			{...props}
-			className={clsx(
+			className={consolidate(
 				props.className,
 				getButtonClassName({ size, variant }),
 				'flex justify-center gap-4',
@@ -222,7 +223,10 @@ export function LabelButton({
 	return (
 		<label
 			{...props}
-			className={clsx('cursor-pointer', getButtonClassName({ size, variant }))}
+			className={consolidate(
+				'cursor-pointer',
+				getButtonClassName({ size, variant }),
+			)}
 		/>
 	)
 }
