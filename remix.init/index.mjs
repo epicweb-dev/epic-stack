@@ -1,7 +1,7 @@
 import { execSync } from 'child_process'
 import parseGitHubURL from 'parse-github-url'
 import crypto from 'crypto'
-import { $ } from 'execa'
+import { $, execa } from 'execa'
 import fs from 'fs/promises'
 import inquirer from 'inquirer'
 import path from 'path'
@@ -236,7 +236,11 @@ async function setupDeployment({ rootDirectory }) {
 		if (commitAndPush) {
 			console.log(`📦 Committing and pushing...`)
 			await $I`git add -A`
-			await $I`git commit -m "Initial commit"`
+			// $I doesn't like the quotes
+			await execa('git', ['commit', '-m', 'Initial commit'], {
+				stdio: 'inherit',
+				cwd: rootDirectory,
+			})
 			await $I`git push -u origin main`
 		}
 	}
