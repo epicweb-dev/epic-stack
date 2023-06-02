@@ -1,10 +1,10 @@
-import { useLoaderData, Outlet, NavLink, Link } from '@remix-run/react'
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { prisma } from '~/utils/db.server.ts'
-import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { getUserImgSrc } from '~/utils/misc.ts'
-import { requireUserId } from '~/utils/auth.server.ts'
+import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { twMerge } from 'tailwind-merge'
+import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { getUserImgSrc } from '~/utils/misc.ts'
 
 export async function loader({ params, request }: DataFunctionArgs) {
 	await requireUserId(request, { redirectTo: null })

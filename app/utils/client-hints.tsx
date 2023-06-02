@@ -10,7 +10,7 @@ export const colorSchemeHint = {
 	cookieName: 'CH-prefers-color-scheme',
 	getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
 	fallback: 'light',
-	transform(value: any) {
+	transform(value: string | null) {
 		return value === 'dark' ? 'dark' : 'light'
 	},
 	// "as const" is necessary for inference to work.
