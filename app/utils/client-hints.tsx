@@ -2,7 +2,7 @@
  * This file contains utilities for using client hints for user preference which
  * are needed by the server, but are only known by the browser.
  */
-
+import * as React from 'react'
 import { useRequestInfo } from './request-info.ts'
 
 export const clientHints = {
@@ -77,6 +77,19 @@ export function useHints() {
  * inaccurate value.
  */
 export function ClientHintCheck({ nonce }: { nonce: string }) {
+	React.useEffect(() => {
+		const themeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+		function handleThemeChange() {
+			document.cookie = `${clientHints.theme.cookieName}=${
+				themeQuery.matches ? 'dark' : 'light'
+			}`
+		}
+		themeQuery.addEventListener('change', handleThemeChange)
+		return () => {
+			themeQuery.removeEventListener('change', handleThemeChange)
+		}
+	}, [])
+
 	return (
 		<script
 			nonce={nonce}

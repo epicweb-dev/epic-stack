@@ -1,10 +1,10 @@
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { useFetcher, useRevalidator } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import * as React from 'react'
 import { z } from 'zod'
-import { clientHints, useHints } from '~/utils/client-hints.tsx'
+import { useHints } from '~/utils/client-hints.tsx'
 import { ErrorList } from '~/utils/forms.tsx'
 import { safeRedirect } from '~/utils/misc.ts'
 import { useRequestInfo } from '~/utils/request-info.ts'
@@ -66,23 +66,10 @@ export function ThemeSwitch({
 	const requestInfo = useRequestInfo()
 	const fetcher = useFetcher()
 	const [isHydrated, setIsHydrated] = React.useState(false)
-	const { revalidate } = useRevalidator()
 
 	React.useEffect(() => {
 		setIsHydrated(true)
 	}, [])
-
-	React.useEffect(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-		const handleChange = () => {
-			document.cookie = `${clientHints.theme.cookieName}=${
-				mediaQuery.matches ? 'dark' : 'light'
-			}`
-			revalidate()
-		}
-		mediaQuery.addEventListener('change', handleChange)
-		return () => mediaQuery.removeEventListener('change', handleChange)
-	}, [revalidate])
 
 	const [form] = useForm({
 		id: 'onboarding',
