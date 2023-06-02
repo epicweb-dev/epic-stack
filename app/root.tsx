@@ -26,9 +26,10 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
-import { consolidate, getUserImgSrc } from './utils/misc.ts'
+import { getUserImgSrc } from './utils/misc.ts'
 import { useUser } from './utils/user.ts'
 import { useNonce } from './utils/nonce-provider.ts'
+import { twMerge } from 'tailwind-merge'
 
 export const links: LinksFunction = () => {
 	return [
@@ -150,7 +151,7 @@ function ThemeSwitch() {
 		<fetcher.Form>
 			<label>
 				<Checkbox.Root
-					className={consolidate(
+					className={twMerge(
 						'bg-gray-night-500 h-10 w-20 rounded-full p-1',
 						theme === 'dark' && 'bg-night-500',
 						theme === 'light' && 'bg-white',
@@ -176,14 +177,14 @@ function ThemeSwitch() {
 					}
 				>
 					<span
-						className={consolidate(
+						className={twMerge(
 							'flex justify-between rounded-full',
 							mode === 'system' && theme === 'dark' && 'bg-white',
 							mode === 'system' && theme === 'light' && 'theme-switch-light',
 						)}
 					>
 						<span
-							className={consolidate(
+							className={twMerge(
 								'theme-switch-light',
 								'flex h-8 w-8 items-center justify-center rounded-full',
 								mode === 'light' && 'text-white',
@@ -192,7 +193,7 @@ function ThemeSwitch() {
 							🔆
 						</span>
 						<span
-							className={consolidate(
+							className={twMerge(
 								'theme-switch-dark',
 								'flex h-8 w-8 items-center justify-center rounded-full',
 								mode === 'dark' && 'text-white',

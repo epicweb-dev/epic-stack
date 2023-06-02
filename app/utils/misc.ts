@@ -102,8 +102,3 @@ export function useDoubleCheck() {
 
 	return { doubleCheck, getButtonProps }
 }
-
-type ClassNameValue = string[] | string | null | undefined | 0 | false;
-export function consolidate(...inputs: ClassNameValue[]) {
-	return twMerge(inputs)
-}

@@ -2,7 +2,7 @@ import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
 import React, { useId } from 'react'
 import styles from './forms.module.css'
-import { consolidate } from './misc.ts'
+import { twMerge } from 'tailwind-merge'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -41,7 +41,7 @@ export function Field({
 	const id = inputProps.id ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={consolidate(styles.field, className)}>
+		<div className={twMerge(styles.field, className)}>
 			<input
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -74,7 +74,7 @@ export function TextareaField({
 	const id = textareaProps.id ?? textareaProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={consolidate(styles.textareaField, className)}>
+		<div className={twMerge(styles.textareaField, className)}>
 			<textarea
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -161,7 +161,7 @@ export function getButtonClassName({
 	const mediumClassName = 'px-14 py-5 text-lg'
 	const mediumWideClassName = 'px-24 py-5 text-lg'
 	const pillClassName = 'px-12 py-3 leading-3'
-	const className = consolidate(
+	const className = twMerge(
 		baseClassName,
 		variant === 'primary' && primaryClassName,
 		variant === 'secondary' && secondaryClassName,
@@ -192,7 +192,7 @@ export function Button({
 	return (
 		<button
 			{...props}
-			className={consolidate(
+			className={twMerge(
 				props.className,
 				getButtonClassName({ size, variant }),
 				'flex justify-center gap-4',
@@ -223,7 +223,7 @@ export function LabelButton({
 	return (
 		<label
 			{...props}
-			className={consolidate(
+			className={twMerge(
 				'cursor-pointer',
 				getButtonClassName({ size, variant }),
 			)}
