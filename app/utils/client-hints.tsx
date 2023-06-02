@@ -66,9 +66,10 @@ export function getHints(request?: Request) {
  * if they are not set then reloads the page if any cookie was set to an
  * inaccurate value.
  */
-export function ClientHintCheck() {
+export function ClientHintCheck({ nonce }: { nonce: string }) {
 	return (
 		<script
+			nonce={nonce}
 			dangerouslySetInnerHTML={{
 				__html: `
 const cookies = document.cookie.split(';').map(c => c.trim()).reduce((acc, cur) => {
