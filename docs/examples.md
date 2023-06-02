@@ -8,8 +8,9 @@ template.
 This page links to examples of how to implement some things with the Epic Stack.
 
 - [Framer Motion](https://github.com/kentcdodds/epic-stack-with-framer-motion)
-  by @kentcdodds: Using client hints to avoid content layout shift with
-  `prefers-reduced-motion` and framer motion animations.
+  by [@kentcdodds](https://github.com/kentcdodds): Using client hints to avoid
+  content layout shift with `prefers-reduced-motion` and framer motion
+  animations.
 
 ## How to contribute
 
