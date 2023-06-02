@@ -5,6 +5,7 @@ import {
 	type DataFunctionArgs,
 	type LinksFunction,
 	type V2_MetaFunction,
+	type HeadersFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -30,6 +31,7 @@ import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { getSession, getTheme } from './utils/session.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { makeTimings, time } from './utils/timing.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -67,13 +69,22 @@ export const meta: V2_MetaFunction = () => {
 
 export async function loader({ request }: DataFunctionArgs) {
 	const cookieSession = await getSession(request.headers.get('Cookie'))
-	const userId = await getUserId(request)
+	const timings = makeTimings('rootLoader')
+	const userId = await time(() => getUserId(request), {
+		timings,
+		type: 'getUserId',
+		desc: 'getUserId in root',
+	})
 
 	const user = userId
-		? await prisma.user.findUnique({
-				where: { id: userId },
-				select: { id: true, name: true, username: true, imageId: true },
-		  })
+		? await time(
+				() =>
+					prisma.user.findUnique({
+						where: { id: userId },
+						select: { id: true, name: true, username: true, imageId: true },
+					}),
+				{ timings, type: 'find user', desc: 'find user in root' },
+		  )
 		: null
 	if (userId && !user) {
 		console.info('something weird happened')
@@ -82,18 +93,32 @@ export async function loader({ request }: DataFunctionArgs) {
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
 
-	return json({
-		user,
-		requestInfo: {
-			hints: getHints(request),
-			origin: getDomainUrl(request),
-			path: new URL(request.url).pathname,
-			session: {
-				theme: getTheme(cookieSession),
+	return json(
+		{
+			user,
+			requestInfo: {
+				hints: getHints(request),
+				origin: getDomainUrl(request),
+				path: new URL(request.url).pathname,
+				session: {
+					theme: getTheme(cookieSession),
+				},
+			},
+			ENV: getEnv(),
+		},
+		{
+			headers: {
+				'Server-Timing': timings.toString(),
 			},
 		},
-		ENV: getEnv(),
-	})
+	)
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+	const headers = {
+		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
+	}
+	return headers
 }
 
 export default function App() {

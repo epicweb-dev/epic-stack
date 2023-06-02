@@ -1,7 +1,15 @@
-import type { V2_MetaFunction } from '@remix-run/node'
+import type { HeadersFunction, V2_MetaFunction } from '@remix-run/node'
 import { logos, kodyRocket, stars } from './logos/logos.ts'
+import { combineServerTimings } from '~/utils/timing.server.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
+
+export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+	const headers = {
+		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
+	}
+	return headers
+}
 
 export default function Index() {
 	return (
