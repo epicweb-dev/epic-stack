@@ -4,7 +4,7 @@ import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher, useRevalidator } from '@remix-run/react'
 import * as React from 'react'
 import { z } from 'zod'
-import { colorSchemeHint, useHints } from '~/utils/client-hints.tsx'
+import { clientHints, useHints } from '~/utils/client-hints.tsx'
 import { ErrorList } from '~/utils/forms.tsx'
 import { safeRedirect } from '~/utils/misc.ts'
 import { useRequestInfo } from '~/utils/request-info.ts'
@@ -75,7 +75,7 @@ export function ThemeSwitch({
 	React.useEffect(() => {
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 		const handleChange = () => {
-			document.cookie = `${colorSchemeHint.cookieName}=${
+			document.cookie = `${clientHints.theme.cookieName}=${
 				mediaQuery.matches ? 'dark' : 'light'
 			}`
 			revalidate()

@@ -5,7 +5,7 @@
 
 import { useRequestInfo } from './request-info.ts'
 
-const clientHints = {
+export const clientHints = {
 	theme: {
 		cookieName: 'CH-prefers-color-scheme',
 		getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
