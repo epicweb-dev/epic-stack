@@ -79,7 +79,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 
 		// .git could exist if pointing to a local version of the template rather
 		// than the github version, and there's not any situation we'd want that.
-		fs.rm(path.join(rootDirectory, '.git'), { recursive: true }),
+		fs.rm(path.join(rootDirectory, '.git'), { recursive: true, force: true }),
 	]
 
 	await Promise.all(fileOperationPromises)
