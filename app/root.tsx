@@ -18,7 +18,7 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { ThemeSwitch } from './routes/resources+/theme.tsx'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -29,7 +29,7 @@ import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { getSession, getTheme } from './utils/session.server.ts'
-import { useUser } from './utils/user.ts'
+import { useOptionalUser, useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -99,8 +99,9 @@ export async function loader({ request }: DataFunctionArgs) {
 export default function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
-	const { user } = data
-	const theme = data.requestInfo.session.theme ?? data.requestInfo.hints.theme
+	const user = useOptionalUser()
+	const theme = useTheme()
+
 	return (
 		<html lang="en" className={`${theme} h-full`}>
 			<head>

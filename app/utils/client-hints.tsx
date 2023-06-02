@@ -3,6 +3,8 @@
  * are needed by the server, but are only known by the browser.
  */
 
+import { useRequestInfo } from './request-info.ts'
+
 export const colorSchemeHint = {
 	name: 'theme',
 	cookieName: 'CH-prefers-color-scheme',
@@ -59,6 +61,14 @@ export function getHints(request?: Request) {
 			>
 		},
 	)
+}
+
+/**
+ * @returns an object with the client hints and their values
+ */
+export function useHints() {
+	const requestInfo = useRequestInfo()
+	return requestInfo.hints
 }
 
 /**
