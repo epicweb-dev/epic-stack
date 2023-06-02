@@ -20,7 +20,6 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { clsx } from 'clsx'
 import { useState } from 'react'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
@@ -30,6 +29,7 @@ import { ButtonLink } from './utils/forms.tsx'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useUser } from './utils/user.ts'
 import { useNonce } from './utils/nonce-provider.ts'
+import { twMerge } from 'tailwind-merge'
 
 export const links: LinksFunction = () => {
 	return [
@@ -151,10 +151,11 @@ function ThemeSwitch() {
 		<fetcher.Form>
 			<label>
 				<Checkbox.Root
-					className={clsx('bg-gray-night-500 h-10 w-20 rounded-full p-1', {
-						'bg-night-500': theme === 'dark',
-						'bg-white': theme === 'light',
-					})}
+					className={twMerge(
+						'bg-gray-night-500 h-10 w-20 rounded-full p-1',
+						theme === 'dark' && 'bg-night-500',
+						theme === 'light' && 'bg-white',
+					)}
 					checked={checked}
 					name="theme"
 					value={mode}
@@ -176,29 +177,26 @@ function ThemeSwitch() {
 					}
 				>
 					<span
-						className={clsx('flex justify-between rounded-full', {
-							'bg-white': mode === 'system' && theme === 'dark',
-							'theme-switch-light': mode === 'system' && theme === 'light',
-						})}
+						className={twMerge(
+							'flex justify-between rounded-full',
+							mode === 'system' && theme === 'dark' && 'bg-white',
+							mode === 'system' && theme === 'light' && 'theme-switch-light',
+						)}
 					>
 						<span
-							className={clsx(
+							className={twMerge(
 								'theme-switch-light',
 								'flex h-8 w-8 items-center justify-center rounded-full',
-								{
-									'text-white': mode === 'light',
-								},
+								mode === 'light' && 'text-white',
 							)}
 						>
 							🔆
 						</span>
 						<span
-							className={clsx(
+							className={twMerge(
 								'theme-switch-dark',
 								'flex h-8 w-8 items-center justify-center rounded-full',
-								{
-									'text-white': mode === 'dark',
-								},
+								mode === 'dark' && 'text-white',
 							)}
 						>
 							🌙
