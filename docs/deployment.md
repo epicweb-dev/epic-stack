@@ -1,5 +1,10 @@
 # Deployment
 
+When you first create an Epic Stack repo, it should take you through a series of
+questions to get your app setup and deployed. However, we'll document the steps
+here in case things don't go well for you or you decide to do it manually later.
+Here they are!
+
 The Epic Stack comes with a GitHub Action that handles automatically deploying
 your app to production and staging environments.
 
@@ -17,17 +22,6 @@ Prior to your first deployment, you'll need to do a few things:
   > into the same account in the Fly CLI as you are in the browser. In your
   > terminal, run `fly auth whoami` and ensure the email matches the Fly account
   > signed into the browser.
-
-  > **Note**: The following instructions will be improved soon. Eventually most
-  > of these steps will be replaced with a simple `fly launch` command which
-  > will prompt you for what you need. For now the steps below are manual.
-
-  > **Warning**: This template is currently only configured to work for Fly v1
-  > apps. If you just created your account you are probably running on Fly v2
-  > which is ultimately preferable, but will require a few changes. This is
-  > temporary and will be fixed soon. See
-  > [#22](https://github.com/epicweb-dev/epic-stack/discussions/22) for more
-  > info.
 
 - Create two apps on Fly, one for staging and one for production:
 
@@ -83,6 +77,14 @@ Prior to your first deployment, you'll need to do a few things:
   ```sh
   fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]
   fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]-staging
+  ```
+
+- Attach consul to your app. Consul is a fly-managed service that manages your
+  primary instance for data replication
+  ([learn more about configuring consul](https://fly.io/docs/litefs/getting-started/#lease-configuration)).
+
+  ```sh
+  fly consul attach --app [YOUR_APP_NAME]
   ```
 
 Now that everything is set up you can commit and push your changes to your repo.

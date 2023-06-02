@@ -11,13 +11,21 @@
   </p>
 </div>
 
+```sh
+npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
+```
+
 [![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)](https://www.epicweb.dev/epic-stack)
+
+[The Epic Stack](https://www.epicweb.dev/epic-stack)
 
 <hr />
 
 ## Watch Kent's Introduction to The Epic Stack
 
 [![screenshot of a YouTube video](https://github.com/epicweb-dev/epic-stack/assets/1500684/6beafa78-41c6-47e1-b999-08d3d3e5cb57)](https://www.youtube.com/watch?v=yMK5SVRASxM)
+
+["The Epic Stack" by Kent C. Dodds at #RemixConf 2023 💿](https://www.youtube.com/watch?v=yMK5SVRASxM)
 
 ## Docs
 
