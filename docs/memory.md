@@ -11,3 +11,7 @@ executed before running our app within the `litefs.yml` config.
 
 > **NOTE**: PRs welcome to document how to determine the effectiveness of the
 > swap file for your app.
+
+To increase the memory allocated to your vm, use the
+[`fly scale`](https://fly.io/docs/flyctl/scale-memory/) command. You can
+[learn more about memory sizing in the Fly docs](https://fly.io/docs/machines/guides-examples/machine-sizing).
