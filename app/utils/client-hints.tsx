@@ -5,27 +5,22 @@
 
 import { useRequestInfo } from './request-info.ts'
 
-export const colorSchemeHint = {
-	name: 'theme',
-	cookieName: 'CH-prefers-color-scheme',
-	getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
-	fallback: 'light',
-	transform(value: string | null) {
-		return value === 'dark' ? 'dark' : 'light'
+const clientHints = {
+	theme: {
+		cookieName: 'CH-prefers-color-scheme',
+		getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
+		fallback: 'light',
+		transform(value: string | null) {
+			return value === 'dark' ? 'dark' : 'light'
+		},
 	},
-	// "as const" is necessary for inference to work.
-	// PRs welcome to improve the typings for all this.
-} as const
-
-const clientHints = [
-	colorSchemeHint,
 	// add other hints here
-] as const
+}
 
-type ClientHintNames = (typeof clientHints)[number]['name']
+type ClientHintNames = keyof typeof clientHints
 
 function getCookieValue(cookieString: string, name: ClientHintNames) {
-	const hint = clientHints.find(hint => hint.name === name)
+	const hint = clientHints[name]
 	if (!hint) {
 		throw new Error(`Unknown client hint: ${name}`)
 	}
@@ -50,14 +45,19 @@ export function getHints(request?: Request) {
 			: typeof request !== 'undefined'
 			? request.headers.get('Cookie') ?? ''
 			: ''
-	return clientHints.reduce(
-		(acc, hint) => {
-			acc[hint.name] = hint.transform(getCookieValue(cookieString, hint.name))
+
+	return Object.entries(clientHints).reduce(
+		(acc, [name, hint]) => {
+			const hintName = name as ClientHintNames
+			// using ignore because it's not an issue with only one hint, but will
+			// be with more than one...
+			// @ts-ignore PR to improve these types is welcome
+			acc[hintName] = hint.transform(getCookieValue(cookieString, hintName))
 			return acc
 		},
 		{} as {
 			[name in ClientHintNames]: ReturnType<
-				(typeof clientHints)[number]['transform']
+				(typeof clientHints)[name]['transform']
 			>
 		},
 	)
@@ -89,7 +89,7 @@ const cookies = document.cookie.split(';').map(c => c.trim()).reduce((acc, cur) 
 }, {});
 let cookieChanged = false;
 const hints = [
-${clientHints
+${Object.values(clientHints)
 	.map(hint => {
 		const cookieName = JSON.stringify(hint.cookieName)
 		return `{ name: ${cookieName}, actual: String(${hint.getValueCode}), cookie: cookies[${cookieName}] }`
