@@ -16,6 +16,7 @@ import docker from './docker.png'
 import typescript from './typescript.svg'
 import prettier from './prettier.svg'
 import eslint from './eslint.svg'
+import sentry from './sentry.svg'
 
 export { default as stars } from './stars.jpg'
 
@@ -113,7 +114,7 @@ export const logos = [
 		href: 'https://eslint.org',
 	},
 	{
-		src: 'https://svgur.com/i/t9k.svg',
+		src: sentry,
 		alt: 'Sentry',
 		href: 'https://sentry.io',
 	},
