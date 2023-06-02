@@ -5,7 +5,7 @@ import { $, execa } from 'execa'
 import fs from 'fs/promises'
 import inquirer from 'inquirer'
 import path from 'path'
-import toml from 'toml'
+import toml from '@iarna/toml'
 
 const escapeRegExp = string =>
 	// $& means the whole matched string
@@ -76,6 +76,10 @@ export default async function main({ isTypeScript, rootDirectory }) {
 		fs.rm(path.join(rootDirectory, 'LICENSE.md')),
 		fs.rm(path.join(rootDirectory, 'CONTRIBUTING.md')),
 		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
+
+		// .git could exist if pointing to a local version of the template rather
+		// than the github version, and there's not any situation we'd want that.
+		fs.rm(path.join(rootDirectory, '.git'), { recursive: true }),
 	]
 
 	await Promise.all(fileOperationPromises)
@@ -143,10 +147,19 @@ async function setupDeployment({ rootDirectory }) {
 		)
 	}
 
+	console.log('🔎 Determining the best region for you...')
+	const primaryRegion = await getPreferredRegion()
+
 	const flyConfig = toml.parse(
 		await fs.readFile(path.join(rootDirectory, 'fly.toml')),
 	)
-	const { app: APP_NAME, primary_region: PRIMARY_REGION } = flyConfig
+	flyConfig.primary_region = primaryRegion
+	await fs.writeFile(
+		path.join(rootDirectory, 'fly.toml'),
+		toml.stringify(flyConfig),
+	)
+
+	const { app: APP_NAME } = flyConfig
 
 	console.log(`🥪 Creating app ${APP_NAME} and ${APP_NAME}-staging...`)
 	await $I`fly apps create ${APP_NAME}-staging`
@@ -156,9 +169,11 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly secrets set SESSION_SECRET=${getRandomString16()} ENCRYPTION_SECRET=${getRandomString16()} INTERNAL_COMMAND_TOKEN=${getRandomString16()} --app ${APP_NAME}-staging`
 	await $I`fly secrets set SESSION_SECRET=${getRandomString16()} ENCRYPTION_SECRET=${getRandomString16()} INTERNAL_COMMAND_TOKEN=${getRandomString16()} --app ${APP_NAME}`
 
-	console.log(`🔊 Creating volumes`)
-	await $I`fly volumes create data --region ${PRIMARY_REGION} --size 1 --app ${APP_NAME}-staging`
-	await $I`fly volumes create data --region ${PRIMARY_REGION} --size 1 --app ${APP_NAME}`
+	console.log(
+		`🔊 Creating volumes. Answer "yes" when it warns you about downtime. You can add more volumes later (when you actually start getting paying customers �).`,
+	)
+	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}-staging`
+	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}`
 
 	// attach consul
 	console.log(`🔗 Attaching consul`)
@@ -177,11 +192,13 @@ async function setupDeployment({ rootDirectory }) {
 		console.log(`🚀 Deploying apps...`)
 		console.log(`  Starting with staging`)
 		await $I`fly deploy --app ${APP_NAME}-staging`
-		await $I`fly open --app ${APP_NAME}-staging`
+		// "fly open" was having trouble with opening the staging app
+		// so we'll just use "open" instead.
+		await $I`open https://${APP_NAME}-staging.fly.dev/`
 
 		console.log(`  Staging deployed... Deploying production...`)
 		await $I`fly deploy --app ${APP_NAME}`
-		await $I`fly open --app ${APP_NAME}`
+		await $I`open https://${APP_NAME}.fly.dev/`
 		console.log(`  Production deployed...`)
 	}
 
@@ -235,7 +252,10 @@ async function setupDeployment({ rootDirectory }) {
 		])
 		if (commitAndPush) {
 			// have to delete the remix.init directory before committing
-			await fs.remove(path.join(rootDirectory, 'remix.init'))
+			await fs.rm(path.join(rootDirectory, 'remix.init'), {
+				recursive: true,
+				force: true,
+			})
 
 			console.log(`📦 Committing and pushing...`)
 			await $I`git add -A`
@@ -282,4 +302,44 @@ async function ensureLoggedIn() {
 		await $({ stdio: 'inherit' })`fly auth login`
 		return ensureLoggedIn()
 	}
+}
+
+async function getPreferredRegion() {
+	const {
+		platform: { requestRegion: defaultRegion },
+	} = await makeFlyRequest({ query: 'query {platform {requestRegion}}' })
+
+	const availableRegions = await makeFlyRequest({
+		query: `{platform {regions {name code}}}`,
+	})
+	const { preferredRegion } = await inquirer.prompt([
+		{
+			name: 'preferredRegion',
+			type: 'list',
+			default: defaultRegion,
+			message: `Which region would you like to deploy to? The closest to you is ${defaultRegion}.`,
+			choices: availableRegions.platform.regions.map(region => ({
+				name: `${region.name} (${region.code})`,
+				value: region.code,
+			})),
+		},
+	])
+	return preferredRegion
+}
+
+let flyToken = null
+async function makeFlyRequest({ query, variables }) {
+	if (!flyToken) {
+		flyToken = (await $`fly auth token`).stdout.trim()
+	}
+
+	const json = await fetch('https://api.fly.io/graphql', {
+		method: 'POST',
+		body: JSON.stringify({ query, variables }),
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${flyToken}`,
+		},
+	}).then(response => response.json())
+	return json.data
 }
