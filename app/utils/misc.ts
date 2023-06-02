@@ -1,6 +1,5 @@
-import { ClassNameValue } from 'node_modules/tailwind-merge/dist/lib/tw-join.js'
 import React from 'react'
-import { twMerge, twJoin } from 'tailwind-merge'
+import { twMerge } from 'tailwind-merge'
 
 const DEFAULT_REDIRECT = '/'
 
@@ -104,6 +103,7 @@ export function useDoubleCheck() {
 	return { doubleCheck, getButtonProps }
 }
 
+type ClassNameValue = string[] | string | null | undefined | 0 | false;
 export function consolidate(...inputs: ClassNameValue[]) {
-	return twMerge(twJoin(inputs))
+	return twMerge(inputs)
 }
