@@ -198,7 +198,7 @@ function UserDropdown() {
 						alt={user.name ?? user.username}
 						src={getUserImgSrc(user.imageId)}
 					/>
-					<span className="text-body-sm font-bold">
+					<span className="text-body-sm font-bold text-white">
 						{user.name ?? user.username}
 					</span>
 				</Link>
