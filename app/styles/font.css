@@ -1,6 +1,6 @@
 /* nunito-sans-200 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 200;
@@ -12,7 +12,7 @@
 }
 /* nunito-sans-200italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 200;
@@ -24,7 +24,7 @@
 }
 /* nunito-sans-300 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 300;
@@ -36,7 +36,7 @@
 }
 /* nunito-sans-300italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 300;
@@ -48,7 +48,7 @@
 }
 /* nunito-sans-regular - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 400;
@@ -60,7 +60,7 @@
 }
 /* nunito-sans-italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 400;
@@ -72,7 +72,7 @@
 }
 /* nunito-sans-600 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 600;
@@ -84,7 +84,7 @@
 }
 /* nunito-sans-600italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 600;
@@ -96,7 +96,7 @@
 }
 /* nunito-sans-700 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 700;
@@ -108,7 +108,7 @@
 }
 /* nunito-sans-700italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 700;
@@ -120,7 +120,7 @@
 }
 /* nunito-sans-800 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 800;
@@ -132,7 +132,7 @@
 }
 /* nunito-sans-800italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 800;
@@ -144,7 +144,7 @@
 }
 /* nunito-sans-900 - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: normal;
 	font-weight: 900;
@@ -156,7 +156,7 @@
 }
 /* nunito-sans-900italic - latin_latin-ext */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap; 
 	font-family: 'Nunito Sans';
 	font-style: italic;
 	font-weight: 900;
