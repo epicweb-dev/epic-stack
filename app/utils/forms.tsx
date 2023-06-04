@@ -133,7 +133,7 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="text-body-xs text-night-200"
+					className="self-center text-body-xs text-night-200"
 				/>
 			</div>
 			<div className="px-4 pb-3 pt-1">
@@ -193,9 +193,9 @@ export function Button({
 		<button
 			{...props}
 			className={twMerge(
-				props.className,
 				getButtonClassName({ size, variant }),
 				'flex justify-center gap-4',
+				props.className,
 			)}
 		>
 			<div>{props.children}</div>
@@ -208,10 +208,18 @@ export function ButtonLink({
 	size,
 	variant,
 	...props
-}: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'> &
+}: React.ComponentPropsWithoutRef<typeof Link> &
 	Parameters<typeof getButtonClassName>[0]) {
-	// eslint-disable-next-line jsx-a11y/anchor-has-content
-	return <Link {...props} className={getButtonClassName({ size, variant })} />
+	return (
+		// eslint-disable-next-line jsx-a11y/anchor-has-content
+		<Link
+			{...props}
+			className={twMerge(
+				getButtonClassName({ size, variant }),
+				props.className,
+			)}
+		/>
+	)
 }
 
 export function LabelButton({
@@ -224,8 +232,8 @@ export function LabelButton({
 		<label
 			{...props}
 			className={twMerge(
-				'cursor-pointer',
 				getButtonClassName({ size, variant }),
+				'cursor-pointer',
 			)}
 		/>
 	)
