@@ -136,12 +136,12 @@ export default function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-day-300 text-black dark:bg-night-700 dark:text-white">
+			<body className="flex h-full flex-col justify-between bg-day-300 text-white dark:bg-night-700 ">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
-							<div className="font-light">epic</div>
-							<div className="font-bold">notes</div>
+							<div className="font-light text-black dark:text-white">epic</div>
+							<div className="font-bold text-black dark:text-white">notes</div>
 						</Link>
 						<div className="flex items-center gap-10">
 							{user ? (
@@ -161,8 +161,8 @@ export default function App() {
 
 				<div className="container mx-auto flex justify-between">
 					<Link to="/">
-						<div className="font-light">epic</div>
-						<div className="font-bold">notes</div>
+						<div className="font-light text-black dark:text-white">epic</div>
+						<div className="font-bold text-black dark:text-white">notes</div>
 					</Link>
 					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
