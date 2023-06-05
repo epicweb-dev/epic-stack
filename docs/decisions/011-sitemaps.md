@@ -18,8 +18,9 @@ it's kind of annoying.
 
 ## Decision
 
-Instead of building a sitemap into the template, we'll use an example people can
-reference to add a sitemap to their Epic Stack sites if they like.
+Instead of building a sitemap into the template, we'll use
+[an example](../examples.md) people can reference to add a sitemap to their Epic
+Stack sites if they like.
 
 ## Consequences
 
