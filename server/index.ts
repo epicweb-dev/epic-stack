@@ -67,7 +67,7 @@ app.use(
 app.use(
 	'/fonts',
 	express.static('public/fonts', { immutable: true, maxAge: '1y' }),
-);
+)
 
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
