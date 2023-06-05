@@ -55,8 +55,12 @@ export const links: LinksFunction = () => {
 		},
 		{ rel: 'manifest', href: '/site.webmanifest' },
 		{ rel: 'icon', href: '/favicon.ico' },
+		// Preload CSS as a resource to avoid render blocking
+		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
+		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
+		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
 }
