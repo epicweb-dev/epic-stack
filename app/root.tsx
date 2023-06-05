@@ -36,6 +36,10 @@ import { makeTimings, time } from './utils/timing.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
+		// Preload CSS as a resource to avoid render blocking
+		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
+		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
+		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{
 			rel: 'apple-touch-icon',
 			sizes: '180x180',

@@ -1,12 +1,12 @@
 ## Font Metric Overrides
 
-When using custom fonts, your site elements may stretch or shrink to accomodate the font. This is because the browser doesn't know the dimensions of the font you're using until it arrives, this introduces Cumulative Layout Shift and impact your web vitals. This is fixed in Epic Stack by introducing [Font Metric Overrides](https://github.com/epicweb-dev/epic-stack/pull/128/files) to our css.
+When using custom fonts, your site elements may stretch or shrink to accomodate the font. This is because the browser doesn't know the dimensions of the font you're using until it arrives, which introduces Cumulative Layout Shift and impact its web vitals. 
 
-### Adding Metric Overrides for Your Custom Fonts
+In Epic Stack, we fixed this by introducing [Font Metric Overrides](https://github.com/epicweb-dev/epic-stack/pull/128/files).
 
-Adding metric overrides for your custom fonts is a manual process. 
+### Custom Fonts Metric Overrides
 
-Add a font family fallback name to your `tailwind.config.js` file:
+Adding metric overrides for your custom fonts is a manual process. Add a font family fallback name to your `tailwind.config.js` file:
 
 ```js
     //tailwind.config.js
@@ -28,6 +28,8 @@ npx fontpie ./local/font/location.woff2 -w font-weight -s normal/italic -n YourF
 npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2 -w 200 -s normal -n NunitoSans
 ```
 
+Use fontpie for every custom font used (including variants) and add the metric overrides to `font.css`.
+
 ```css
 @font-face {
   font-family: 'NunitoSans Fallback';
@@ -41,6 +43,6 @@ npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2
 }
 ```
 
-Use fontpie for every custom font used (including variants) and add the metric overrides to `font.css`.
+*Ensure the original font has the `font-display: swap` property or the fallback wouldn't work!*
 
 That's it! You can now use your custom font without worrying about Cumulative Layout Shift!
