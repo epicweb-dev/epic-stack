@@ -6,18 +6,21 @@ test('Users can create notes', async ({ login, page }) => {
 	await page.goto(`/users/${user.username}/notes`)
 
 	const newNote = createNewNote()
-	await page.locator("//a[text()='+ New Note']").click()
+	await page.getByRole('link', { name: '+ New Note' }).click()
 
 	// blank form submission should result in errors
-	await page.locator('button[type="submit"]').click()
-	await expect(page.locator('ul#note-editor-title-error')).toBeVisible()
-	await expect(page.locator('ul#note-editor-content-error')).toBeVisible()
+	await page.getByRole('button', { name: /submit/i }).click()
+	let countErrors = page
+		.getByText('String must contain at least 1 character(s)')
+		.count()
+	await expect(countErrors).toEqual(2)
 
 	// fill in form and submit
-	await page.locator('input[name="title"]').fill(newNote.title)
-	await page.locator('textarea[name="content"]').fill(newNote.content)
-	await page.locator('button[type="submit"]').click()
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/*`))
+	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
+	await page.getByLabel(/^content$/i).fill(newNote.content)
+
+	await page.getByRole('button').last().click()
+	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 })
 
 test('Users can edit notes', async ({ login, page }) => {
