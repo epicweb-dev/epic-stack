@@ -7,6 +7,7 @@ if (process.env.NODE_ENV === 'production') {
 		'tsx watch --clear-screen=false --ignore "app/**" --ignore "build/**" --ignore "node_modules/**" --inspect ./index.js'
 	execa(command, {
 		stdio: ['ignore', 'inherit', 'inherit'],
+		shell: true,
 		env: {
 			...process.env,
 			FORCE_COLOR: true,
