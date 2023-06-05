@@ -24,7 +24,9 @@ npx fontpie ./local/font/location.woff2 -w font-weight -s normal/italic -n YourF
 
 ### Example
 
-`npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2 -w 200 -s normal -n NunitoSans`
+```sh
+npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2 -w 200 -s normal -n NunitoSans
+```
 
 ```css
 @font-face {
