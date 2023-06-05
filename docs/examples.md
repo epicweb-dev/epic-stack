@@ -11,6 +11,10 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@kentcdodds](https://github.com/kentcdodds): Using client hints to avoid
   content layout shift with `prefers-reduced-motion` and framer motion
   animations.
+- [Sitemaps](https://github.com/kentcdodds/epic-stack-with-sitemap) by
+  [@kentcdodds](https://github.com/kentcdodds): Automatically generating a
+  sitemap and a nice way to handle dynamic routes and customize the sitemap on a
+  per-route basis.
 
 ## How to contribute
 
