@@ -34,7 +34,7 @@ test('Users can edit notes', async ({ login, page }) => {
 	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
 	await page.getByRole('button', { name: /submit/i }).click()
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/*`))
+	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 
 	// edit the note
 	await page.getByRole('link', { name: 'Edit' }).click()
@@ -61,7 +61,7 @@ test('Users can delete notes', async ({ login, page }) => {
 	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
 	await page.getByRole('button', { name: /submit/i }).click()
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/*`))
+	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 	await expect(page.getByRole('heading', { name: newNote.title })).toBeVisible()
 	// count links on page
 
