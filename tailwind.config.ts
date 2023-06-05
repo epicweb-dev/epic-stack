@@ -35,7 +35,7 @@ export default {
 				},
 			},
 			fontFamily: {
-				sans: ['Nunito Sans', ...defaultTheme.fontFamily.sans],
+				sans: ['Nunito Sans', 'Nunito Sans Fallback', ...defaultTheme.fontFamily.sans],
 			},
 			fontSize: {
 				// 1rem = 16px
