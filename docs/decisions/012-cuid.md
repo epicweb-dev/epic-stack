@@ -12,7 +12,8 @@ understanding of the `uuid` vs `cuid` debate, I took it to ChatGPT.
 <details>
 <summary>ChatGPT conversation: CUID vs UUID Debate</summary>
 
-**CUID vs UUID Debate** - June 6, 2023
+**CUID vs UUID Debate** -
+[June 6, 2023](https://chat.openai.com/share/cc0eb433-9bc0-48ea-861a-dfc7ed5acf43)
 
 **Kent:** Please argue both sides of the cuid vs uuid debate.
 
