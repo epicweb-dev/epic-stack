@@ -1,7 +1,4 @@
 import { createCookieSessionStorage } from '@remix-run/node'
-import invariant from 'tiny-invariant'
-
-invariant(process.env.SESSION_SECRET, 'SESSION_SECRET must be set')
 
 export const sessionStorage = createCookieSessionStorage({
 	cookie: {
@@ -14,5 +11,22 @@ export const sessionStorage = createCookieSessionStorage({
 	},
 })
 
-// you can also export the methods individually for your own usage
 export const { getSession, commitSession, destroySession } = sessionStorage
+
+type Session = Awaited<ReturnType<typeof getSession>>
+
+const themeKey = 'theme'
+
+export function getTheme(session: Session): 'dark' | 'light' | null {
+	const theme = session.get(themeKey)
+	if (theme === 'dark' || theme === 'light') return theme
+	return null
+}
+
+export function setTheme(session: Session, theme: 'dark' | 'light') {
+	session.set(themeKey, theme)
+}
+
+export function deleteTheme(session: Session) {
+	session.unset(themeKey)
+}

@@ -3,8 +3,9 @@
 Decisions about the Epic Stack should be guided by the following guiding
 principles:
 
-- **Limit Third Party Services:** If we can reasonably build, deploy, maintain
-  it ourselves, do it. This saves on cost and reduces complexity.
+- **Limit Services:** If we can reasonably build, deploy, maintain it ourselves,
+  do it. Additionally, if we can reasonably run it within our app instance, do
+  it. This saves on cost and reduces complexity.
 - **Include Only Most Common Use Cases:** As a project generator, it is expected
   that some code will necessarily be deleted, but implementing support for every
   possible type of feature is literally impossible. _The starter app is not

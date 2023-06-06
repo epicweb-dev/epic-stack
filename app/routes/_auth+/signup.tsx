@@ -34,7 +34,7 @@ function createSchema(
 					code: z.ZodIssueCode.custom,
 					message: conform.VALIDATION_UNDEFINED,
 				})
-				return;
+				return
 			}
 			// if constraint is defined, validate uniqueness
 			return constraints.isEmailUnique(email).then(isUnique => {
@@ -50,6 +50,10 @@ function createSchema(
 	})
 	return signupSchema
 }
+
+const emailFieldSchema = z.object({
+	email: emailSchema,
+})
 
 const tokenSchema = z.object({
 	type: z.literal(tokenType),
@@ -156,10 +160,10 @@ export default function SignupRoute() {
 	const signupFetcher = useFetcher<typeof action>()
 	const [form, fields] = useForm({
 		id: 'signup-form',
-		constraint: getFieldsetConstraint(createSchema()),
+		constraint: getFieldsetConstraint(emailFieldSchema),
 		lastSubmission: signupFetcher.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: createSchema() })
+			return parse(formData, { schema: emailFieldSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})

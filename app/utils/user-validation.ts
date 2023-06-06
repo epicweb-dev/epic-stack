@@ -4,6 +4,7 @@ export const usernameSchema = z
 	.string()
 	.min(3, { message: 'Username is too short' })
 	.max(20, { message: 'Username is too long' })
+	.regex(/^[^@]*$/, 'Username can not contain "@"')
 export const passwordSchema = z
 	.string()
 	.min(6, { message: 'Password is too short' })

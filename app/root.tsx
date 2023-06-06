@@ -1,4 +1,3 @@
-import * as Checkbox from '@radix-ui/react-checkbox'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
@@ -6,6 +5,7 @@ import {
 	type DataFunctionArgs,
 	type LinksFunction,
 	type V2_MetaFunction,
+	type HeadersFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -16,22 +16,30 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useFetcher,
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { clsx } from 'clsx'
-import { useState } from 'react'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
 import tailwindStylesheetUrl from './styles/tailwind.css'
+import fontStylestylesheetUrl from './styles/font.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
+import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { ButtonLink } from './utils/forms.tsx'
+import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
-import { useUser } from './utils/user.ts'
+import { useNonce } from './utils/nonce-provider.ts'
+import { getSession, getTheme } from './utils/session.server.ts'
+import { useOptionalUser, useUser } from './utils/user.ts'
+import { makeTimings, time } from './utils/timing.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
+		// Preload CSS as a resource to avoid render blocking
+		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
+		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
+		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{
 			rel: 'apple-touch-icon',
 			sizes: '180x180',
@@ -51,7 +59,7 @@ export const links: LinksFunction = () => {
 		},
 		{ rel: 'manifest', href: '/site.webmanifest' },
 		{ rel: 'icon', href: '/favicon.ico' },
-		{ rel: 'stylesheet', href: '/fonts/nunito-sans/font.css' },
+		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
@@ -65,13 +73,23 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const userId = await getUserId(request)
+	const cookieSession = await getSession(request.headers.get('Cookie'))
+	const timings = makeTimings('rootLoader')
+	const userId = await time(() => getUserId(request), {
+		timings,
+		type: 'getUserId',
+		desc: 'getUserId in root',
+	})
 
 	const user = userId
-		? await prisma.user.findUnique({
-				where: { id: userId },
-				select: { id: true, name: true, username: true, imageId: true },
-		  })
+		? await time(
+				() =>
+					prisma.user.findUnique({
+						where: { id: userId },
+						select: { id: true, name: true, username: true, imageId: true },
+					}),
+				{ timings, type: 'find user', desc: 'find user in root' },
+		  )
 		: null
 	if (userId && !user) {
 		console.info('something weird happened')
@@ -80,26 +98,55 @@ export async function loader({ request }: DataFunctionArgs) {
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
 
-	return json({ user, ENV: getEnv() })
+	return json(
+		{
+			user,
+			requestInfo: {
+				hints: getHints(request),
+				origin: getDomainUrl(request),
+				path: new URL(request.url).pathname,
+				session: {
+					theme: getTheme(cookieSession),
+				},
+			},
+			ENV: getEnv(),
+		},
+		{
+			headers: {
+				'Server-Timing': timings.toString(),
+			},
+		},
+	)
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+	const headers = {
+		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
+	}
+	return headers
 }
 
 export default function App() {
 	const data = useLoaderData<typeof loader>()
-	const { user } = data
+	const nonce = useNonce()
+	const user = useOptionalUser()
+	const theme = useTheme()
+
 	return (
-		<html lang="en" className="dark h-full">
+		<html lang="en" className={`${theme} h-full`}>
 			<head>
+				<ClientHintCheck nonce={nonce} />
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-night-700 text-white">
+			<body className="flex h-full flex-col justify-between bg-day-300 text-white dark:bg-night-700 ">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
-							<div className="font-light">epic</div>
-							<div className="font-bold">notes</div>
+							<div className="font-light text-black dark:text-white">epic</div>
+							<div className="font-bold text-black dark:text-white">notes</div>
 						</Link>
 						<div className="flex items-center gap-10">
 							{user ? (
@@ -119,91 +166,23 @@ export default function App() {
 
 				<div className="container mx-auto flex justify-between">
 					<Link to="/">
-						<div className="font-light">epic</div>
-						<div className="font-bold">notes</div>
+						<div className="font-light text-black dark:text-white">epic</div>
+						<div className="font-bold text-black dark:text-white">notes</div>
 					</Link>
-					<ThemeSwitch />
+					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
-				<ScrollRestoration />
-				<Scripts />
+				<ScrollRestoration nonce={nonce} />
+				<Scripts nonce={nonce} />
 				<script
+					nonce={nonce}
 					dangerouslySetInnerHTML={{
 						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
 					}}
 				/>
-				<LiveReload />
+				<LiveReload nonce={nonce} />
 			</body>
 		</html>
-	)
-}
-
-function ThemeSwitch() {
-	const fetcher = useFetcher()
-	const [mode, setMode] = useState<'system' | 'dark' | 'light'>('system')
-	const checked: boolean | 'indeterminate' =
-		mode === 'system' ? 'indeterminate' : mode === 'dark'
-	const theme = mode === 'system' ? 'dark' : mode
-	return (
-		<fetcher.Form>
-			<label>
-				<Checkbox.Root
-					className={clsx('bg-gray-night-500 h-10 w-20 rounded-full p-1', {
-						'bg-night-500': theme === 'dark',
-						'bg-white': theme === 'light',
-					})}
-					checked={checked}
-					name="theme"
-					value={mode}
-					onCheckedChange={() =>
-						setMode(oldMode =>
-							oldMode === 'system'
-								? 'light'
-								: oldMode === 'light'
-								? 'dark'
-								: 'system',
-						)
-					}
-					aria-label={
-						mode === 'system'
-							? 'System Theme'
-							: mode === 'dark'
-							? 'Dark Theme'
-							: 'Light Theme'
-					}
-				>
-					<span
-						className={clsx('flex justify-between rounded-full', {
-							'bg-white': mode === 'system' && theme === 'dark',
-							'theme-switch-light': mode === 'system' && theme === 'light',
-						})}
-					>
-						<span
-							className={clsx(
-								'theme-switch-light',
-								'flex h-8 w-8 items-center justify-center rounded-full',
-								{
-									'text-white': mode === 'light',
-								},
-							)}
-						>
-							🔆
-						</span>
-						<span
-							className={clsx(
-								'theme-switch-dark',
-								'flex h-8 w-8 items-center justify-center rounded-full',
-								{
-									'text-white': mode === 'dark',
-								},
-							)}
-						>
-							🌙
-						</span>
-					</span>
-				</Checkbox.Root>
-			</label>
-		</fetcher.Form>
 	)
 }
 
@@ -224,7 +203,7 @@ function UserDropdown() {
 						alt={user.name ?? user.username}
 						src={getUserImgSrc(user.imageId)}
 					/>
-					<span className="text-body-sm font-bold">
+					<span className="text-body-sm font-bold text-white">
 						{user.name ?? user.username}
 					</span>
 				</Link>
