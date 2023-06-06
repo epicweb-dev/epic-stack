@@ -19,6 +19,7 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
+import { withSentry } from "@sentry/remix";
 import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import fontStylestylesheetUrl from './styles/font.css'
