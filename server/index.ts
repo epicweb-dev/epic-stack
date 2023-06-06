@@ -87,7 +87,7 @@ app.use(
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
 			directives: {
-				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
+				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : ["*.ingest.sentry.io"],
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
 				'img-src': ["'self'"],
