@@ -1,8 +1,8 @@
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
-import { clsx } from 'clsx'
 import React, { useId } from 'react'
 import styles from './forms.module.css'
+import { twMerge } from 'tailwind-merge'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -41,7 +41,7 @@ export function Field({
 	const id = inputProps.id ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={clsx(styles.field, className)}>
+		<div className={twMerge(styles.field, className)}>
 			<input
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -74,7 +74,7 @@ export function TextareaField({
 	const id = textareaProps.id ?? textareaProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
-		<div className={clsx(styles.textareaField, className)}>
+		<div className={twMerge(styles.textareaField, className)}>
 			<textarea
 				id={id}
 				aria-invalid={errorId ? true : undefined}
@@ -133,7 +133,7 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="text-body-xs text-night-200"
+					className="self-center text-body-xs text-night-200"
 				/>
 			</div>
 			<div className="px-4 pb-3 pt-1">
@@ -161,15 +161,16 @@ export function getButtonClassName({
 	const mediumClassName = 'px-14 py-5 text-lg'
 	const mediumWideClassName = 'px-24 py-5 text-lg'
 	const pillClassName = 'px-12 py-3 leading-3'
-	const className = clsx(baseClassName, {
-		[primaryClassName]: variant === 'primary',
-		[secondaryClassName]: variant === 'secondary',
-		[extraSmallClassName]: size === 'xs',
-		[smallClassName]: size === 'sm',
-		[mediumClassName]: size === 'md',
-		[mediumWideClassName]: size === 'md-wide',
-		[pillClassName]: size === 'pill',
-	})
+	const className = twMerge(
+		baseClassName,
+		variant === 'primary' && primaryClassName,
+		variant === 'secondary' && secondaryClassName,
+		size === 'xs' && extraSmallClassName,
+		size === 'sm' && smallClassName,
+		size === 'md' && mediumClassName,
+		size === 'md-wide' && [mediumWideClassName],
+		size === 'pill' && pillClassName,
+	)
 	return className
 }
 
@@ -191,10 +192,10 @@ export function Button({
 	return (
 		<button
 			{...props}
-			className={clsx(
-				props.className,
+			className={twMerge(
 				getButtonClassName({ size, variant }),
 				'flex justify-center gap-4',
+				props.className,
 			)}
 		>
 			<div>{props.children}</div>
@@ -207,10 +208,18 @@ export function ButtonLink({
 	size,
 	variant,
 	...props
-}: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'> &
+}: React.ComponentPropsWithoutRef<typeof Link> &
 	Parameters<typeof getButtonClassName>[0]) {
-	// eslint-disable-next-line jsx-a11y/anchor-has-content
-	return <Link {...props} className={getButtonClassName({ size, variant })} />
+	return (
+		// eslint-disable-next-line jsx-a11y/anchor-has-content
+		<Link
+			{...props}
+			className={twMerge(
+				getButtonClassName({ size, variant }),
+				props.className,
+			)}
+		/>
+	)
 }
 
 export function LabelButton({
@@ -222,7 +231,10 @@ export function LabelButton({
 	return (
 		<label
 			{...props}
-			className={clsx('cursor-pointer', getButtonClassName({ size, variant }))}
+			className={twMerge(
+				getButtonClassName({ size, variant }),
+				'cursor-pointer',
+			)}
 		/>
 	)
 }

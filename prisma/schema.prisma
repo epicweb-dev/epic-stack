@@ -8,7 +8,7 @@ generator client {
 }
 
 model File {
-  id   String @id @unique @default(uuid())
+  id   String @id @unique @default(cuid())
   blob Bytes
 
   createdAt DateTime @default(now())
@@ -76,7 +76,7 @@ model Password {
 }
 
 model Session {
-  id             String   @id @default(uuid())
+  id             String   @id @default(cuid())
   createdAt      DateTime @default(now())
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String

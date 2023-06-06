@@ -1,10 +1,10 @@
-import { useLoaderData, Outlet, NavLink, Link } from '@remix-run/react'
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { prisma } from '~/utils/db.server.ts'
-import { clsx } from 'clsx'
+import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+import { twMerge } from 'tailwind-merge'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { getUserImgSrc } from '~/utils/misc.ts'
 import { requireUserId } from '~/utils/auth.server.ts'
+import { prisma } from '~/utils/db.server.ts'
+import { getUserImgSrc } from '~/utils/misc.ts'
 
 export async function loader({ params, request }: DataFunctionArgs) {
 	await requireUserId(request, { redirectTo: null })
@@ -61,9 +61,7 @@ export default function NotesRoute() {
 							<NavLink
 								to="new"
 								className={({ isActive }) =>
-									clsx(navLinkDefaultClassName, {
-										'bg-night-400': isActive,
-									})
+									twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
 								}
 							>
 								+ New Note
@@ -74,9 +72,7 @@ export default function NotesRoute() {
 								<NavLink
 									to={note.id}
 									className={({ isActive }) =>
-										clsx(navLinkDefaultClassName, {
-											'bg-night-400': isActive,
-										})
+										twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
 									}
 								>
 									{note.title}
