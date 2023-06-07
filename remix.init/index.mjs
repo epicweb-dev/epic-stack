@@ -44,10 +44,6 @@ export default async function main({ isTypeScript, rootDirectory }) {
 	const newEnv = env
 		.replace(/^SESSION_SECRET=.*$/m, `SESSION_SECRET="${getRandomString(16)}"`)
 		.replace(
-			/^ENCRYPTION_SECRET=.*$/m,
-			`ENCRYPTION_SECRET="${getRandomString(16)}"`,
-		)
-		.replace(
 			/^INTERNAL_COMMAND_TOKEN=.*$/m,
 			`INTERNAL_COMMAND_TOKEN="${getRandomString(16)}"`,
 		)

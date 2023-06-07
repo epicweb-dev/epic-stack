@@ -52,12 +52,12 @@ Prior to your first deployment, you'll need to do a few things:
   [your repo secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
   with the name `FLY_API_TOKEN`.
 
-- Add a `SESSION_SECRET`, `ENCRYPTION_SECRET`, and `INTERNAL_COMMAND_TOKEN` to
-  your fly app secrets, to do this you can run the following commands:
+- Add a `SESSION_SECRET` and `INTERNAL_COMMAND_TOKEN` to your fly app secrets,
+  to do this you can run the following commands:
 
   ```sh
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app [YOUR_APP_NAME]
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) ENCRYPTION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app [YOUR_APP_NAME]-staging
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app [YOUR_APP_NAME]
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) --app [YOUR_APP_NAME]-staging
   ```
 
   If you don't have openssl installed, you can also use

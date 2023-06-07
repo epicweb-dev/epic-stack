@@ -5,7 +5,6 @@ const requiredServerEnvs = [
 	'DATABASE_PATH',
 	'DATABASE_URL',
 	'SESSION_SECRET',
-	'ENCRYPTION_SECRET',
 	'INTERNAL_COMMAND_TOKEN',
 	'CACHE_DATABASE_PATH',
 	// If you plan to use Mailgun, uncomment these lines

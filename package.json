@@ -35,19 +35,18 @@
     "/server-build"
   ],
   "dependencies": {
-    "@conform-to/react": "^0.6.3",
-    "@conform-to/zod": "^0.6.3",
+    "@conform-to/react": "^0.7.0-pre.2",
+    "@conform-to/zod": "^0.7.0-pre.2",
     "@prisma/client": "^4.15.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
-    "@remix-run/css-bundle": "1.16.1",
-    "@remix-run/express": "^1.16.1",
-    "@remix-run/node": "1.16.1",
-    "@remix-run/react": "1.16.1",
-    "@remix-run/router": "^1.6.2",
-    "@remix-run/serve": "1.16.1",
-    "@remix-run/server-runtime": "1.16.1",
+    "@remix-run/css-bundle": "^1.17.0",
+    "@remix-run/express": "^1.17.0",
+    "@remix-run/node": "^1.17.0",
+    "@remix-run/react": "^1.17.0",
+    "@remix-run/router": "^1.6.3",
+    "@remix-run/server-runtime": "^1.17.0",
     "@sentry/remix": "^7.54.0",
     "address": "^1.2.2",
     "bcryptjs": "^2.4.3",
@@ -66,6 +65,7 @@
     "litefs-js": "^1.1.2",
     "lru-cache": "^9.1.1",
     "morgan": "^1.10.0",
+    "prisma": "^4.15.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remix-auth": "^3.4.0",
@@ -77,8 +77,9 @@
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
     "@playwright/test": "^1.34.3",
-    "@remix-run/dev": "1.16.1",
-    "@remix-run/eslint-config": "1.16.1",
+    "@remix-run/dev": "^1.17.0",
+    "@remix-run/eslint-config": "^1.17.0",
+    "@remix-run/serve": "^1.17.0",
     "@testing-library/dom": "^9.3.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -114,7 +115,6 @@
     "prettier": "^2.8.8",
     "prettier-plugin-sql": "^0.14.0",
     "prettier-plugin-tailwindcss": "^0.3.0",
-    "prisma": "^4.15.0",
     "remix-flat-routes": "^0.5.8",
     "tailwindcss": "^3.3.2",
     "tailwindcss-radix": "^2.8.0",
@@ -131,5 +131,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "volta": {
+    "node": "18.16.0"
   }
 }

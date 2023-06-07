@@ -23,9 +23,10 @@ import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema } from '~/utils/user-validation.ts'
-import { resetPasswordSessionKey } from './forgot-password.tsx'
 
-const ResetPasswordSchema = z
+export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
+
+const resetPasswordSchema = z
 	.object({
 		password: passwordSchema,
 		confirmPassword: passwordSchema,
@@ -39,7 +40,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
 	const error = session.get(authenticator.sessionErrorKey)
-	const resetPasswordUsername = session.get(resetPasswordSessionKey)
+	const resetPasswordUsername = session.get(resetPasswordUsernameSessionKey)
 	if (typeof resetPasswordUsername !== 'string' || !resetPasswordUsername) {
 		return redirect('/login')
 	}
@@ -57,7 +58,7 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
-		schema: ResetPasswordSchema,
+		schema: resetPasswordSchema,
 		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
@@ -75,12 +76,12 @@ export async function action({ request }: DataFunctionArgs) {
 	const { password } = submission.value
 
 	const session = await getSession(request.headers.get('cookie'))
-	const username = session.get(resetPasswordSessionKey)
+	const username = session.get(resetPasswordUsernameSessionKey)
 	if (typeof username !== 'string' || !username) {
 		return redirect('/login')
 	}
 	await resetUserPassword({ username, password })
-	session.unset(resetPasswordSessionKey)
+	session.unset(resetPasswordUsernameSessionKey)
 	return redirect('/login', {
 		headers: { 'Set-Cookie': await commitSession(session) },
 	})
@@ -98,10 +99,10 @@ export default function ResetPasswordPage() {
 
 	const [form, fields] = useForm({
 		id: 'reset-password',
-		constraint: getFieldsetConstraint(ResetPasswordSchema),
+		constraint: getFieldsetConstraint(resetPasswordSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: ResetPasswordSchema })
+			return parse(formData, { schema: resetPasswordSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
