@@ -12,7 +12,7 @@ import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 
-export const LoginFormSchema = z.object({
+export const loginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
@@ -22,7 +22,7 @@ export const LoginFormSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.clone().formData()
 	const submission = parse(formData, {
-		schema: LoginFormSchema,
+		schema: loginFormSchema,
 		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value || submission.intent !== 'submit') {
@@ -88,10 +88,10 @@ export function InlineLogin({
 
 	const [form, fields] = useForm({
 		id: 'inline-login',
-		constraint: getFieldsetConstraint(LoginFormSchema),
+		constraint: getFieldsetConstraint(loginFormSchema),
 		lastSubmission: loginFetcher.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: LoginFormSchema })
+			return parse(formData, { schema: loginFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -148,8 +148,7 @@ export function InlineLogin({
 						{...conform.input(fields.redirectTo)}
 						type="hidden"
 					/>
-					<ErrorList errors={formError ? [formError] : []} />
-					<ErrorList errors={form.errors} id={form.errorId} />
+					<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6 pt-3">
 						<Button
