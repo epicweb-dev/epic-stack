@@ -8,6 +8,25 @@ export default {
 	theme: {
 		extend: {
 			colors: {
+				background: 'var(--color-background)',
+				foreground: 'var(--color-foreground)',
+				primary: 'var(--color-primary)',
+				//accent: 'var(--color-accent)',
+				'muted-50': 'var(--color-muted-50)',
+				'muted-100': 'var(--color-muted-100)',
+				'muted-200': 'var(--color-muted-200)',
+				'muted-300': 'var(--color-muted-300)',
+				'muted-400': 'var(--color-muted-400)',
+				'muted-500': 'var(--color-muted-500)',
+				'muted-600': 'var(--color-muted-600)',
+				'muted-700': 'var(--color-muted-700)',
+				'muted-800': 'var(--color-muted-800)',
+				'muted-900': 'var(--color-muted-900)',
+				success: 'var(--color-success)',
+				info: 'var(--color-info)',
+				warning: 'var(--color-warning)',
+				danger: 'var(--color-danger)',
+				'danger-muted': 'var(--color-danger-muted)',
 				night: {
 					100: '#DADADA',
 					200: '#AAAAAA',

@@ -21,7 +21,7 @@
 	--color-info: blue;
 	--color-warning: yellow;
 	--color-danger: red;
-	--color-danger-muted: pink;
+	--color-danger-muted: lightcoral;
 }
 
 :root.dark {
