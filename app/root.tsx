@@ -74,7 +74,7 @@ export const meta: V2_MetaFunction = () => {
 
 export async function loader({ request }: DataFunctionArgs) {
 	const cookieSession = await getSession(request.headers.get('Cookie'))
-	const timings = makeTimings('rootLoader')
+	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
 		type: 'getUserId',
