@@ -24,6 +24,7 @@
 	--color-danger-muted: lightcoral;
 }
 
+/** Copy those 👆 CSS vars here 👇 if you want to change them in dark mode */
 :root.dark {
 	--color-background: black;
 	--color-foreground: white;
