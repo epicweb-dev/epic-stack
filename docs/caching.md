@@ -57,9 +57,9 @@ export async function getScheduledEvents({
 			]
 		},
 		checkValue: eventSchema.array(),
-		// Time To Live (ttl): the cached value is considered valid for 24 hours
-		ttl: 1000 * 60 * 24,
-		// Stale While Revalidate (swr): if the cached value is less than 30 days
+		// Time To Live (ttl) in milliseconds: the cached value is considered valid for 24 hours
+		ttl: 1000 * 60 * 60 * 24,
+		// Stale While Revalidate (swr) in milliseconds: if the cached value is less than 30 days
 		// expired, return it while fetching a fresh value in the background
 		staleWhileRevalidate: 1000 * 60 * 60 * 24 * 30,
 	})
