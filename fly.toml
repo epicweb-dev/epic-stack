@@ -13,7 +13,7 @@ source = "data"
 destination = "/data"
 
 [deploy]
-release_command = "npm run upload:sentry"
+release_command = "node ./scripts/sentry-create-release"
 
 [[services]]
 internal_port = 8080

@@ -10,7 +10,6 @@
     "build": "run-s build:*",
     "build:remix": "remix build --sourcemap",
     "build:server": "tsx ./other/build-server.ts",
-    "upload:sentry": "node ./scripts/sentry-create-release",
     "dev": "remix dev -c \"node ./server/dev-server.js\" --no-restart",
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
@@ -131,8 +130,5 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
-  },
-  "volta": {
-    "node": "18.16.0"
   }
 }

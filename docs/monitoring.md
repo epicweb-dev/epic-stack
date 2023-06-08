@@ -32,4 +32,6 @@ organization settings page and copy that organization slug (`SENTRY_ORG_SLUG`).
 
 Now, set the secrets in Fly.io:
 
+```sh
 fly secrets set SENTRY_DSN=<your_dsn> SENTRY_AUTH_TOKEN=<your_auth_token> SENTRY_ORG=<your_org_slug> SENTRY_PROJECT=javascript-remix
+```
