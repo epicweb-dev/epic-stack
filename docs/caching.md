@@ -72,11 +72,13 @@ request to the tito API and return the results. It will also cache the results
 in the `cache` (which is the SQLite cache). The next time you call
 `getScheduledEvents` it will return the cached value if the cached value is less
 than 30 days old. If the cached value is older than 24 hours, it will also make
-a request to the tito API in the. If the cache value is more than 30 days old,
-it will wait until the tito request is complete and then return the fresh value.
+a request to the tito API. If the cache value is more than 30 days old, it will
+wait until the tito request is complete and then return the fresh value.
 
 Bottom line: You make the request much less often and users are never waiting
-for it.
+for it. Every situation will require you think through the implications of
+caching and acceptable stale-ness, but the point is you have those levers to
+pull.
 
 A lot more needs to be said on this subject (an entire workshop full!), but this
 should be enough to get you going!
