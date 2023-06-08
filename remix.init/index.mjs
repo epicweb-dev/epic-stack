@@ -60,7 +60,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 	const fileOperationPromises = [
 		fs.writeFile(FLY_TOML_PATH, newFlyTomlContent),
 		fs.writeFile(ENV_PATH, newEnv),
-		fs.writeFile(PKG_PATH, JSON.stringify(packageJson)),
+		fs.writeFile(PKG_PATH, JSON.stringify(packageJson, null, 2)),
 		fs.copyFile(
 			path.join(rootDirectory, 'remix.init', 'gitignore'),
 			path.join(rootDirectory, '.gitignore'),
