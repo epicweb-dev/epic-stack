@@ -24,7 +24,10 @@ export default function Index() {
 							</h1>
 							<p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
 								Check the{' '}
-								<a href="https://github.com/epicweb-dev/epic-stack/blob/main/docs/getting-started.md">
+								<a
+									className="underline"
+									href="https://github.com/epicweb-dev/epic-stack/blob/main/docs/getting-started.md"
+								>
 									Getting Started
 								</a>{' '}
 								guide file for instructions on how to get your project off the

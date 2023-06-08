@@ -87,7 +87,7 @@ async function validate(request: Request, body: FormData | URLSearchParams) {
 					{
 						algorithm: verification.algorithm,
 						validSeconds: verification.validSeconds,
-						window: 50,
+						window: 1,
 					},
 				)
 				if (!result) {
