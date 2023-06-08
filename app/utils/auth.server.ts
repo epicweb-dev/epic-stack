@@ -78,7 +78,11 @@ export async function getUserId(request: Request) {
 		where: { id: sessionId },
 		select: { userId: true },
 	})
-	if (!session) return null
+	if (!session) {
+		// Perhaps their session was deleted?
+		await authenticator.logout(request, { redirectTo: '/' })
+		return null
+	}
 	return session.userId
 }
 
