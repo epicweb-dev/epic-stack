@@ -100,7 +100,7 @@ app.use(
 						: process.env.SENTRY_DSN
 						? // if using self-hosted or relay server, use that url here
 						  ['*.ingest.sentry.io']
-						: [],
+						: ["'self'"],
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
 				'img-src': ["'self'", 'data:'],
