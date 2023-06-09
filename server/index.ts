@@ -97,7 +97,7 @@ app.use(
 				'connect-src': [
 					MODE === 'development' ? 'ws:' : null,
 					process.env.SENTRY_DSN ? '*.ingest.sentry.io' : null,
-					'"self"',
+					"'self'",
 				].filter(Boolean),
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
