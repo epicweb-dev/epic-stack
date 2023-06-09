@@ -14,7 +14,7 @@ import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
-import { Verifier, unverifiedSessionKey } from './verify.tsx'
+import { unverifiedSessionKey } from './verify.tsx'
 
 const ROUTE_PATH = '/resources/login'
 
@@ -93,22 +93,17 @@ export async function action({ request }: DataFunctionArgs) {
 			}),
 		},
 	}
-	if (user2FA) {
-		return json({ status: 'unverified', submission } as const, responseInit)
-	} else {
-		if (redirectTo) {
-			throw redirect(safeRedirect(redirectTo), responseInit)
-		}
+	if (user2FA || !redirectTo) {
 		return json({ status: 'success', submission } as const, responseInit)
+	} else {
+		throw redirect(safeRedirect(redirectTo), responseInit)
 	}
 }
 
 export function InlineLogin({
 	redirectTo,
 	formError,
-	status = 'idle',
 }: {
-	status?: 'idle' | 'error' | 'unverified'
 	redirectTo?: string
 	formError?: string | null
 }) {
@@ -116,6 +111,7 @@ export function InlineLogin({
 
 	const [form, fields] = useForm({
 		id: 'inline-login',
+		defaultValue: { redirectTo },
 		constraint: getFieldsetConstraint(loginFormSchema),
 		lastSubmission: loginFetcher.data?.submission,
 		onValidate({ formData }) {
@@ -123,12 +119,6 @@ export function InlineLogin({
 		},
 		shouldRevalidate: 'onBlur',
 	})
-
-	const fetcherStatus = loginFetcher.data?.status ?? status
-
-	if (fetcherStatus === 'unverified') {
-		return <Verifier redirectTo={redirectTo} />
-	}
 
 	return (
 		<div>
@@ -144,7 +134,7 @@ export function InlineLogin({
 							htmlFor: fields.username.id,
 							children: 'Username',
 						}}
-						inputProps={conform.input(fields.username)}
+						inputProps={{ ...conform.input(fields.username), autoFocus: true }}
 						errors={fields.username.errors}
 					/>
 
@@ -177,11 +167,7 @@ export function InlineLogin({
 						</div>
 					</div>
 
-					<input
-						value={redirectTo}
-						{...conform.input(fields.redirectTo)}
-						type="hidden"
-					/>
+					<input {...conform.input(fields.redirectTo)} type="hidden" />
 					<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6 pt-3">
@@ -190,7 +176,9 @@ export function InlineLogin({
 							size="md"
 							variant="primary"
 							status={
-								loginFetcher.state === 'submitting' ? 'pending' : fetcherStatus
+								loginFetcher.state === 'submitting'
+									? 'pending'
+									: loginFetcher.data?.status
 							}
 							type="submit"
 							disabled={loginFetcher.state !== 'idle'}
