@@ -36,4 +36,5 @@ Now, set the secrets in Fly.io:
 fly secrets set SENTRY_DSN=<your_dsn> SENTRY_AUTH_TOKEN=<your_auth_token> SENTRY_ORG=<your_org_slug> SENTRY_PROJECT=javascript-remix
 ```
 
-Note that `javascript-remix` is the name of the default Remix project in Sentry and if you use a differnet project name you'll need to update that value here.
+Note that `javascript-remix` is the name of the default Remix project in Sentry
+and if you use a differnet project name you'll need to update that value here.

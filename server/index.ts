@@ -98,8 +98,8 @@ app.use(
 					MODE === 'development'
 						? ['ws:', "'self'"]
 						: process.env.SENTRY_DSN
-						// if using self-hosted or relay server, use that url here
-						? ['*.ingest.sentry.io']
+						? // if using self-hosted or relay server, use that url here
+						  ['*.ingest.sentry.io']
 						: [],
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
