@@ -17,7 +17,7 @@ import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 
 export const forgotPasswordOTPQueryParam = 'code'
-export const forgotPasswordVerificationTargetQueryParam = 'usernameOrEmail'
+export const forgotPasswordTargetQueryParam = 'usernameOrEmail'
 export const verificationType = 'forgot-password'
 
 const forgotPasswordSchema = z.object({
@@ -48,7 +48,7 @@ export async function action({ request }: DataFunctionArgs) {
 		`${getDomainUrl(request)}/forgot-password/verify`,
 	)
 	resetPasswordUrl.searchParams.set(
-		forgotPasswordVerificationTargetQueryParam,
+		forgotPasswordTargetQueryParam,
 		usernameOrEmail,
 	)
 	const redirectTo = new URL(resetPasswordUrl.toString())
@@ -66,23 +66,25 @@ export async function action({ request }: DataFunctionArgs) {
 		// allows a user who forgot one to use the other to reset their password.
 		// And displaying what the user provided rather than the other ensures we
 		// don't leak the association between the two.
-		const verificationTarget = usernameOrEmail
-		const { otp, key, algorithm, validSeconds } = generateTOTP({
-			validSeconds: tenMinutesInSeconds,
+		const target = usernameOrEmail
+		const { otp, secret, algorithm, period, digits } = generateTOTP({
+			algorithm: 'sha256',
+			period: tenMinutesInSeconds,
 		})
 		// delete old verifications. Users should not have more than one verification
 		// of a specific type for a specific target at a time.
 		await prisma.verification.deleteMany({
-			where: { type: verificationType, verificationTarget },
+			where: { type: verificationType, target },
 		})
 		await prisma.verification.create({
 			data: {
 				type: verificationType,
-				verificationTarget,
+				target,
 				algorithm,
-				secretKey: key,
-				validSeconds,
-				otp,
+				secret,
+				period,
+				digits,
+				expiresAt: new Date(Date.now() + period * 1000),
 			},
 		})
 

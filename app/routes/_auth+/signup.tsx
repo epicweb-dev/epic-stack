@@ -66,22 +66,24 @@ export async function action({ request }: DataFunctionArgs) {
 	const { email } = submission.value
 
 	const thirtyMinutesInSeconds = 30 * 60
-	const { otp, key, algorithm, validSeconds } = generateTOTP({
-		validSeconds: thirtyMinutesInSeconds,
+	const { otp, secret, algorithm, period, digits } = generateTOTP({
+		algorithm: 'sha256',
+		period: thirtyMinutesInSeconds,
 	})
 	// delete old verifications. Users should not have more than one verification
 	// of a specific type for a specific target at a time.
 	await prisma.verification.deleteMany({
-		where: { type: verificationType, verificationTarget: email },
+		where: { type: verificationType, target: email },
 	})
 	await prisma.verification.create({
 		data: {
 			type: verificationType,
-			verificationTarget: email,
+			target: email,
 			algorithm,
-			secretKey: key,
-			validSeconds,
-			otp,
+			secret,
+			period,
+			digits,
+			expiresAt: new Date(Date.now() + period * 1000),
 		},
 	})
 	const onboardingUrl = new URL(`${getDomainUrl(request)}/signup/verify`)

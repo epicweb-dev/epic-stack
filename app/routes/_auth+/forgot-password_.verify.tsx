@@ -22,7 +22,7 @@ import { commitSession, getSession } from '~/utils/session.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import {
 	forgotPasswordOTPQueryParam,
-	forgotPasswordVerificationTargetQueryParam,
+	forgotPasswordTargetQueryParam,
 	verificationType,
 } from './forgot-password.tsx'
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
@@ -30,10 +30,7 @@ import { verifyTOTP } from '~/utils/totp.server.ts'
 import invariant from 'tiny-invariant'
 
 const verifySchema = z.object({
-	[forgotPasswordVerificationTargetQueryParam]: z.union([
-		emailSchema,
-		usernameSchema,
-	]),
+	[forgotPasswordTargetQueryParam]: z.union([emailSchema, usernameSchema]),
 	[forgotPasswordOTPQueryParam]: z.string().min(6).max(6),
 })
 
@@ -65,13 +62,13 @@ async function validate(request: Request, body: FormData | URLSearchParams) {
 				const verification = await prisma.verification.findFirst({
 					where: {
 						type: verificationType,
-						verificationTarget: data.usernameOrEmail,
-						otp: data.code,
+						target: data.usernameOrEmail,
+						expiresAt: { gt: new Date() },
 					},
 					select: {
 						algorithm: true,
-						secretKey: true,
-						validSeconds: true,
+						secret: true,
+						period: true,
 					},
 				})
 				if (!verification) {
@@ -82,14 +79,13 @@ async function validate(request: Request, body: FormData | URLSearchParams) {
 					})
 					return
 				}
-				const result = verifyTOTP(
-					{ otp: data.code, key: verification.secretKey },
-					{
-						algorithm: verification.algorithm,
-						validSeconds: verification.validSeconds,
-						window: 1,
-					},
-				)
+				const result = verifyTOTP({
+					otp: data.code,
+					secret: verification.secret,
+					algorithm: verification.algorithm,
+					period: verification.period,
+					window: 0,
+				})
 				if (!result) {
 					ctx.addIssue({
 						path: [forgotPasswordOTPQueryParam],
@@ -118,8 +114,7 @@ async function validate(request: Request, body: FormData | URLSearchParams) {
 	await prisma.verification.deleteMany({
 		where: {
 			type: verificationType,
-			verificationTarget: submission.value.usernameOrEmail,
-			otp: submission.value.code,
+			target: submission.value.usernameOrEmail,
 		},
 	})
 	const { usernameOrEmail } = submission.value

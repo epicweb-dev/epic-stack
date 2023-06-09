@@ -134,7 +134,7 @@ export default function PhotoChooserModal() {
 	})
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
-	const dismissModal = () => navigate('..')
+	const dismissModal = () => navigate('..', { preventScrollReset: true })
 	return (
 		<Dialog.Root open={true}>
 			<Dialog.Portal>
@@ -209,6 +209,7 @@ export default function PhotoChooserModal() {
 					<Dialog.Close asChild>
 						<Link
 							to=".."
+							preventScrollReset
 							aria-label="Close"
 							className="absolute right-10 top-10"
 						>
@@ -222,7 +223,7 @@ export default function PhotoChooserModal() {
 				id={deleteProfilePhotoFormId}
 				action={deleteImageRoute.ROUTE_PATH}
 			>
-				<input name="intent" value="submit" />
+				<input name="intent" type="hidden" value="submit" />
 				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
 			</deleteImageFetcher.Form>
 		</Dialog.Root>

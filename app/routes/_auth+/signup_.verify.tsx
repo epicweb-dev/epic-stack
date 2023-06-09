@@ -53,13 +53,13 @@ async function validate(request: Request, body: URLSearchParams | FormData) {
 				const verification = await prisma.verification.findFirst({
 					where: {
 						type: verificationType,
-						verificationTarget: data.email,
-						otp: data.code,
+						target: data.email,
+						expiresAt: { gt: new Date() },
 					},
 					select: {
 						algorithm: true,
-						secretKey: true,
-						validSeconds: true,
+						secret: true,
+						period: true,
 					},
 				})
 				if (!verification) {
@@ -70,14 +70,13 @@ async function validate(request: Request, body: URLSearchParams | FormData) {
 					})
 					return
 				}
-				const result = verifyTOTP(
-					{ otp: data.code, key: verification.secretKey },
-					{
-						algorithm: verification.algorithm,
-						validSeconds: verification.validSeconds,
-						window: 1,
-					},
-				)
+				const result = verifyTOTP({
+					otp: data.code,
+					secret: verification.secret,
+					algorithm: verification.algorithm,
+					period: verification.period,
+					window: 0,
+				})
 				if (!result) {
 					ctx.addIssue({
 						path: [onboardingOTPQueryParam],
@@ -105,8 +104,7 @@ async function validate(request: Request, body: URLSearchParams | FormData) {
 	await prisma.verification.deleteMany({
 		where: {
 			type: verificationType,
-			verificationTarget: submission.value.email,
-			otp: submission.value.code,
+			target: submission.value.email,
 		},
 	})
 	const session = await getSession(request.headers.get('Cookie'))
