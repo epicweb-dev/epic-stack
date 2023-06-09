@@ -94,13 +94,11 @@ app.use(
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
 			directives: {
-				'connect-src':
-					MODE === 'development'
-						? ['ws:', "'self'"]
-						: process.env.SENTRY_DSN
-						? // if using self-hosted or relay server, use that url here
-						  ['*.ingest.sentry.io']
-						: ["'self'"],
+				'connect-src': [
+					MODE === 'development' ? 'ws:' : null,
+					process.env.SENTRY_DSN ? '*.ingest.sentry.io' : null,
+					'"self"',
+				].filter(Boolean),
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
 				'img-src': ["'self'", 'data:'],
