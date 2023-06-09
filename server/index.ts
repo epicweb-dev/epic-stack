@@ -8,7 +8,11 @@ import address from 'address'
 import closeWithGrace from 'close-with-grace'
 import helmet from 'helmet'
 import crypto from 'crypto'
-import { type RequestHandler, createRequestHandler } from '@remix-run/express'
+import {
+	type RequestHandler,
+	createRequestHandler as _createRequestHandler,
+} from '@remix-run/express'
+import { wrapExpressCreateRequestHandler } from '@sentry/remix'
 import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
@@ -17,6 +21,10 @@ import chalk from 'chalk'
 // definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
 const MODE = process.env.NODE_ENV
+
+const createRequestHandler = wrapExpressCreateRequestHandler(
+	_createRequestHandler,
+)
 
 const BUILD_PATH = '../build/index.js'
 
@@ -86,7 +94,13 @@ app.use(
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
 			directives: {
-				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
+				'connect-src':
+					MODE === 'development'
+						? ['ws:', "'self'"]
+						: process.env.SENTRY_DSN
+						// if using self-hosted or relay server, use that url here
+						? ['*.ingest.sentry.io']
+						: [],
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
 				'img-src': ["'self'"],

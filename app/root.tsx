@@ -19,6 +19,7 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
+import { withSentry } from "@sentry/remix";
 import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import fontStylestylesheetUrl from './styles/font.css'
@@ -126,7 +127,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-export default function App() {
+function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
 	const user = useOptionalUser()
@@ -185,6 +186,7 @@ export default function App() {
 		</html>
 	)
 }
+export default withSentry(App);
 
 function UserDropdown() {
 	const user = useUser()
