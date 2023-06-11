@@ -15,6 +15,7 @@ export default defineConfig({
 		coverage: {
 			include: ['app/**/*.{ts,tsx}'],
 			all: true,
+			provider: 'v8',
 		},
 	},
 })
