@@ -18,7 +18,7 @@
  * Here's the typical process:
  * 1. Generate a secret (crypto.randomBytes(32).toString('hex'))
  * 2. Generate the TOTP with that secret (generateTOTP(secret))
- * 3. Store the secret, digits, period in the database along with the thing you're verifying (e.g. user email)
+ * 3. Store the secret, digits, and period in the database along with the thing you're verifying (e.g. user email)
  * 4. Send the TOTP to the user (e.g. email it to them)
  * 5. When the user enters the TOTP, verify it (verifyTOTP(token, secret))
  * 6. If the TOTP is valid, delete it from the database and allow the user to proceed
