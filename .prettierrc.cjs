@@ -22,7 +22,6 @@ module.exports = {
 			files: ['**/*.json'],
 			options: {
 				useTabs: false,
-				parser: 'json',
 			},
 		},
 	],
