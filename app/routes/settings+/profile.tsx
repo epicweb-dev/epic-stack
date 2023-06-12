@@ -26,6 +26,7 @@ import {
 	passwordSchema,
 	usernameSchema,
 } from '~/utils/user-validation.ts'
+import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
@@ -50,7 +51,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		},
 	})
 	const twoFactorVerification = await prisma.verification.findFirst({
-		where: { type: '2fa', target: userId },
+		where: { type: twoFAVerificationType, target: userId },
 		select: { id: true },
 	})
 	if (!user) {
