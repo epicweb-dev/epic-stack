@@ -12,5 +12,4 @@ node_modules
 /coverage
 /prisma/migrations
 
-package.json
 package-lock.json
