@@ -25,7 +25,6 @@ export default function TwoFactorRoute() {
 				<Dialog.Overlay className="fixed inset-0 backdrop-blur-[2px]" />
 				<Dialog.Content
 					onEscapeKeyDown={dismissModal}
-					onInteractOutside={dismissModal}
 					onPointerDownOutside={dismissModal}
 					className="fixed left-1/2 top-1/2 max-h-full w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform overflow-y-scroll rounded-lg bg-night-500 p-12 shadow-lg"
 				>

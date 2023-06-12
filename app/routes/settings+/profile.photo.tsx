@@ -141,7 +141,6 @@ export default function PhotoChooserModal() {
 				<Dialog.Overlay className="fixed inset-0 backdrop-blur-[2px]" />
 				<Dialog.Content
 					onEscapeKeyDown={dismissModal}
-					onInteractOutside={dismissModal}
 					onPointerDownOutside={dismissModal}
 					className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
 				>
