@@ -13,7 +13,7 @@ import {
 	deleteTheme,
 	getSession,
 	setTheme,
-} from '~/utils/session.server.ts'
+} from './theme-session.server.ts'
 
 const ROUTE_PATH = '/resources/theme'
 

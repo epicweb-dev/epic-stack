@@ -3,9 +3,9 @@ import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
 	type DataFunctionArgs,
+	type HeadersFunction,
 	type LinksFunction,
 	type V2_MetaFunction,
-	type HeadersFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -20,9 +20,10 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
-import tailwindStylesheetUrl from './styles/tailwind.css'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
+import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
+import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
@@ -31,9 +32,9 @@ import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
-import { getSession, getTheme } from './utils/session.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
+import { getSession } from './utils/session.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
+import { useOptionalUser, useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -107,7 +108,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
 				session: {
-					theme: getTheme(cookieSession),
+					theme: await getTheme(request),
 				},
 			},
 			ENV: getEnv(),
