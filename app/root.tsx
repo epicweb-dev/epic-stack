@@ -32,7 +32,6 @@ import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
-import { getSession } from './utils/session.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 
@@ -75,7 +74,6 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const cookieSession = await getSession(request.headers.get('Cookie'))
 	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
