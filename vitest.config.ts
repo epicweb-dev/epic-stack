@@ -7,6 +7,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
 	plugins: [react(), tsconfigPaths()],
+	css: { postcss: { plugins: [] } },
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],
 		environment: 'jsdom',
@@ -15,7 +16,6 @@ export default defineConfig({
 		coverage: {
 			include: ['app/**/*.{ts,tsx}'],
 			all: true,
-			provider: 'v8',
 		},
 	},
 })
