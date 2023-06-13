@@ -13,7 +13,7 @@ source = "data"
 destination = "/data"
 
 [deploy]
-release_command = "node ./scripts/sentry-create-release"
+release_command = "node ./other/sentry-create-release"
 
 [[services]]
 internal_port = 8080
