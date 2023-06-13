@@ -2,7 +2,6 @@
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": [],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -17,14 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "prisma/*": ["./prisma/*"],
       "tests/*": ["./tests/*"]
     },
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "typeRoots": ["./types", "./node_modules/@types"],
-
-    // Remix takes care of building everything in `remix build`.
     "noEmit": true
   }
 }
