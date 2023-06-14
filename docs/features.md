@@ -14,7 +14,7 @@ Here are a few things you get today:
   on merge for both production and staging environments
 - Email/Password Authentication with
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
-- Two-Factor Authentication with support for authenticator apps.
+- Two-Factor Authentication (2fa) with support for authenticator apps.
 - Transactional email with [Mailgun](https://www.mailgun.com/) and forgot
   password/password reset support.
 - Progressively Enhanced and fully type safe forms with
@@ -38,6 +38,7 @@ Here are a few things you get today:
 - Static Types with [TypeScript](https://typescriptlang.org/)
 - Runtime schema validation with [zod](https://zod.dev/)
 - Error monitoring with [Sentry](https://sentry.io/welcome/)
+- Light/Dark/System mode (without a flash of incorrect theme)
 
 Here are some things that will likely find their way into the Epic Stack (or the
 docs examples) in the future:
@@ -48,7 +49,6 @@ docs examples) in the future:
 - Internationalization
 - Image optimization route and component
 - Feature flags
-- Light/Dark/System mode (without a flash of incorrect theme)
 - Documentation on production data seeding process
 
 Not a fan of bits of the stack? Fork it, change it, and use
