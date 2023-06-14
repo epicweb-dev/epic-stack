@@ -15,6 +15,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@kentcdodds](https://github.com/kentcdodds): Automatically generating a
   sitemap and a nice way to handle dynamic routes and customize the sitemap on a
   per-route basis.
+- [Cross-site Request Forgery Protection (CSRF)](https://github.com/kentcdodds/epic-stack-with-csrf)
+  by [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
+  with CSRF protection on forms.
 
 ## How to contribute
 
