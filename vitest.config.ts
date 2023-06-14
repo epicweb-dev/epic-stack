@@ -1,5 +1,4 @@
 /// <reference types="vitest" />
-/// <reference types="vite/client" />
 
 import { react } from './tests/setup/vitejs-plugin-react.cjs'
 import { defineConfig } from 'vite'
