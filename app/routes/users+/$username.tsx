@@ -118,7 +118,7 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
 		{ title: `${displayName} | Epic Notes` },
 		{
 			name: 'description',
-			content: `${displayName} on Epic Notes is not a host or renter yet.`,
+			content: `Profile of ${displayName} on Epic Notes`,
 		},
 	]
 }
