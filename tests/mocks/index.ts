@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import closeWithGrace from 'close-with-grace'
@@ -32,6 +33,12 @@ const server = setupServer(...handlers)
 server.listen({ onUnhandledRequest: 'warn' })
 console.info('🔶 Mock server installed')
 
-closeWithGrace(() => {
+closeWithGrace(({ err }) => {
 	server.close()
+	
+	if (err) {
+		console.error(chalk.red(err))
+		console.error(chalk.red(err.stack))
+		process.exit(1)
+	}
 })
