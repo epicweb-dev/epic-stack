@@ -235,8 +235,6 @@ function UserDropdown() {
 					</DropdownMenu.Item>
 					<DropdownMenu.Item asChild>
 						<Form
-							action="/logout"
-							method="POST"
 							className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500"
 							onClick={e => {
 								e.preventDefault()
