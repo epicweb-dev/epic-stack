@@ -234,7 +234,11 @@ function UserDropdown() {
 						</Link>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item asChild>
-						<Form className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500">
+						<Form
+							action="/logout"
+							method="POST"
+							className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500"
+						>
 							<button type="submit" onClick={e => e.stopPropagation()}>
 								Logout
 							</button>
