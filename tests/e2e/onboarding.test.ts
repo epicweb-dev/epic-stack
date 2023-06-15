@@ -19,7 +19,7 @@ test('onboarding with link', async ({ page }) => {
 	const lastName = faker.person.lastName()
 	const username = faker.internet
 		.userName({ firstName, lastName })
-		.slice(0, 15)
+		.slice(0, 20)
 		.replace(/[^a-z0-9_]/g, '_')
 	const onboardingData = {
 		name: `${firstName} ${lastName}`,

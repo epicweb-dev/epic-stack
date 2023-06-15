@@ -11,7 +11,9 @@ export function createUser() {
 	const username = unique({
 		firstName: firstName.toLowerCase(),
 		lastName: lastName.toLowerCase(),
-	}).replace(/[^a-z0-9_]/g, '_')
+	})
+		.slice(0, 20)
+		.replace(/[^a-z0-9_]/g, '_')
 	return {
 		username,
 		name: `${firstName} ${lastName}`,
