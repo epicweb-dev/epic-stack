@@ -177,10 +177,22 @@ ${chalk.bold('Press Ctrl+C to stop')}
 	}
 })
 
-closeWithGrace(async () => {
+closeWithGrace(async ({ err }) => {
+	// log the error early
+	if (err) {
+		console.error(chalk.red(err))
+		console.error(chalk.red(err.stack))
+	}
+
+	// close up things
 	await new Promise((resolve, reject) => {
 		server.close(e => (e ? reject(e) : resolve('ok')))
 	})
+
+	// if there was an error, then exit with a failure code
+	if (err) {
+		process.exit(1)
+	}
 })
 
 // during dev, we'll keep the build module up to date with the changes
