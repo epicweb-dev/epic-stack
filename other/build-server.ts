@@ -40,6 +40,7 @@ esbuild
 		outdir: here('../server-build'),
 		target: [`node${pkg.engines.node}`],
 		platform: 'node',
+		sourcemap: true,
 		format: 'esm',
 		logLevel: 'info',
 	})
