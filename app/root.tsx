@@ -17,7 +17,6 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
-	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
@@ -189,7 +188,6 @@ export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
-	const submit = useSubmit()
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
