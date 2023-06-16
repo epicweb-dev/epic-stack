@@ -12,7 +12,7 @@
 .field textarea + label,
 .textareaField input + label,
 .textareaField textarea + label {
-	@apply text-muted-200 absolute left-0 origin-top-left translate-x-4 text-body-xs transition-transform;
+	@apply absolute left-0 origin-top-left translate-x-4 text-body-xs text-muted-200 transition-transform;
 }
 
 .field input:required + label:after,
@@ -46,7 +46,7 @@
 }
 
 .checkboxField button[aria-checked='true'] {
-	@apply border-accent-pink bg-accent-pink;
+	@apply border-primary bg-primary;
 }
 
 .field input[aria-invalid='true'],
