@@ -45,12 +45,12 @@ export default function Index() {
 				</div>
 
 				<div className="mx-auto mt-8 max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
-					<div className="flex flex-wrap justify-center gap-8 rounded-3xl bg-muted-300 py-4">
+					<div className="flex flex-wrap justify-center gap-8 rounded-3xl bg-muted-500 py-4">
 						{logos.map(img => (
 							<a
 								key={img.href}
 								href={img.href}
-								className="flex h-16 w-32 justify-center p-1 grayscale transition hover:grayscale-0 focus:grayscale-0"
+								className="flex h-16 w-32 justify-center p-1 brightness-50 grayscale transition hover:grayscale-0 focus:grayscale-0"
 							>
 								<img alt={img.alt} src={img.src} className="object-contain" />
 							</a>

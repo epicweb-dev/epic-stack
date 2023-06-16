@@ -5,7 +5,7 @@
 @layer base {
 	:root {
 		--color-background: 255 255 255; /* white */
-		--color-foreground: 17 24 39; /* gray-900 */
+		--color-foreground: 0 0 0; /* gray-900 */
 		--color-primary: 100 68 255; /* purple */
 		--color-secondary: 255 190 63; /* yellow */
 		--color-secondary-muted: 255 210 98; /* yellow muted */
@@ -38,7 +38,7 @@
 	}
 
 	.dark {
-		--color-background: 17 24 39; /* gray-900 */
+		--color-background: 0 0 0; /* gray-900 */
 		--color-foreground: 255 255 255; /* white */
 		--color-muted-50: 3 7 18; /* gray-950 */
 		--color-muted-100: 17 24 39; /* gray-900 */

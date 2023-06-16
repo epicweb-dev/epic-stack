@@ -44,7 +44,7 @@ export default function LoginPage() {
 			<div className="mx-auto w-full max-w-md">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome back!</h1>
-					<p className="text-muted-200 text-body-md">
+					<p className="text-body-md text-muted-500">
 						Please enter your details.
 					</p>
 				</div>

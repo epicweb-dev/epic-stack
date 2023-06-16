@@ -171,7 +171,7 @@ export default function EditUserProfile() {
 						<Link
 							preventScrollReset
 							to="photo"
-							className="border-muted-700 bg-muted-500 absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 p-5"
+							className="absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 border-muted-700 bg-muted-500 p-5"
 							title="Change profile photo"
 							aria-label="Change profile photo"
 						>
@@ -207,9 +207,9 @@ export default function EditUserProfile() {
 							errors={fields.email.errors}
 						/>
 
-						<div className="border-muted-500 col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
+						<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px] border-muted-500" />
 						<fieldset className="col-span-6">
-							<legend className="text-muted-200 pb-6 text-lg">
+							<legend className="pb-6 text-lg text-muted-500">
 								Change password
 							</legend>
 							<div className="flex justify-between gap-10">

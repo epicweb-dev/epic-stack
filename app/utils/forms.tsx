@@ -18,7 +18,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="space-y-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-danger text-[10px]">
+				<li key={e} className="text-[10px] text-danger">
 					{e}
 				</li>
 			))}
@@ -48,7 +48,7 @@ export function Field({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...inputProps}
-				className="border-muted-400 bg-muted-700 focus:border-ring disabled:bg-muted-400 h-16 w-full rounded-lg border px-4 pt-4 text-body-xs caret-white outline-none"
+				className="h-16 w-full rounded-lg border border-muted-400 bg-muted-200 px-4 pt-4 text-body-xs text-foreground caret-foreground outline-none focus:border-ring disabled:bg-muted-400"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -81,7 +81,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...textareaProps}
-				className="border-muted-400 bg-muted-700 focus:border-ring disabled:bg-muted-400 h-48 w-full rounded-lg border px-4 pt-8 text-body-xs caret-white outline-none"
+				className="h-48 w-full rounded-lg border border-muted-400 bg-muted-700 px-4 pt-8 text-body-xs caret-white outline-none focus:border-ring disabled:bg-muted-400"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -119,11 +119,11 @@ export function CheckboxField({
 					{...buttonProps}
 					type="button"
 				>
-					<Checkbox.Indicator className="h-4 w-4">
+					<Checkbox.Indicator className="h-4 w-4 text-muted-800">
 						<svg viewBox="0 0 8 8">
 							<path
 								d="M1,4 L3,6 L7,2"
-								stroke="black"
+								stroke="currentColor"
 								strokeWidth="1"
 								fill="none"
 							/>
@@ -133,7 +133,7 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="text-muted-200 self-center text-body-xs"
+					className="self-center text-body-xs text-muted-500"
 				/>
 			</div>
 			<div className="px-4 pb-3 pt-1">
@@ -153,9 +153,9 @@ export function getButtonClassName({
 	const baseClassName =
 		'flex justify-center items-center rounded-full font-bold outline-none transition-[background-color,color] duration-200 disabled:bg-muted-500 disabled:text-muted-200'
 	const primaryClassName =
-		'bg-primary hover:bg-primary hover:text-muted-700 focus:bg-primary focus:text-muted-700 active:bg-secondary'
+		'bg-primary hover:bg-secondary focus:bg-primary active:bg-secondary-muted'
 	const secondaryClassName =
-		'border-[1.5px] border-muted-400 bg-muted-700 hover:border-ring focus:border-ring active:border-primary'
+		'border-[1.5px] border-foreground hover:border-ring focus:border-ring active:border-primary'
 	const extraSmallClassName = 'py-2 px-3 text-body-xs'
 	const smallClassName = 'px-10 py-[14px] text-body-xs'
 	const mediumClassName = 'px-14 py-5 text-lg'

@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
 		<div className="container mx-auto flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Password Reset</h1>
-				<p className="text-muted-200 mt-3 text-body-md">
+				<p className="mt-3 text-body-md text-muted-500">
 					Hi, {data.resetPasswordUsername}. No worries. It happens all the time.
 				</p>
 			</div>
