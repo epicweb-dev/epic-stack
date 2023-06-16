@@ -1,6 +1,11 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import * as Dialog from '@radix-ui/react-dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from '~/components/ui/index.tsx'
 import {
 	type DataFunctionArgs,
 	json,
@@ -134,89 +139,78 @@ export default function PhotoChooserModal() {
 	})
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
-	const dismissModal = () => navigate('..', { preventScrollReset: true })
+	const dismissModal = () =>
+		navigate('/settings/profile', { preventScrollReset: true })
 	return (
-		<Dialog.Root open={true}>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 backdrop-blur-[2px]" />
-				<Dialog.Content
-					onEscapeKeyDown={dismissModal}
-					onPointerDownOutside={dismissModal}
-					className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
+		<Dialog open={true} onOpenChange={open => !open && dismissModal()}>
+			<DialogContent
+				onEscapeKeyDown={dismissModal}
+				onPointerDownOutside={dismissModal}
+				className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
+			>
+				<DialogHeader>
+					<DialogTitle>Profile photo</DialogTitle>
+				</DialogHeader>
+				<Form
+					method="POST"
+					encType="multipart/form-data"
+					className="mt-8 flex flex-col items-center justify-center gap-10"
+					onReset={() => setNewImageSrc(null)}
+					{...form.props}
 				>
-					<Dialog.Title asChild className="text-center">
-						<h2 className="text-h2">Profile photo</h2>
-					</Dialog.Title>
-					<Form
-						method="POST"
-						encType="multipart/form-data"
-						className="mt-8 flex flex-col items-center justify-center gap-10"
-						onReset={() => setNewImageSrc(null)}
-						{...form.props}
-					>
-						<img
-							src={newImageSrc ?? getUserImgSrc(data.user.imageId)}
-							className="h-64 w-64 rounded-full"
-							alt={data.user.name ?? data.user.username}
-						/>
-						<ErrorList errors={photoFile.errors} id={photoFile.id} />
-						<input
-							{...conform.input(photoFile, { type: 'file' })}
-							type="file"
-							accept="image/*"
-							className="sr-only"
-							tabIndex={newImageSrc ? -1 : 0}
-							onChange={e => {
-								const file = e.currentTarget.files?.[0]
-								if (file) {
-									const reader = new FileReader()
-									reader.onload = event => {
-										setNewImageSrc(event.target?.result?.toString() ?? null)
-									}
-									reader.readAsDataURL(file)
+					<img
+						src={newImageSrc ?? getUserImgSrc(data.user.imageId)}
+						className="h-64 w-64 rounded-full"
+						alt={data.user.name ?? data.user.username}
+					/>
+					<ErrorList errors={photoFile.errors} id={photoFile.id} />
+					<input
+						{...conform.input(photoFile, { type: 'file' })}
+						type="file"
+						accept="image/*"
+						className="sr-only"
+						tabIndex={newImageSrc ? -1 : 0}
+						onChange={e => {
+							const file = e.currentTarget.files?.[0]
+							if (file) {
+								const reader = new FileReader()
+								reader.onload = event => {
+									setNewImageSrc(event.target?.result?.toString() ?? null)
 								}
-							}}
-						/>
-						{newImageSrc ? (
-							<div className="flex gap-4">
-								<Button type="submit" size="md" variant="primary">
-									Save Photo
+								reader.readAsDataURL(file)
+							}
+						}}
+					/>
+					{newImageSrc ? (
+						<div className="flex gap-4">
+							<Button type="submit" size="md" variant="primary">
+								Save Photo
+							</Button>
+							<Button type="reset" size="md" variant="secondary">
+								Reset
+							</Button>
+						</div>
+					) : (
+						<div className="flex gap-4">
+							<LabelButton htmlFor={photoFile.id} size="md" variant="primary">
+								✏️ Change
+							</LabelButton>
+							{data.user.imageId ? (
+								<Button
+									size="md"
+									variant="secondary"
+									type="submit"
+									form={deleteProfilePhotoFormId}
+								>
+									🗑 Delete
 								</Button>
-								<Button type="reset" size="md" variant="secondary">
-									Reset
-								</Button>
-							</div>
-						) : (
-							<div className="flex gap-4">
-								<LabelButton htmlFor={photoFile.id} size="md" variant="primary">
-									✏️ Change
-								</LabelButton>
-								{data.user.imageId ? (
-									<Button
-										size="md"
-										variant="secondary"
-										type="submit"
-										form={deleteProfilePhotoFormId}
-									>
-										🗑 Delete
-									</Button>
-								) : null}
-							</div>
-						)}
-						<ErrorList errors={form.errors} />
-					</Form>
-					<Dialog.Close asChild>
-						<Link
-							to=".."
-							preventScrollReset
-							aria-label="Close"
-							className="absolute right-10 top-10"
-						>
-							❌
-						</Link>
-					</Dialog.Close>
-				</Dialog.Content>
-			</Dialog.Portal>
+							) : null}
+						</div>
+					)}
+					<ErrorList errors={form.errors} />
+				</Form>
+			</DialogContent>
+
 			<deleteImageFetcher.Form
 				method="POST"
 				id={deleteProfilePhotoFormId}
@@ -225,6 +219,6 @@ export default function PhotoChooserModal() {
 				<input name="intent" type="hidden" value="submit" />
 				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
 			</deleteImageFetcher.Form>
-		</Dialog.Root>
+		</Dialog>
 	)
 }

@@ -1,4 +1,6 @@
 import React from 'react'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 const DEFAULT_REDIRECT = '/'
 
@@ -100,4 +102,8 @@ export function useDoubleCheck() {
 	}
 
 	return { doubleCheck, getButtonProps }
+}
+ 
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
