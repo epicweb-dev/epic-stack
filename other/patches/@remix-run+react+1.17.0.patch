@@ -1,0 +1,162 @@
+diff --git a/node_modules/@remix-run/react/dist/components.js b/node_modules/@remix-run/react/dist/components.js
+index f03433d..398e27e 100644
+--- a/node_modules/@remix-run/react/dist/components.js
++++ b/node_modules/@remix-run/react/dist/components.js
+@@ -591,6 +591,7 @@ function V2Meta() {
+         json = JSON.stringify(metaProps["script:ld+json"]);
+       } catch (err) {}
+       return json != null && /*#__PURE__*/React__namespace.createElement("script", {
++        nonce: metaProps.nonce,
+         key: "script:ld+json",
+         type: "application/ld+json",
+         dangerouslySetInnerHTML: {
+@@ -671,6 +672,7 @@ function Scripts(props) {
+       let promiseKeyValues = deferredData.deferredKeys.map(key => {
+         if (pendingKeys.has(key)) {
+           deferredScripts.push( /*#__PURE__*/React__namespace.createElement(DeferredHydrationScript, {
++            nonce: props.nonce,
+             key: `${routeId} | ${key}`,
+             deferredData: deferredData,
+             routeId: routeId,
+@@ -721,6 +723,7 @@ import(${JSON.stringify(manifest.entry.module)});`;
+   if (!isStatic && typeof __remixContext === "object" && __remixContext.a) {
+     for (let i = 0; i < __remixContext.a; i++) {
+       deferredScripts.push( /*#__PURE__*/React__namespace.createElement(DeferredHydrationScript, {
++        nonce: props.nonce,
+         key: i
+       }));
+     }
+@@ -753,6 +756,7 @@ import(${JSON.stringify(manifest.entry.module)});`;
+   })), initialScripts, deferredScripts);
+ }
+ function DeferredHydrationScript({
++  nonce,
+   dataKey,
+   deferredData,
+   routeId
+@@ -766,6 +770,7 @@ function DeferredHydrationScript({
+     // but when hydrating, we need to render a script tag to avoid a hydration issue.
+     // To reproduce a hydration mismatch, just render null as a fallback.
+     typeof document === "undefined" && deferredData && dataKey && routeId ? null : /*#__PURE__*/React__namespace.createElement("script", {
++      nonce,
+       async: true,
+       suppressHydrationWarning: true,
+       dangerouslySetInnerHTML: {
+@@ -775,10 +780,12 @@ function DeferredHydrationScript({
+   }, typeof document === "undefined" && deferredData && dataKey && routeId ? /*#__PURE__*/React__namespace.createElement(Await, {
+     resolve: deferredData.data[dataKey],
+     errorElement: /*#__PURE__*/React__namespace.createElement(ErrorDeferredHydrationScript, {
++      nonce,
+       dataKey: dataKey,
+       routeId: routeId
+     }),
+     children: data => /*#__PURE__*/React__namespace.createElement("script", {
++      nonce,
+       async: true,
+       suppressHydrationWarning: true,
+       dangerouslySetInnerHTML: {
+@@ -786,6 +793,7 @@ function DeferredHydrationScript({
+       }
+     })
+   }) : /*#__PURE__*/React__namespace.createElement("script", {
++    nonce,
+     async: true,
+     suppressHydrationWarning: true,
+     dangerouslySetInnerHTML: {
+@@ -794,6 +802,7 @@ function DeferredHydrationScript({
+   }));
+ }
+ function ErrorDeferredHydrationScript({
++  nonce,
+   dataKey,
+   routeId
+ }) {
+@@ -806,6 +815,7 @@ function ErrorDeferredHydrationScript({
+     stack: undefined
+   };
+   return /*#__PURE__*/React__namespace.createElement("script", {
++    nonce,
+     suppressHydrationWarning: true,
+     dangerouslySetInnerHTML: {
+       __html: `__remixContext.r(${JSON.stringify(routeId)}, ${JSON.stringify(dataKey)}, !1, ${markup.escapeHtml(JSON.stringify(toSerialize))});`
+diff --git a/node_modules/@remix-run/react/dist/esm/components.js b/node_modules/@remix-run/react/dist/esm/components.js
+index c4a7e3f..660817d 100644
+--- a/node_modules/@remix-run/react/dist/esm/components.js
++++ b/node_modules/@remix-run/react/dist/esm/components.js
+@@ -567,6 +567,7 @@ function V2Meta() {
+         json = JSON.stringify(metaProps["script:ld+json"]);
+       } catch (err) {}
+       return json != null && /*#__PURE__*/React.createElement("script", {
++        nonce: metaProps.nonce,
+         key: "script:ld+json",
+         type: "application/ld+json",
+         dangerouslySetInnerHTML: {
+@@ -647,6 +648,7 @@ function Scripts(props) {
+       let promiseKeyValues = deferredData.deferredKeys.map(key => {
+         if (pendingKeys.has(key)) {
+           deferredScripts.push( /*#__PURE__*/React.createElement(DeferredHydrationScript, {
++            nonce: props.nonce,
+             key: `${routeId} | ${key}`,
+             deferredData: deferredData,
+             routeId: routeId,
+@@ -697,6 +699,7 @@ import(${JSON.stringify(manifest.entry.module)});`;
+   if (!isStatic && typeof __remixContext === "object" && __remixContext.a) {
+     for (let i = 0; i < __remixContext.a; i++) {
+       deferredScripts.push( /*#__PURE__*/React.createElement(DeferredHydrationScript, {
++        nonce,
+         key: i
+       }));
+     }
+@@ -729,6 +732,7 @@ import(${JSON.stringify(manifest.entry.module)});`;
+   })), initialScripts, deferredScripts);
+ }
+ function DeferredHydrationScript({
++  nonce,
+   dataKey,
+   deferredData,
+   routeId
+@@ -742,6 +746,7 @@ function DeferredHydrationScript({
+     // but when hydrating, we need to render a script tag to avoid a hydration issue.
+     // To reproduce a hydration mismatch, just render null as a fallback.
+     typeof document === "undefined" && deferredData && dataKey && routeId ? null : /*#__PURE__*/React.createElement("script", {
++      nonce,
+       async: true,
+       suppressHydrationWarning: true,
+       dangerouslySetInnerHTML: {
+@@ -751,10 +756,12 @@ function DeferredHydrationScript({
+   }, typeof document === "undefined" && deferredData && dataKey && routeId ? /*#__PURE__*/React.createElement(Await, {
+     resolve: deferredData.data[dataKey],
+     errorElement: /*#__PURE__*/React.createElement(ErrorDeferredHydrationScript, {
++      nonce,
+       dataKey: dataKey,
+       routeId: routeId
+     }),
+     children: data => /*#__PURE__*/React.createElement("script", {
++      nonce,
+       async: true,
+       suppressHydrationWarning: true,
+       dangerouslySetInnerHTML: {
+@@ -762,6 +769,7 @@ function DeferredHydrationScript({
+       }
+     })
+   }) : /*#__PURE__*/React.createElement("script", {
++    nonce,
+     async: true,
+     suppressHydrationWarning: true,
+     dangerouslySetInnerHTML: {
+@@ -770,6 +778,7 @@ function DeferredHydrationScript({
+   }));
+ }
+ function ErrorDeferredHydrationScript({
++  nonce,
+   dataKey,
+   routeId
+ }) {
+@@ -782,6 +791,7 @@ function ErrorDeferredHydrationScript({
+     stack: undefined
+   };
+   return /*#__PURE__*/React.createElement("script", {
++    nonce,
+     suppressHydrationWarning: true,
+     dangerouslySetInnerHTML: {
+       __html: `__remixContext.r(${JSON.stringify(routeId)}, ${JSON.stringify(dataKey)}, !1, ${escapeHtml(JSON.stringify(toSerialize))});`

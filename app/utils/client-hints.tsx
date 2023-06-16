@@ -4,6 +4,7 @@
  */
 import * as React from 'react'
 import { useRequestInfo } from './request-info.ts'
+import { useRevalidator } from '@remix-run/react'
 
 export const clientHints = {
 	theme: {
@@ -77,18 +78,20 @@ export function useHints() {
  * inaccurate value.
  */
 export function ClientHintCheck({ nonce }: { nonce: string }) {
+	const { revalidate } = useRevalidator()
 	React.useEffect(() => {
 		const themeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 		function handleThemeChange() {
 			document.cookie = `${clientHints.theme.cookieName}=${
 				themeQuery.matches ? 'dark' : 'light'
 			}`
+			revalidate()
 		}
 		themeQuery.addEventListener('change', handleThemeChange)
 		return () => {
 			themeQuery.removeEventListener('change', handleThemeChange)
 		}
-	}, [])
+	}, [revalidate])
 
 	return (
 		<script

@@ -5,12 +5,13 @@ const requiredServerEnvs = [
 	'DATABASE_PATH',
 	'DATABASE_URL',
 	'SESSION_SECRET',
-	'ENCRYPTION_SECRET',
 	'INTERNAL_COMMAND_TOKEN',
 	'CACHE_DATABASE_PATH',
 	// If you plan to use Mailgun, uncomment these lines
 	// 'MAILGUN_SENDING_KEY',
 	// 'MAILGUN_DOMAIN',
+	// If you plan on using Sentry, uncomment this line
+	// 'SENTRY_DSN',
 ] as const
 
 declare global {
@@ -40,6 +41,7 @@ export function getEnv() {
 
 	return {
 		MODE: process.env.NODE_ENV,
+		SENTRY_DSN: process.env.SENTRY_DSN,
 	}
 }
 

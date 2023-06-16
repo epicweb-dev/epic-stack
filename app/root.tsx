@@ -3,9 +3,9 @@ import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
 	type DataFunctionArgs,
+	type HeadersFunction,
 	type LinksFunction,
 	type V2_MetaFunction,
-	type HeadersFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -19,9 +19,11 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
-import tailwindStylesheetUrl from './styles/tailwind.css'
+import { withSentry } from '@sentry/remix'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
+import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
+import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
@@ -30,9 +32,8 @@ import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
-import { getSession, getTheme } from './utils/session.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
+import { useOptionalUser, useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -73,8 +74,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const cookieSession = await getSession(request.headers.get('Cookie'))
-	const timings = makeTimings('rootLoader')
+	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
 		type: 'getUserId',
@@ -106,7 +106,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
 				session: {
-					theme: getTheme(cookieSession),
+					theme: await getTheme(request),
 				},
 			},
 			ENV: getEnv(),
@@ -126,7 +126,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-export default function App() {
+function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
 	const user = useOptionalUser()
@@ -185,6 +185,7 @@ export default function App() {
 		</html>
 	)
 }
+export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()

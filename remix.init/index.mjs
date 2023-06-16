@@ -12,14 +12,13 @@ const escapeRegExp = string =>
 	string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const getRandomString = length => crypto.randomBytes(length).toString('hex')
-const getRandomString16 = () => getRandomString(16)
+const getRandomString32 = () => getRandomString(32)
 
 export default async function main({ isTypeScript, rootDirectory }) {
 	if (!isTypeScript) {
 		// not throwing an error because the stack trace doesn't do anything to help the user
 		throw `Sorry, this template only supports TypeScript. Please run the command again and select "TypeScript". Learn more about why in https://github.com/epicweb-dev/epic-stack/blob/main/docs/decisions/001-typescript-only.md`
 	}
-	const README_PATH = path.join(rootDirectory, 'README.md')
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
 	const EXAMPLE_ENV_PATH = path.join(rootDirectory, '.env.example')
 	const ENV_PATH = path.join(rootDirectory, '.env')
@@ -34,19 +33,14 @@ export default async function main({ isTypeScript, rootDirectory }) {
 		// get rid of anything that's not allowed in an app name
 		.replace(/[^a-zA-Z0-9-_]/g, '-')
 
-	const [flyTomlContent, readme, env, packageJson] = await Promise.all([
+	const [flyTomlContent, env, packageJsonString] = await Promise.all([
 		fs.readFile(FLY_TOML_PATH, 'utf-8'),
-		fs.readFile(README_PATH, 'utf-8'),
 		fs.readFile(EXAMPLE_ENV_PATH, 'utf-8'),
 		fs.readFile(PKG_PATH, 'utf-8'),
 	])
 
 	const newEnv = env
 		.replace(/^SESSION_SECRET=.*$/m, `SESSION_SECRET="${getRandomString(16)}"`)
-		.replace(
-			/^ENCRYPTION_SECRET=.*$/m,
-			`ENCRYPTION_SECRET="${getRandomString(16)}"`,
-		)
 		.replace(
 			/^INTERNAL_COMMAND_TOKEN=.*$/m,
 			`INTERNAL_COMMAND_TOKEN="${getRandomString(16)}"`,
@@ -57,18 +51,16 @@ export default async function main({ isTypeScript, rootDirectory }) {
 		APP_NAME,
 	)
 
-	const newReadme = readme.replace(new RegExp(appNameRegex, 'g'), APP_NAME)
+	const packageJson = JSON.parse(packageJsonString)
 
-	const newPackageJson = packageJson.replace(
-		new RegExp(appNameRegex, 'g'),
-		APP_NAME,
-	)
+	packageJson.name = APP_NAME
+	delete packageJson.author
+	delete packageJson.license
 
 	const fileOperationPromises = [
 		fs.writeFile(FLY_TOML_PATH, newFlyTomlContent),
-		fs.writeFile(README_PATH, newReadme),
 		fs.writeFile(ENV_PATH, newEnv),
-		fs.writeFile(PKG_PATH, newPackageJson),
+		fs.writeFile(PKG_PATH, JSON.stringify(packageJson, null, 2)),
 		fs.copyFile(
 			path.join(rootDirectory, 'remix.init', 'gitignore'),
 			path.join(rootDirectory, '.gitignore'),
@@ -167,8 +159,8 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly apps create ${APP_NAME}`
 
 	console.log(`🤫 Setting secrets in apps`)
-	await $I`fly secrets set SESSION_SECRET=${getRandomString16()} ENCRYPTION_SECRET=${getRandomString16()} INTERNAL_COMMAND_TOKEN=${getRandomString16()} --app ${APP_NAME}-staging`
-	await $I`fly secrets set SESSION_SECRET=${getRandomString16()} ENCRYPTION_SECRET=${getRandomString16()} INTERNAL_COMMAND_TOKEN=${getRandomString16()} --app ${APP_NAME}`
+	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} --app ${APP_NAME}-staging`
+	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} --app ${APP_NAME}`
 
 	console.log(
 		`🔊 Creating volumes. Answer "yes" when it warns you about downtime. You can add more volumes later (when you actually start getting paying customers �).`,

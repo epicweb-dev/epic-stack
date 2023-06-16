@@ -26,19 +26,12 @@ import {
 	passwordSchema,
 	usernameSchema,
 } from '~/utils/user-validation.ts'
+import { twoFAVerificationType } from './profile.two-factor.tsx'
 
-const ProfileFormSchema = z.object({
+const profileFormSchema = z.object({
 	name: nameSchema.optional(),
 	username: usernameSchema,
 	email: emailSchema.optional(),
-	phone: z.string().optional(),
-	address: z.string().optional(),
-	city: z.string().optional(),
-	state: z.string().optional(),
-	zip: z.string().optional(),
-	country: z.string().optional(),
-	hostBio: z.string().optional(),
-	renterBio: z.string().optional(),
 	currentPassword: z
 		.union([passwordSchema, z.string().min(0).max(0)])
 		.optional(),
@@ -57,10 +50,14 @@ export async function loader({ request }: DataFunctionArgs) {
 			imageId: true,
 		},
 	})
+	const twoFactorVerification = await prisma.verification.findFirst({
+		where: { type: twoFAVerificationType, target: userId },
+		select: { id: true },
+	})
 	if (!user) {
 		throw await authenticator.logout(request, { redirectTo: '/' })
 	}
-	return json({ user })
+	return json({ user, isTwoFactorEnabled: Boolean(twoFactorVerification) })
 }
 
 export async function action({ request }: DataFunctionArgs) {
@@ -68,7 +65,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = await parse(formData, {
 		async: true,
-		schema: ProfileFormSchema.superRefine(
+		schema: profileFormSchema.superRefine(
 			async ({ username, currentPassword, newPassword }, ctx) => {
 				if (newPassword && !currentPassword) {
 					ctx.addIssue({
@@ -141,10 +138,10 @@ export default function EditUserProfile() {
 
 	const [form, fields] = useForm({
 		id: 'edit-profile',
-		constraint: getFieldsetConstraint(ProfileFormSchema),
+		constraint: getFieldsetConstraint(profileFormSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: ProfileFormSchema })
+			return parse(formData, { schema: profileFormSchema })
 		},
 		defaultValue: {
 			username: data.user.username,
@@ -172,6 +169,7 @@ export default function EditUserProfile() {
 							className="h-full w-full rounded-full object-cover"
 						/>
 						<Link
+							preventScrollReset
 							to="photo"
 							className="absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 border-night-700 bg-night-500 p-5"
 							title="Change profile photo"
@@ -243,11 +241,14 @@ export default function EditUserProfile() {
 								/>
 							</div>
 						</fieldset>
+						<Link preventScrollReset to="two-factor" className="col-span-full">
+							{data.isTwoFactorEnabled ? '🔒 2FA is enabled' : '🔓 Enable 2FA'}
+						</Link>
 					</div>
 
 					<ErrorList errors={form.errors} id={form.errorId} />
 
-					<div className="mt-3 flex justify-center">
+					<div className="mt-8 flex justify-center">
 						<Button
 							type="submit"
 							size="md-wide"

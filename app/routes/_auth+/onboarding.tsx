@@ -26,9 +26,10 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
-import { onboardingEmailSessionKey } from './signup.tsx'
 
-const OnboardingFormSchema = z
+export const onboardingEmailSessionKey = 'onboardingEmail'
+
+const onboardingFormSchema = z
 	.object({
 		username: usernameSchema,
 		name: nameSchema,
@@ -59,8 +60,9 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (typeof onboardingEmail !== 'string' || !onboardingEmail) {
 		return redirect('/signup')
 	}
+	const message = error?.message ?? null
 	return json(
-		{ formError: error?.message },
+		{ formError: typeof message === 'string' ? message : null },
 		{
 			headers: {
 				'Set-Cookie': await commitSession(session),
@@ -78,7 +80,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const formData = await request.formData()
 	const submission = parse(formData, {
-		schema: OnboardingFormSchema,
+		schema: onboardingFormSchema,
 		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
@@ -129,10 +131,10 @@ export default function OnboardingPage() {
 
 	const [form, fields] = useForm({
 		id: 'onboarding',
-		constraint: getFieldsetConstraint(OnboardingFormSchema),
+		constraint: getFieldsetConstraint(onboardingFormSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: OnboardingFormSchema })
+			return parse(formData, { schema: onboardingFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -234,8 +236,10 @@ export default function OnboardingPage() {
 						value={redirectTo}
 					/>
 
-					<ErrorList errors={data.formError ? [data.formError] : []} />
-					<ErrorList errors={form.errors} id={form.errorId} />
+					<ErrorList
+						errors={[...form.errors, data.formError]}
+						id={form.errorId}
+					/>
 
 					<div className="flex items-center justify-between gap-6">
 						<Button

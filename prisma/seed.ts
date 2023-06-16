@@ -23,9 +23,6 @@ async function seed() {
 		},
 	})
 	console.timeEnd(`👑 Created admin role/permission...`)
-	// hosts with ships and reviews
-	// renters with bookings and reviews
-	// hosts who are renters also
 	const totalUsers = 40
 	console.time(`👤 Created ${totalUsers} users...`)
 	const users = await Promise.all(

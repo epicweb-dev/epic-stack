@@ -12,6 +12,10 @@ const ABORT_DELAY = 5000
 init()
 global.ENV = getEnv()
 
+if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
+	import('~/utils/monitoring.server.ts').then(({ init }) => init())
+}
+
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
 export default async function handleRequest(...args: DocRequestArgs) {

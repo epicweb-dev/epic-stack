@@ -12,6 +12,8 @@ export function createUser() {
 		firstName: firstName.toLowerCase(),
 		lastName: lastName.toLowerCase(),
 	})
+		.slice(0, 20)
+		.replace(/[^a-z0-9_]/g, '_')
 	return {
 		username,
 		name: `${firstName} ${lastName}`,

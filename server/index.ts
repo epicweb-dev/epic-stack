@@ -8,7 +8,11 @@ import address from 'address'
 import closeWithGrace from 'close-with-grace'
 import helmet from 'helmet'
 import crypto from 'crypto'
-import { type RequestHandler, createRequestHandler } from '@remix-run/express'
+import {
+	type RequestHandler,
+	createRequestHandler as _createRequestHandler,
+} from '@remix-run/express'
+import { wrapExpressCreateRequestHandler } from '@sentry/remix'
 import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
@@ -17,6 +21,10 @@ import chalk from 'chalk'
 // definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
 const MODE = process.env.NODE_ENV
+
+const createRequestHandler = wrapExpressCreateRequestHandler(
+	_createRequestHandler,
+)
 
 const BUILD_PATH = '../build/index.js'
 
@@ -86,10 +94,14 @@ app.use(
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
 			directives: {
-				'connect-src': MODE === 'development' ? ['ws:', "'self'"] : null,
+				'connect-src': [
+					MODE === 'development' ? 'ws:' : null,
+					process.env.SENTRY_DSN ? '*.ingest.sentry.io' : null,
+					"'self'",
+				].filter(Boolean),
 				'font-src': ["'self'"],
 				'frame-src': ["'self'"],
-				'img-src': ["'self'"],
+				'img-src': ["'self'", 'data:'],
 				'script-src': [
 					"'strict-dynamic'",
 					"'self'",
@@ -165,10 +177,22 @@ ${chalk.bold('Press Ctrl+C to stop')}
 	}
 })
 
-closeWithGrace(async () => {
+closeWithGrace(async ({ err }) => {
+	// log the error early
+	if (err) {
+		console.error(chalk.red(err))
+		console.error(chalk.red(err.stack))
+	}
+
+	// close up things
 	await new Promise((resolve, reject) => {
 		server.close(e => (e ? reject(e) : resolve('ok')))
 	})
+
+	// if there was an error, then exit with a failure code
+	if (err) {
+		process.exit(1)
+	}
 })
 
 // during dev, we'll keep the build module up to date with the changes

@@ -11,7 +11,12 @@ const here = (...s: Array<string>) => path.join(__dirname, ...s)
 const globsafe = (s: string) => s.replace(/\\/g, '/')
 
 const allFiles = globSync(globsafe(here('../server/**/*.*')), {
-	ignore: ['**/tsconfig.json', '**/eslint*', '**/__tests__/**'],
+	ignore: [
+		'server/dev-server.js', // for development only
+		'**/tsconfig.json',
+		'**/eslint*',
+		'**/__tests__/**',
+	],
 })
 
 const entries = []
@@ -31,10 +36,11 @@ console.log('building...')
 
 esbuild
 	.build({
-		entryPoints: globSync(globsafe(here('../server/**/*.+(ts|js|tsx|jsx)'))),
+		entryPoints: entries,
 		outdir: here('../server-build'),
 		target: [`node${pkg.engines.node}`],
 		platform: 'node',
+		sourcemap: true,
 		format: 'esm',
 		logLevel: 'info',
 	})
