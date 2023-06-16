@@ -141,7 +141,7 @@ export default function ForgotPasswordRoute() {
 			<div className="flex flex-col justify-center">
 				<div className="text-center">
 					<h1 className="text-h1">Forgot Password</h1>
-					<p className="mt-3 text-body-md text-night-200">
+					<p className="text-muted-200 mt-3 text-body-md">
 						No worries, we'll send you reset instructions.
 					</p>
 				</div>

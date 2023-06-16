@@ -142,7 +142,7 @@ export default function PhotoChooserModal() {
 				<Dialog.Content
 					onEscapeKeyDown={dismissModal}
 					onPointerDownOutside={dismissModal}
-					className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-night-500 p-12 shadow-lg"
+					className="bg-muted-500 fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg p-12 shadow-lg"
 				>
 					<Dialog.Title asChild className="text-center">
 						<h2 className="text-h2">Profile photo</h2>

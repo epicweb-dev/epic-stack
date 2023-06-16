@@ -159,7 +159,7 @@ export default function ForgotPasswordVerifyRoute() {
 				<>
 					<div className="text-center">
 						<h1 className="text-h1">Check your email</h1>
-						<p className="mt-3 text-body-md text-night-200">
+						<p className="text-muted-200 mt-3 text-body-md">
 							We've sent you a code to verify your password reset.
 						</p>
 					</div>

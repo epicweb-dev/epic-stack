@@ -2,40 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-	--color-background: white;
-	--color-foreground: black;
-	--color-primary: deepskyblue;
-	--color-accent: tomato;
-	--color-muted-50: #f8fafc;
-	--color-muted-100: #f1f5f9;
-	--color-muted-200: #e2e8f0;
-	--color-muted-300: #cbd5e1;
-	--color-muted-400: #94a3b8;
-	--color-muted-500: #64748b;
-	--color-muted-600: #475569;
-	--color-muted-700: #334155;
-	--color-muted-800: #1e293b;
-	--color-muted-900: #020617;
-	--color-success: green;
-	--color-info: blue;
-	--color-warning: yellow;
-	--color-danger: red;
-	--color-danger-muted: lightcoral;
+@layer base {
+	:root {
+		--color-background: 255 255 255; /* white */
+		--color-foreground: 17 24 39; /* gray-900 */
+		--color-primary: 202 138 4; /* yellow-600 */
+		--color-secondary: 234 179 8; /* yellow-500 */
+		--color-success-title: 22 101 52; /* green-800 */
+		--color-success-foreground: 21 128 61; /* green-700 */
+		--color-success-background: 240 253 244; /* green-50 */
+		--color-info-title: 30 64 175; /* blue-800 */
+		--color-info-foreground: 29 78 216; /* blue-700 */
+		--color-info-background: 239 246 255; /* blue-50 */
+		--color-warning-title: 133 77 14; /* yellow-800 */
+		--color-warning-foreground: 161 98 7; /* yellow-700 */
+		--color-warning-background: 254 252 232; /* yellow-50 */
+		--color-danger-title: 153 27 27; /* red-800 */
+		--color-danger-foreground: 185 28 28; /* red-700 */
+		--color-danger-background: 254 242 242; /* red-50 */
+		--color-muted-50: 249 250 251; /* gray-50 */
+		--color-muted-100: 243 244 246; /* gray-100 */
+		--color-muted-200: 229 231 235; /* gray-200 */
+		--color-muted-300: 209 213 db; /* gray-300 */
+		--color-muted-400: 156 163 175; /* gray-400 */
+		--color-muted-500: 107 114 128; /* gray-500 */
+		--color-muted-600: 75 85 99; /* gray-600 */
+		--color-muted-700: 55 65 81; /* gray-700 */
+		--color-muted-800: 31 41 55; /* gray-800 */
+		--color-muted-900: 17 24 39; /* gray-900 */
+		--color-muted-950: 3 7 18; /* gray-950 */
+		--ring: 79 70 229; /* indigo-600 */
+		--radius: 0.375rem;
+		--min-tap-target: 24px;
+	}
+
+	.dark {
+		--color-background: 17 24 39; /* gray-900 */
+		--color-foreground: 255 255 255; /* white */
+		--color-primary: 202 138 4; /* yellow-600 */
+		--color-secondary: 234 179 8; /* yellow-500 */
+		--color-success-title: 22 101 52; /* green-800 */
+		--color-success-foreground: 21 128 61; /* green-700 */
+		--color-success-background: 240 253 244; /* green-50 */
+		--color-info-title: 30 64 175; /* blue-800 */
+		--color-info-foreground: 29 78 216; /* blue-700 */
+		--color-info-background: 239 246 255; /* blue-50 */
+		--color-warning-title: 133 77 14; /* yellow-800 */
+		--color-warning-foreground: 161 98 7; /* yellow-700 */
+		--color-warning-background: 254 252 232; /* yellow-50 */
+		--color-danger-title: 153 27 27; /* red-800 */
+		--color-danger-foreground: 185 28 28; /* red-700 */
+		--color-danger-background: 254 242 242; /* red-50 */
+		--color-muted-50: 3 7 18; /* gray-950 */
+		--color-muted-100: 17 24 39; /* gray-900 */
+		--color-muted-200: 31 41 55; /* gray-800 */
+		--color-muted-300: 55 65 81; /* gray-700 */
+		--color-muted-400: 75 85 99; /* gray-600 */
+		--color-muted-500: 107 114 128; /* gray-500 */
+		--color-muted-600: 156 163 175; /* gray-400 */
+		--color-muted-700: 209 213 db; /* gray-300 */
+		--color-muted-800: 229 231 235; /* gray-200 */
+		--color-muted-900: 243 244 246; /* gray-100 */
+		--color-muted-950: 249 250 251; /* gray-50 */
+		--ring: 63 66 f1; /* indigo-500 */
+	}
 }
 
-/** Copy those 👆 CSS vars here 👇 if you want to change them in dark mode */
-:root.dark {
-	--color-background: black;
-	--color-foreground: white;
-	--color-muted-50: #020617;
-	--color-muted-100: #1e293b;
-	--color-muted-200: #334155;
-	--color-muted-300: #475569;
-	--color-muted-400: #64748b;
-	--color-muted-500: #94a3b8;
-	--color-muted-600: #cbd5e1;
-	--color-muted-700: #e2e8f0;
-	--color-muted-800: #f1f5f9;
-	--color-muted-900: #f8fafc;
+@media (pointer: coarse) {
+	:root {
+		--min-tap-target: 44px;
+	}
 }

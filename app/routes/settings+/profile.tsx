@@ -154,10 +154,10 @@ export default function EditUserProfile() {
 	return (
 		<div className="container m-auto mb-36 mt-16 max-w-3xl">
 			<div className="flex gap-3">
-				<Link className="text-night-300" to={`/users/${data.user.username}`}>
+				<Link className="text-muted-300" to={`/users/${data.user.username}`}>
 					Profile
 				</Link>
-				<span className="text-night-300">▶️</span>
+				<span className="text-muted-300">▶️</span>
 				<span>Edit Profile</span>
 			</div>
 			<div className="mt-16 flex flex-col gap-12">
@@ -171,7 +171,7 @@ export default function EditUserProfile() {
 						<Link
 							preventScrollReset
 							to="photo"
-							className="absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 border-night-700 bg-night-500 p-5"
+							className="border-muted-700 bg-muted-500 absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 p-5"
 							title="Change profile photo"
 							aria-label="Change profile photo"
 						>
@@ -207,9 +207,9 @@ export default function EditUserProfile() {
 							errors={fields.email.errors}
 						/>
 
-						<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px] border-night-500" />
+						<div className="border-muted-500 col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
 						<fieldset className="col-span-6">
-							<legend className="pb-6 text-lg text-night-200">
+							<legend className="text-muted-200 pb-6 text-lg">
 								Change password
 							</legend>
 							<div className="flex justify-between gap-10">

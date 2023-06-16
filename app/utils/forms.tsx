@@ -18,7 +18,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="space-y-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-[10px] text-accent-red">
+				<li key={e} className="text-danger text-[10px]">
 					{e}
 				</li>
 			))}
@@ -48,7 +48,7 @@ export function Field({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...inputProps}
-				className="h-16 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-4 text-body-xs caret-white outline-none focus:border-accent-purple disabled:bg-night-400"
+				className="border-muted-400 bg-muted-700 focus:border-ring disabled:bg-muted-400 h-16 w-full rounded-lg border px-4 pt-4 text-body-xs caret-white outline-none"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -81,7 +81,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...textareaProps}
-				className="h-48 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-8 text-body-xs caret-white outline-none focus:border-accent-purple disabled:bg-night-400"
+				className="border-muted-400 bg-muted-700 focus:border-ring disabled:bg-muted-400 h-48 w-full rounded-lg border px-4 pt-8 text-body-xs caret-white outline-none"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -133,7 +133,7 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="self-center text-body-xs text-night-200"
+					className="text-muted-200 self-center text-body-xs"
 				/>
 			</div>
 			<div className="px-4 pb-3 pt-1">
@@ -151,11 +151,11 @@ export function getButtonClassName({
 	variant: 'primary' | 'secondary'
 }) {
 	const baseClassName =
-		'flex justify-center items-center rounded-full font-bold outline-none transition-[background-color,color] duration-200 disabled:bg-night-500 disabled:text-night-200'
+		'flex justify-center items-center rounded-full font-bold outline-none transition-[background-color,color] duration-200 disabled:bg-muted-500 disabled:text-muted-200'
 	const primaryClassName =
-		'bg-accent-purple hover:bg-accent-yellow hover:text-night-700 focus:bg-accent-yellow focus:text-night-700 active:bg-accent-yellow-muted'
+		'bg-primary hover:bg-primary hover:text-muted-700 focus:bg-primary focus:text-muted-700 active:bg-secondary'
 	const secondaryClassName =
-		'border-[1.5px] border-night-400 bg-night-700 hover:border-accent-purple focus:border-accent-purple active:border-accent-purple-lighter'
+		'border-[1.5px] border-muted-400 bg-muted-700 hover:border-ring focus:border-ring active:border-primary'
 	const extraSmallClassName = 'py-2 px-3 text-body-xs'
 	const smallClassName = 'px-10 py-[14px] text-body-xs'
 	const mediumClassName = 'px-14 py-5 text-lg'

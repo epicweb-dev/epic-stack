@@ -154,7 +154,7 @@ export default function SignupRoute() {
 		<div className="container mx-auto flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Let's start your journey!</h1>
-				<p className="mt-3 text-body-md text-night-200">
+				<p className="text-muted-200 mt-3 text-body-md">
 					Please enter your email.
 				</p>
 			</div>

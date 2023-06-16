@@ -41,7 +41,7 @@ export default function UsernameIndex() {
 		<div className="container mx-auto mb-48 mt-36 flex flex-col items-center justify-center">
 			<Spacer size="4xs" />
 
-			<div className="container mx-auto flex flex-col items-center rounded-3xl bg-night-500 p-12">
+			<div className="bg-muted-500 container mx-auto flex flex-col items-center rounded-3xl p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
@@ -60,7 +60,7 @@ export default function UsernameIndex() {
 					<div className="flex flex-wrap items-center justify-center gap-4">
 						<h1 className="text-center text-h2">{userDisplayName}</h1>
 					</div>
-					<p className="mt-2 text-center text-night-200">
+					<p className="text-muted-200 mt-2 text-center">
 						Joined {data.userJoinedDisplay}
 					</p>
 					<div className="mt-10 flex gap-4">

@@ -66,7 +66,7 @@ export default function NotesRoute() {
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
 		<div className="flex h-full pb-12">
-			<div className="mx-auto grid w-full flex-grow grid-cols-4 bg-night-500 pl-2 md:container md:rounded-3xl">
+			<div className="bg-muted-500 mx-auto grid w-full flex-grow grid-cols-4 pl-2 md:container md:rounded-3xl">
 				<div className="col-span-1 py-12">
 					<Link
 						to={`/users/${data.owner.username}`}
@@ -86,7 +86,7 @@ export default function NotesRoute() {
 							<NavLink
 								to="new"
 								className={({ isActive }) =>
-									twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
+									twMerge(navLinkDefaultClassName, isActive && 'bg-muted-400')
 								}
 							>
 								+ New Note
@@ -97,7 +97,7 @@ export default function NotesRoute() {
 								<NavLink
 									to={note.id}
 									className={({ isActive }) =>
-										twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
+										twMerge(navLinkDefaultClassName, isActive && 'bg-muted-400')
 									}
 								>
 									{note.title}
@@ -106,7 +106,7 @@ export default function NotesRoute() {
 						))}
 					</ul>
 				</div>
-				<main className="col-span-3 bg-night-400 px-10 py-12 md:rounded-r-3xl">
+				<main className="bg-muted-400 col-span-3 px-10 py-12 md:rounded-r-3xl">
 					<Outlet />
 				</main>
 			</div>

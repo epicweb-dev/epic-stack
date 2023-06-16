@@ -16,7 +16,7 @@ export default function Index() {
 						<div className="lg:pt-18 relative px-4 pb-8 pt-8 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8 lg:pb-20">
 							<h1 className="text-center text-mega font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
 								<a
-									className="block uppercase text-accent-pink drop-shadow-md"
+									className="text-accent-pink block uppercase drop-shadow-md"
 									href="https://www.epicweb.dev/stack"
 								>
 									Epic Stack
@@ -45,7 +45,7 @@ export default function Index() {
 				</div>
 
 				<div className="mx-auto mt-8 max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
-					<div className="flex flex-wrap justify-center gap-8 rounded-3xl bg-day-300 py-4">
+					<div className="bg-muted-300 flex flex-wrap justify-center gap-8 rounded-3xl py-4">
 						{logos.map(img => (
 							<a
 								key={img.href}
