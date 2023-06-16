@@ -6,8 +6,9 @@
 	:root {
 		--color-background: 255 255 255; /* white */
 		--color-foreground: 17 24 39; /* gray-900 */
-		--color-primary: 202 138 4; /* yellow-600 */
-		--color-secondary: 234 179 8; /* yellow-500 */
+		--color-primary: 100 68 255; /* purple */
+		--color-secondary: 255 190 63; /* yellow */
+		--color-secondary-muted: 255 210 98; /* yellow muted */
 		--color-success-title: 22 101 52; /* green-800 */
 		--color-success-foreground: 21 128 61; /* green-700 */
 		--color-success-background: 240 253 244; /* green-50 */
