@@ -8,30 +8,23 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				night: {
-					100: '#DADADA',
-					200: '#AAAAAA',
-					300: '#717171',
-					400: '#494949',
-					500: '#1E1E20',
-					600: '#141414',
-					700: '#090909',
-				},
-				day: {
-					100: '#F7F5FF',
-					200: '#E4E4FB',
-					300: '#DDDDF4',
-					400: '#D0D0E8',
-					500: '#9696E0',
-					600: '#9999CC',
-					700: '#6A44FF',
+				background: 'hsl(var(--color-background))',
+				foreground: 'hsl(var(--color-foreground))',
+				brand: {
+					100: 'hsl(var(--color-100))',
+					200: 'hsl(var(--color-200))',
+					300: 'hsl(var(--color-300))',
+					400: 'hsl(var(--color-400))',
+					500: 'hsl(var(--color-500))',
+					600: 'hsl(var(--color-600))',
+					700: 'hsl(var(--color-700))',
 				},
 				accent: {
-					purple: '#6A44FF',
-					pink: '#F183FF',
-					yellow: '#FFBE3F',
-					'yellow-muted': '#FFD262',
-					red: '#EF5A5A',
+					purple: 'hsl(var(--color-accent-purple))',
+					pink: 'hsl(var(--color-accent-pink))',
+					yellow: 'hsl(var(--color-accent-yellow))',
+					'yellow-muted': 'hsl(var(--color-accent-yellow-muted))',
+					red: 'hsl(var(--color-accent-red))',
 				},
 			},
 			fontFamily: {
