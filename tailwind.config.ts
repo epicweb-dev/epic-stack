@@ -10,14 +10,23 @@ export default {
 			colors: {
 				background: 'hsl(var(--color-background))',
 				foreground: 'hsl(var(--color-foreground))',
-				brand: {
-					100: 'hsl(var(--color-100))',
-					200: 'hsl(var(--color-200))',
-					300: 'hsl(var(--color-300))',
-					400: 'hsl(var(--color-400))',
-					500: 'hsl(var(--color-500))',
-					600: 'hsl(var(--color-600))',
-					700: 'hsl(var(--color-700))',
+				day: {
+					100: 'hsl(var(--color-day-100))',
+					200: 'hsl(var(--color-day-200))',
+					300: 'hsl(var(--color-day-300))',
+					400: 'hsl(var(--color-day-400))',
+					500: 'hsl(var(--color-day-500))',
+					600: 'hsl(var(--color-day-600))',
+					700: 'hsl(var(--color-day-700))',
+				},
+				night: {
+					100: 'hsl(var(--color-night-100))',
+					200: 'hsl(var(--color-night-200))',
+					300: 'hsl(var(--color-night-300))',
+					400: 'hsl(var(--color-night-400))',
+					500: 'hsl(var(--color-night-500))',
+					600: 'hsl(var(--color-night-600))',
+					700: 'hsl(var(--color-night-700))',
 				},
 				accent: {
 					purple: 'hsl(var(--color-accent-purple))',
