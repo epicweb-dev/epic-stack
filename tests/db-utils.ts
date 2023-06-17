@@ -2,11 +2,12 @@ import { faker } from '@faker-js/faker'
 import bcrypt from 'bcryptjs'
 import { UniqueEnforcer } from 'enforce-unique'
 
+const uniqueUsernameEnforcer = new UniqueEnforcer()
+
 export function createUser() {
 	const firstName = faker.person.firstName()
 	const lastName = faker.person.lastName()
 
-	const uniqueUsernameEnforcer = new UniqueEnforcer()
 	const username = uniqueUsernameEnforcer.enforce(() => {
 		return faker.internet.userName({
 			firstName: firstName.toLowerCase(),
