@@ -1,16 +1,17 @@
 import { faker } from '@faker-js/faker'
 import bcrypt from 'bcryptjs'
-import { memoizeUnique } from './memoize-unique.ts'
-
-const unique = memoizeUnique(faker.internet.userName)
+import { UniqueEnforcer } from 'enforce-unique'
 
 export function createUser() {
 	const firstName = faker.person.firstName()
 	const lastName = faker.person.lastName()
 
-	const username = unique({
-		firstName: firstName.toLowerCase(),
-		lastName: lastName.toLowerCase(),
+	const uniqueUsernameEnforcer = new UniqueEnforcer()
+	const username = uniqueUsernameEnforcer.enforce(() => {
+		return faker.internet.userName({
+			firstName: firstName.toLowerCase(),
+			lastName: lastName.toLowerCase(),
+		})
 	})
 		.slice(0, 20)
 		.replace(/[^a-z0-9_]/g, '_')
