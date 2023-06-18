@@ -85,7 +85,7 @@ export function deleteAllData() {
 
 	// Delete all data in each table in the proper order
 	for (const tableName of sortedTableNames) {
-		db.prepare(`DELETE FROM ${tableName}`).run()
+		db.prepare(`DELETE FROM "${tableName}"`).run()
 	}
 
 	db.close()
