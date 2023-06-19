@@ -50,6 +50,7 @@
     "@remix-run/server-runtime": "^1.17.0",
     "@sentry/remix": "^7.54.0",
     "address": "^1.2.2",
+    "autoprefixer": "^10.4.14",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^8.4.0",
     "cachified": "^3.5.4",
