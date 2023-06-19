@@ -10,6 +10,15 @@ export default {
 			colors: {
 				background: 'hsl(var(--color-background))',
 				foreground: 'hsl(var(--color-foreground))',
+				brand: {
+					primary: 'hsl(var(--color-brand-primary))',
+					secondary: {
+						DEFAULT: 'hsl(var(--color-brand-secondary))',
+						muted: 'hsl(var(--color-brand-secondary-muted))',
+					},
+					tertiary: 'hsl(var(--color-brand-tertiary))',
+				},
+				danger: 'hsl(var(--color-danger))',
 				day: {
 					100: 'hsl(var(--color-day-100))',
 					200: 'hsl(var(--color-day-200))',
@@ -27,13 +36,6 @@ export default {
 					500: 'hsl(var(--color-night-500))',
 					600: 'hsl(var(--color-night-600))',
 					700: 'hsl(var(--color-night-700))',
-				},
-				accent: {
-					purple: 'hsl(var(--color-accent-purple))',
-					pink: 'hsl(var(--color-accent-pink))',
-					yellow: 'hsl(var(--color-accent-yellow))',
-					'yellow-muted': 'hsl(var(--color-accent-yellow-muted))',
-					red: 'hsl(var(--color-accent-red))',
 				},
 			},
 			fontFamily: {

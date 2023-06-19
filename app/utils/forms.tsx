@@ -18,7 +18,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="space-y-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-[10px] text-accent-red">
+				<li key={e} className="text-[10px] text-danger">
 					{e}
 				</li>
 			))}
@@ -48,7 +48,7 @@ export function Field({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...inputProps}
-				className="h-16 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-4 text-body-xs caret-white outline-none focus:border-accent-purple disabled:bg-night-400"
+				className="h-16 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-4 text-body-xs caret-white outline-none focus:border-brand-primary disabled:bg-night-400"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -81,7 +81,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				placeholder=" "
 				{...textareaProps}
-				className="h-48 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-8 text-body-xs caret-white outline-none focus:border-accent-purple disabled:bg-night-400"
+				className="h-48 w-full rounded-lg border border-night-400 bg-night-700 px-4 pt-8 text-body-xs caret-white outline-none focus:border-brand-primary disabled:bg-night-400"
 			/>
 			{/* the label comes after the input so we can use the sibling selector in the CSS to give us animated label control in CSS only */}
 			<label htmlFor={id} {...labelProps} />
@@ -153,9 +153,9 @@ export function getButtonClassName({
 	const baseClassName =
 		'flex justify-center items-center rounded-full font-bold outline-none transition-[background-color,color] duration-200 disabled:bg-night-500 disabled:text-night-200'
 	const primaryClassName =
-		'bg-accent-purple hover:bg-accent-yellow hover:text-night-700 focus:bg-accent-yellow focus:text-night-700 active:bg-accent-yellow-muted'
+		'bg-brand-primary hover:bg-brand-secondary hover:text-night-700 focus:bg-brand-secondary focus:text-night-700 active:bg-brand-secondary-muted'
 	const secondaryClassName =
-		'border-[1.5px] border-night-400 bg-night-700 hover:border-accent-purple focus:border-accent-purple active:border-accent-purple-lighter'
+		'border-[1.5px] border-night-400 bg-night-700 hover:border-brand-primary focus:border-brand-primary active:border-brand-primary-lighter'
 	const extraSmallClassName = 'py-2 px-3 text-body-xs'
 	const smallClassName = 'px-10 py-[14px] text-body-xs'
 	const mediumClassName = 'px-14 py-5 text-lg'
