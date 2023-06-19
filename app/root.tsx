@@ -49,6 +49,13 @@ export const links: LinksFunction = () => {
 		},
 		{ rel: 'apple-touch-icon', href: '/favicon/apple-touch-icon.png' },
 		{ rel: 'manifest', href: '/site.webmanifest' },
+		{ rel: 'icon', type: 'image/svg+xml', href: '/favicon/favicon.svg' },
+		{
+			rel: 'icon',
+			type: 'image/svg+xml',
+			href: '/favicon/favicon-dark.svg',
+			media: '(prefers-color-scheme: dark)',
+		},
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
@@ -129,18 +136,6 @@ function App() {
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
-				<link
-					rel="icon"
-					type="image/svg+xml"
-					href={
-						// important to use the client-hints theme instead of the user
-						// preference because the favicon should match the theme of the
-						// browser window, not the theme of the app.
-						data.requestInfo.hints.theme === 'dark'
-							? '/favicon/favicon-dark.svg'
-							: '/favicon/favicon.svg'
-					}
-				/>
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
 				<header className="container mx-auto py-6">
