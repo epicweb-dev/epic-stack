@@ -235,7 +235,7 @@ function UserDropdown() {
 					</DropdownMenu.Item>
 					<DropdownMenu.Item asChild>
 						<Form
-							className="rounded-b-3xl outline-none radix-highlighted:bg-night-500"
+							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
 							onClick={e => {
 								e.preventDefault()
 								submit(null, { action: '/logout', method: 'POST' })
