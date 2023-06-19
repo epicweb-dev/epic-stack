@@ -17,6 +17,7 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
@@ -188,6 +189,7 @@ export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
+	const submit = useSubmit()
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -233,13 +235,13 @@ function UserDropdown() {
 					</DropdownMenu.Item>
 					<DropdownMenu.Item asChild>
 						<Form
-							action="/logout"
-							method="POST"
 							className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500"
+							onClick={e => {
+								e.preventDefault()
+								submit(null, { action: '/logout', method: 'POST' })
+							}}
 						>
-							<button type="submit" onClick={e => e.stopPropagation()}>
-								Logout
-							</button>
+							<button type="submit">Logout</button>
 						</Form>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
