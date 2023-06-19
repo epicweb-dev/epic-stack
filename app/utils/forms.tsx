@@ -1,8 +1,9 @@
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { Link } from '@remix-run/react'
-import React, { useId } from 'react'
+import React, { useId, useRef } from 'react'
 import styles from './forms.module.css'
 import { twMerge } from 'tailwind-merge'
+import { useInputEvent } from '@conform-to/react'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -107,6 +108,15 @@ export function CheckboxField({
 	errors?: ListOfErrors
 }) {
 	const fallbackId = useId()
+	const buttonRef = useRef<HTMLButtonElement>(null);
+	// To emulate naitve events that Conform listen to:
+	// See https://conform.guide/integrations 
+	const control = useInputEvent({
+		// Retrieve the checkbox element by name instead as Radix does not expose the internal checkbox element
+		// See https://github.com/radix-ui/primitives/discussions/874
+		ref: () => buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
+		onFocus: () => buttonRef.current?.focus(),
+	});
 	const id = buttonProps.id ?? buttonProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
@@ -114,9 +124,22 @@ export function CheckboxField({
 			<div className="flex gap-2">
 				<Checkbox.Root
 					id={id}
+					ref={buttonRef}
 					aria-invalid={errorId ? true : undefined}
 					aria-describedby={errorId}
 					{...buttonProps}
+					onCheckedChange={state => {
+						control.change(Boolean(state.valueOf()));
+						buttonProps.onCheckedChange?.(state);
+					}}
+					onFocus={event => {
+						control.focus();
+						buttonProps.onFocus?.(event);
+					}}
+					onBlur={event => {
+						control.blur();
+						buttonProps.onBlur?.(event);
+					}}
 					type="button"
 				>
 					<Checkbox.Indicator className="h-4 w-4">
