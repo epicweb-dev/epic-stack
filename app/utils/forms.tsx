@@ -108,15 +108,16 @@ export function CheckboxField({
 	errors?: ListOfErrors
 }) {
 	const fallbackId = useId()
-	const buttonRef = useRef<HTMLButtonElement>(null);
-	// To emulate naitve events that Conform listen to:
-	// See https://conform.guide/integrations 
+	const buttonRef = useRef<HTMLButtonElement>(null)
+	// To emulate native events that Conform listen to:
+	// See https://conform.guide/integrations
 	const control = useInputEvent({
 		// Retrieve the checkbox element by name instead as Radix does not expose the internal checkbox element
 		// See https://github.com/radix-ui/primitives/discussions/874
-		ref: () => buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
+		ref: () =>
+			buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
 		onFocus: () => buttonRef.current?.focus(),
-	});
+	})
 	const id = buttonProps.id ?? buttonProps.name ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 	return (
@@ -129,16 +130,16 @@ export function CheckboxField({
 					aria-describedby={errorId}
 					{...buttonProps}
 					onCheckedChange={state => {
-						control.change(Boolean(state.valueOf()));
-						buttonProps.onCheckedChange?.(state);
+						control.change(Boolean(state.valueOf()))
+						buttonProps.onCheckedChange?.(state)
 					}}
 					onFocus={event => {
-						control.focus();
-						buttonProps.onFocus?.(event);
+						control.focus()
+						buttonProps.onFocus?.(event)
 					}}
 					onBlur={event => {
-						control.blur();
-						buttonProps.onBlur?.(event);
+						control.blur()
+						buttonProps.onBlur?.(event)
 					}}
 					type="button"
 				>
