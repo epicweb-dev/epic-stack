@@ -1,0 +1,13 @@
+diff --git a/node_modules/@remix-run/dev/dist/config.js b/node_modules/@remix-run/dev/dist/config.js
+index 0590486..55605a2 100644
+--- a/node_modules/@remix-run/dev/dist/config.js
++++ b/node_modules/@remix-run/dev/dist/config.js
+@@ -63,7 +63,7 @@ async function readConfig(remixRoot, serverMode = serverModes.ServerMode.Product
+       var _appConfigModule;
+       // shout out to next
+       // https://github.com/vercel/next.js/blob/b15a976e11bf1dc867c241a4c1734757427d609c/packages/next/server/config.ts#L748-L765
+-      if (process.env.NODE_ENV === "test") {
++      if (process.env.JEST_WORKER_ID) {
+         // dynamic import does not currently work inside of vm which
+         // jest relies on so we fall back to require for this case
+         // https://github.com/nodejs/node/issues/35889
