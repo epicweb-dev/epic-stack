@@ -11,7 +11,10 @@ export default {
 				background: 'hsl(var(--color-background))',
 				foreground: 'hsl(var(--color-foreground))',
 				brand: {
-					primary: 'hsl(var(--color-brand-primary))',
+					primary: {
+						DEFAULT: 'hsl(var(--color-brand-primary))',
+						muted: 'hsl(var(--color-brand-primary-muted))',
+					},
 					secondary: {
 						DEFAULT: 'hsl(var(--color-brand-secondary))',
 						muted: 'hsl(var(--color-brand-secondary-muted))',

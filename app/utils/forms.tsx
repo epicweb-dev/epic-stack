@@ -155,7 +155,7 @@ export function getButtonClassName({
 	const primaryClassName =
 		'bg-brand-primary hover:bg-brand-secondary hover:text-night-700 focus:bg-brand-secondary focus:text-night-700 active:bg-brand-secondary-muted'
 	const secondaryClassName =
-		'border-[1.5px] border-night-400 bg-night-700 hover:border-brand-primary focus:border-brand-primary active:border-brand-primary-lighter'
+		'border-[1.5px] border-night-400 bg-night-700 hover:border-brand-primary focus:border-brand-primary active:border-brand-primary-muted'
 	const extraSmallClassName = 'py-2 px-3 text-body-xs'
 	const smallClassName = 'px-10 py-[14px] text-body-xs'
 	const mediumClassName = 'px-14 py-5 text-lg'
