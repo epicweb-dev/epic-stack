@@ -8,30 +8,37 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				night: {
-					100: '#DADADA',
-					200: '#AAAAAA',
-					300: '#717171',
-					400: '#494949',
-					500: '#1E1E20',
-					600: '#141414',
-					700: '#090909',
+				background: 'hsl(var(--color-background))',
+				foreground: 'hsl(var(--color-foreground))',
+				brand: {
+					primary: {
+						DEFAULT: 'hsl(var(--color-brand-primary))',
+						muted: 'hsl(var(--color-brand-primary-muted))',
+					},
+					secondary: {
+						DEFAULT: 'hsl(var(--color-brand-secondary))',
+						muted: 'hsl(var(--color-brand-secondary-muted))',
+					},
+					tertiary: 'hsl(var(--color-brand-tertiary))',
 				},
+				danger: 'hsl(var(--color-danger))',
 				day: {
-					100: '#F7F5FF',
-					200: '#E4E4FB',
-					300: '#DDDDF4',
-					400: '#D0D0E8',
-					500: '#9696E0',
-					600: '#9999CC',
-					700: '#6A44FF',
+					100: 'hsl(var(--color-day-100))',
+					200: 'hsl(var(--color-day-200))',
+					300: 'hsl(var(--color-day-300))',
+					400: 'hsl(var(--color-day-400))',
+					500: 'hsl(var(--color-day-500))',
+					600: 'hsl(var(--color-day-600))',
+					700: 'hsl(var(--color-day-700))',
 				},
-				accent: {
-					purple: '#6A44FF',
-					pink: '#F183FF',
-					yellow: '#FFBE3F',
-					'yellow-muted': '#FFD262',
-					red: '#EF5A5A',
+				night: {
+					100: 'hsl(var(--color-night-100))',
+					200: 'hsl(var(--color-night-200))',
+					300: 'hsl(var(--color-night-300))',
+					400: 'hsl(var(--color-night-400))',
+					500: 'hsl(var(--color-night-500))',
+					600: 'hsl(var(--color-night-600))',
+					700: 'hsl(var(--color-night-700))',
 				},
 			},
 			fontFamily: {

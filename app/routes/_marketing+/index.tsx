@@ -16,7 +16,7 @@ export default function Index() {
 						<div className="lg:pt-18 relative px-4 pb-8 pt-8 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8 lg:pb-20">
 							<h1 className="text-center text-mega font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
 								<a
-									className="block uppercase text-accent-pink drop-shadow-md"
+									className="block uppercase text-brand-tertiary drop-shadow-md"
 									href="https://www.epicweb.dev/stack"
 								>
 									Epic Stack
