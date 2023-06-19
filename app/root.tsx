@@ -237,7 +237,7 @@ function UserDropdown() {
 						<Form
 							action="/logout"
 							method="POST"
-							className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500"
+							className="radix-highlighted:bg-brand-500 rounded-b-3xl px-7 py-5 outline-none"
 							onClick={e => submit(e.currentTarget)}
 						>
 							<button type="submit">Logout</button>
