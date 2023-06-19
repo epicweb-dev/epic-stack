@@ -9,9 +9,9 @@ if (process.env.NODE_ENV === 'production') {
 		stdio: ['ignore', 'inherit', 'inherit'],
 		shell: true,
 		env: {
-			...process.env,
 			FORCE_COLOR: true,
 			MOCKS: true,
+			...process.env,
 		},
 		// https://github.com/sindresorhus/execa/issues/433
 		windowsHide: false,
