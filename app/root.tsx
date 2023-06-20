@@ -17,6 +17,7 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
@@ -33,6 +34,7 @@ import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { useRef } from 'react'
 
 export const links: LinksFunction = () => {
 	return [
@@ -184,6 +186,8 @@ export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
+	const submit = useSubmit()
+	const formRef = useRef<HTMLFormElement>(null)
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -230,12 +234,16 @@ function UserDropdown() {
 					<DropdownMenu.Item
 						asChild
 						// this prevents the menu from closing before the form submission is completed
-						onSelect={event => event.preventDefault()}
+						onSelect={event => {
+							event.preventDefault()
+							submit(formRef.current)
+						}}
 					>
 						<Form
 							action="/logout"
 							method="POST"
 							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
+							ref={formRef}
 						>
 							<button type="submit" className="px-7 py-5">
 								Logout
