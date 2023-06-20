@@ -15,6 +15,7 @@ import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { getDomainUrl } from '~/utils/misc.server.ts'
 import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
+import { ForgotPasswordEmail } from './email.server.tsx'
 
 export const forgotPasswordOTPQueryParam = 'code'
 export const forgotPasswordTargetQueryParam = 'usernameOrEmail'
@@ -94,25 +95,12 @@ export async function action({ request }: DataFunctionArgs) {
 		await sendEmail({
 			to: user.email,
 			subject: `Epic Notes Password Reset`,
-			text: `
-Welcome to Epic Notes!
-Here's your verification code: ${otp}
-Or you can open this URL: ${resetPasswordUrl}
-			`.trim(),
-			html: `
-			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-			<html>
-				<head>
-					<meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-				</head>
-				<body>
-					<h1>Reset your Epic Notes password for ${user.username}.</h1>
-					<p>Here's your verification code: <strong>${otp}</strong></p>
-					<p>Or click this link:</p>
-					<a href="${resetPasswordUrl}">${resetPasswordUrl}</a>
-				</body>
-			</html>
-		`,
+			react: (
+				<ForgotPasswordEmail
+					onboardingUrl={resetPasswordUrl.toString()}
+					otp={otp}
+				/>
+			),
 		})
 	}
 
@@ -156,7 +144,10 @@ export default function ForgotPasswordRoute() {
 								htmlFor: fields.usernameOrEmail.id,
 								children: 'Username or Email',
 							}}
-							inputProps={conform.input(fields.usernameOrEmail)}
+							inputProps={{
+								autoFocus: true,
+								...conform.input(fields.usernameOrEmail),
+							}}
 							errors={fields.usernameOrEmail.errors}
 						/>
 					</div>

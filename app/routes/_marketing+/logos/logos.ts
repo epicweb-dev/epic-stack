@@ -5,6 +5,7 @@ import prisma from './prisma.svg'
 import zod from './zod.svg'
 import github from './github.svg'
 import resend from './resend.svg'
+import reactEmail from './react-email.svg'
 import tailwind from './tailwind.svg'
 import radixUI from './radix.svg'
 import playwright from './playwright.svg'
@@ -57,6 +58,11 @@ export const logos = [
 		src: resend,
 		alt: 'Resend',
 		href: 'https://resend.com',
+	},
+	{
+		src: reactEmail,
+		alt: 'React Email',
+		href: 'https://react.email',
 	},
 	{
 		src: tailwind,

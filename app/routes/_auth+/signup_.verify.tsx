@@ -16,7 +16,7 @@ import {
 	onboardingEmailQueryParam,
 	onboardingOTPQueryParam,
 	verificationType,
-} from './signup.tsx'
+} from './signup/index.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { onboardingEmailSessionKey } from './onboarding.tsx'
 
