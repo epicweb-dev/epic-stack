@@ -17,7 +17,6 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
-	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
@@ -185,7 +184,6 @@ export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
-	const submit = useSubmit()
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -229,14 +227,19 @@ function UserDropdown() {
 							Notes
 						</Link>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
+					<DropdownMenu.Item
+						asChild
+						// this prevents the menu from closing before the form submission is completed
+						onSelect={event => event.preventDefault()}
+					>
 						<Form
 							action="/logout"
 							method="POST"
-							className="radix-highlighted:bg-brand-500 rounded-b-3xl px-7 py-5 outline-none"
-							onClick={e => submit(e.currentTarget)}
+							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
 						>
-							<button type="submit">Logout</button>
+							<button type="submit" className="px-7 py-5">
+								Logout
+							</button>
 						</Form>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
