@@ -1,7 +1,7 @@
 {
 	"name": "Epic Notes",
 	"short_name": "Epic Notes",
-	"start_url": "./",
+	"start_url": "/",
 	"icons": [
 		{
 			"src": "/favicons/android-chrome-192x192.png",

@@ -24,7 +24,7 @@ import {
 	forgotPasswordOTPQueryParam,
 	forgotPasswordTargetQueryParam,
 	verificationType,
-} from './forgot-password.tsx'
+} from './forgot-password/index.tsx'
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
 import { verifyTOTP } from '~/utils/totp.server.ts'
 import invariant from 'tiny-invariant'
