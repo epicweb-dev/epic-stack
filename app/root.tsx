@@ -17,7 +17,6 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
-	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
@@ -189,7 +188,6 @@ export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
-	const submit = useSubmit()
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -197,7 +195,7 @@ function UserDropdown() {
 					to={`/users/${user.username}`}
 					// this is for progressive enhancement
 					onClick={e => e.preventDefault()}
-					className="flex items-center gap-2 rounded-full bg-brand-500 py-2 pl-2 pr-4 outline-none hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400"
+					className="bg-brand-500 hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400 flex items-center gap-2 rounded-full py-2 pl-2 pr-4 outline-none"
 				>
 					<img
 						className="h-8 w-8 rounded-full object-cover"
@@ -219,7 +217,7 @@ function UserDropdown() {
 						<Link
 							prefetch="intent"
 							to={`/users/${user.username}`}
-							className="rounded-t-3xl px-7 py-5 outline-none hover:bg-brand-500 radix-highlighted:bg-brand-500"
+							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 rounded-t-3xl px-7 py-5 outline-none"
 						>
 							Profile
 						</Link>
@@ -228,18 +226,20 @@ function UserDropdown() {
 						<Link
 							prefetch="intent"
 							to={`/users/${user.username}/notes`}
-							className="px-7 py-5 outline-none hover:bg-brand-500 radix-highlighted:bg-brand-500"
+							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 px-7 py-5 outline-none"
 						>
 							Notes
 						</Link>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
+					<DropdownMenu.Item
+						asChild
+						// this prevents the menu from closing before the form submission is completed
+						onSelect={event => event.preventDefault()}
+					>
 						<Form
-							className="rounded-b-3xl outline-none radix-highlighted:bg-brand-500"
-							onClick={e => {
-								e.preventDefault()
-								submit(null, { action: '/logout', method: 'POST' })
-							}}
+							action="/logout"
+							method="POST"
+							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
 						>
 							<button type="submit" className="px-7 py-5">
 								Logout
