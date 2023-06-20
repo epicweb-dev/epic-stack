@@ -16,7 +16,7 @@ export async function sendEmail(email: {
 		return new Response(null, { status: 200 })
 	}
 
-	return fetch('https://api.resend.io/emails', {
+	return fetch('https://api.resend.com/emails', {
 		method: 'POST',
 		body: JSON.stringify({
 			from,
