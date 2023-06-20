@@ -7,9 +7,8 @@ const requiredServerEnvs = [
 	'SESSION_SECRET',
 	'INTERNAL_COMMAND_TOKEN',
 	'CACHE_DATABASE_PATH',
-	// If you plan to use Mailgun, uncomment these lines
-	// 'MAILGUN_SENDING_KEY',
-	// 'MAILGUN_DOMAIN',
+	// If you plan to use Resend, uncomment this line
+	// 'RESEND_API_KEY',
 	// If you plan on using Sentry, uncomment this line
 	// 'SENTRY_DSN',
 ] as const

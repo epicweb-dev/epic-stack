@@ -2,7 +2,7 @@
 
 Date: 2023-05-08
 
-Status: accepted
+Status: superseded by [017](017-resend-email.md)
 
 ## Context
 

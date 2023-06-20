@@ -4,7 +4,7 @@ import sqlite from './sqlite.svg'
 import prisma from './prisma.svg'
 import zod from './zod.svg'
 import github from './github.svg'
-import mailgun from './mailgun.png'
+import resend from './resend.svg'
 import tailwind from './tailwind.svg'
 import radixUI from './radix.svg'
 import playwright from './playwright.svg'
@@ -54,9 +54,9 @@ export const logos = [
 		href: 'https://github.com',
 	},
 	{
-		src: mailgun,
-		alt: 'Mailgun',
-		href: 'https://mailgun.com',
+		src: resend,
+		alt: 'Resend',
+		href: 'https://resend.com',
 	},
 	{
 		src: tailwind,

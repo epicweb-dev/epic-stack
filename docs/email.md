@@ -1,20 +1,21 @@
 # Email
 
-This document describes how to get [Mailgun](https://mailgun.com) (the Epic
-Stack email provider) setup.
+This document describes how to get [Resend](https://resend.com) (the Epic Stack
+email provider) setup.
 
 > **NOTE**: this is an optional step. During development the emails will be
 > logged to the terminal and in production if you haven't set the proper
 > environment variables yet you will get a warning until you set the environment
 > variables.
 
-Create a Sending API Key (find it at
-`https://app.mailgun.com/app/sending/domains/YOUR_SENDING_DOMAIN/sending-keys`
-replacing `YOUR_SENDING_DOMAIN` with your sending domain) and set
-`MAILGUN_DOMAIN` and `MAILGUN_SENDING_KEY` environment variables in both prod
-and staging:
+Create [an API Key](https://resend.com/api-keys) and set `RESEND_API_KEY` in
+both prod and staging:
 
 ```sh
-fly secrets set MAILGUN_DOMAIN="mg.example.com" MAILGUN_SENDING_KEY="some-api-token-with-dashes" --app [YOUR_APP_NAME]
-fly secrets set MAILGUN_DOMAIN="mg.example.com" MAILGUN_SENDING_KEY="some-api-token-with-dashes" --app [YOUR_APP_NAME]-staging
+fly secrets set RESEND_API_KEY="re_blAh_blaHBlaHblahBLAhBlAh" --app [YOUR_APP_NAME]
+fly secrets set RESEND_API_KEY="re_blAh_blaHBlaHblahBLAhBlAh" --app [YOUR_APP_NAME]-staging
 ```
+
+Setup a [custom sending domain](https://resend.com/domains) and then make sure
+to update the `from` email address in `app/utils/email.server.ts` to the one you
+want your emails to come from.

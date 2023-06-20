@@ -15,7 +15,7 @@ Here are a few things you get today:
 - Email/Password Authentication with
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
 - Two-Factor Authentication (2fa) with support for authenticator apps.
-- Transactional email with [Mailgun](https://www.mailgun.com/) and forgot
+- Transactional email with [Resend](https://resend.com/) and forgot
   password/password reset support.
 - Progressively Enhanced and fully type safe forms with
   [Conform](https://conform.guide/)

@@ -4,31 +4,27 @@ export async function sendEmail(email: {
 	html: string
 	text: string
 }) {
-	if (!process.env.MAILGUN_SENDING_KEY && !process.env.MOCKS) {
-		console.error(`MAILGUN_SENDING_KEY not set and we're not in mocks mode.`)
+	const from = 'hello@epicstack.dev'
+
+	// feel free to remove this condition once you've set up resend
+	if (!process.env.RESEND_API_KEY && !process.env.MOCKS) {
+		console.error(`RESEND_API_KEY not set and we're not in mocks mode.`)
 		console.error(
-			`To send emails, set MAILGUN_SENDING_KEY and MAILGUN_DOMAIN environment variables.`,
+			`To send emails, set the RESEND_API_KEY environment variable.`,
 		)
 		console.error(`Failing to send the following email:`, JSON.stringify(email))
-		return
+		return new Response(null, { status: 200 })
 	}
-	const auth = `${Buffer.from(
-		`api:${process.env.MAILGUN_SENDING_KEY}`,
-	).toString('base64')}`
 
-	const body = new URLSearchParams({
-		...email,
-		from: 'hello@epicstack.dev',
-	})
-
-	return fetch(
-		`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`,
-		{
-			method: 'POST',
-			body,
-			headers: {
-				Authorization: `Basic ${auth}`,
-			},
+	return fetch('https://api.resend.io/emails', {
+		method: 'POST',
+		body: JSON.stringify({
+			from,
+			...email,
+		}),
+		headers: {
+			Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+			'Content-Type': 'application/json',
 		},
-	)
+	})
 }
