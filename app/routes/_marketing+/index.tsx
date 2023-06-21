@@ -1,7 +1,13 @@
 import type { V2_MetaFunction } from '@remix-run/node'
 import { kodyRocket, logos, stars } from './logos/logos.ts'
+import { redirectWithConfetti } from '~/utils/confetti-session.server.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
+
+// Temporary addition just to show how redirect works
+export const loader = async () => {
+	return await redirectWithConfetti('/about')
+}
 
 export default function Index() {
 	return (

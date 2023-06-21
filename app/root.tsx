@@ -35,6 +35,8 @@ import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import { useRef } from 'react'
+import { Confetti } from './components/confetti.tsx'
+import { getConfetti } from './utils/confetti-session.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -94,6 +96,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
+	const { confetti, headers } = await getConfetti(request)
 
 	return json(
 		{
@@ -107,10 +110,12 @@ export async function loader({ request }: DataFunctionArgs) {
 				},
 			},
 			ENV: getEnv(),
+			confetti,
 		},
 		{
 			headers: {
 				'Server-Timing': timings.toString(),
+				...headers,
 			},
 		},
 	)
@@ -139,6 +144,7 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
+				<Confetti run={data.confetti} />
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
