@@ -10,7 +10,7 @@ export function ForgotPasswordEmail({
 }) {
 	return (
 		<Tailwind config={tailwindConfig}>
-			<Html lang="en" dir="rtl">
+			<Html lang="en" dir="ltr">
 				<Container>
 					<h1>
 						<Text>Epic Notes Password Reset</Text>
