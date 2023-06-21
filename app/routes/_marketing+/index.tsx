@@ -6,8 +6,14 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '~/components/ui/tooltip.tsx'
+import { redirectWithConfetti } from '~/utils/confetti-session.server.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
+
+// Temporary addition just to show how redirect works
+export const loader = async () => {
+	return await redirectWithConfetti('/about')
+}
 
 export default function Index() {
 	return (
