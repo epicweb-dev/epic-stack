@@ -90,6 +90,7 @@ Prior to your first deployment, you'll need to do a few things:
 
   ```sh
   fly consul attach --app [YOUR_APP_NAME]
+  fly consul attach --app [YOUR_APP_NAME]-staging
   ```
 
 Now that everything is set up you can commit and push your changes to your repo.
