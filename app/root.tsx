@@ -36,13 +36,17 @@ import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import { useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
-import { getConfetti } from './utils/confetti-session.server.ts'
+import { getFlashSession } from './utils/flash-session.server.ts'
+import { ToastContainer } from 'react-toastify'
+import toastStylesheetUrl from 'react-toastify/dist/ReactToastify.css'
+import { useToast } from './utils/useToast.tsx'
 
 export const links: LinksFunction = () => {
 	return [
 		// Preload CSS as a resource to avoid render blocking
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
+		{ rel: 'preload', href: toastStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
@@ -61,6 +65,7 @@ export const links: LinksFunction = () => {
 		},
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
+		{ rel: 'stylesheet', href: toastStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
 }
@@ -96,7 +101,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
-	const { confetti, headers } = await getConfetti(request)
+	const { flash, headers } = await getFlashSession(request)
 
 	return json(
 		{
@@ -110,7 +115,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				},
 			},
 			ENV: getEnv(),
-			confetti,
+			flash,
 		},
 		{
 			headers: {
@@ -133,6 +138,7 @@ function App() {
 	const nonce = useNonce()
 	const user = useOptionalUser()
 	const theme = useTheme()
+	useToast(data.flash?.toast)
 
 	return (
 		<html lang="en" className={`${theme} h-full`}>
@@ -144,7 +150,7 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<Confetti run={data.confetti} />
+				<Confetti run={data.flash?.confetti} />
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
@@ -184,6 +190,7 @@ function App() {
 					}}
 				/>
 				<LiveReload nonce={nonce} />
+				<ToastContainer theme="colored" position="bottom-right" />
 			</body>
 		</html>
 	)
