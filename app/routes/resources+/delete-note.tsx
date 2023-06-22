@@ -1,4 +1,4 @@
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { Button, ErrorList } from '~/utils/forms.tsx'
 import { useForm } from '@conform-to/react'
@@ -6,6 +6,7 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { z } from 'zod'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 const DeleteFormSchema = z.object({
 	noteId: z.string(),
@@ -48,7 +49,10 @@ export async function action({ request }: DataFunctionArgs) {
 		where: { id: note.id },
 	})
 
-	return redirect(`/users/${note.owner.username}/notes`)
+	return redirectWithToast(`/users/${note.owner.username}/notes`, {
+		type: 'success',
+		text: 'Note deleted',
+	})
 }
 
 export function DeleteNote({ id }: { id: string }) {
