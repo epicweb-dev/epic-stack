@@ -5,7 +5,7 @@ interface ConfettiProps extends Props {}
 
 let hydrating = true
 
-export function useHydrated() {
+function useHydrated() {
 	let [hydrated, setHydrated] = useState(() => !hydrating)
 
 	useEffect(function hydrate() {
