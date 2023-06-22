@@ -10,7 +10,7 @@ export function SignupEmail({
 }) {
 	return (
 		<Tailwind config={tailwindConfig}>
-			<Html lang="en" dir="rtl">
+			<Html lang="en" dir="ltr">
 				<Container>
 					<h1>
 						<Text>Welcome to Epic Notes!</Text>

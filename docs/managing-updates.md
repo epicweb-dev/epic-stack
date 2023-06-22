@@ -92,7 +92,7 @@ To check for the new package's features, check its release notes on GitHub.
 > package is for your project when choosing which to update first.
 
 ```sh
-npx npm-check-updates -u -filter <package-with-cyan-minor-update>
+npx npm-check-updates -u --filter <package-with-cyan-minor-update>
 npm i
 ```
 
