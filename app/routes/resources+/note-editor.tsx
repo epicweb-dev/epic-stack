@@ -1,6 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { Button } from '~/components/ui/button.tsx'
@@ -8,6 +8,7 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
@@ -74,7 +75,10 @@ export async function action({ request }: DataFunctionArgs) {
 	} else {
 		note = await prisma.note.create({ data, select })
 	}
-	return redirect(`/users/${note.owner.username}/notes/${note.id}`)
+	return redirectWithToast(`/users/${note.owner.username}/notes/${note.id}`, {
+		type: 'success',
+		text: id ? 'Note updated' : 'Note created',
+	})
 }
 
 export function NoteEditor({
