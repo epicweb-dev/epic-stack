@@ -6,17 +6,8 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '~/components/ui/tooltip.tsx'
-import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
-
-// Temporary addition just to show how redirect works
-export const loader = async () => {
-	return await redirectWithToast('/about', {
-		type: 'info',
-		text: 'Redirected to about page',
-	})
-}
 
 export default function Index() {
 	return (

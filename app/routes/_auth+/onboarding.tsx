@@ -20,6 +20,7 @@ import { Spacer } from '~/components/spacer.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
 import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
+import { redirectWithConfetti } from '~/utils/flash-session.server.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import {
 	nameSchema,
@@ -114,7 +115,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const newCookie = await commitSession(cookieSession, {
 		expires: remember ? session.expirationDate : undefined,
 	})
-	return redirect(safeRedirect(redirectTo, '/'), {
+	return redirectWithConfetti(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
 	})
 }

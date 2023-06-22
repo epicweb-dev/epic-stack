@@ -1,5 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node'
-import { redirect } from '@remix-run/router'
+import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import { type TypeOptions } from 'react-toastify'
 
 const FLASH_SESSION = 'flash'
@@ -37,11 +36,18 @@ export const redirectWithFlash = async (
 ) => {
 	const session = await sessionStorage.getSession()
 	session.flash(FLASH_SESSION, flash)
+	// Convert the type so we can easily access the Set-Cookie header
+	const headers = init?.headers as
+		| Record<string, string | undefined>
+		| undefined
+	const additionalCookies = headers?.['Set-Cookie']
+	const flashCookie = await sessionStorage.commitSession(session)
+
 	return redirect(url, {
 		...init,
 		headers: {
 			...init?.headers,
-			'Set-Cookie': await sessionStorage.commitSession(session),
+			'Set-Cookie': [additionalCookies, flashCookie].filter(Boolean).join('; '),
 		},
 	})
 }
