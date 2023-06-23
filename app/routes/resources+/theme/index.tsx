@@ -72,7 +72,7 @@ export function ThemeSwitch({
 	}, [])
 
 	const [form] = useForm({
-		id: 'onboarding',
+		id: 'theme-switch',
 		lastSubmission: fetcher.data?.submission,
 		onValidate({ formData }) {
 			return parse(formData, { schema: ThemeFormSchema })
