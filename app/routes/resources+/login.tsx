@@ -88,8 +88,8 @@ export async function action({ request }: DataFunctionArgs) {
 		headers: {
 			'Set-Cookie': await commitSession(cookieSession, {
 				maxAge: remember
-					? 60 * 60 * 24 * 7 // 7 days
-					: undefined,
+					? undefined
+					: 60 * 60 * 24 * 7 // 7 days
 			}),
 		},
 	}
