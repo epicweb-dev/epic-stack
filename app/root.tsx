@@ -153,7 +153,7 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<Confetti run={data.flash?.confetti} />
+				<Confetti confetti={data.flash?.confetti} />
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
