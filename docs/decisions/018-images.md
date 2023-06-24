@@ -15,8 +15,7 @@ sense.
 Currently, the Epic Stack stores images in the SQLite database as a blob of
 bytes. At first glance, you may think this is a really bad idea, and for some
 use cases it definitely would be. But it scales surprisingly well (in some
-cases, serving large files from SQLite can be faster than the file system due to
-paging _citation needed_). In fact, thanks to LiteFS, you get the benefits of
+cases, [serving small files from SQLite can be faster than the file system](https://www.sqlite.org/fasterthanfs.html)). In fact, thanks to LiteFS, you get the benefits of
 replicated storage to all your app nodes.
 
 Currently, the setup is pretty sub-optimal. There's currently no optimization or
