@@ -60,8 +60,8 @@ export const redirectWithFlash = async (
  * @param init Additional response options
  * @returns Returns a redirect response with confetti stored in the session
  */
-export const redirectWithConfetti = async (url: string, init?: ResponseInit) =>
-	await redirectWithFlash(url, { confetti: randomUUID() }, init)
+export const redirectWithConfetti = (url: string, init?: ResponseInit) =>
+	redirectWithFlash(url, { confetti: randomUUID() }, init)
 
 /**
  * Helper method used to redirect the user to a new page with a toast notification
