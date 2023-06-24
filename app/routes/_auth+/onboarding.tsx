@@ -111,7 +111,7 @@ export async function action({ request }: DataFunctionArgs) {
 	cookieSession.unset(onboardingEmailSessionKey)
 
 	const newCookie = await commitSession(cookieSession, {
-		expires: remember ? session.expirationDate : undefined,
+		expires: remember ?  undefined : session.expirationDate,
 	})
 	return redirect(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
