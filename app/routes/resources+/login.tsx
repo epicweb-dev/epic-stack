@@ -87,7 +87,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const responseInit = {
 		headers: {
 			'Set-Cookie': await commitSession(cookieSession, {
-				maxAge: remember
+				expires: remember
 					? session.expirationDate
 					: undefined
 			}),
