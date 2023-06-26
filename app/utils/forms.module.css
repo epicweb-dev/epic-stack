@@ -46,11 +46,11 @@
 }
 
 .checkboxField button[aria-checked='true'] {
-	@apply border-accent-pink bg-accent-pink;
+	@apply border-brand-tertiary bg-brand-tertiary;
 }
 
 .field input[aria-invalid='true'],
 .textareaField textarea[aria-invalid='true'],
 .checkboxField button[aria-invalid='true'] {
-	@apply border-accent-red;
+	@apply border-danger;
 }

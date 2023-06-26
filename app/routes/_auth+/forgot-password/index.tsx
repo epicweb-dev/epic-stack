@@ -15,9 +15,10 @@ import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { getDomainUrl } from '~/utils/misc.server.ts'
 import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
+import { ForgotPasswordEmail } from './email.server.tsx'
 
 export const forgotPasswordOTPQueryParam = 'code'
-export const forgotPasswordVerificationTargetQueryParam = 'usernameOrEmail'
+export const forgotPasswordTargetQueryParam = 'usernameOrEmail'
 export const verificationType = 'forgot-password'
 
 const forgotPasswordSchema = z.object({
@@ -48,7 +49,7 @@ export async function action({ request }: DataFunctionArgs) {
 		`${getDomainUrl(request)}/forgot-password/verify`,
 	)
 	resetPasswordUrl.searchParams.set(
-		forgotPasswordVerificationTargetQueryParam,
+		forgotPasswordTargetQueryParam,
 		usernameOrEmail,
 	)
 	const redirectTo = new URL(resetPasswordUrl.toString())
@@ -66,23 +67,25 @@ export async function action({ request }: DataFunctionArgs) {
 		// allows a user who forgot one to use the other to reset their password.
 		// And displaying what the user provided rather than the other ensures we
 		// don't leak the association between the two.
-		const verificationTarget = usernameOrEmail
-		const { otp, key, algorithm, validSeconds } = generateTOTP({
-			validSeconds: tenMinutesInSeconds,
+		const target = usernameOrEmail
+		const { otp, secret, algorithm, period, digits } = generateTOTP({
+			algorithm: 'sha256',
+			period: tenMinutesInSeconds,
 		})
 		// delete old verifications. Users should not have more than one verification
 		// of a specific type for a specific target at a time.
 		await prisma.verification.deleteMany({
-			where: { type: verificationType, verificationTarget },
+			where: { type: verificationType, target },
 		})
 		await prisma.verification.create({
 			data: {
 				type: verificationType,
-				verificationTarget,
+				target,
 				algorithm,
-				secretKey: key,
-				validSeconds,
-				otp,
+				secret,
+				period,
+				digits,
+				expiresAt: new Date(Date.now() + period * 1000),
 			},
 		})
 
@@ -92,25 +95,12 @@ export async function action({ request }: DataFunctionArgs) {
 		await sendEmail({
 			to: user.email,
 			subject: `Epic Notes Password Reset`,
-			text: `
-Welcome to Epic Notes!
-Here's your verification code: ${otp}
-Or you can open this URL: ${resetPasswordUrl}
-			`.trim(),
-			html: `
-			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-			<html>
-				<head>
-					<meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-				</head>
-				<body>
-					<h1>Reset your Epic Notes password for ${user.username}.</h1>
-					<p>Here's your verification code: <strong>${otp}</strong></p>
-					<p>Or click this link:</p>
-					<a href="${resetPasswordUrl}">${resetPasswordUrl}</a>
-				</body>
-			</html>
-		`,
+			react: (
+				<ForgotPasswordEmail
+					onboardingUrl={resetPasswordUrl.toString()}
+					otp={otp}
+				/>
+			),
 		})
 	}
 
@@ -154,7 +144,10 @@ export default function ForgotPasswordRoute() {
 								htmlFor: fields.usernameOrEmail.id,
 								children: 'Username or Email',
 							}}
-							inputProps={conform.input(fields.usernameOrEmail)}
+							inputProps={{
+								autoFocus: true,
+								...conform.input(fields.usernameOrEmail),
+							}}
 							errors={fields.usernameOrEmail.errors}
 						/>
 					</div>

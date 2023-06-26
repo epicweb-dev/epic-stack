@@ -15,7 +15,7 @@
 npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
 ```
 
-[![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/345a3947-54ad-481d-888a-dbc1d1f313c1)](https://www.epicweb.dev/epic-stack)
+[![The Epic Stack](https://github.com/epicweb-dev/epic-stack/assets/1500684/1b00286c-aa3d-44b2-9ef2-04f694eb3592)](https://www.epicweb.dev/epic-stack)
 
 [The Epic Stack](https://www.epicweb.dev/epic-stack)
 
@@ -42,6 +42,12 @@ npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
   for suggestions.
 - 🐛 Open a [GitHub issue](https://github.com/epicweb-dev/epic-stack/issues) to
   report a bug.
+
+## Branding
+
+Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
+assets you can use in your material:
+[EpicWeb.dev/brand](https://epicweb.dev/brand)
 
 ## Thanks
 

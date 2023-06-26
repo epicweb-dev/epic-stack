@@ -35,7 +35,7 @@ export const test = base.extend<{
 }>({
 	login: [
 		async ({ page, baseURL }, use) => {
-			use(user => loginPage({ page, baseURL, user }))
+			await use(user => loginPage({ page, baseURL, user }))
 		},
 		{ auto: true },
 	],

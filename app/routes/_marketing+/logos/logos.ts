@@ -4,7 +4,8 @@ import sqlite from './sqlite.svg'
 import prisma from './prisma.svg'
 import zod from './zod.svg'
 import github from './github.svg'
-import mailgun from './mailgun.png'
+import resend from './resend.svg'
+import reactEmail from './react-email.svg'
 import tailwind from './tailwind.svg'
 import radixUI from './radix.svg'
 import playwright from './playwright.svg'
@@ -16,6 +17,7 @@ import docker from './docker.png'
 import typescript from './typescript.svg'
 import prettier from './prettier.svg'
 import eslint from './eslint.svg'
+import sentry from './sentry.svg'
 
 export { default as stars } from './stars.jpg'
 
@@ -53,9 +55,14 @@ export const logos = [
 		href: 'https://github.com',
 	},
 	{
-		src: mailgun,
-		alt: 'Mailgun',
-		href: 'https://mailgun.com',
+		src: resend,
+		alt: 'Resend',
+		href: 'https://resend.com',
+	},
+	{
+		src: reactEmail,
+		alt: 'React Email',
+		href: 'https://react.email',
 	},
 	{
 		src: tailwind,
@@ -111,5 +118,10 @@ export const logos = [
 		src: eslint,
 		alt: 'ESLint',
 		href: 'https://eslint.org',
+	},
+	{
+		src: sentry,
+		alt: 'Sentry',
+		href: 'https://sentry.io',
 	},
 ]

@@ -1,6 +1,7 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
+	Link,
 	useFetcher,
 	useLoaderData,
 	useSearchParams,
@@ -189,10 +190,12 @@ function CacheKeyRow({
 }: {
 	cacheKey: string
 	instance?: string
-	type: string
+	type: 'sqlite' | 'lru'
 }) {
 	const fetcher = useFetcher()
 	const dc = useDoubleCheck()
+	const encodedKey = encodeURIComponent(cacheKey)
+	const valuePage = `/admin/cache/${type}/${encodedKey}?instance=${instance}`
 	return (
 		<div className="flex items-center gap-2 font-mono">
 			<fetcher.Form method="post">
@@ -211,13 +214,9 @@ function CacheKeyRow({
 						: 'Deleting...'}
 				</Button>
 			</fetcher.Form>
-			<a
-				href={`/admin/cache/${type}/${encodeURIComponent(
-					cacheKey,
-				)}?instance=${instance}`}
-			>
+			<Link reloadDocument to={valuePage}>
 				{cacheKey}
-			</a>
+			</Link>
 		</div>
 	)
 }

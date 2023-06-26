@@ -1,13 +1,13 @@
-import { devices, type PlaywrightTestConfig } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test'
 import 'dotenv/config'
 
 const PORT = process.env.PORT || '3000'
 
-export default {
+export default defineConfig({
 	testDir: './tests/e2e',
-	timeout: 30 * 1000,
+	timeout: 15 * 1000,
 	expect: {
-		timeout: 10 * 1000,
+		timeout: 5 * 1000,
 	},
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
@@ -15,7 +15,6 @@ export default {
 	workers: process.env.CI ? 1 : undefined,
 	reporter: 'html',
 	use: {
-		actionTimeout: 0,
 		baseURL: `http://localhost:${PORT}/`,
 		trace: 'on-first-retry',
 	},
@@ -30,12 +29,13 @@ export default {
 	],
 
 	webServer: {
-		command: process.env.CI
-			? `cross-env PORT=${PORT} npm run start:mocks`
-			: `cross-env PORT=${PORT} npm run dev`,
+		command: process.env.CI ? 'npm run start:mocks' : 'npm run dev',
 		port: Number(PORT),
-		reuseExistingServer: true,
+		reuseExistingServer: !process.env.CI,
 		stdout: 'pipe',
 		stderr: 'pipe',
+		env: {
+			PORT,
+		},
 	},
-} satisfies PlaywrightTestConfig
+})

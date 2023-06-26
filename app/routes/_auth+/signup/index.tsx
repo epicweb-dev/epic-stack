@@ -20,6 +20,7 @@ import { Button, ErrorList, Field } from '~/utils/forms.tsx'
 import { getDomainUrl } from '~/utils/misc.server.ts'
 import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
+import { SignupEmail } from './email.server.tsx'
 
 export const onboardingOTPQueryParam = 'code'
 export const onboardingEmailQueryParam = 'email'
@@ -66,22 +67,24 @@ export async function action({ request }: DataFunctionArgs) {
 	const { email } = submission.value
 
 	const thirtyMinutesInSeconds = 30 * 60
-	const { otp, key, algorithm, validSeconds } = generateTOTP({
-		validSeconds: thirtyMinutesInSeconds,
+	const { otp, secret, algorithm, period, digits } = generateTOTP({
+		algorithm: 'sha256',
+		period: thirtyMinutesInSeconds,
 	})
 	// delete old verifications. Users should not have more than one verification
 	// of a specific type for a specific target at a time.
 	await prisma.verification.deleteMany({
-		where: { type: verificationType, verificationTarget: email },
+		where: { type: verificationType, target: email },
 	})
 	await prisma.verification.create({
 		data: {
 			type: verificationType,
-			verificationTarget: email,
+			target: email,
 			algorithm,
-			secretKey: key,
-			validSeconds,
-			otp,
+			secret,
+			period,
+			digits,
+			expiresAt: new Date(Date.now() + period * 1000),
 		},
 	})
 	const onboardingUrl = new URL(`${getDomainUrl(request)}/signup/verify`)
@@ -94,30 +97,13 @@ export async function action({ request }: DataFunctionArgs) {
 	const response = await sendEmail({
 		to: email,
 		subject: `Welcome to Epic Notes!`,
-		text: `
-Welcome to Epic Notes!
-Here's your verification code: ${otp}
-Or you can open this URL: ${onboardingUrl}
-		`.trim(),
-		html: `
-		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-		<html>
-			<head>
-				<meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-			</head>
-			<body>
-				<h1>Welcome to Epic Notes!</h1>
-				<p>Here's your verification code: <strong>${otp}</strong></p>
-				<p>Or click the link to get started:</p>
-				<a href="${onboardingUrl}">${onboardingUrl}</a>
-			</body>
-		</html>
-		`,
+		react: <SignupEmail onboardingUrl={onboardingUrl.toString()} otp={otp} />,
 	})
 
-	if (response?.ok) {
+	if (response.status === 'success') {
 		return redirect(redirectTo.pathname + redirectTo.search)
 	} else {
+		submission.error[''] = response.error.message
 		return json(
 			{
 				status: 'error',
@@ -166,7 +152,7 @@ export default function SignupRoute() {
 						htmlFor: fields.email.id,
 						children: 'Email',
 					}}
-					inputProps={conform.input(fields.email)}
+					inputProps={{ ...conform.input(fields.email), autoFocus: true }}
 					errors={fields.email.errors}
 				/>
 				<ErrorList errors={form.errors} id={form.errorId} />

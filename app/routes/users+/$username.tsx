@@ -3,12 +3,12 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { Form, useLoaderData } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { ButtonLink } from '~/utils/forms.tsx'
+import { Button, ButtonLink } from '~/utils/forms.tsx'
 import { getUserImgSrc } from '~/utils/misc.ts'
 import { useOptionalUser } from '~/utils/user.ts'
 
@@ -63,6 +63,13 @@ export default function UsernameIndex() {
 					<p className="mt-2 text-center text-night-200">
 						Joined {data.userJoinedDisplay}
 					</p>
+					{isLoggedInUser ? (
+						<Form action="/logout" method="POST" className="mt-3">
+							<Button type="submit" variant="secondary" size="pill">
+								Logout
+							</Button>
+						</Form>
+					) : null}
 					<div className="mt-10 flex gap-4">
 						{isLoggedInUser ? (
 							<>
@@ -118,7 +125,7 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
 		{ title: `${displayName} | Epic Notes` },
 		{
 			name: 'description',
-			content: `${displayName} on Epic Notes is not a host or renter yet.`,
+			content: `Profile of ${displayName} on Epic Notes`,
 		},
 	]
 }

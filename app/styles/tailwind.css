@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	:root {
+		color-scheme: light;
+		--color-background: 240 51% 91%; /* day-300 */
+		--color-foreground: 0 0% 0%; /* black */
+		--color-brand-primary: 252 100% 63%;
+		--color-brand-primary-muted: 252 100% 69%;
+		--color-brand-secondary: 40 100% 62%;
+		--color-brand-secondary-muted: 43 100% 69%;
+		--color-brand-tertiary: 293 100% 76%;
+		--color-danger: 0 82% 65%;
+		--color-day-100: 252 100% 98%; /* day-100 */
+		--color-day-200: 240 74% 94%; /* day-200 */
+		--color-day-300: 240 51% 91%; /* day-300 */
+		--color-day-400: 240 34% 86%; /* day-400 */
+		--color-day-500: 240 54% 73%; /* day-500 */
+		--color-day-600: 240 33% 70%; /* day-600 */
+		--color-day-700: 252 100% 63%; /* day-700 */
+		--color-night-100: 0 0% 85%; /* night-100 */
+		--color-night-200: 0 0% 67%; /* night-200 */
+		--color-night-300: 0 0% 44%; /* night-300 */
+		--color-night-400: 0 0% 29%; /* night-400 */
+		--color-night-500: 240 3% 12%; /* night-500 */
+		--color-night-600: 0 0% 8%; /* night-600 */
+		--color-night-700: 0 0% 4%; /* night-700 */
+	}
+
+	.dark {
+		color-scheme: dark;
+		--color-background: 0 0% 4%; /* night-700 */
+		--color-foreground: 0 0% 100%; /* white */
+	}
+}

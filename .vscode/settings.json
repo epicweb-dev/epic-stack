@@ -1,0 +1,7 @@
+{
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@remix-run/server-runtime",
+    "@remix-run/router",
+    "react-router"
+  ]
+}

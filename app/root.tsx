@@ -3,9 +3,9 @@ import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
 	type DataFunctionArgs,
+	type HeadersFunction,
 	type LinksFunction,
 	type V2_MetaFunction,
-	type HeadersFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -19,9 +19,11 @@ import {
 	useLoaderData,
 	useSubmit,
 } from '@remix-run/react'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme.tsx'
-import tailwindStylesheetUrl from './styles/tailwind.css'
+import { withSentry } from '@sentry/remix'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
+import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
+import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
@@ -30,9 +32,9 @@ import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
-import { getSession, getTheme } from './utils/session.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
+import { useOptionalUser, useUser } from './utils/user.ts'
+import { useRef } from 'react'
 
 export const links: LinksFunction = () => {
 	return [
@@ -40,25 +42,21 @@ export const links: LinksFunction = () => {
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
+		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
-			rel: 'apple-touch-icon',
-			sizes: '180x180',
-			href: '/favicons/apple-touch-icon.png',
-		},
-		{
-			rel: 'icon',
+			rel: 'alternate icon',
 			type: 'image/png',
-			sizes: '32x32',
 			href: '/favicons/favicon-32x32.png',
 		},
+		{ rel: 'apple-touch-icon', href: '/favicons/apple-touch-icon.png' },
+		{ rel: 'manifest', href: '/site.webmanifest' },
+		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{
 			rel: 'icon',
-			type: 'image/png',
-			sizes: '16x16',
-			href: '/favicons/favicon-16x16.png',
+			type: 'image/svg+xml',
+			href: '/favicons/favicon-dark.svg',
+			media: '(prefers-color-scheme: dark)',
 		},
-		{ rel: 'manifest', href: '/site.webmanifest' },
-		{ rel: 'icon', href: '/favicon.ico' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
@@ -73,7 +71,6 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-	const cookieSession = await getSession(request.headers.get('Cookie'))
 	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
@@ -106,7 +103,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
 				session: {
-					theme: getTheme(cookieSession),
+					theme: await getTheme(request),
 				},
 			},
 			ENV: getEnv(),
@@ -126,7 +123,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-export default function App() {
+function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
 	const user = useOptionalUser()
@@ -141,12 +138,12 @@ export default function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-day-300 text-white dark:bg-night-700 ">
+			<body className="flex h-full flex-col justify-between bg-background text-foreground">
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
-							<div className="font-light text-black dark:text-white">epic</div>
-							<div className="font-bold text-black dark:text-white">notes</div>
+							<div className="font-light">epic</div>
+							<div className="font-bold">notes</div>
 						</Link>
 						<div className="flex items-center gap-10">
 							{user ? (
@@ -166,8 +163,8 @@ export default function App() {
 
 				<div className="container mx-auto flex justify-between">
 					<Link to="/">
-						<div className="font-light text-black dark:text-white">epic</div>
-						<div className="font-bold text-black dark:text-white">notes</div>
+						<div className="font-light">epic</div>
+						<div className="font-bold">notes</div>
 					</Link>
 					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
@@ -185,10 +182,12 @@ export default function App() {
 		</html>
 	)
 }
+export default withSentry(App)
 
 function UserDropdown() {
 	const user = useUser()
 	const submit = useSubmit()
+	const formRef = useRef<HTMLFormElement>(null)
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -196,7 +195,7 @@ function UserDropdown() {
 					to={`/users/${user.username}`}
 					// this is for progressive enhancement
 					onClick={e => e.preventDefault()}
-					className="flex items-center gap-2 rounded-full bg-night-500 py-2 pl-2 pr-4 outline-none hover:bg-night-400 focus:bg-night-400 radix-state-open:bg-night-400"
+					className="bg-brand-500 hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400 flex items-center gap-2 rounded-full py-2 pl-2 pr-4 outline-none"
 				>
 					<img
 						className="h-8 w-8 rounded-full object-cover"
@@ -218,7 +217,7 @@ function UserDropdown() {
 						<Link
 							prefetch="intent"
 							to={`/users/${user.username}`}
-							className="rounded-t-3xl px-7 py-5 outline-none hover:bg-night-500 radix-highlighted:bg-night-500"
+							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 rounded-t-3xl px-7 py-5 outline-none"
 						>
 							Profile
 						</Link>
@@ -227,19 +226,28 @@ function UserDropdown() {
 						<Link
 							prefetch="intent"
 							to={`/users/${user.username}/notes`}
-							className="px-7 py-5 outline-none hover:bg-night-500 radix-highlighted:bg-night-500"
+							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 px-7 py-5 outline-none"
 						>
 							Notes
 						</Link>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
+					<DropdownMenu.Item
+						asChild
+						// this prevents the menu from closing before the form submission is completed
+						onSelect={event => {
+							event.preventDefault()
+							submit(formRef.current)
+						}}
+					>
 						<Form
 							action="/logout"
 							method="POST"
-							className="rounded-b-3xl px-7 py-5 outline-none radix-highlighted:bg-night-500"
-							onClick={e => submit(e.currentTarget)}
+							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
+							ref={formRef}
 						>
-							<button type="submit">Logout</button>
+							<button type="submit" className="px-7 py-5">
+								Logout
+							</button>
 						</Form>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>

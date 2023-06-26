@@ -64,9 +64,14 @@ Prior to your first deployment, you'll need to do a few things:
   [1Password](https://1password.com/password-generator) to generate a random
   secret, just replace `$(openssl rand -hex 32)` with the generated secret.
 
-- **Create an account on Mailgun.** (optional)
+- **Create an account on Resend.** (optional)
 
   Find instructions for this optional step in [the email docs](./email.md).
+
+- **Create an account on Sentry.** (optional)
+
+  Find instructions for this optional step in
+  [the error tracking docs](./monitoring.md).
 
 - Create a persistent volume for the sqlite database for both your staging and
   production environments. Run the following (feel free to change the GB size
@@ -85,6 +90,7 @@ Prior to your first deployment, you'll need to do a few things:
 
   ```sh
   fly consul attach --app [YOUR_APP_NAME]
+  fly consul attach --app [YOUR_APP_NAME]-staging
   ```
 
 Now that everything is set up you can commit and push your changes to your repo.

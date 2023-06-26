@@ -8,8 +8,8 @@ node_modules
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/tests/mocks/fixtures/email/*.json
+/tests/fixtures/email/*.json
 /coverage
+/prisma/migrations
 
-package.json
 package-lock.json

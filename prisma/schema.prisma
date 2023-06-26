@@ -65,7 +65,7 @@ model User {
   password Password?
   notes    Note[]
   roles    Role[]
-  Session  Session[]
+  session  Session[]
 }
 
 model Password {
@@ -83,21 +83,24 @@ model Verification {
   type String
 
   /// The thing we're trying to verify, e.g. a user's email or phone number
-  verificationTarget String
+  target String
 
   /// The secret key used to generate the otp
-  secretKey String
-
-  /// The one-time password sent to the user for verification
-  otp String
+  secret String
 
   /// The algorithm used to generate the otp
   algorithm String
 
-  /// The number of seconds the otp is valid for
-  validSeconds Int
+  /// The number of digits in the otp
+  digits Int
 
-  @@unique([verificationTarget, type])
+  /// The number of seconds the otp is valid for
+  period Int
+
+  /// When it's safe to delete this verification
+  expiresAt DateTime?
+
+  @@unique([target, type])
 }
 
 model Session {

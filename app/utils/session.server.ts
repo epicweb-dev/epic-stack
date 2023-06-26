@@ -12,21 +12,3 @@ export const sessionStorage = createCookieSessionStorage({
 })
 
 export const { getSession, commitSession, destroySession } = sessionStorage
-
-type Session = Awaited<ReturnType<typeof getSession>>
-
-const themeKey = 'theme'
-
-export function getTheme(session: Session): 'dark' | 'light' | null {
-	const theme = session.get(themeKey)
-	if (theme === 'dark' || theme === 'light') return theme
-	return null
-}
-
-export function setTheme(session: Session, theme: 'dark' | 'light') {
-	session.set(themeKey, theme)
-}
-
-export function deleteTheme(session: Session) {
-	session.unset(themeKey)
-}

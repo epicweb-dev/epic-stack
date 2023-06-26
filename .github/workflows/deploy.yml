@@ -92,7 +92,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: 📥 Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npm run test:e2e:install
 
       - name: 🛠 Setup Database
         run: npx prisma migrate deploy
