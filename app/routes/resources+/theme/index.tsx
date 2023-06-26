@@ -3,10 +3,10 @@ import { parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import * as React from 'react'
+import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { useHints } from '~/utils/client-hints.tsx'
 import { ErrorList } from '~/utils/forms.tsx'
-import { safeRedirect } from '~/utils/misc.ts'
 import { useRequestInfo } from '~/utils/request-info.ts'
 import {
 	commitSession,
