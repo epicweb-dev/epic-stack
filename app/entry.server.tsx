@@ -6,6 +6,7 @@ import { renderToPipeableStream } from 'react-dom/server'
 import { PassThrough } from 'stream'
 import { getEnv, init } from './utils/env.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
+import { makeTimings } from './utils/timing.server.ts'
 
 const ABORT_DELAY = 5000
 
@@ -40,6 +41,10 @@ export default async function handleRequest(...args: DocRequestArgs) {
 	return new Promise((resolve, reject) => {
 		let didError = false
 
+		// NOTE: this timing will only include things that are rendered in the shell
+		// and will not include suspended components and deferred loaders
+		const timings = makeTimings('render', 'renderToPipeableStream')
+
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
 				<RemixServer context={remixContext} url={request.url} />
@@ -48,6 +53,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 				[callbackName]: () => {
 					const body = new PassThrough()
 					responseHeaders.set('Content-Type', 'text/html')
+					responseHeaders.append('Server-Timing', timings.toString())
 					resolve(
 						new Response(body, {
 							headers: responseHeaders,
