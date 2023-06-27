@@ -32,6 +32,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 	const APP_NAME = (DIR_NAME + '-' + SUFFIX)
 		// get rid of anything that's not allowed in an app name
 		.replace(/[^a-zA-Z0-9-_]/g, '-')
+		.toLowerCase()
 
 	const [flyTomlContent, env, packageJsonString] = await Promise.all([
 		fs.readFile(FLY_TOML_PATH, 'utf-8'),
