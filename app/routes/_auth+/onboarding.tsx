@@ -14,11 +14,11 @@ import {
 	useNavigation,
 	useSearchParams,
 } from '@remix-run/react'
+import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { Spacer } from '~/components/spacer.tsx'
 import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
 import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
-import { safeRedirect } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import {
 	nameSchema,

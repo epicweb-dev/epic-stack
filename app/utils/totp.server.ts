@@ -63,7 +63,7 @@ function generateHOTP(
 	return hotp.slice(-digits)
 }
 
-function verifyHTOP(
+function verifyHOTP(
 	otp: string,
 	secret: Buffer,
 	{
@@ -175,7 +175,7 @@ export function verifyTOTP({
 	secret: string
 	window?: number
 } & Partial<TOTPConfig>) {
-	return verifyHTOP(otp, base32.decode(secret), {
+	return verifyHOTP(otp, base32.decode(secret), {
 		counter: getCounter(period),
 		digits,
 		window,

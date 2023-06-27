@@ -4,12 +4,12 @@ import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher } from '@remix-run/react'
 import { AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
+import { safeRedirect } from 'remix-utils'
 import invariant from 'tiny-invariant'
 import { z } from 'zod'
 import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
-import { safeRedirect } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
@@ -71,7 +71,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const session = await prisma.session.findUnique({
 		where: { id: sessionId },
-		select: { userId: true },
+		select: { userId: true, expirationDate: true },
 	})
 	invariant(session, 'newly created session not found')
 
@@ -87,9 +87,9 @@ export async function action({ request }: DataFunctionArgs) {
 	const responseInit = {
 		headers: {
 			'Set-Cookie': await commitSession(cookieSession, {
-				maxAge: remember
-					? 60 * 60 * 24 * 7 // 7 days
-					: undefined,
+				expires: remember
+					? session.expirationDate
+					: undefined
 			}),
 		},
 	}
