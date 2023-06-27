@@ -1,11 +1,12 @@
 import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
-import { Button, ErrorList } from '~/utils/forms.tsx'
+import { ErrorList } from '~/components/forms.tsx'
 import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { z } from 'zod'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const DeleteFormSchema = z.object({
 	noteId: z.string(),
@@ -69,9 +70,8 @@ export function DeleteNote({ id }: { id: string }) {
 			{...form.props}
 		>
 			<input type="hidden" name="noteId" value={id} />
-			<Button
+			<StatusButton
 				type="submit"
-				size="md"
 				variant="secondary"
 				status={
 					noteDeleteFetcher.state === 'submitting'
@@ -81,7 +81,7 @@ export function DeleteNote({ id }: { id: string }) {
 				disabled={noteDeleteFetcher.state !== 'idle'}
 			>
 				Delete
-			</Button>
+			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />
 		</noteDeleteFetcher.Form>
 	)

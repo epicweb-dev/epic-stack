@@ -5,9 +5,10 @@ import { useFetcher, useLoaderData } from '@remix-run/react'
 import * as QRCode from 'qrcode'
 import invariant from 'tiny-invariant'
 import { z } from 'zod'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, Field } from '~/utils/forms.tsx'
+import { Field } from '~/components/forms.tsx'
 import { getDomainUrl } from '~/utils/misc.server.ts'
 import { getTOTPAuthUri, verifyTOTP } from '~/utils/totp.server.ts'
 
@@ -156,8 +157,11 @@ export default function TwoFactorRoute() {
 					If you cannot scan the QR code, you can manually add this account to
 					your authenticator app using this code:
 				</p>
-				<div className="max-w-full overflow-x-scroll p-3">
-					<pre className="text-sm" aria-label="One-time Password URI">
+				<div className="p-3">
+					<pre
+						className="whitespace-pre-wrap break-all text-sm"
+						aria-label="One-time Password URI"
+					>
 						{data.otpUri}
 					</pre>
 				</div>
@@ -183,9 +187,7 @@ export default function TwoFactorRoute() {
 						className="mx-auto w-28"
 					/>
 					<div className="flex flex-row-reverse justify-between">
-						<Button
-							variant="primary"
-							size="md"
+						<StatusButton
 							type="submit"
 							name="intent"
 							value="confirm"
@@ -197,10 +199,9 @@ export default function TwoFactorRoute() {
 							}
 						>
 							Confirm
-						</Button>
-						<Button
+						</StatusButton>
+						<StatusButton
 							variant="secondary"
-							size="md"
 							type="submit"
 							name="intent"
 							value="cancel"
@@ -212,7 +213,7 @@ export default function TwoFactorRoute() {
 							}
 						>
 							Cancel
-						</Button>
+						</StatusButton>
 					</div>
 				</toggle2FAFetcher.Form>
 			</div>

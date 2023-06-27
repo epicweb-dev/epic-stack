@@ -6,7 +6,7 @@ import * as React from 'react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { useHints } from '~/utils/client-hints.tsx'
-import { ErrorList } from '~/utils/forms.tsx'
+import { ErrorList } from '~/components/forms.tsx'
 import { useRequestInfo } from '~/utils/request-info.ts'
 import {
 	commitSession,

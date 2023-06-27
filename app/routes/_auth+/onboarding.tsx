@@ -17,8 +17,9 @@ import {
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { Spacer } from '~/components/spacer.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
-import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
+import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import {
 	nameSchema,
@@ -146,7 +147,7 @@ export default function OnboardingPage() {
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard!</h1>
-					<p className="text-body-md text-night-200">
+					<p className="text-body-md text-muted-foreground">
 						Please enter your details.
 					</p>
 				</div>
@@ -242,10 +243,8 @@ export default function OnboardingPage() {
 					/>
 
 					<div className="flex items-center justify-between gap-6">
-						<Button
+						<StatusButton
 							className="w-full"
-							size="md"
-							variant="primary"
 							status={
 								navigation.state === 'submitting' &&
 								navigation.formAction === formAction &&
@@ -257,7 +256,7 @@ export default function OnboardingPage() {
 							disabled={navigation.state !== 'idle'}
 						>
 							Create an account
-						</Button>
+						</StatusButton>
 					</div>
 				</Form>
 			</div>

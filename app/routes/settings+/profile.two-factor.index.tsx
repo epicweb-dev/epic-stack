@@ -1,11 +1,11 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher, useLoaderData } from '@remix-run/react'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button } from '~/utils/forms.tsx'
 import { generateTOTP } from '~/utils/totp.server.ts'
-import { verificationType as verifyVerificationType } from './profile.two-factor.verify.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
+import { verificationType as verifyVerificationType } from './profile.two-factor.verify.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
@@ -55,9 +55,8 @@ export default function TwoFactorRoute() {
 				<>
 					<p className="text-sm">You have enabled two-factor authentication.</p>
 					<toggle2FAFetcher.Form method="POST" preventScrollReset>
-						<Button
+						<StatusButton
 							variant="secondary"
-							size="md"
 							type="submit"
 							name="intent"
 							value="disable"
@@ -65,7 +64,7 @@ export default function TwoFactorRoute() {
 							className="mx-auto"
 						>
 							Disable 2FA
-						</Button>
+						</StatusButton>
 					</toggle2FAFetcher.Form>
 				</>
 			) : (
@@ -74,12 +73,14 @@ export default function TwoFactorRoute() {
 					<p className="text-sm">
 						Two factor authentication adds an extra layer of security to your
 						account. You will need to enter a code from an authenticator app
-						like <a href="https://1password.com/">1Password</a> to log in.
+						like{' '}
+						<a className="underline" href="https://1password.com/">
+							1Password
+						</a>{' '}
+						to log in.
 					</p>
 					<toggle2FAFetcher.Form method="POST" preventScrollReset>
-						<Button
-							variant="primary"
-							size="md"
+						<StatusButton
 							type="submit"
 							name="intent"
 							value="enable"
@@ -87,7 +88,7 @@ export default function TwoFactorRoute() {
 							className="mx-auto"
 						>
 							Enable 2FA
-						</Button>
+						</StatusButton>
 					</toggle2FAFetcher.Form>
 				</>
 			)}

@@ -1,52 +1,71 @@
 import type { Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
-import tailwindcssRadix from 'tailwindcss-radix'
+import animatePlugin from 'tailwindcss-animate'
+import radixPlugin from 'tailwindcss-radix'
 
 export default {
 	content: ['./app/**/*.{ts,tsx,jsx,js}'],
 	darkMode: 'class',
 	theme: {
+		container: {
+			center: true,
+			padding: '2rem',
+			screens: {
+				'2xl': '1400px',
+			},
+		},
 		extend: {
 			colors: {
-				background: 'hsl(var(--color-background))',
-				foreground: 'hsl(var(--color-foreground))',
-				brand: {
-					primary: {
-						DEFAULT: 'hsl(var(--color-brand-primary))',
-						muted: 'hsl(var(--color-brand-primary-muted))',
-					},
-					secondary: {
-						DEFAULT: 'hsl(var(--color-brand-secondary))',
-						muted: 'hsl(var(--color-brand-secondary-muted))',
-					},
-					tertiary: 'hsl(var(--color-brand-tertiary))',
+				border: 'hsl(var(--border))',
+				input: {
+					DEFAULT: 'hsl(var(--input))',
+					invalid: 'hsl(var(--input-invalid))',
 				},
-				danger: 'hsl(var(--color-danger))',
-				day: {
-					100: 'hsl(var(--color-day-100))',
-					200: 'hsl(var(--color-day-200))',
-					300: 'hsl(var(--color-day-300))',
-					400: 'hsl(var(--color-day-400))',
-					500: 'hsl(var(--color-day-500))',
-					600: 'hsl(var(--color-day-600))',
-					700: 'hsl(var(--color-day-700))',
+				ring: {
+					DEFAULT: 'hsl(var(--ring))',
+					invalid: 'hsl(var(--foreground-danger))',
 				},
-				night: {
-					100: 'hsl(var(--color-night-100))',
-					200: 'hsl(var(--color-night-200))',
-					300: 'hsl(var(--color-night-300))',
-					400: 'hsl(var(--color-night-400))',
-					500: 'hsl(var(--color-night-500))',
-					600: 'hsl(var(--color-night-600))',
-					700: 'hsl(var(--color-night-700))',
+				background: 'hsl(var(--background))',
+				foreground: {
+					DEFAULT: 'hsl(var(--foreground))',
+					danger: 'hsl(var(--foreground-danger))',
+				},
+				primary: {
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))',
+				},
+				secondary: {
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--secondary-foreground))',
+				},
+				destructive: {
+					DEFAULT: 'hsl(var(--destructive))',
+					foreground: 'hsl(var(--destructive-foreground))',
+				},
+				muted: {
+					DEFAULT: 'hsl(var(--muted))',
+					foreground: 'hsl(var(--muted-foreground))',
+				},
+				accent: {
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))',
+				},
+				popover: {
+					DEFAULT: 'hsl(var(--popover))',
+					foreground: 'hsl(var(--popover-foreground))',
+				},
+				card: {
+					DEFAULT: 'hsl(var(--card))',
+					foreground: 'hsl(var(--card-foreground))',
 				},
 			},
+			borderRadius: {
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 2px)',
+				sm: 'calc(var(--radius) - 4px)',
+			},
 			fontFamily: {
-				sans: [
-					'Nunito Sans',
-					'Nunito Sans Fallback',
-					...defaultTheme.fontFamily.sans,
-				],
+				sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
 			},
 			fontSize: {
 				// 1rem = 16px
@@ -85,7 +104,21 @@ export default {
 				/** 12px size / 16px high / bold */
 				button: ['0.75rem', { lineHeight: '1rem', fontWeight: '700' }],
 			},
+			keyframes: {
+				'accordion-down': {
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' },
+				},
+				'accordion-up': {
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' },
+				},
+			},
+			animation: {
+				'accordion-down': 'accordion-down 0.2s ease-out',
+				'accordion-up': 'accordion-up 0.2s ease-out',
+			},
 		},
 	},
-	plugins: [tailwindcssRadix],
+	plugins: [animatePlugin, radixPlugin],
 } satisfies Config

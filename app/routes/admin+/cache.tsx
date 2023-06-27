@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -11,14 +12,14 @@ import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
 import invariant from 'tiny-invariant'
 import { Spacer } from '~/components/spacer.tsx'
+import { Button } from '~/components/ui/button.tsx'
 import {
 	cache,
 	getAllCacheKeys,
 	lruCache,
 	searchCacheKeys,
 } from '~/utils/cache.server.ts'
-import { Button, Field } from '~/utils/forms.tsx'
-import { useDebounce, useDoubleCheck } from '~/utils/misc.ts'
+import { Field } from '~/components/forms.tsx'
 import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -113,7 +114,7 @@ export default function CacheAdminRoute() {
 								defaultValue: query,
 							}}
 						/>
-						<div className="flex h-16 w-14 items-center text-lg font-medium text-slate-500">
+						<div className="flex h-16 w-14 items-center text-lg font-medium text-muted-foreground">
 							<span title="Total results shown">
 								{data.cacheKeys.sqlite.length + data.cacheKeys.lru.length}
 							</span>
@@ -192,7 +193,7 @@ function CacheKeyRow({
 	instance?: string
 	type: 'sqlite' | 'lru'
 }) {
-	const fetcher = useFetcher()
+	const fetcher = useFetcher<typeof action>()
 	const dc = useDoubleCheck()
 	const encodedKey = encodeURIComponent(cacheKey)
 	const valuePage = `/admin/cache/${type}/${encodedKey}?instance=${instance}`
@@ -218,6 +219,69 @@ function CacheKeyRow({
 				{cacheKey}
 			</Link>
 		</div>
+	)
+}
+
+function callAll<Args extends Array<unknown>>(
+	...fns: Array<((...args: Args) => unknown) | undefined>
+) {
+	return (...args: Args) => fns.forEach(fn => fn?.(...args))
+}
+
+export function useDoubleCheck() {
+	const [doubleCheck, setDoubleCheck] = React.useState(false)
+
+	function getButtonProps(
+		props?: React.ButtonHTMLAttributes<HTMLButtonElement>,
+	) {
+		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] =
+			() => setDoubleCheck(false)
+
+		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] =
+			doubleCheck
+				? undefined
+				: e => {
+						e.preventDefault()
+						setDoubleCheck(true)
+				  }
+
+		return {
+			...props,
+			onBlur: callAll(onBlur, props?.onBlur),
+			onClick: callAll(onClick, props?.onClick),
+		}
+	}
+
+	return { doubleCheck, getButtonProps }
+}
+
+function debounce<Callback extends (...args: Parameters<Callback>) => void>(
+	fn: Callback,
+	delay: number,
+) {
+	let timer: ReturnType<typeof setTimeout> | null = null
+	return (...args: Parameters<Callback>) => {
+		if (timer) clearTimeout(timer)
+		timer = setTimeout(() => {
+			fn(...args)
+		}, delay)
+	}
+}
+
+export function useDebounce<
+	Callback extends (...args: Parameters<Callback>) => ReturnType<Callback>,
+>(callback: Callback, delay: number) {
+	const callbackRef = React.useRef(callback)
+	React.useEffect(() => {
+		callbackRef.current = callback
+	})
+	return React.useMemo(
+		() =>
+			debounce(
+				(...args: Parameters<Callback>) => callbackRef.current(...args),
+				delay,
+			),
+		[delay],
 	)
 }
 

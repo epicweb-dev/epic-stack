@@ -9,12 +9,13 @@ import invariant from 'tiny-invariant'
 import { z } from 'zod'
 import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, CheckboxField, ErrorList, Field } from '~/utils/forms.tsx'
+import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
 import { unverifiedSessionKey } from './verify.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const ROUTE_PATH = '/resources/login'
 
@@ -87,9 +88,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const responseInit = {
 		headers: {
 			'Set-Cookie': await commitSession(cookieSession, {
-				expires: remember
-					? session.expirationDate
-					: undefined
+				expires: remember ? session.expirationDate : undefined,
 			}),
 		},
 	}
@@ -130,19 +129,13 @@ export function InlineLogin({
 					{...form.props}
 				>
 					<Field
-						labelProps={{
-							htmlFor: fields.username.id,
-							children: 'Username',
-						}}
+						labelProps={{ children: 'Username' }}
 						inputProps={{ ...conform.input(fields.username), autoFocus: true }}
 						errors={fields.username.errors}
 					/>
 
 					<Field
-						labelProps={{
-							htmlFor: fields.password.id,
-							children: 'Password',
-						}}
+						labelProps={{ children: 'Password' }}
 						inputProps={conform.input(fields.password, { type: 'password' })}
 						errors={fields.password.errors}
 					/>
@@ -171,10 +164,8 @@ export function InlineLogin({
 					<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6 pt-3">
-						<Button
+						<StatusButton
 							className="w-full"
-							size="md"
-							variant="primary"
 							status={
 								loginFetcher.state === 'submitting'
 									? 'pending'
@@ -184,11 +175,11 @@ export function InlineLogin({
 							disabled={loginFetcher.state !== 'idle'}
 						>
 							Log in
-						</Button>
+						</StatusButton>
 					</div>
 				</loginFetcher.Form>
 				<div className="flex items-center justify-center gap-2 pt-6">
-					<span className="text-night-200">New here?</span>
+					<span className="text-muted-foreground">New here?</span>
 					<Link to="/signup">Create an account</Link>
 				</div>
 			</div>

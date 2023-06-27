@@ -9,16 +9,17 @@ import {
 	useNavigation,
 } from '@remix-run/react'
 import { z } from 'zod'
+import { ErrorList, Field } from '~/components/forms.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { commitSession, getSession } from '~/utils/session.server.ts'
 import { verifyTOTP } from '~/utils/totp.server.ts'
+import { onboardingEmailSessionKey } from './onboarding.tsx'
 import {
 	onboardingEmailQueryParam,
 	onboardingOTPQueryParam,
 	verificationType,
 } from './signup/index.tsx'
-import { commitSession, getSession } from '~/utils/session.server.ts'
-import { onboardingEmailSessionKey } from './onboarding.tsx'
 
 const verifySchema = z.object({
 	[onboardingEmailQueryParam]: z.string().email(),
@@ -135,7 +136,7 @@ export default function SignupVerifyRoute() {
 		<div className="container mx-auto flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Check your email</h1>
-				<p className="mt-3 text-body-md text-night-200">
+				<p className="mt-3 text-body-md text-muted-foreground">
 					We've sent you a code to verify your email address.
 				</p>
 			</div>
@@ -166,16 +167,14 @@ export default function SignupVerifyRoute() {
 					errors={fields.code.errors}
 				/>
 				<ErrorList errors={form.errors} id={form.errorId} />
-				<Button
+				<StatusButton
 					className="w-full"
-					size="md"
-					variant="primary"
 					status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
 					type="submit"
 					disabled={isSubmitting}
 				>
 					Submit
-				</Button>
+				</StatusButton>
 			</Form>
 		</div>
 	)

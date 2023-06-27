@@ -1,4 +1,3 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -28,13 +27,20 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import { useRef } from 'react'
+import { Button } from './components/ui/button.tsx'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from './components/ui/dropdown-menu.tsx'
 
 export const links: LinksFunction = () => {
 	return [
@@ -149,9 +155,9 @@ function App() {
 							{user ? (
 								<UserDropdown />
 							) : (
-								<ButtonLink to="/login" size="sm" variant="primary">
-									Log In
-								</ButtonLink>
+								<Button asChild variant="default" size="sm">
+									<Link to="/login">Log In</Link>
+								</Button>
 							)}
 						</div>
 					</nav>
@@ -189,49 +195,39 @@ function UserDropdown() {
 	const submit = useSubmit()
 	const formRef = useRef<HTMLFormElement>(null)
 	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
-				<Link
-					to={`/users/${user.username}`}
-					// this is for progressive enhancement
-					onClick={e => e.preventDefault()}
-					className="bg-brand-500 hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400 flex items-center gap-2 rounded-full py-2 pl-2 pr-4 outline-none"
-				>
-					<img
-						className="h-8 w-8 rounded-full object-cover"
-						alt={user.name ?? user.username}
-						src={getUserImgSrc(user.imageId)}
-					/>
-					<span className="text-body-sm font-bold text-white">
-						{user.name ?? user.username}
-					</span>
-				</Link>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
-					sideOffset={8}
-					align="start"
-					className="flex flex-col rounded-3xl bg-[#323232]"
-				>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 rounded-t-3xl px-7 py-5 outline-none"
-						>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button asChild variant="secondary">
+					<Link
+						to={`/users/${user.username}`}
+						// this is for progressive enhancement
+						onClick={e => e.preventDefault()}
+						className="flex items-center gap-2"
+					>
+						<img
+							className="h-8 w-8 rounded-full object-cover"
+							alt={user.name ?? user.username}
+							src={getUserImgSrc(user.imageId)}
+						/>
+						<span className="text-body-sm font-bold">
+							{user.name ?? user.username}
+						</span>
+					</Link>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuPortal>
+				<DropdownMenuContent sideOffset={8} align="start">
+					<DropdownMenuItem asChild>
+						<Link prefetch="intent" to={`/users/${user.username}`}>
 							Profile
 						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}/notes`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 px-7 py-5 outline-none"
-						>
+					</DropdownMenuItem>
+					<DropdownMenuItem asChild>
+						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
 							Notes
 						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
+					</DropdownMenuItem>
+					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
 						onSelect={event => {
@@ -239,19 +235,12 @@ function UserDropdown() {
 							submit(formRef.current)
 						}}
 					>
-						<Form
-							action="/logout"
-							method="POST"
-							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
-							ref={formRef}
-						>
-							<button type="submit" className="px-7 py-5">
-								Logout
-							</button>
+						<Form action="/logout" method="POST" ref={formRef}>
+							<button type="submit">Logout</button>
 						</Form>
-					</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenuPortal>
+		</DropdownMenu>
 	)
 }

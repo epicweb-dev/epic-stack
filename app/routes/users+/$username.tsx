@@ -3,12 +3,12 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+import { Form, Link, useLoaderData } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
+import { Button } from '~/components/ui/button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ButtonLink } from '~/utils/forms.tsx'
 import { getUserImgSrc } from '~/utils/misc.ts'
 import { useOptionalUser } from '~/utils/user.ts'
 
@@ -41,7 +41,7 @@ export default function UsernameIndex() {
 		<div className="container mx-auto mb-48 mt-36 flex flex-col items-center justify-center">
 			<Spacer size="4xs" />
 
-			<div className="container mx-auto flex flex-col items-center rounded-3xl bg-night-500 p-12">
+			<div className="container mx-auto flex flex-col items-center rounded-3xl bg-muted p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
@@ -60,7 +60,7 @@ export default function UsernameIndex() {
 					<div className="flex flex-wrap items-center justify-center gap-4">
 						<h1 className="text-center text-h2">{userDisplayName}</h1>
 					</div>
-					<p className="mt-2 text-center text-night-200">
+					<p className="mt-2 text-center text-muted-foreground">
 						Joined {data.userJoinedDisplay}
 					</p>
 					{isLoggedInUser ? (
@@ -73,32 +73,23 @@ export default function UsernameIndex() {
 					<div className="mt-10 flex gap-4">
 						{isLoggedInUser ? (
 							<>
-								<ButtonLink
-									to="notes"
-									variant="primary"
-									size="md"
-									prefetch="intent"
-								>
-									My notes
-								</ButtonLink>
-								<ButtonLink
-									to="/settings/profile"
-									variant="secondary"
-									size="md"
-									prefetch="intent"
-								>
-									Edit profile
-								</ButtonLink>
+								<Button asChild>
+									<Link to="notes" prefetch="intent">
+										My notes
+									</Link>
+								</Button>
+								<Button asChild>
+									<Link to="/settings/profile" prefetch="intent">
+										Edit profile
+									</Link>
+								</Button>
 							</>
 						) : (
-							<ButtonLink
-								to="notes"
-								variant="primary"
-								size="md"
-								prefetch="intent"
-							>
-								{userDisplayName}'s notes
-							</ButtonLink>
+							<Button asChild>
+								<Link to="notes" prefetch="intent">
+									{userDisplayName}'s notes
+								</Link>
+							</Button>
 						)}
 					</div>
 				</div>
