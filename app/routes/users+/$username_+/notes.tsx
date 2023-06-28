@@ -5,6 +5,7 @@ import {
 } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { cn, getUserImgSrc } from '~/utils/misc.ts'
 import {
@@ -88,7 +89,7 @@ export default function NotesRoute() {
 									cn(navLinkDefaultClassName, isActive && 'bg-accent')
 								}
 							>
-								+ New Note
+								<Icon name="plus">New Note</Icon>
 							</NavLink>
 						</li>
 						{data.notes.map(note => (

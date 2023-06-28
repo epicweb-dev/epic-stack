@@ -29,6 +29,7 @@ import {
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { Button } from '~/components/ui/button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
@@ -176,7 +177,7 @@ export default function EditUserProfile() {
 						<Button
 							asChild
 							variant="outline"
-							className="absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full p-5"
+							className="absolute -right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full p-0"
 						>
 							<Link
 								preventScrollReset
@@ -184,7 +185,7 @@ export default function EditUserProfile() {
 								title="Change profile photo"
 								aria-label="Change profile photo"
 							>
-								📷
+								<Icon name="camera" className="h-4 w-4" />
 							</Link>
 						</Button>
 					</div>
@@ -249,8 +250,20 @@ export default function EditUserProfile() {
 								/>
 							</div>
 						</fieldset>
-						<Link preventScrollReset to="two-factor" className="col-span-full">
-							{data.isTwoFactorEnabled ? '🔒 2FA is enabled' : '🔓 Enable 2FA'}
+						<Link
+							preventScrollReset
+							to="two-factor"
+							className="col-span-full flex gap-1"
+						>
+							{data.isTwoFactorEnabled ? (
+								<>
+									<Icon name="lock-closed" /> 2FA is enabled
+								</>
+							) : (
+								<>
+									<Icon name="lock-open-1" /> Enable 2FA
+								</>
+							)}
 						</Link>
 					</div>
 

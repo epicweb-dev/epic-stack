@@ -41,9 +41,12 @@ import {
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
 } from './components/ui/dropdown-menu.tsx'
+import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 
 export const links: LinksFunction = () => {
 	return [
+		// Preload svg sprite as a resource to avoid render blocking
+		{ rel: 'preload', href: iconsHref, as: 'image' },
 		// Preload CSS as a resource to avoid render blocking
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
@@ -57,12 +60,6 @@ export const links: LinksFunction = () => {
 		{ rel: 'apple-touch-icon', href: '/favicons/apple-touch-icon.png' },
 		{ rel: 'manifest', href: '/site.webmanifest' },
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
-		{
-			rel: 'icon',
-			type: 'image/svg+xml',
-			href: '/favicons/favicon-dark.svg',
-			media: '(prefers-color-scheme: dark)',
-		},
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
@@ -219,12 +216,16 @@ function UserDropdown() {
 				<DropdownMenuContent sideOffset={8} align="start">
 					<DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}`}>
-							Profile
+							<Icon className="text-body-md" icon="avatar">
+								Profile
+							</Icon>
 						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
-							Notes
+							<Icon className="text-body-md" icon="pencil-2">
+								Notes
+							</Icon>
 						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuItem
@@ -236,7 +237,9 @@ function UserDropdown() {
 						}}
 					>
 						<Form action="/logout" method="POST" ref={formRef}>
-							<button type="submit">Logout</button>
+							<Icon className="text-body-md" icon="exit">
+								<button type="submit">Logout</button>
+							</Icon>
 						</Form>
 					</DropdownMenuItem>
 				</DropdownMenuContent>

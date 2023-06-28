@@ -29,6 +29,7 @@ import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList } from '~/components/forms.tsx'
 import { getUserImgSrc } from '~/utils/misc.ts'
+import { Icon } from '~/components/ui/icon.tsx'
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
@@ -191,15 +192,18 @@ export default function PhotoChooserModal() {
 					) : (
 						<div className="flex gap-4">
 							<Button asChild className="cursor-pointer">
-								<label htmlFor={photoFile.id}>✏️ Change</label>
+								<label htmlFor={photoFile.id} className="flex gap-1">
+									<Icon name="pencil-1" /> Change
+								</label>
 							</Button>
 							{data.user.imageId ? (
 								<Button
 									variant="destructive"
 									type="submit"
 									form={deleteProfilePhotoFormId}
+									className="flex gap-1"
 								>
-									🗑 Delete
+									<Icon name="trash" /> Delete
 								</Button>
 							) : null}
 						</div>
@@ -213,7 +217,7 @@ export default function PhotoChooserModal() {
 						aria-label="Close"
 						className="absolute right-10 top-10"
 					>
-						❌
+						<Icon name="cross-1" />
 					</Link>
 				</DialogClose>
 			</DialogContent>

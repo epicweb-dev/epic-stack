@@ -18,6 +18,7 @@ import typescript from './typescript.svg'
 import prettier from './prettier.svg'
 import eslint from './eslint.svg'
 import sentry from './sentry.svg'
+import shadcnUI from './shadcn-ui.svg'
 
 export { default as stars } from './stars.jpg'
 
@@ -71,6 +72,11 @@ export const logos = [
 		src: radixUI,
 		alt: 'Radix UI',
 		href: 'https://www.radix-ui.com/',
+	},
+	{
+		src: shadcnUI,
+		alt: 'shadcn/ui',
+		href: 'https://ui.shadcn.com/',
 	},
 	{
 		src: playwright,

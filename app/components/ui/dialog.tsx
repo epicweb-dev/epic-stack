@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 
 import { cn } from '~/utils/misc.ts'
+import { Icon } from './icon.tsx'
 
 const Dialog = DialogPrimitive.Root
 
@@ -123,7 +124,9 @@ const DialogClose = React.forwardRef<
 		>
 			{children ?? (
 				<>
-					<span className="h-4 w-4">❌</span>
+					<span className="h-4 w-4">
+						<Icon name="cross-1" />
+					</span>
 					<span className="sr-only">Close</span>
 				</>
 			)}

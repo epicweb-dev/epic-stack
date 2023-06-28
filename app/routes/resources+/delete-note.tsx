@@ -72,7 +72,7 @@ export function DeleteNote({ id }: { id: string }) {
 			<input type="hidden" name="noteId" value={id} />
 			<StatusButton
 				type="submit"
-				variant="secondary"
+				variant="destructive"
 				status={
 					noteDeleteFetcher.state === 'submitting'
 						? 'pending'
