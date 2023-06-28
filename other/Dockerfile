@@ -1,3 +1,5 @@
+# This file is moved to the root directory before building the image
+
 # base node image
 FROM node:18-bullseye-slim as base
 

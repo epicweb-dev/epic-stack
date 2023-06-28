@@ -138,6 +138,12 @@ jobs:
           file: 'fly.toml'
           field: 'app'
 
+      # move Dockerfile to root
+      - name: 🚚 Move Dockerfile
+        run: |
+          mv ./other/Dockerfile ./Dockerfile
+          mv ./other/.dockerignore ./.dockerignore
+
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
         uses: superfly/flyctl-actions@1.3

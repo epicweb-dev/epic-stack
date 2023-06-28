@@ -82,4 +82,4 @@ source library (appropriate attribution is appreciated). Then come back and make
 a PR to use your new library.
 
 NOTE: Actual adoption of your library is not guaranteed. Offloading maintenance
-and adaptability is a delecate balance.
+and adaptability is a delicate balance.
