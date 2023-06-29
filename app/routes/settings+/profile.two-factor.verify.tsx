@@ -9,7 +9,7 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { Field } from '~/components/forms.tsx'
-import { getDomainUrl } from '~/utils/misc.server.ts'
+import { getDomainUrl } from '~/utils/misc.ts'
 import { getTOTPAuthUri, verifyTOTP } from '~/utils/totp.server.ts'
 
 export const verificationType = '2fa-verify'

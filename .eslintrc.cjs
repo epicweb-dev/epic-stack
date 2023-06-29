@@ -18,7 +18,7 @@ module.exports = {
 				fixStyle: 'inline-type-imports',
 			},
 		],
-		'@typescript-eslint/no-duplicate-imports': 'warn',
+		'import/no-duplicates': 'warn',
 	},
 	overrides: [
 		{

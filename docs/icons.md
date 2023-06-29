@@ -4,7 +4,7 @@ The Epic Stack uses SVG sprites for
 [optimal icon performance](https://benadam.me/thoughts/react-svg-sprites/).
 You'll find raw SVGs in the `./other/svg-icons` directory. These are then
 compiled into a sprite using the `npm run gen-svg-sprite` script which generates
-the `app/components/ui/icon.tsx` file and its associated `icons.svg` file.
+the `app/components/ui/icon.tsx` file and its associated `icon.svg` file.
 
 The SVGs used by default in the Epic Stack come from
 [icons.radix-ui.com](https://icons.radix-ui.com/). You can download additional

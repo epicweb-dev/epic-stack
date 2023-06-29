@@ -27,8 +27,7 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { getDomainUrl } from './utils/misc.server.ts'
-import { getUserImgSrc } from './utils/misc.ts'
+import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
@@ -42,6 +41,10 @@ import {
 	DropdownMenuTrigger,
 } from './components/ui/dropdown-menu.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
+import { Confetti } from './components/confetti.tsx'
+import { getFlashSession } from './utils/flash-session.server.ts'
+import { useToast } from './utils/useToast.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 export const links: LinksFunction = () => {
 	return [
@@ -97,6 +100,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
+	const { flash, headers: flasHeaders } = await getFlashSession(request)
 
 	return json(
 		{
@@ -110,11 +114,13 @@ export async function loader({ request }: DataFunctionArgs) {
 				},
 			},
 			ENV: getEnv(),
+			flash,
 		},
 		{
-			headers: {
-				'Server-Timing': timings.toString(),
-			},
+			headers: combineHeaders(
+				{ 'Server-Timing': timings.toString() },
+				flasHeaders,
+			),
 		},
 	)
 }
@@ -131,6 +137,7 @@ function App() {
 	const nonce = useNonce()
 	const user = useOptionalUser()
 	const theme = useTheme()
+	useToast(data.flash?.toast)
 
 	return (
 		<html lang="en" className={`${theme} h-full`}>
@@ -172,6 +179,8 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
+				<Confetti confetti={data.flash?.confetti} />
+				<Toaster />
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
 				<script
