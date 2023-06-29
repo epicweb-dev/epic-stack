@@ -27,6 +27,7 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
+import { redirectWithConfetti } from '~/utils/flash-session.server.ts'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
 
@@ -114,7 +115,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const newCookie = await commitSession(cookieSession, {
 		expires: remember ? session.expirationDate : undefined,
 	})
-	return redirect(safeRedirect(redirectTo, '/'), {
+	return redirectWithConfetti(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
 	})
 }
