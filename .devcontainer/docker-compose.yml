@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ../other/Dockerfile
+      target: base
+
+    volumes:
+      - ../:/workspace:cached
+      - app_node_modules:/workspace/node_modules
+
+    command: sleep infinity
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+volumes:
+  app_node_modules:
