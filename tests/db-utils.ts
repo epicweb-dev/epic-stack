@@ -8,12 +8,13 @@ export function createUser() {
 	const firstName = faker.person.firstName()
 	const lastName = faker.person.lastName()
 
-	const username = uniqueUsernameEnforcer.enforce(() => {
-		return faker.internet.userName({
-			firstName: firstName.toLowerCase(),
-			lastName: lastName.toLowerCase(),
+	const username = uniqueUsernameEnforcer
+		.enforce(() => {
+			return faker.internet.userName({
+				firstName: firstName.toLowerCase(),
+				lastName: lastName.toLowerCase(),
+			})
 		})
-	})
 		.slice(0, 20)
 		.replace(/[^a-z0-9_]/g, '_')
 	return {

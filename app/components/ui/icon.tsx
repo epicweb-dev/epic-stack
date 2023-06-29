@@ -63,17 +63,17 @@ export function Icon({
 }
 
 type IconName =
-  | "avatar"
-  | "camera"
-  | "check"
-  | "cross-1"
-  | "exit"
-  | "laptop"
-  | "lock-closed"
-  | "lock-open-1"
-  | "moon"
-  | "pencil-1"
-  | "pencil-2"
-  | "plus"
-  | "sun"
-  | "trash"
+	| 'avatar'
+	| 'camera'
+	| 'check'
+	| 'cross-1'
+	| 'exit'
+	| 'laptop'
+	| 'lock-closed'
+	| 'lock-open-1'
+	| 'moon'
+	| 'pencil-1'
+	| 'pencil-2'
+	| 'plus'
+	| 'sun'
+	| 'trash'
