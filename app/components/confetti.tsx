@@ -1,17 +1,14 @@
-import { Index as ConfettiShower, type Props } from 'confetti-react'
+import { Index as ConfettiShower } from 'confetti-react'
 import { ClientOnly } from 'remix-utils'
 
-interface ConfettiProps extends Props {
-	confetti?: string
-}
-
-export const Confetti = ({ confetti }: ConfettiProps) => {
-	// Needs to be run client only
+/**
+ * confetti is a unique random identifier which re-renders the component
+ */
+export function Confetti({ confetti }: { confetti?: string }) {
 	return (
 		<ClientOnly>
 			{() => (
 				<ConfettiShower
-					// confetti is a unique random identifier which re-renders the component
 					key={confetti}
 					run={Boolean(confetti)}
 					recycle={false}

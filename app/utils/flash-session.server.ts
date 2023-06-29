@@ -1,19 +1,23 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import { randomUUID } from 'crypto'
+import { z } from 'zod'
 import type { ToastProps } from '~/components/ui/toast.tsx'
 
 const FLASH_SESSION = 'flash'
 
-export type ToastMessage = {
-	title: string
-	variant?: ToastProps['variant']
-	description?: string
-}
+const toastMessageSchema = z.object({
+	title: z.string(),
+	variant: z.custom<ToastProps['variant']>().optional(),
+	description: z.string().optional(),
+})
 
-interface FlashSessionValues {
-	confetti?: string
-	toast?: ToastMessage
-}
+const flashSessionValuesSchema = z.object({
+	confetti: z.string().optional(),
+	toast: toastMessageSchema.optional(),
+})
+
+export type ToastMessage = z.infer<typeof toastMessageSchema>
+type FlashSessionValues = z.infer<typeof flashSessionValuesSchema>
 
 export const sessionStorage = createCookieSessionStorage({
 	cookie: {
@@ -26,7 +30,7 @@ export const sessionStorage = createCookieSessionStorage({
 	},
 })
 
-const getSessionFromRequest = (request: Request) => {
+function getSessionFromRequest(request: Request) {
 	const cookie = request.headers.get('Cookie')
 
 	return sessionStorage.getSession(cookie)
@@ -38,11 +42,11 @@ const getSessionFromRequest = (request: Request) => {
  * @param init Response options
  * @returns Redirect response
  */
-export const redirectWithFlash = async (
+export async function redirectWithFlash(
 	url: string,
 	flash: FlashSessionValues,
 	init?: ResponseInit,
-) => {
+) {
 	const session = await sessionStorage.getSession()
 	session.flash(FLASH_SESSION, flash)
 	const headers = new Headers(init?.headers)
@@ -62,8 +66,9 @@ export const redirectWithFlash = async (
  * @param init Additional response options
  * @returns Returns a redirect response with confetti stored in the session
  */
-export const redirectWithConfetti = (url: string, init?: ResponseInit) =>
-	redirectWithFlash(url, { confetti: randomUUID() }, init)
+export function redirectWithConfetti(url: string, init?: ResponseInit) {
+	return redirectWithFlash(url, { confetti: randomUUID() }, init)
+}
 
 /**
  * Helper method used to redirect the user to a new page with a toast notification
@@ -72,21 +77,26 @@ export const redirectWithConfetti = (url: string, init?: ResponseInit) =>
  * @param init Additional response options
  * @returns Returns a redirect response with toast stored in the session
  */
-export const redirectWithToast = (
+export function redirectWithToast(
 	url: string,
 	toast: ToastMessage,
 	init?: ResponseInit,
-) => redirectWithFlash(url, { toast }, init)
+) {
+	return redirectWithFlash(url, { toast }, init)
+}
 
 /**
  * Helper method used to get the confetti flag from the session and show it to the user
  * @param request Request object
  * @returns Returns the confetti flag from the session and headers to purge the flash storage
  */
-export const getFlashSession = async (request: Request) => {
+export async function getFlashSession(request: Request) {
 	const session = await getSessionFromRequest(request)
-	const flash = session.get(FLASH_SESSION) as FlashSessionValues | undefined
-	const headers = { 'Set-Cookie': await sessionStorage.commitSession(session) }
+	const result = flashSessionValuesSchema.safeParse(session.get(FLASH_SESSION))
+	const flash = result.success ? result.data : undefined
+	const headers = new Headers({
+		'Set-Cookie': await sessionStorage.commitSession(session),
+	})
 	// Headers need to be returned to purge the flash storage
 	return { flash, headers }
 }

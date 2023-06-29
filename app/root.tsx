@@ -27,8 +27,7 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { getDomainUrl } from './utils/misc.server.ts'
-import { getUserImgSrc } from './utils/misc.ts'
+import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
@@ -101,7 +100,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
-	const { flash, headers } = await getFlashSession(request)
+	const { flash, headers: flasHeaders } = await getFlashSession(request)
 
 	return json(
 		{
@@ -118,10 +117,10 @@ export async function loader({ request }: DataFunctionArgs) {
 			flash,
 		},
 		{
-			headers: {
-				'Server-Timing': timings.toString(),
-				...headers,
-			},
+			headers: combineHeaders(
+				new Headers({ 'Server-Timing': timings.toString() }),
+				flasHeaders,
+			),
 		},
 	)
 }
@@ -150,7 +149,6 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<Confetti confetti={data.flash?.confetti} />
 				<header className="container mx-auto py-6">
 					<nav className="flex justify-between">
 						<Link to="/">
@@ -181,6 +179,8 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
+				<Confetti confetti={data.flash?.confetti} />
+				<Toaster />
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
 				<script
@@ -190,7 +190,6 @@ function App() {
 					}}
 				/>
 				<LiveReload nonce={nonce} />
-				<Toaster />
 			</body>
 		</html>
 	)
