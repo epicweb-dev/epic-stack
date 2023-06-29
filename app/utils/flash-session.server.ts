@@ -1,12 +1,13 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import { randomUUID } from 'crypto'
-import { type TypeOptions } from 'react-toastify'
+import type { ToastProps } from '~/components/ui/toast.tsx'
 
 const FLASH_SESSION = 'flash'
 
 export type ToastMessage = {
-	text: string
-	type: TypeOptions
+	title: string
+	variant?: ToastProps['variant']
+	description?: string
 }
 
 interface FlashSessionValues {
