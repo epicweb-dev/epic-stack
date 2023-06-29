@@ -118,7 +118,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		},
 		{
 			headers: combineHeaders(
-				new Headers({ 'Server-Timing': timings.toString() }),
+				{ 'Server-Timing': timings.toString() },
 				flasHeaders,
 			),
 		},

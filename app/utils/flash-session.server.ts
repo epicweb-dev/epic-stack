@@ -35,6 +35,22 @@ function getSessionFromRequest(request: Request) {
 
 	return sessionStorage.getSession(cookie)
 }
+
+/**
+ * Helper method used to add flash session values to the session
+ */
+export async function flashMessage(
+	flash: FlashSessionValues,
+	headers?: ResponseInit['headers'],
+) {
+	const session = await sessionStorage.getSession()
+	session.flash(FLASH_SESSION, flash)
+	const cookie = await sessionStorage.commitSession(session)
+	const newHeaders = new Headers(headers)
+	newHeaders.append('Set-Cookie', cookie)
+	return newHeaders
+}
+
 /**
  * Helper method used to redirect the user to a new page with flash session values
  * @param url Url to redirect to
@@ -47,16 +63,9 @@ export async function redirectWithFlash(
 	flash: FlashSessionValues,
 	init?: ResponseInit,
 ) {
-	const session = await sessionStorage.getSession()
-	session.flash(FLASH_SESSION, flash)
-	const headers = new Headers(init?.headers)
-	const flashCookie = await sessionStorage.commitSession(session)
-	// We append the flash cookie to the session
-	headers.append('Set-Cookie', flashCookie)
-
 	return redirect(url, {
 		...init,
-		headers,
+		headers: await flashMessage(flash, init?.headers),
 	})
 }
 /**

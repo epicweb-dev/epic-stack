@@ -36,10 +36,10 @@ export function getDomainUrl(request: Request) {
 /**
  * Merge multiple headers objects into one (uses set so headers are overridden)
  */
-export function mergeHeaders(...headers: Array<Headers>) {
+export function mergeHeaders(...headers: Array<ResponseInit['headers']>) {
 	const merged = new Headers()
 	for (const header of headers) {
-		for (const [key, value] of header.entries()) {
+		for (const [key, value] of new Headers(header).entries()) {
 			merged.set(key, value)
 		}
 	}
@@ -49,10 +49,10 @@ export function mergeHeaders(...headers: Array<Headers>) {
 /**
  * Combine multiple header objects into one (uses append so headers are not overridden)
  */
-export function combineHeaders(...headers: Array<Headers>) {
+export function combineHeaders(...headers: Array<ResponseInit['headers']>) {
 	const combined = new Headers()
 	for (const header of headers) {
-		for (const [key, value] of header.entries()) {
+		for (const [key, value] of new Headers(header).entries()) {
 			combined.append(key, value)
 		}
 	}
