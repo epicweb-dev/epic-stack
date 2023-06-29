@@ -22,8 +22,10 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
   with OpenAI's GPT API (enhances the notes feature with "generate" buttons).
 - [Prisma Client Extensions](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions)
-  by [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions): An example of the
-  Epic Stack with Prisma Client extensions activated for enum like behavior in SQLite.
+  by
+  [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions):
+  An example of the Epic Stack with Prisma Client extensions activated for enum
+  like behavior in SQLite.
 
 ## How to contribute
 

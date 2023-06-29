@@ -22,3 +22,39 @@ export function getErrorMessage(error: unknown) {
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
 }
+
+export function getDomainUrl(request: Request) {
+	const host =
+		request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
+	if (!host) {
+		throw new Error('Could not determine domain URL.')
+	}
+	const protocol = host.includes('localhost') ? 'http' : 'https'
+	return `${protocol}://${host}`
+}
+
+/**
+ * Merge multiple headers objects into one (uses set so headers are overridden)
+ */
+export function mergeHeaders(...headers: Array<Headers>) {
+	const merged = new Headers()
+	for (const header of headers) {
+		for (const [key, value] of header.entries()) {
+			merged.set(key, value)
+		}
+	}
+	return merged
+}
+
+/**
+ * Combine multiple header objects into one (uses append so headers are not overridden)
+ */
+export function combineHeaders(...headers: Array<Headers>) {
+	const combined = new Headers()
+	for (const header of headers) {
+		for (const [key, value] of header.entries()) {
+			combined.append(key, value)
+		}
+	}
+	return combined
+}
