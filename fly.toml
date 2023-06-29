@@ -1,4 +1,4 @@
-app = "mud-chat-d725"
+app = "mudchat"
 primary_region = "sea"
 kill_signal = "SIGINT"
 kill_timeout = 5
