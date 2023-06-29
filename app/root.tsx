@@ -44,9 +44,8 @@ import {
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { Confetti } from './components/confetti.tsx'
 import { getFlashSession } from './utils/flash-session.server.ts'
-import { ToastContainer } from 'react-toastify'
-import toastStylesheetUrl from 'react-toastify/dist/ReactToastify.css'
 import { useToast } from './utils/useToast.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 export const links: LinksFunction = () => {
 	return [
@@ -55,7 +54,6 @@ export const links: LinksFunction = () => {
 		// Preload CSS as a resource to avoid render blocking
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
-		{ rel: 'preload', href: toastStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
@@ -68,7 +66,6 @@ export const links: LinksFunction = () => {
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
-		{ rel: 'stylesheet', href: toastStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
 }
@@ -193,7 +190,7 @@ function App() {
 					}}
 				/>
 				<LiveReload nonce={nonce} />
-				<ToastContainer theme="colored" position="bottom-right" />
+				<Toaster />
 			</body>
 		</html>
 	)

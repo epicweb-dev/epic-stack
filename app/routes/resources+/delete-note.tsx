@@ -51,8 +51,7 @@ export async function action({ request }: DataFunctionArgs) {
 	})
 
 	return redirectWithToast(`/users/${note.owner.username}/notes`, {
-		type: 'success',
-		text: 'Note deleted',
+		title: 'Note deleted',
 	})
 }
 

@@ -1,11 +1,15 @@
 import { useEffect } from 'react'
-import { toast } from 'react-toastify'
 import { type ToastMessage } from './flash-session.server.ts'
+import { toast } from '~/components/ui/use-toast.ts'
 
 export const useToast = (message?: ToastMessage) => {
 	useEffect(() => {
 		if (message) {
-			toast(message.text, { type: message.type })
+			toast({
+				variant: message.variant,
+				title: message.title,
+				description: message.description,
+			})
 		}
 	}, [message])
 }
