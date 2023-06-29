@@ -1,5 +1,5 @@
 app = "mud-chat-d725"
-primary_region = "sjc"
+primary_region = "sea"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
