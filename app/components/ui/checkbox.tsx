@@ -26,7 +26,7 @@ const Checkbox = React.forwardRef<
 			className={cn('flex items-center justify-center text-current')}
 		>
 			<svg viewBox="0 0 8 8">
-				<path d="M1,4 L3,6 L7,2" stroke="black" strokeWidth="1" fill="none" />
+				<path d="M1,4 L3,6 L7,2" stroke="currentcolor" strokeWidth="1" fill="none" />
 			</svg>
 		</CheckboxPrimitive.Indicator>
 	</CheckboxPrimitive.Root>
