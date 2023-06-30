@@ -219,14 +219,13 @@ export default function PhotoChooserModal() {
 					<ErrorList errors={form.errors} />
 				</Form>
 				<DialogClose asChild>
-					<Link
-						to=".."
-						preventScrollReset
+					<button
+            onClick={dismissModal}
 						aria-label="Close"
 						className="absolute right-10 top-10"
 					>
 						<Icon name="cross-1" />
-					</Link>
+					</button>
 				</DialogClose>
 			</DialogContent>
 			<deleteImageFetcher.Form

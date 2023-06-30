@@ -43,14 +43,13 @@ export default function TwoFactorRoute() {
 					<Outlet />
 				</div>
 				<DialogClose asChild>
-					<Link
-						preventScrollReset
-						to=".."
+					<button
+            onClick={dismissModal}
 						aria-label="Close"
 						className="absolute right-10 top-10"
 					>
 						<Icon name="cross-1" />
-					</Link>
+					</button>
 				</DialogClose>
 			</DialogContent>
 		</Dialog>
