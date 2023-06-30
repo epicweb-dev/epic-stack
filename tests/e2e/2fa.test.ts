@@ -35,7 +35,7 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 		dialog.getByRole('button', { name: /disable 2fa/i }),
 	).toBeVisible()
 
-	await dialog.getByRole('link', { name: /close/i }).click()
+	await dialog.getByRole('button', { name: /close/i }).click()
 	await page.getByRole('link', { name: user.name ?? user.username }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
