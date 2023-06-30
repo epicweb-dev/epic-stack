@@ -1,4 +1,3 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -28,16 +27,29 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { ButtonLink } from './utils/forms.tsx'
-import { getDomainUrl } from './utils/misc.server.ts'
-import { getUserImgSrc } from './utils/misc.ts'
+import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import { useRef } from 'react'
+import { Button } from './components/ui/button.tsx'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from './components/ui/dropdown-menu.tsx'
+import { Icon, href as iconsHref } from './components/ui/icon.tsx'
+import { Confetti } from './components/confetti.tsx'
+import { getFlashSession } from './utils/flash-session.server.ts'
+import { useToast } from './utils/useToast.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 export const links: LinksFunction = () => {
 	return [
+		// Preload svg sprite as a resource to avoid render blocking
+		{ rel: 'preload', href: iconsHref, as: 'image' },
 		// Preload CSS as a resource to avoid render blocking
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
@@ -51,12 +63,6 @@ export const links: LinksFunction = () => {
 		{ rel: 'apple-touch-icon', href: '/favicons/apple-touch-icon.png' },
 		{ rel: 'manifest', href: '/site.webmanifest' },
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
-		{
-			rel: 'icon',
-			type: 'image/svg+xml',
-			href: '/favicons/favicon-dark.svg',
-			media: '(prefers-color-scheme: dark)',
-		},
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
@@ -94,6 +100,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
+	const { flash, headers: flasHeaders } = await getFlashSession(request)
 
 	return json(
 		{
@@ -107,11 +114,13 @@ export async function loader({ request }: DataFunctionArgs) {
 				},
 			},
 			ENV: getEnv(),
+			flash,
 		},
 		{
-			headers: {
-				'Server-Timing': timings.toString(),
-			},
+			headers: combineHeaders(
+				{ 'Server-Timing': timings.toString() },
+				flasHeaders,
+			),
 		},
 	)
 }
@@ -128,6 +137,7 @@ function App() {
 	const nonce = useNonce()
 	const user = useOptionalUser()
 	const theme = useTheme()
+	useToast(data.flash?.toast)
 
 	return (
 		<html lang="en" className={`${theme} h-full`}>
@@ -149,9 +159,9 @@ function App() {
 							{user ? (
 								<UserDropdown />
 							) : (
-								<ButtonLink to="/login" size="sm" variant="primary">
-									Log In
-								</ButtonLink>
+								<Button asChild variant="default" size="sm">
+									<Link to="/login">Log In</Link>
+								</Button>
 							)}
 						</div>
 					</nav>
@@ -169,6 +179,8 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
+				<Confetti confetti={data.flash?.confetti} />
+				<Toaster />
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
 				<script
@@ -189,49 +201,43 @@ function UserDropdown() {
 	const submit = useSubmit()
 	const formRef = useRef<HTMLFormElement>(null)
 	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
-				<Link
-					to={`/users/${user.username}`}
-					// this is for progressive enhancement
-					onClick={e => e.preventDefault()}
-					className="bg-brand-500 hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400 flex items-center gap-2 rounded-full py-2 pl-2 pr-4 outline-none"
-				>
-					<img
-						className="h-8 w-8 rounded-full object-cover"
-						alt={user.name ?? user.username}
-						src={getUserImgSrc(user.imageId)}
-					/>
-					<span className="text-body-sm font-bold text-white">
-						{user.name ?? user.username}
-					</span>
-				</Link>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
-					sideOffset={8}
-					align="start"
-					className="flex flex-col rounded-3xl bg-[#323232]"
-				>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 rounded-t-3xl px-7 py-5 outline-none"
-						>
-							Profile
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button asChild variant="secondary">
+					<Link
+						to={`/users/${user.username}`}
+						// this is for progressive enhancement
+						onClick={e => e.preventDefault()}
+						className="flex items-center gap-2"
+					>
+						<img
+							className="h-8 w-8 rounded-full object-cover"
+							alt={user.name ?? user.username}
+							src={getUserImgSrc(user.imageId)}
+						/>
+						<span className="text-body-sm font-bold">
+							{user.name ?? user.username}
+						</span>
+					</Link>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuPortal>
+				<DropdownMenuContent sideOffset={8} align="start">
+					<DropdownMenuItem asChild>
+						<Link prefetch="intent" to={`/users/${user.username}`}>
+							<Icon className="text-body-md" name="avatar">
+								Profile
+							</Icon>
 						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}/notes`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 px-7 py-5 outline-none"
-						>
-							Notes
+					</DropdownMenuItem>
+					<DropdownMenuItem asChild>
+						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
+							<Icon className="text-body-md" name="pencil-2">
+								Notes
+							</Icon>
 						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
+					</DropdownMenuItem>
+					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
 						onSelect={event => {
@@ -239,19 +245,14 @@ function UserDropdown() {
 							submit(formRef.current)
 						}}
 					>
-						<Form
-							action="/logout"
-							method="POST"
-							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
-							ref={formRef}
-						>
-							<button type="submit" className="px-7 py-5">
-								Logout
-							</button>
+						<Form action="/logout" method="POST" ref={formRef}>
+							<Icon className="text-body-md" name="exit">
+								<button type="submit">Logout</button>
+							</Icon>
 						</Form>
-					</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenuPortal>
+		</DropdownMenu>
 	)
 }

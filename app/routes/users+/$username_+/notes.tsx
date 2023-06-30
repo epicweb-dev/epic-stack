@@ -4,10 +4,10 @@ import {
 	type HeadersFunction,
 } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-import { twMerge } from 'tailwind-merge'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc } from '~/utils/misc.ts'
+import { cn, getUserImgSrc } from '~/utils/misc.ts'
 import {
 	combineServerTimings,
 	makeTimings,
@@ -66,7 +66,7 @@ export default function NotesRoute() {
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
 		<div className="flex h-full pb-12">
-			<div className="mx-auto grid w-full flex-grow grid-cols-4 bg-night-500 pl-2 md:container md:rounded-3xl">
+			<div className="mx-auto grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:rounded-3xl md:pr-0">
 				<div className="col-span-1 py-12">
 					<Link
 						to={`/users/${data.owner.username}`}
@@ -86,10 +86,10 @@ export default function NotesRoute() {
 							<NavLink
 								to="new"
 								className={({ isActive }) =>
-									twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
+									cn(navLinkDefaultClassName, isActive && 'bg-accent')
 								}
 							>
-								+ New Note
+								<Icon name="plus">New Note</Icon>
 							</NavLink>
 						</li>
 						{data.notes.map(note => (
@@ -97,7 +97,7 @@ export default function NotesRoute() {
 								<NavLink
 									to={note.id}
 									className={({ isActive }) =>
-										twMerge(navLinkDefaultClassName, isActive && 'bg-night-400')
+										cn(navLinkDefaultClassName, isActive && 'bg-accent')
 									}
 								>
 									{note.title}
@@ -106,7 +106,7 @@ export default function NotesRoute() {
 						))}
 					</ul>
 				</div>
-				<main className="col-span-3 bg-night-400 px-10 py-12 md:rounded-r-3xl">
+				<main className="col-span-3 bg-accent px-10 py-12 md:rounded-r-3xl">
 					<Outlet />
 				</main>
 			</div>

@@ -1,11 +1,13 @@
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
-import { Button, ErrorList } from '~/utils/forms.tsx'
+import { ErrorList } from '~/components/forms.tsx'
 import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { z } from 'zod'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { StatusButton } from '~/components/ui/status-button.tsx'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 const DeleteFormSchema = z.object({
 	noteId: z.string(),
@@ -48,7 +50,10 @@ export async function action({ request }: DataFunctionArgs) {
 		where: { id: note.id },
 	})
 
-	return redirect(`/users/${note.owner.username}/notes`)
+	return redirectWithToast(`/users/${note.owner.username}/notes`, {
+		title: 'Note deleted',
+		variant: 'destructive',
+	})
 }
 
 export function DeleteNote({ id }: { id: string }) {
@@ -69,10 +74,9 @@ export function DeleteNote({ id }: { id: string }) {
 			{...form.props}
 		>
 			<input type="hidden" name="noteId" value={id} />
-			<Button
+			<StatusButton
 				type="submit"
-				size="md"
-				variant="secondary"
+				variant="destructive"
 				status={
 					noteDeleteFetcher.state === 'submitting'
 						? 'pending'
@@ -81,7 +85,7 @@ export function DeleteNote({ id }: { id: string }) {
 				disabled={noteDeleteFetcher.state !== 'idle'}
 			>
 				Delete
-			</Button>
+			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />
 		</noteDeleteFetcher.Form>
 	)

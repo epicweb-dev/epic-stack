@@ -17,7 +17,7 @@ import {
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { ErrorList, Field } from '~/components/forms.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import {
@@ -28,6 +28,7 @@ import {
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
 import { verifyTOTP } from '~/utils/totp.server.ts'
 import invariant from 'tiny-invariant'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const verifySchema = z.object({
 	[forgotPasswordTargetQueryParam]: z.union([emailSchema, usernameSchema]),
@@ -159,7 +160,7 @@ export default function ForgotPasswordVerifyRoute() {
 				<>
 					<div className="text-center">
 						<h1 className="text-h1">Check your email</h1>
-						<p className="mt-3 text-body-md text-night-200">
+						<p className="mt-3 text-body-md text-muted-foreground">
 							We've sent you a code to verify your password reset.
 						</p>
 					</div>
@@ -187,16 +188,14 @@ export default function ForgotPasswordVerifyRoute() {
 						<ErrorList errors={form.errors} id={form.errorId} />
 
 						<div className="mt-6">
-							<Button
+							<StatusButton
 								className="w-full"
-								size="md"
-								variant="primary"
 								status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
 								type="submit"
 								disabled={isSubmitting}
 							>
 								Submit
-							</Button>
+							</StatusButton>
 						</div>
 					</Form>
 				</>

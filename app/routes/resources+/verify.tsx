@@ -8,9 +8,10 @@ import { z } from 'zod'
 import { twoFAVerificationType } from '~/routes/settings+/profile.two-factor.tsx'
 import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { ErrorList, Field } from '~/components/forms.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { verifyTOTP } from '~/utils/totp.server.ts'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const ROUTE_PATH = '/resources/verify'
 export const unverifiedSessionKey = 'unverified-sessionId'
@@ -156,10 +157,8 @@ export function Verifier({
 				errors={fields.code.errors}
 			/>
 			<div className="flex flex-row-reverse justify-between">
-				<Button
+				<StatusButton
 					type="submit"
-					variant="primary"
-					size="md"
 					name="intent"
 					value="confirm"
 					status={
@@ -169,11 +168,10 @@ export function Verifier({
 					}
 				>
 					Confirm
-				</Button>
-				<Button
+				</StatusButton>
+				<StatusButton
 					type="submit"
 					variant="secondary"
-					size="md"
 					name="intent"
 					value="cancel"
 					status={
@@ -183,7 +181,7 @@ export function Verifier({
 					}
 				>
 					Cancel
-				</Button>
+				</StatusButton>
 			</div>
 			<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
 		</fetcher.Form>

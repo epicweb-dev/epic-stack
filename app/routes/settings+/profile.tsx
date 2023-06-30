@@ -18,7 +18,7 @@ import {
 	verifyLogin,
 } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ErrorList, Field } from '~/utils/forms.tsx'
+import { ErrorList, Field } from '~/components/forms.tsx'
 import { getUserImgSrc } from '~/utils/misc.ts'
 import {
 	emailSchema,
@@ -27,6 +27,9 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
+import { Button } from '~/components/ui/button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
@@ -154,10 +157,13 @@ export default function EditUserProfile() {
 	return (
 		<div className="container m-auto mb-36 mt-16 max-w-3xl">
 			<div className="flex gap-3">
-				<Link className="text-night-300" to={`/users/${data.user.username}`}>
+				<Link
+					className="text-muted-foreground"
+					to={`/users/${data.user.username}`}
+				>
 					Profile
 				</Link>
-				<span className="text-night-300">▶️</span>
+				<span className="text-muted-foreground">▶️</span>
 				<span>Edit Profile</span>
 			</div>
 			<div className="mt-16 flex flex-col gap-12">
@@ -168,15 +174,20 @@ export default function EditUserProfile() {
 							alt={data.user.username}
 							className="h-full w-full rounded-full object-cover"
 						/>
-						<Link
-							preventScrollReset
-							to="photo"
-							className="absolute -right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border-4 border-night-700 bg-night-500 p-5"
-							title="Change profile photo"
-							aria-label="Change profile photo"
+						<Button
+							asChild
+							variant="outline"
+							className="absolute -right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full p-0"
 						>
-							📷
-						</Link>
+							<Link
+								preventScrollReset
+								to="photo"
+								title="Change profile photo"
+								aria-label="Change profile photo"
+							>
+								<Icon name="camera" className="h-4 w-4" />
+							</Link>
+						</Button>
 					</div>
 				</div>
 				<Form method="POST" {...form.props}>
@@ -207,11 +218,9 @@ export default function EditUserProfile() {
 							errors={fields.email.errors}
 						/>
 
-						<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px] border-night-500" />
+						<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
 						<fieldset className="col-span-6">
-							<legend className="pb-6 text-lg text-night-200">
-								Change password
-							</legend>
+							<legend className="pb-6 text-lg">Change password</legend>
 							<div className="flex justify-between gap-10">
 								<Field
 									className="flex-1"
@@ -241,22 +250,33 @@ export default function EditUserProfile() {
 								/>
 							</div>
 						</fieldset>
-						<Link preventScrollReset to="two-factor" className="col-span-full">
-							{data.isTwoFactorEnabled ? '🔒 2FA is enabled' : '🔓 Enable 2FA'}
+						<Link
+							preventScrollReset
+							to="two-factor"
+							className="col-span-full flex gap-1"
+						>
+							{data.isTwoFactorEnabled ? (
+								<>
+									<Icon name="lock-closed" /> 2FA is enabled
+								</>
+							) : (
+								<>
+									<Icon name="lock-open-1" /> Enable 2FA
+								</>
+							)}
 						</Link>
 					</div>
 
 					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="mt-8 flex justify-center">
-						<Button
+						<StatusButton
 							type="submit"
-							size="md-wide"
-							variant="primary"
+							size="wide"
 							status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
 						>
 							Save changes
-						</Button>
+						</StatusButton>
 					</div>
 				</Form>
 			</div>

@@ -6,7 +6,7 @@ test('Users can create notes', async ({ login, page }) => {
 	await page.goto(`/users/${user.username}/notes`)
 
 	const newNote = createNewNote()
-	await page.getByRole('link', { name: '+ New Note' }).click()
+	await page.getByRole('link', { name: /New Note/i }).click()
 
 	// blank form submission should result in errors
 	await page.getByRole('button', { name: /submit/i }).click()
@@ -29,7 +29,7 @@ test('Users can edit notes', async ({ login, page }) => {
 
 	// create a note
 	const newNote = createNewNote()
-	await page.getByRole('link', { name: '+ New Note' }).click()
+	await page.getByRole('link', { name: /New Note/i }).click()
 
 	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
@@ -56,7 +56,7 @@ test('Users can delete notes', async ({ login, page }) => {
 	await page.goto(`/users/${user.username}/notes`)
 
 	const newNote = createNewNote()
-	await page.getByRole('link', { name: '+ New Note' }).click()
+	await page.getByRole('link', { name: /New Note/i }).click()
 
 	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)

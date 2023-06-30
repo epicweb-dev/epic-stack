@@ -9,10 +9,11 @@ import {
 import { Link, useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { ErrorList, Field } from '~/components/forms.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { Button, ErrorList, Field } from '~/utils/forms.tsx'
-import { getDomainUrl } from '~/utils/misc.server.ts'
+import { getDomainUrl } from '~/utils/misc.ts'
 import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { ForgotPasswordEmail } from './email.server.tsx'
@@ -129,7 +130,7 @@ export default function ForgotPasswordRoute() {
 			<div className="flex flex-col justify-center">
 				<div className="text-center">
 					<h1 className="text-h1">Forgot Password</h1>
-					<p className="mt-3 text-body-md text-night-200">
+					<p className="mt-3 text-body-md text-muted-foreground">
 						No worries, we'll send you reset instructions.
 					</p>
 				</div>
@@ -154,10 +155,8 @@ export default function ForgotPasswordRoute() {
 					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="mt-6">
-						<Button
+						<StatusButton
 							className="w-full"
-							size="md"
-							variant="primary"
 							status={
 								forgotPassword.state === 'submitting'
 									? 'pending'
@@ -167,7 +166,7 @@ export default function ForgotPasswordRoute() {
 							disabled={forgotPassword.state !== 'idle'}
 						>
 							Recover password
-						</Button>
+						</StatusButton>
 					</div>
 				</forgotPassword.Form>
 				<Link to="/login" className="mt-11 text-center text-body-sm font-bold">

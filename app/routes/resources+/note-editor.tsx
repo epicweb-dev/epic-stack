@@ -1,11 +1,14 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
+import { Button } from '~/components/ui/button.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Button, ErrorList, Field, TextareaField } from '~/utils/forms.tsx'
+import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
@@ -72,7 +75,9 @@ export async function action({ request }: DataFunctionArgs) {
 	} else {
 		note = await prisma.note.create({ data, select })
 	}
-	return redirect(`/users/${note.owner.username}/notes/${note.id}`)
+	return redirectWithToast(`/users/${note.owner.username}/notes/${note.id}`, {
+		title: id ? 'Note updated' : 'Note created',
+	})
 }
 
 export function NoteEditor({
@@ -104,7 +109,7 @@ export function NoteEditor({
 		>
 			<input name="id" type="hidden" value={note?.id} />
 			<Field
-				labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
+				labelProps={{ children: 'Title' }}
 				inputProps={{
 					...conform.input(fields.title),
 					autoComplete: 'title',
@@ -112,7 +117,7 @@ export function NoteEditor({
 				errors={fields.title.errors}
 			/>
 			<TextareaField
-				labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
+				labelProps={{ children: 'Content' }}
 				textareaProps={{
 					...conform.textarea(fields.content),
 					autoComplete: 'content',
@@ -121,12 +126,10 @@ export function NoteEditor({
 			/>
 			<ErrorList errors={form.errors} id={form.errorId} />
 			<div className="flex justify-end gap-4">
-				<Button size="md" variant="secondary" type="reset">
+				<Button variant="secondary" type="reset">
 					Reset
 				</Button>
-				<Button
-					size="md"
-					variant="primary"
+				<StatusButton
 					status={
 						noteEditorFetcher.state === 'submitting'
 							? 'pending'
@@ -136,7 +139,7 @@ export function NoteEditor({
 					disabled={noteEditorFetcher.state !== 'idle'}
 				>
 					Submit
-				</Button>
+				</StatusButton>
 			</div>
 		</noteEditorFetcher.Form>
 	)
