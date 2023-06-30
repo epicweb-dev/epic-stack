@@ -1,5 +1,5 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useNavigate } from '@remix-run/react'
+import { Outlet, useNavigate } from '@remix-run/react'
 import { Icon } from '~/components/ui/icon.tsx'
 import {
 	Dialog,
