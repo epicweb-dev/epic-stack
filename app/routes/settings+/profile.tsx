@@ -4,10 +4,10 @@ import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
 	Link,
-	Outlet,
 	useActionData,
 	useFormAction,
 	useLoaderData,
+	useLocation,
 	useNavigation,
 } from '@remix-run/react'
 import { z } from 'zod'
@@ -19,7 +19,7 @@ import {
 } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field } from '~/components/forms.tsx'
-import { getUserImgSrc } from '~/utils/misc.ts'
+import { getUserImgSrc, AnimatedOutlet } from '~/utils/misc.ts'
 import {
 	emailSchema,
 	nameSchema,
@@ -30,6 +30,8 @@ import { twoFAVerificationType } from './profile.two-factor.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
+import { useRef } from 'react'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
@@ -133,6 +135,9 @@ export default function EditUserProfile() {
 	const actionData = useActionData<typeof action>()
 	const navigation = useNavigation()
 	const formAction = useFormAction()
+
+	const location = useLocation()
+	const nodeRef = useRef(null)
 
 	const isSubmitting =
 		navigation.state === 'submitting' &&
@@ -280,7 +285,13 @@ export default function EditUserProfile() {
 					</div>
 				</Form>
 			</div>
-			<Outlet />
+			<SwitchTransition>
+				<CSSTransition key={location.pathname} timeout={150} nodeRef={nodeRef}>
+					<div ref={nodeRef}>
+						<AnimatedOutlet />
+					</div>
+				</CSSTransition>
+			</SwitchTransition>
 		</div>
 	)
 }

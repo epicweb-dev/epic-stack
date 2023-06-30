@@ -1,4 +1,6 @@
+import { useOutlet } from '@remix-run/react'
 import { type ClassValue, clsx } from 'clsx'
+import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 export function getUserImgSrc(imageId?: string | null) {
@@ -110,4 +112,10 @@ export function invariantResponse(
 			...responseInit,
 		})
 	}
+}
+
+export function AnimatedOutlet() {
+	const [outlet] = useState(useOutlet())
+
+	return outlet
 }

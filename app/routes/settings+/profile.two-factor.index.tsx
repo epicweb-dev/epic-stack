@@ -46,7 +46,7 @@ export async function action({ request }: DataFunctionArgs) {
 }
 
 export default function TwoFactorRoute() {
-	const data = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>() || {}
 	const toggle2FAFetcher = useFetcher<typeof action>()
 
 	return (

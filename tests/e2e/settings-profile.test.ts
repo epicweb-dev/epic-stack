@@ -73,6 +73,8 @@ test('Users can update their profile photo', async ({ login, page }) => {
 		.getByRole('button', { name: /save/i })
 		.click()
 
+	await expect(page.getByRole('dialog')).toBeHidden()
+
 	await expect(
 		page,
 		'Was not redirected after saving the profile photo',

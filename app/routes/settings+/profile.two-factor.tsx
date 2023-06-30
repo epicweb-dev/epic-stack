@@ -9,6 +9,7 @@ import {
 } from '~/components/ui/dialog.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { useState } from 'react'
 
 export const twoFAVerificationType = '2fa'
 
@@ -23,10 +24,14 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function TwoFactorRoute() {
 	const navigate = useNavigate()
+	const [open, setOpen] = useState(true)
 
-	const dismissModal = () => navigate('..', { preventScrollReset: true })
+	const dismissModal = () => {
+		setOpen(false)
+		navigate('..', { preventScrollReset: true })
+	}
 	return (
-		<Dialog open={true}>
+		<Dialog open={open}>
 			<DialogContent
 				onEscapeKeyDown={dismissModal}
 				onPointerDownOutside={dismissModal}
