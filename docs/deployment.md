@@ -106,6 +106,22 @@ command-line session on the machine. You can do this using `fly ssh console`.
 The Dockerfile simplifies this further by adding a `database-cli` command. You
 can connect to the live database by running `fly ssh console -C database-cli`.
 
+To connect to the deployed database from your local machine using Prisma Studio, 
+you can utilize Fly's ﻿`ssh` and ﻿`proxy` commands.
+
+- Run in one terminal the command to start Prisma Studio on your desired Fly app
+  ```sh
+  fly ssh console -C "npm run prisma:studio" --app [YOUR_APP_NAME]
+  ```
+- Run in a second terminal the command to proxy your local port 5556 to 
+  Prisma Studio
+  ```sh
+  fly proxy 5556:5555 --app [YOUR_APP_NAME]
+  ```
+
+To work with Prisma Studio and your deployed app's database, simply open 
+`http://localhost:5556` in your browser.
+
 ## GitHub Actions
 
 We use GitHub Actions for continuous integration and deployment. Anything that
