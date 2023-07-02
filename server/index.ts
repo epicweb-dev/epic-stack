@@ -127,7 +127,7 @@ function getRequestHandler(build: ServerBuild): RequestHandler {
 
 app.all(
 	'*',
-	process.env.NODE_ENV === 'development'
+	MODE === 'development'
 		? (...args) => getRequestHandler(devBuild)(...args)
 		: getRequestHandler(build),
 )
@@ -172,7 +172,7 @@ ${chalk.bold('Press Ctrl+C to stop')}
 		`.trim(),
 	)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (MODE === 'development') {
 		broadcastDevReady(build)
 	}
 })
@@ -184,7 +184,7 @@ closeWithGrace(async () => {
 })
 
 // during dev, we'll keep the build module up to date with the changes
-if (process.env.NODE_ENV === 'development') {
+if (MODE=== 'development') {
 	async function reloadBuild() {
 		devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
 		broadcastDevReady(devBuild)
