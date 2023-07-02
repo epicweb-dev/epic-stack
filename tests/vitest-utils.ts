@@ -1,7 +1,7 @@
 import { authenticator } from '~/utils/auth.server.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 
-export const BASE_URL = 'https://epicstack.dev'
+export const BASE_URL = 'https://mud.chat'
 
 export async function getSessionSetCookieHeader(
 	session: { id: string },
