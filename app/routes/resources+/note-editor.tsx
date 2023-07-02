@@ -1,14 +1,13 @@
+import * as React from 'react'
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
-import { Button } from '~/components/ui/button.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
-import { redirectWithToast } from '~/utils/flash-session.server.ts'
+import { Button } from '~/components/ui/button.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
@@ -75,9 +74,7 @@ export async function action({ request }: DataFunctionArgs) {
 	} else {
 		note = await prisma.note.create({ data, select })
 	}
-	return redirectWithToast(`/users/${note.owner.username}/notes/${note.id}`, {
-		title: id ? 'Note updated' : 'Note created',
-	})
+	return redirect(`/users/${note.owner.username}/notes/${note.id}`)
 }
 
 export function NoteEditor({
@@ -86,6 +83,8 @@ export function NoteEditor({
 	note?: { id: string; title: string; content: string }
 }) {
 	const noteEditorFetcher = useFetcher<typeof action>()
+	const [content, setContent] = React.useState(note?.content ?? '')
+	const [title, setTitle] = React.useState(note?.title ?? '')
 
 	const [form, fields] = useForm({
 		id: 'note-editor',
@@ -93,10 +92,6 @@ export function NoteEditor({
 		lastSubmission: noteEditorFetcher.data?.submission,
 		onValidate({ formData }) {
 			return parse(formData, { schema: NoteEditorSchema })
-		},
-		defaultValue: {
-			title: note?.title,
-			content: note?.content,
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -109,37 +104,112 @@ export function NoteEditor({
 		>
 			<input name="id" type="hidden" value={note?.id} />
 			<Field
-				labelProps={{ children: 'Title' }}
+				labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
 				inputProps={{
+					value: title,
+					onChange: event => setTitle(event.currentTarget.value),
 					...conform.input(fields.title),
 					autoComplete: 'title',
 				}}
 				errors={fields.title.errors}
 			/>
+			<Button
+				className="mb-10"
+				type="button"
+				variant="secondary"
+				size="pill"
+				onClick={event => {
+					event.preventDefault()
+
+					// @ts-expect-error we'll fix this later probably...
+					const content = event.currentTarget.form.elements.content.value
+
+					const sse = new EventSource(
+						`/resources/completions?${new URLSearchParams({ content })}`,
+					)
+
+					sse.addEventListener('message', event => {
+						setTitle(
+							prevTitle => prevTitle + event.data.replace('__NEWLINE__', '\n'),
+						)
+					})
+
+					sse.addEventListener('error', event => {
+						console.log('error: ', event)
+						sse.close()
+					})
+				}}
+			>
+				Generate Title
+			</Button>
 			<TextareaField
-				labelProps={{ children: 'Content' }}
+				labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
 				textareaProps={{
+					value: content,
+					onChange: event => setContent(event.currentTarget.value),
 					...conform.textarea(fields.content),
 					autoComplete: 'content',
 				}}
 				errors={fields.content.errors}
 			/>
+			<Button
+				className="mb-10"
+				type="button"
+				variant="secondary"
+				size="pill"
+				onClick={event => {
+					event.preventDefault()
+
+					// @ts-expect-error we'll fix this later probably...
+					const title = event.currentTarget.form.elements.title.value
+
+					const sse = new EventSource(
+						`/resources/completions?${new URLSearchParams({ title })}`,
+					)
+
+					sse.addEventListener('message', event => {
+						setContent(
+							prevContent =>
+								prevContent + event.data.replace('__NEWLINE__', '\n'),
+						)
+					})
+
+					sse.addEventListener('error', event => {
+						console.log('error: ', event)
+						sse.close()
+					})
+				}}
+			>
+				Generate Content
+			</Button>
 			<ErrorList errors={form.errors} id={form.errorId} />
 			<div className="flex justify-end gap-4">
-				<Button variant="secondary" type="reset">
+				<Button
+					size="default"
+					variant="secondary"
+					type="reset"
+					onClick={() => {
+						// because this is a controlled form, we need to reset the state
+						// because the built-in browser behavior will no longer work.
+						setContent(note?.content ?? '')
+						setTitle(note?.title ?? '')
+					}}
+				>
 					Reset
 				</Button>
-				<StatusButton
-					status={
-						noteEditorFetcher.state === 'submitting'
-							? 'pending'
-							: noteEditorFetcher.data?.status ?? 'idle'
-					}
+				<Button
+					size="default"
+					variant="default"
+					// status={
+					// 	noteEditorFetcher.state === 'submitting'
+					// 		? 'pending'
+					// 		: noteEditorFetcher.data?.status ?? 'idle'
+					// }
 					type="submit"
 					disabled={noteEditorFetcher.state !== 'idle'}
 				>
 					Submit
-				</StatusButton>
+				</Button>
 			</div>
 		</noteEditorFetcher.Form>
 	)

@@ -30,6 +30,13 @@ const handlers = [
 				)
 		  })
 		: null,
+
+	rest.post('https://api.openai.com/v1/chat/completions', req => {
+		// TODO: properly mock this
+		// I'm not certain how to do this with MSW. Maybe the new version with
+		// the web fetch API can do it?
+		return req.passthrough()
+	}),
 ].filter(Boolean)
 
 const server = setupServer(...handlers)
