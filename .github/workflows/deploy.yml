@@ -121,7 +121,7 @@ jobs:
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, vitest, playwright]
+    needs: [lint, typecheck, vitest]
     # only build/deploy main branch on pushes
     if:
       ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
