@@ -1,5 +1,5 @@
 {
-  "name": "MUDchat",
+  "name": "mudchat",
   "private": true,
   "sideEffects": false,
   "type": "module",
