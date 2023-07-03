@@ -26,6 +26,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions):
   An example of the Epic Stack with Prisma Client extensions activated for enum
   like behavior in SQLite.
+- [Socket.IO](https://github.com/L-Steinmacher/epic-stack-with-socket.io): by
+  [@L-Steinmacher](https://github.com/L-Steinmacher):
+  An example of setting up using websockets in the Epic Stack using the `Socket.IO` library.
 
 ## How to contribute
 
