@@ -26,6 +26,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions):
   An example of the Epic Stack with Prisma Client extensions activated for enum
   like behavior in SQLite.
+- [Epic Stack + Storybook](https://github.com/moishinetzer/epic-stack-with-storybook): by
+  [@moishinetzer](https://github.com/moishinetzer): An example of the Epic Stack
+  with Storybook. It also showcases creating a Remix stub, which is very helpful for isolating Remix-specific components inside of Storybook.
 
 ## How to contribute
 
