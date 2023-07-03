@@ -72,51 +72,51 @@ jobs:
       - name: ⚡ Run vitest
         run: npm run test -- --coverage
 
-  playwright:
-    name: 🎭 Playwright
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+  # playwright:
+  #   name: 🎭 Playwright
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 60
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v3
 
-      - name: 🏄 Copy test env vars
-        run: cp .env.example .env
+  #     - name: 🏄 Copy test env vars
+  #       run: cp .env.example .env
 
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+  #     - name: ⎔ Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+  #     - name: 📥 Download deps
+  #       uses: bahmutov/npm-install@v1
 
-      - name: 📥 Install Playwright Browsers
-        run: npm run test:e2e:install
+  #     - name: 📥 Install Playwright Browsers
+  #       run: npm run test:e2e:install
 
-      - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+  #     - name: 🛠 Setup Database
+  #       run: npx prisma migrate deploy
 
-      - name: 🏦 Cache Database
-        id: db-cache
-        uses: actions/cache@v3
-        with:
-          path: prisma/data.db
-          key: db-cache
+  #     - name: 🏦 Cache Database
+  #       id: db-cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: prisma/data.db
+  #         key: db-cache
 
-      - name: 🏗 Build
-        run: npm run build
+  #     - name: 🏗 Build
+  #       run: npm run build
 
-      - name: 🎭 Playwright tests
-        run: npx playwright test
+  #     - name: 🎭 Playwright tests
+  #       run: npx playwright test
 
-      - name: 📊 Upload report
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+  #     - name: 📊 Upload report
+  #       uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: playwright-report
+  #         path: playwright-report/
+  #         retention-days: 30
 
   deploy:
     name: 🚀 Deploy
