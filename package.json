@@ -1,5 +1,5 @@
 {
-  "name": "epic-stack-template",
+  "name": "mudchat",
   "private": true,
   "sideEffects": false,
   "license": "MIT",
@@ -78,6 +78,7 @@
     "litefs-js": "^1.1.2",
     "lru-cache": "^10.0.0",
     "morgan": "^1.10.0",
+    "openai": "^3.3.0",
     "prisma": "^4.16.2",
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
