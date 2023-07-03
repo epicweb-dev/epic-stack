@@ -20,6 +20,7 @@ test('Users can create notes', async ({ login, page }) => {
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
 
 	await page.getByRole('button', { name: /submit/i }).click()
+	await expect(page.getByText('Note created', { exact: true })).toBeVisible()
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 })
 
@@ -37,13 +38,14 @@ test('Users can edit notes', async ({ login, page }) => {
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 
 	// edit the note
-	await page.getByRole('link', { name: 'Edit' }).click()
+	await page.getByRole('link', { name: 'Edit', exact: true }).click()
 	const updatedNote = createNewNote()
 	await page.getByRole('textbox', { name: /title/i }).fill(updatedNote.title)
 	await page
 		.getByRole('textbox', { name: /content/i })
 		.fill(updatedNote.content)
 	await page.getByRole('button', { name: /submit/i }).click()
+	await expect(page.getByText('Note updated', { exact: true })).toBeVisible()
 
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 	await expect(
@@ -68,6 +70,7 @@ test('Users can delete notes', async ({ login, page }) => {
 	// find links with  href prefix
 	let countBefore = await page.locator('ul>li>a').count()
 	await page.getByRole('button', { name: /delete/i }).click()
+	await expect(page.getByText('Note deleted', { exact: true })).toBeVisible()
 	await expect(page).toHaveURL(`/users/${user.username}/notes`)
 	let countAfter = await page.locator('ul>li>a').count()
 	expect(countAfter).toEqual(countBefore - 1)
