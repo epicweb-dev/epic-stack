@@ -98,6 +98,28 @@ Every commit to your `main` branch will trigger a deployment to your production
 environment, and every commit to your `dev` branch will trigger a deployment to
 your staging environment.
 
+## Deploying locally
+
+If you'd like to deploy locally you definitely can. You need to (temporarily)
+move the `Dockerfile` and the `.dockerignore` to the root of the project first.
+Then you can run the deploy command:
+
+```
+mv ./other/Dockerfile Dockerfile
+mv ./other/dockerignore .dockerignore
+fly deploy
+```
+
+Once it's done, move the files back:
+
+```
+mv Dockerfile ./other/Dockerfile
+mv .dockerignore ./other/.dockerignore
+```
+
+You can keep the `Dockerfile` and `.dockerignore` in the root if you prefer,
+just make sure to remove the move step from the `.github/workflows/deploy.yml`.
+
 ## Connecting to your database
 
 The sqlite database lives at `/data/sqlite.db` in the deployed application.

@@ -1,5 +1,5 @@
 diff --git a/node_modules/@remix-run/dev/dist/config.js b/node_modules/@remix-run/dev/dist/config.js
-index c3cad77..1321076 100644
+index 4d13ff1..a3eaa39 100644
 --- a/node_modules/@remix-run/dev/dist/config.js
 +++ b/node_modules/@remix-run/dev/dist/config.js
 @@ -63,7 +63,7 @@ async function readConfig(remixRoot, serverMode = serverModes.ServerMode.Product

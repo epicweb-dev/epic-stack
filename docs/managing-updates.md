@@ -1,5 +1,36 @@
 # Managing updates
 
+## Updating Node.js
+
+The Epic Stack runs a long-running Node.js server. It defaults to the current
+active LTS version of node
+([read the Node.js version decision document](./decisions/021-node-version.md)).
+
+If you wish to change the Node.js version, you can do so by updating the
+`engines.node` property in the `package.json` file.
+
+```json
+{
+	"engines": {
+		"node": "20.3.1"
+	}
+}
+```
+
+Make certain you do not use a version range here because this is used in the
+`./other/build-server.ts` to compile the express server code.
+
+You will also want to update the `Dockerfile` to use the same version of Node.js
+as the `package.json` file.
+
+```diff
+- FROM node:18-bookworm-slim as base
++ FROM node:20.3.1-bookworm-slim as base
+```
+
+You'll find the
+[Node.js versions available on Docker Hub](https://hub.docker.com/_/node).
+
 ## Within the Epic Stack
 
 When you create a new project with the Epic Stack, a bunch of code is generated
