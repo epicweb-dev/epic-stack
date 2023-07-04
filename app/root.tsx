@@ -100,7 +100,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
-	const { flash, headers: flasHeaders } = await getFlashSession(request)
+	const { flash, headers: flashHeaders } = await getFlashSession(request)
 
 	return json(
 		{
@@ -119,7 +119,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		{
 			headers: combineHeaders(
 				{ 'Server-Timing': timings.toString() },
-				flasHeaders,
+				flashHeaders,
 			),
 		},
 	)
