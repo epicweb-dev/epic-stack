@@ -69,7 +69,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const thirtyMinutesInSeconds = 30 * 60
 	const { otp, secret, algorithm, period, digits } = generateTOTP({
-		algorithm: 'sha256',
+		algorithm: 'SHA256',
 		period: thirtyMinutesInSeconds,
 	})
 	// delete old verifications. Users should not have more than one verification

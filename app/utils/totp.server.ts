@@ -1,7 +1,7 @@
 /**
  * This was copy/paste/modified from https://npm.im/notp (MIT)
  *
- * The primary motivation was to support a more secure algorithm than sha1.
+ * The primary motivation was to support a more secure algorithm than SHA1.
  * The maintainer has not actively responded to issues or pull requests in years.
  *
  * Some improvements were made to modernize the code (which was last published in 2014).
@@ -32,9 +32,9 @@ import * as base32 from 'thirty-two'
 // SHA1 is not secure, but in the context of TOTPs, it's unrealistic to expect
 // security issues. Also, it's the default for compatibility with OTP apps.
 // That said, if you're acting the role of both client and server and your TOTP
-// is longer lived, you can definitely use a more secure algorithm like sha256.
+// is longer lived, you can definitely use a more secure algorithm like SHA256.
 // Learn more: https://www.rfc-editor.org/rfc/rfc4226#page-25 (B.1. SHA-1 Status)
-const DEFAULT_ALGORITHM = 'sha1'
+const DEFAULT_ALGORITHM = 'SHA1'
 const DEFAULT_DIGITS = 6
 const DEFAULT_WINDOW = 1
 const DEFAULT_PERIOD = 30
@@ -89,7 +89,7 @@ function verifyHOTP(
  * @param options Configuration options for the TOTP.
  * @param options.period The number of seconds for the OTP to be valid. Defaults to 30.
  * @param options.digits The length of the OTP. Defaults to 6.
- * @param options.algorithm The algorithm to use. Defaults to sha1.
+ * @param options.algorithm The algorithm to use. Defaults to SHA1.
  * @param options.secret The secret to use for the TOTP. Defaults to a random secret.
  * @returns The OTP, secret, and config options used to generate the OTP.
  */

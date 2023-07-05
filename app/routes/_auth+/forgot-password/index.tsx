@@ -70,7 +70,7 @@ export async function action({ request }: DataFunctionArgs) {
 		// don't leak the association between the two.
 		const target = usernameOrEmail
 		const { otp, secret, algorithm, period, digits } = generateTOTP({
-			algorithm: 'sha256',
+			algorithm: 'SHA256',
 			period: tenMinutesInSeconds,
 		})
 		// delete old verifications. Users should not have more than one verification
