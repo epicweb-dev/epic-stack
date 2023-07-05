@@ -1,7 +1,7 @@
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher, useFetchers } from '@remix-run/react'
 import * as React from 'react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
@@ -80,7 +80,8 @@ export function ThemeSwitch({
 		},
 	})
 
-	const mode = userPreference ?? 'system'
+	const { submittedTheme } = useOptimisticTheme()
+	const mode = submittedTheme ?? userPreference ?? 'system'
 	const nextMode =
 		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
 	const modeLabel = {
@@ -126,7 +127,27 @@ export function ThemeSwitch({
  * has not set a preference.
  */
 export function useTheme() {
-	const hints = useHints()
 	const requestInfo = useRequestInfo()
-	return requestInfo.session.theme ?? hints.theme
+	const { optimisticTheme, hints } = useOptimisticTheme()
+	return optimisticTheme ?? requestInfo.session.theme ?? hints.theme
+}
+
+export function useOptimisticTheme() {
+	const hints = useHints()
+	const fetchers = useFetchers()
+
+	const themeFetcher = fetchers.find(f => f.formAction?.startsWith(ROUTE_PATH))
+
+	let submittedTheme
+	let optimisticTheme
+
+	if (themeFetcher && themeFetcher.formData) {
+		const submission = parse(themeFetcher.formData, {
+			schema: ThemeFormSchema,
+		})
+		submittedTheme = submission.value?.theme
+		optimisticTheme = submittedTheme === 'system' ? hints.theme : submittedTheme
+	}
+
+	return { optimisticTheme, submittedTheme, hints }
 }
