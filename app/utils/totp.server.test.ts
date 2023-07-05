@@ -10,7 +10,7 @@ test('OTP can be generated and verified', () => {
 	const { secret, otp, algorithm, period } = totp.generateTOTP()
 	const result = totp.verifyTOTP({ otp, secret })
 	expect(result).toEqual({ delta: 0 })
-	expect(algorithm).toBe('sha1')
+	expect(algorithm).toBe('SHA1')
 	expect(period).toBe(30)
 })
 
@@ -56,13 +56,24 @@ test('Setting a different seconds config for generating and verifying will fail'
 })
 
 test('Setting a different algo config for generating and verifying will fail', () => {
-	const desiredAlgo = 'sha512'
+	const desiredAlgo = 'SHA512'
 	const { otp, secret, algorithm } = totp.generateTOTP({
 		algorithm: desiredAlgo,
 	})
 	expect(algorithm).toBe(desiredAlgo)
-	const result = totp.verifyTOTP({ otp, secret, algorithm: 'sha1' })
+	const result = totp.verifyTOTP({ otp, secret, algorithm: 'SHA1' })
 	expect(result).toBeNull()
+})
+
+test('Generating and verifying also works with the algorithm name alias', () => {
+	const desiredAlgo = 'SHA1'
+	const { otp, secret, algorithm } = totp.generateTOTP({
+		algorithm: desiredAlgo,
+	})
+	expect(algorithm).toBe(desiredAlgo)
+
+	const result = totp.verifyTOTP({ otp, secret, algorithm: 'sha1' })
+	expect(result).not.toBeNull()
 })
 
 test('OTP Auth URI can be generated', () => {
