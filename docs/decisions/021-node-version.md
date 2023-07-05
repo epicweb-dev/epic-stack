@@ -8,7 +8,7 @@ Status: accepted
 
 Node.js has a regular release cycle which is documented in the
 [release schedule](https://nodejs.org/en/about/releases/). At the time of this
-writing, there are 5 stable maintained releases: 16, 18, and 20. I'll refer you
+writing, there are 3 stable maintained releases: 16, 18, and 20. I'll refer you
 to that documentation to understand how the release cycle works.
 
 Deciding which version of Node.js to use for a project is a trade-off between
