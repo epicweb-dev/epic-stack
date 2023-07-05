@@ -39,10 +39,18 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!verification) {
 		return redirect('/settings/profile/two-factor')
 	}
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: { email: true },
+	})
+	if (user == null) {
+		// This should not be possible
+		throw new Error(`user with ID "${userId}" is unknown`)
+	}
 	const issuer = new URL(getDomainUrl(request)).host
 	const otpUri = getTOTPAuthUri({
 		...verification,
-		accountName: userId,
+		accountName: user.email,
 		issuer,
 	})
 	const qrCode = await QRCode.toDataURL(otpUri)
