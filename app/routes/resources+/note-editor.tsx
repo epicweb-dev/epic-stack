@@ -5,6 +5,7 @@ import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { Button } from '~/components/ui/button.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
@@ -105,6 +106,7 @@ export function NoteEditor({
 		<noteEditorFetcher.Form
 			method="post"
 			action="/resources/note-editor"
+			className="flex gap-y-4 h-full flex-col overflow-x-hidden px-10 py-12"
 			{...form.props}
 		>
 			<input name="id" type="hidden" value={note?.id} />
@@ -116,6 +118,7 @@ export function NoteEditor({
 					autoFocus: true,
 				}}
 				errors={fields.title.errors}
+				className="flex flex-col gap-y-2"
 			/>
 			<TextareaField
 				labelProps={{ children: 'Content' }}
@@ -124,10 +127,12 @@ export function NoteEditor({
 					autoComplete: 'content',
 				}}
 				errors={fields.content.errors}
+				className="flex flex-col gap-y-2 flex-1 [&_textarea]:flex-1 [&_textarea]:resize-none"
 			/>
 			<ErrorList errors={form.errors} id={form.errorId} />
-			<div className="flex justify-end gap-4">
+			<div className="shadow-accent shadow-xl w-full flex justify-end gap-4 bg-accent/50 backdrop-blur">
 				<Button variant="secondary" type="reset">
+					<Icon name="reset" className="mr-2 scale-125" />
 					Reset
 				</Button>
 				<StatusButton
@@ -139,6 +144,7 @@ export function NoteEditor({
 					type="submit"
 					disabled={noteEditorFetcher.state !== 'idle'}
 				>
+					<Icon name="check" className="mr-2 scale-125" />
 					Submit
 				</StatusButton>
 			</div>
