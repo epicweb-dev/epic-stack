@@ -113,6 +113,7 @@ export function NoteEditor({
 				inputProps={{
 					...conform.input(fields.title),
 					autoComplete: 'title',
+					autoFocus: true,
 				}}
 				errors={fields.title.errors}
 			/>

@@ -148,37 +148,36 @@ function App() {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<header className="container mx-auto py-6">
-					<nav className="flex justify-between">
+			<body className="bg-background text-foreground">
+				<div className="flex h-screen flex-col justify-between">
+					<header className="container mx-auto py-6">
+						<nav className="flex justify-between">
+							<Link to="/">
+								<div className="font-light">epic</div>
+								<div className="font-bold">notes</div>
+							</Link>
+							<div className="flex items-center gap-10">
+								{user ? (
+									<UserDropdown />
+								) : (
+									<Button asChild variant="default" size="sm">
+										<Link to="/login">Log In</Link>
+									</Button>
+								)}
+							</div>
+						</nav>
+					</header>
+
+					<Outlet />
+
+					<div className="container mx-auto flex justify-between pb-5">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
-						<div className="flex items-center gap-10">
-							{user ? (
-								<UserDropdown />
-							) : (
-								<Button asChild variant="default" size="sm">
-									<Link to="/login">Log In</Link>
-								</Button>
-							)}
-						</div>
-					</nav>
-				</header>
-
-				<div className="flex-1">
-					<Outlet />
+						<ThemeSwitch userPreference={data.requestInfo.session.theme} />
+					</div>
 				</div>
-
-				<div className="container mx-auto flex justify-between">
-					<Link to="/">
-						<div className="font-light">epic</div>
-						<div className="font-bold">notes</div>
-					</Link>
-					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
-				</div>
-				<div className="h-5" />
 				<Confetti confetti={data.flash?.confetti} />
 				<Toaster />
 				<ScrollRestoration nonce={nonce} />
