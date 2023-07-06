@@ -65,8 +65,8 @@ export default function NotesRoute() {
 	const navLinkDefaultClassName =
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
-		<div className="flex h-full min-h-[400px] pb-12">
-			<div className="mx-auto grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:mx-2 md:rounded-3xl md:pr-0">
+		<div className="container flex h-full min-h-[400px] pb-12">
+			<div className="grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:mx-2 md:rounded-3xl md:pr-0">
 				<div className="relative col-span-1">
 					<div className="absolute inset-0 overflow-scroll [&>:last-child]:pb-12">
 						<Link
