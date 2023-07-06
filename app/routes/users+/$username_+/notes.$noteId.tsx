@@ -29,7 +29,7 @@ export default function NoteRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (
-		<div className="flex h-full flex-col overflow-auto">
+		<div className="flex h-full flex-col overflow-y-auto overflow-x-hidden">
 			<div className="flex-grow">
 				<h2 className="mb-2 text-h2 lg:mb-6">{data.note.title}</h2>
 				<p className="text-sm md:text-lg">{data.note.content}</p>
