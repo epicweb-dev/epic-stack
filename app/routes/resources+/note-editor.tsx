@@ -110,6 +110,7 @@ export function NoteEditor({
 					onChange: event => setTitle(event.currentTarget.value),
 					...conform.input(fields.title),
 					autoComplete: 'title',
+					autoFocus: true,
 				}}
 				errors={fields.title.errors}
 			/>

@@ -169,7 +169,7 @@ export function InlineLogin({
 							status={
 								loginFetcher.state === 'submitting'
 									? 'pending'
-									: loginFetcher.data?.status
+									: loginFetcher.data?.status ?? 'idle'
 							}
 							type="submit"
 							disabled={loginFetcher.state !== 'idle'}

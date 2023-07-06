@@ -65,49 +65,53 @@ export default function NotesRoute() {
 	const navLinkDefaultClassName =
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
-		<div className="flex h-full pb-12">
-			<div className="mx-auto grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:rounded-3xl md:pr-0">
-				<div className="col-span-1 py-12">
-					<Link
-						to={`/users/${data.owner.username}`}
-						className="mb-4 flex flex-col items-center justify-center gap-2 pl-8 pr-4 lg:flex-row lg:justify-start lg:gap-4"
-					>
-						<img
-							src={getUserImgSrc(data.owner.imageId)}
-							alt={ownerDisplayName}
-							className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
-						/>
-						<h1 className="text-center text-base font-bold md:text-lg lg:text-left lg:text-2xl">
-							{ownerDisplayName}'s Notes
-						</h1>
-					</Link>
-					<ul>
-						<li>
-							<NavLink
-								to="new"
-								className={({ isActive }) =>
-									cn(navLinkDefaultClassName, isActive && 'bg-accent')
-								}
-							>
-								<Icon name="plus">New Note</Icon>
-							</NavLink>
-						</li>
-						{data.notes.map(note => (
-							<li key={note.id}>
+		<div className="container flex h-full min-h-[400px] pb-12">
+			<div className="grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:mx-2 md:rounded-3xl md:pr-0">
+				<div className="relative col-span-1">
+					<div className="absolute inset-0 overflow-y-auto overflow-x-hidden [&>:last-child]:pb-12">
+						<Link
+							to={`/users/${data.owner.username}`}
+							className="sticky top-0 flex flex-col items-center justify-center gap-2 bg-muted pb-4 pl-8 pr-4 pt-12 lg:flex-row lg:justify-start lg:gap-4"
+						>
+							<img
+								src={getUserImgSrc(data.owner.imageId)}
+								alt={ownerDisplayName}
+								className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
+							/>
+							<h1 className="text-center text-base font-bold md:text-lg lg:text-left lg:text-2xl">
+								{ownerDisplayName}'s Notes
+							</h1>
+						</Link>
+						<ul>
+							<li>
 								<NavLink
-									to={note.id}
+									to="new"
 									className={({ isActive }) =>
 										cn(navLinkDefaultClassName, isActive && 'bg-accent')
 									}
 								>
-									{note.title}
+									<Icon name="plus">New Note</Icon>
 								</NavLink>
 							</li>
-						))}
-					</ul>
+							{data.notes.map(note => (
+								<li key={note.id}>
+									<NavLink
+										to={note.id}
+										className={({ isActive }) =>
+											cn(navLinkDefaultClassName, isActive && 'bg-accent')
+										}
+									>
+										{note.title}
+									</NavLink>
+								</li>
+							))}
+						</ul>
+					</div>
 				</div>
-				<main className="col-span-3 bg-accent px-10 py-12 md:rounded-r-3xl">
-					<Outlet />
+				<main className="relative col-span-3 bg-accent md:rounded-r-3xl">
+					<div className="absolute inset-0 overflow-y-auto px-10 py-12">
+						<Outlet />
+					</div>
 				</main>
 			</div>
 		</div>

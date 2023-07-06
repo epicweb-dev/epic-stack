@@ -1,12 +1,13 @@
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher, useFetchers } from '@remix-run/react'
 import * as React from 'react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
-import { useHints } from '~/utils/client-hints.tsx'
 import { ErrorList } from '~/components/forms.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
+import { useHints } from '~/utils/client-hints.tsx'
 import { useRequestInfo } from '~/utils/request-info.ts'
 import {
 	commitSession,
@@ -14,7 +15,6 @@ import {
 	getSession,
 	setTheme,
 } from './theme-session.server.ts'
-import { Icon } from '~/components/ui/icon.tsx'
 
 const ROUTE_PATH = '/resources/theme'
 
@@ -80,7 +80,8 @@ export function ThemeSwitch({
 		},
 	})
 
-	const mode = userPreference ?? 'system'
+	const optimisticMode = useOptimisticThemeMode()
+	const mode = optimisticMode ?? userPreference ?? 'system'
 	const nextMode =
 		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
 	const modeLabel = {
@@ -128,5 +129,26 @@ export function ThemeSwitch({
 export function useTheme() {
 	const hints = useHints()
 	const requestInfo = useRequestInfo()
+	const optimisticMode = useOptimisticThemeMode()
+	if (optimisticMode) {
+		return optimisticMode === 'system' ? hints.theme : optimisticMode
+	}
 	return requestInfo.session.theme ?? hints.theme
+}
+
+/**
+ * If the user's changing their theme mode preference, this will return the
+ * value it's being changed to.
+ */
+export function useOptimisticThemeMode() {
+	const fetchers = useFetchers()
+
+	const themeFetcher = fetchers.find(f => f.formAction?.startsWith(ROUTE_PATH))
+
+	if (themeFetcher && themeFetcher.formData) {
+		const submission = parse(themeFetcher.formData, {
+			schema: ThemeFormSchema,
+		})
+		return submission.value?.theme
+	}
 }
