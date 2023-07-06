@@ -14,7 +14,7 @@ to that documentation to understand how the release cycle works.
 Deciding which version of Node.js to use for a project is a trade-off between
 using the latest features and stability.
 
-The Epic Stack is more focused on stabling shipping web apps than experimenting
+The Epic Stack is more focused on stably shipping web apps than experimenting
 with the latest features which is where the Active Long-Term Support (LTS)
 version really shines.
 
@@ -33,7 +33,7 @@ this.
 
 ## Decision
 
-Use and current LTS version of Node.js as the default in the starter.
+Use the current LTS version of Node.js as the default in the starter.
 
 We'll use the `slim` flavor of the node.js images.
 
