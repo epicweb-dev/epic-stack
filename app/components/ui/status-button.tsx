@@ -4,7 +4,7 @@ import { cn } from '~/utils/misc.ts'
 
 export const StatusButton = React.forwardRef<
 	HTMLButtonElement,
-	ButtonProps & { status?: 'pending' | 'success' | 'error' | 'idle' }
+	ButtonProps & { status: 'pending' | 'success' | 'error' | 'idle' }
 >(({ status = 'idle', className, children, ...props }, ref) => {
 	const companion = {
 		pending: <span className="inline-block animate-spin">🌀</span>,
