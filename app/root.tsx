@@ -46,7 +46,6 @@ import { getFlashSession } from './utils/flash-session.server.ts'
 import { useToast } from './utils/useToast.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
 
-// @ts-ignore is there a bug with LinksFunction type?
 export const links: LinksFunction = () => {
 	return [
 		// Preload svg sprite as a resource to avoid render blocking
@@ -66,7 +65,7 @@ export const links: LinksFunction = () => {
 			rel: 'manifest',
 			href: '/site.webmanifest',
 			crossOrigin: 'use-credentials',
-		},
+		} as const, // needed to make typescript happy
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
