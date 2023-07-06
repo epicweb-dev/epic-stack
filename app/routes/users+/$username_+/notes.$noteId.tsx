@@ -29,20 +29,22 @@ export default function NoteRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (
-		<div className="flex h-full flex-col overflow-y-auto overflow-x-hidden">
-			<div className="flex-grow">
-				<h2 className="mb-2 text-h2 lg:mb-6">{data.note.title}</h2>
-				<p className="text-sm md:text-lg">{data.note.content}</p>
+		<>
+			<div className="flex h-full flex-col overflow-x-hidden px-10">
+				<div className={`flex-grow pt-12 ${data.isOwner ? 'pb-20' : 'pb-12'}`}>
+					<h2 className="mb-2 text-h2 lg:mb-6">{data.note.title}</h2>
+					<p className="text-sm md:text-lg">{data.note.content}</p>
+				</div>
 			</div>
 			{data.isOwner ? (
-				<div className="flex justify-end gap-4">
+				<div className="absolute px-10 py-4 shadow-accent shadow-xl w-full flex justify-end gap-4 bottom-0 bg-accent/50 backdrop-blur self-end rounded-lg">
 					<DeleteNote id={data.note.id} />
 					<Button asChild>
 						<Link to="edit">Edit</Link>
 					</Button>
 				</div>
 			) : null}
-		</div>
+		</>
 	)
 }
 

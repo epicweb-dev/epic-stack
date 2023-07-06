@@ -109,7 +109,7 @@ export default function NotesRoute() {
 					</div>
 				</div>
 				<main className="relative col-span-3 bg-accent md:rounded-r-3xl">
-					<div className="absolute inset-0 overflow-y-auto px-10 py-12">
+					<div className="absolute inset-0 overflow-y-auto">
 						<Outlet />
 					</div>
 				</main>
