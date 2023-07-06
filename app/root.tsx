@@ -168,7 +168,9 @@ function App() {
 						</nav>
 					</header>
 
-					<Outlet />
+					<div className="flex-1">
+						<Outlet />
+					</div>
 
 					<div className="container mx-auto flex justify-between pb-5">
 						<Link to="/">
