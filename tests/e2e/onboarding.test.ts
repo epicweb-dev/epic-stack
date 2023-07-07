@@ -7,6 +7,7 @@ import {
 	test,
 } from '../playwright-utils.ts'
 import { readEmail } from '../mocks/utils.ts'
+import { createUser } from 'tests/db-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
@@ -14,19 +15,17 @@ function extractUrl(text: string) {
 	return match?.groups?.url
 }
 
-test('onboarding with link', async ({ page }) => {
-	const firstName = faker.person.firstName()
-	const lastName = faker.person.lastName()
-	const username = faker.internet
-		.userName({ firstName, lastName })
-		.slice(0, 20)
-		.toLowerCase()
+function getOnboardingData() {
+	const userData = createUser()
 	const onboardingData = {
-		name: `${firstName} ${lastName}`,
-		username,
-		email: `${username}@example.com`,
+		...userData,
 		password: faker.internet.password(),
 	}
+	return onboardingData
+}
+
+test('onboarding with link', async ({ page }) => {
+	const onboardingData = getOnboardingData()
 
 	await page.goto('/')
 
@@ -94,18 +93,7 @@ test('onboarding with link', async ({ page }) => {
 })
 
 test('onboarding with a short code', async ({ page }) => {
-	const firstName = faker.person.firstName()
-	const lastName = faker.person.lastName()
-	const username = faker.internet
-		.userName({ firstName, lastName })
-		.slice(0, 15)
-		.toLowerCase()
-	const onboardingData = {
-		name: `${firstName} ${lastName}`,
-		username,
-		email: `${username}@example.com`,
-		password: faker.internet.password(),
-	}
+	const onboardingData = getOnboardingData()
 
 	await page.goto('/signup')
 
