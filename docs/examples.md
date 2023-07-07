@@ -33,6 +33,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Socket.IO](https://github.com/L-Steinmacher/epic-stack-with-socket.io): by
   [@L-Steinmacher](https://github.com/L-Steinmacher):
   An example of setting up using websockets in the Epic Stack using the `Socket.IO` library.
+- [User Impersonation](https://github.com/alan2207/epic-stack-with-user-impersonation) by
+  [@alan2207](https://github.com/alan2207): 
+  An example Remix application showcasing how to implement user impersonation in the Epic Stack.
 
 ## How to contribute
 
