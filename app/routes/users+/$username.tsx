@@ -4,16 +4,15 @@ import {
 	type V2_MetaFunction,
 } from '@remix-run/node'
 import { Form, Link, useLoaderData } from '@remix-run/react'
-import invariant from 'tiny-invariant'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc } from '~/utils/misc.ts'
+import { getUserImgSrc, invariantResponse } from '~/utils/misc.ts'
 import { useOptionalUser } from '~/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
-	invariant(params.username, 'Missing username')
+	invariantResponse(params.username, 'Missing username')
 	const user = await prisma.user.findUnique({
 		where: { username: params.username },
 		select: {

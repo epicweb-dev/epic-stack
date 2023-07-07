@@ -3,15 +3,15 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
-import invariant from 'tiny-invariant'
 import { z } from 'zod'
+import { ErrorList, Field } from '~/components/forms.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { twoFAVerificationType } from '~/routes/settings+/profile.two-factor.tsx'
 import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { ErrorList, Field } from '~/components/forms.tsx'
+import { invariantResponse } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { verifyTOTP } from '~/utils/totp.server.ts'
-import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const ROUTE_PATH = '/resources/verify'
 export const unverifiedSessionKey = 'unverified-sessionId'
@@ -113,7 +113,7 @@ export async function action({ request }: DataFunctionArgs) {
 		)
 	}
 
-	invariant(submission.value.intent === 'confirm', 'invalid intent')
+	invariantResponse(submission.value.intent === 'confirm', 'invalid intent')
 
 	const { redirectTo } = submission.value
 	cookieSession.unset(unverifiedSessionKey)

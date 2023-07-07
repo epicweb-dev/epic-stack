@@ -1,15 +1,14 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher, useLoaderData } from '@remix-run/react'
 import * as QRCode from 'qrcode'
-import invariant from 'tiny-invariant'
 import { z } from 'zod'
+import { Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { Field } from '~/components/forms.tsx'
-import { getDomainUrl } from '~/utils/misc.ts'
+import { getDomainUrl, invariantResponse } from '~/utils/misc.ts'
 import { getTOTPAuthUri, verifyTOTP } from '~/utils/totp.server.ts'
 
 export const verificationType = '2fa-verify'
@@ -119,7 +118,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	switch (submission.value.intent) {
 		case 'confirm': {
-			invariant(verification, 'Verification should exist by this point')
+			invariantResponse(verification, 'Verification should exist by this point')
 			// upgrade to regular 2fa
 			await prisma.verification.update({
 				where: { id: verification.id },

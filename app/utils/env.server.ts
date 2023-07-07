@@ -1,4 +1,4 @@
-import invariant from 'tiny-invariant'
+import { invariant } from './misc.ts'
 
 const requiredServerEnvs = [
 	'NODE_ENV',

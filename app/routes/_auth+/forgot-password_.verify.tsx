@@ -16,9 +16,12 @@ import {
 } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field } from '~/components/forms.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
+import { prisma } from '~/utils/db.server.ts'
+import { invariantResponse } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
+import { verifyTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import {
 	forgotPasswordOTPQueryParam,
@@ -26,9 +29,6 @@ import {
 	verificationType,
 } from './forgot-password/index.tsx'
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
-import { verifyTOTP } from '~/utils/totp.server.ts'
-import invariant from 'tiny-invariant'
-import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const verifySchema = z.object({
 	[forgotPasswordTargetQueryParam]: z.union([emailSchema, usernameSchema]),
@@ -124,7 +124,7 @@ async function validate(request: Request, body: FormData | URLSearchParams) {
 		select: { email: true, username: true },
 	})
 	// this should not be possible...
-	invariant(user, 'User not found')
+	invariantResponse(user, 'User not found')
 
 	const session = await getSession(request.headers.get('Cookie'))
 	session.set(resetPasswordUsernameSessionKey, user.username)
