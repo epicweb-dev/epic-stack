@@ -11,7 +11,7 @@ export const clientHints = {
 		cookieName: 'CH-prefers-color-scheme',
 		getValueCode: `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'`,
 		fallback: 'light',
-		transform(value: string | null) {
+		transform(value: string) {
 			return value === 'dark' ? 'dark' : 'light'
 		},
 	},
@@ -53,7 +53,9 @@ export function getHints(request?: Request) {
 			// using ignore because it's not an issue with only one hint, but will
 			// be with more than one...
 			// @ts-ignore PR to improve these types is welcome
-			acc[hintName] = hint.transform(getCookieValue(cookieString, hintName))
+			acc[hintName] = hint.transform(
+				getCookieValue(cookieString, hintName) ?? hint.fallback,
+			)
 			return acc
 		},
 		{} as {
