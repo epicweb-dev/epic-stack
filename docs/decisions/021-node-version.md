@@ -38,7 +38,7 @@ Use the current LTS version of Node.js as the default in the starter.
 We'll use the `slim` flavor of the node.js images.
 
 We'll use the `bookworm` flavor of the node.js images (which is the current
-stable version of Dabian: v12).
+stable version of Debian: v12).
 
 ## Consequences
 
