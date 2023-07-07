@@ -155,7 +155,7 @@ function App() {
 			</head>
 			<body className="bg-background text-foreground">
 				<div className="flex h-screen flex-col justify-between">
-					<header className="container mx-auto py-6">
+					<header className="container py-6">
 						<nav className="flex justify-between">
 							<Link to="/">
 								<div className="font-light">epic</div>
@@ -177,7 +177,7 @@ function App() {
 						<Outlet />
 					</div>
 
-					<div className="container mx-auto flex justify-between pb-5">
+					<div className="container flex justify-between pb-5">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>

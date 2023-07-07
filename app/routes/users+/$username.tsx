@@ -38,10 +38,10 @@ export default function UsernameIndex() {
 	const isLoggedInUser = data.user.id === loggedInUser?.id
 
 	return (
-		<div className="container mx-auto mb-48 mt-36 flex flex-col items-center justify-center">
+		<div className="container mb-48 mt-36 flex flex-col items-center justify-center">
 			<Spacer size="4xs" />
 
-			<div className="container mx-auto flex flex-col items-center rounded-3xl bg-muted p-12">
+			<div className="container flex flex-col items-center rounded-3xl bg-muted p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
