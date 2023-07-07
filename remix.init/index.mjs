@@ -246,39 +246,15 @@ async function setupDeployment({ rootDirectory }) {
 			throw new Error(`Invalid GitHub URL: ${repoURL}`)
 		}
 
-		console.log(`🔗 Adding remote...`)
-		await $I`git remote add origin git@github.com:${githubParts.repo}.git`
-
 		console.log(
 			`Opening Fly Tokens Dashboard and GitHub Action Secrets pages. Please create a new token on Fly and set it as the value for a new secret called FLY_API_TOKEN on GitHub.`,
 		)
 		await $I`open https://web.fly.io/user/personal_access_tokens/new`
 		await $I`open ${repoURL}/settings/secrets/actions/new`
 
-		const { commitAndPush } = await inquirer.prompt([
-			{
-				name: 'commitAndPush',
-				type: 'confirm',
-				default: true,
-				message: 'Would you like to commit and push your changes?',
-			},
-		])
-		if (commitAndPush) {
-			// have to delete the remix.init directory before committing
-			await fs.rm(path.join(rootDirectory, 'remix.init'), {
-				recursive: true,
-				force: true,
-			})
-
-			console.log(`📦 Committing and pushing...`)
-			await $I`git add -A`
-			// $I doesn't like the quotes
-			await execa('git', ['commit', '-m', 'Initial commit'], {
-				stdio: 'inherit',
-				cwd: rootDirectory,
-			})
-			await $I`git push -u origin main`
-		}
+		console.log(
+			`Once you're finished with setting the token, you should be good to add the remote, commit, and push!`,
+		)
 	}
 	console.log('All done 🎉 Happy building')
 }
