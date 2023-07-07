@@ -8,6 +8,7 @@ import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
+import { Icon } from '~/components/ui/icon.tsx'
 
 const DeleteFormSchema = z.object({
 	noteId: z.string(),
@@ -83,8 +84,10 @@ export function DeleteNote({ id }: { id: string }) {
 						: noteDeleteFetcher.data?.status ?? 'idle'
 				}
 				disabled={noteDeleteFetcher.state !== 'idle'}
+				className="w-full max-md:px-0 max-md:aspect-square"
 			>
-				Delete
+				<Icon name="trash" className="md:mr-2 scale-125 max-md:scale-150" />
+				<span className="max-md:hidden">Delete</span>
 			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />
 		</noteDeleteFetcher.Form>
