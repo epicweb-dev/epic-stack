@@ -84,7 +84,7 @@ export function DeleteNote({ id }: { id: string }) {
 						: noteDeleteFetcher.data?.status ?? 'idle'
 				}
 				disabled={noteDeleteFetcher.state !== 'idle'}
-				className="w-full"
+				className="w-full max-md:px-0 max-md:aspect-square"
 			>
 				<Icon name="trash" className="md:mr-2 scale-125 max-md:scale-150" />
 				<span className="max-md:hidden">Delete</span>

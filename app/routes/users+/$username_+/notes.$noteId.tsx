@@ -42,14 +42,14 @@ export default function NoteRoute() {
 				</div>
 			</div>
 			{data.isOwner ? (
-				<div className="flex space-between items-center absolute left-3 right-3 bottom-3 p-4 pl-5 md:pl-7 rounded-lg shadow-accent shadow-xl gap-2 bg-muted/80 backdrop-blur-sm">
-					<span className="max-[525px]:hidden text-sm text-foreground/90" title={date.toLocaleString()}>
+				<div className="floating-toolbar">
+					<span className="max-[524px]:hidden text-sm text-foreground/90" title={date.toLocaleString()}>
 						<Icon name="clock" className="mr-2 scale-125" />
 						{timeAgo} ago
 					</span>
 					<div className="flex-1 grid grid-cols-2 min-[525px]:flex justify-end gap-2 md:gap-4">
 						<DeleteNote id={data.note.id} />
-						<Button asChild>
+						<Button asChild className="min-[525px]:max-md:px-0 min-[525px]:max-md:aspect-square">
 							<Link to="edit">
 								<Icon name="pencil-1" className="md:mr-2 scale-125 max-md:scale-150" />
 								<span className="max-md:hidden">Edit</span>
