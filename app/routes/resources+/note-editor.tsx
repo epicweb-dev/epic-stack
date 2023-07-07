@@ -10,6 +10,7 @@ import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
+import { floatingToolbarClassName } from '~/components/floating-toolbar.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
@@ -106,7 +107,7 @@ export function NoteEditor({
 		<noteEditorFetcher.Form
 			method="post"
 			action="/resources/note-editor"
-			className="flex gap-y-4 h-full flex-col overflow-x-hidden px-10 pt-12 pb-28"
+			className="flex h-full flex-col gap-y-4 overflow-x-hidden px-10 pb-28 pt-12"
 			{...form.props}
 		>
 			<input name="id" type="hidden" value={note?.id} />
@@ -125,14 +126,19 @@ export function NoteEditor({
 				textareaProps={{
 					...conform.textarea(fields.content),
 					autoComplete: 'content',
+					className: 'flex-1 resize-none',
 				}}
 				errors={fields.content.errors}
-				className="flex flex-col gap-y-2 flex-1 [&_textarea]:flex-1 [&_textarea]:resize-none"
+				className="flex flex-1 flex-col gap-y-2"
 			/>
 			<ErrorList errors={form.errors} id={form.errorId} />
-			<div className="floating-toolbar grid grid-cols-2 min-[525px]:flex justify-end">
-				<Button variant="destructive" type="reset" className="min-[525px]:max-md:px-0 min-[525px]:max-md:aspect-square">
-					<Icon name="reset" className="md:mr-2 scale-125 max-md:scale-150" />
+			<div className={floatingToolbarClassName}>
+				<Button
+					variant="destructive"
+					type="reset"
+					className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
+				>
+					<Icon name="reset" className="scale-125 max-md:scale-150 md:mr-2" />
 					<span className="max-md:hidden">Reset</span>
 				</Button>
 				<StatusButton
@@ -143,9 +149,12 @@ export function NoteEditor({
 					}
 					type="submit"
 					disabled={noteEditorFetcher.state !== 'idle'}
-					className="min-[525px]:max-md:px-0 min-[525px]:max-md:aspect-square"
+					className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
 				>
-					<Icon name="arrow-right" className="md:mr-2 scale-125 max-md:scale-150" />
+					<Icon
+						name="arrow-right"
+						className="scale-125 max-md:scale-150 md:mr-2"
+					/>
 					<span className="max-md:hidden">Submit</span>
 				</StatusButton>
 			</div>

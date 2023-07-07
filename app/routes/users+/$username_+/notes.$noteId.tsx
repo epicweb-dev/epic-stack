@@ -7,6 +7,7 @@ import { DeleteNote } from '~/routes/resources+/delete-note.tsx'
 import { getUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { formatDistanceToNow } from 'date-fns'
+import { floatingToolbarClassName } from '~/components/floating-toolbar.tsx'
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	const userId = await getUserId(request)
@@ -47,7 +48,7 @@ export default function NoteRoute() {
 				</div>
 			</div>
 			{data.isOwner ? (
-				<div className="floating-toolbar">
+				<div className={floatingToolbarClassName}>
 					<span
 						className="text-sm text-foreground/90 max-[524px]:hidden"
 						title={data.dateDisplay}
