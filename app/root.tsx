@@ -19,19 +19,8 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
-import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
-import fontStylestylesheetUrl from './styles/font.css'
-import tailwindStylesheetUrl from './styles/tailwind.css'
-import { authenticator, getUserId } from './utils/auth.server.ts'
-import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
-import { prisma } from './utils/db.server.ts'
-import { getEnv } from './utils/env.server.ts'
-import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.ts'
-import { useNonce } from './utils/nonce-provider.ts'
-import { makeTimings, time } from './utils/timing.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
 import { useRef } from 'react'
+import { Confetti } from './components/confetti.tsx'
 import { Button } from './components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -41,10 +30,22 @@ import {
 	DropdownMenuTrigger,
 } from './components/ui/dropdown-menu.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
-import { Confetti } from './components/confetti.tsx'
-import { getFlashSession } from './utils/flash-session.server.ts'
-import { useToast } from './utils/useToast.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
+import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
+import fontStylestylesheetUrl from './styles/font.css'
+import './styles/global.css'
+import tailwindStylesheetUrl from './styles/tailwind.css'
+import { authenticator, getUserId } from './utils/auth.server.ts'
+import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
+import { prisma } from './utils/db.server.ts'
+import { getEnv } from './utils/env.server.ts'
+import { getFlashSession } from './utils/flash-session.server.ts'
+import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.ts'
+import { useNonce } from './utils/nonce-provider.ts'
+import { makeTimings, time } from './utils/timing.server.ts'
+import { useToast } from './utils/useToast.tsx'
+import { useOptionalUser, useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -154,7 +155,7 @@ function App() {
 			</head>
 			<body className="bg-background text-foreground">
 				<div className="flex h-screen flex-col justify-between">
-					<header className="container mx-auto py-6">
+					<header className="container py-6">
 						<nav className="flex justify-between">
 							<Link to="/">
 								<div className="font-light">epic</div>
@@ -176,7 +177,7 @@ function App() {
 						<Outlet />
 					</div>
 
-					<div className="container mx-auto flex justify-between pb-5">
+					<div className="container flex justify-between pb-5">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>

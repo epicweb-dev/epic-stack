@@ -68,10 +68,10 @@ export default function NotesRoute() {
 		<div className="container flex h-full min-h-[400px] pb-12">
 			<div className="grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:mx-2 md:rounded-3xl md:pr-0">
 				<div className="relative col-span-1">
-					<div className="absolute inset-0 overflow-y-auto overflow-x-hidden [&>:last-child]:pb-12">
+					<div className="absolute inset-0 flex flex-col">
 						<Link
 							to={`/users/${data.owner.username}`}
-							className="sticky top-0 flex flex-col items-center justify-center gap-2 bg-muted pb-4 pl-8 pr-4 pt-12 lg:flex-row lg:justify-start lg:gap-4"
+							className="flex flex-col items-center justify-center gap-2 bg-muted pb-4 pl-8 pr-4 pt-12 lg:flex-row lg:justify-start lg:gap-4"
 						>
 							<img
 								src={getUserImgSrc(data.owner.imageId)}
@@ -82,7 +82,7 @@ export default function NotesRoute() {
 								{ownerDisplayName}'s Notes
 							</h1>
 						</Link>
-						<ul>
+						<ul className="overflow-y-auto overflow-x-hidden pb-12">
 							<li>
 								<NavLink
 									to="new"
@@ -109,9 +109,7 @@ export default function NotesRoute() {
 					</div>
 				</div>
 				<main className="relative col-span-3 bg-accent md:rounded-r-3xl">
-					<div className="absolute inset-0 overflow-y-auto px-10 py-12">
-						<Outlet />
-					</div>
+					<Outlet />
 				</main>
 			</div>
 		</div>

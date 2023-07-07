@@ -155,7 +155,7 @@ export default function ForgotPasswordVerifyRoute() {
 	})
 
 	return (
-		<div className="container mx-auto pb-32 pt-20">
+		<div className="container pb-32 pt-20">
 			<div className="flex flex-col justify-center">
 				<>
 					<div className="text-center">

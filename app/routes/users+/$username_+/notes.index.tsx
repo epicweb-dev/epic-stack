@@ -1,3 +1,7 @@
 export default function NotesIndexRoute() {
-	return <p>Select a note</p>
+	return (
+		<div className="container pt-12">
+			<p className="text-body-md">Select a note</p>
+		</div>
+	)
 }

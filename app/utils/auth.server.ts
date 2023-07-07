@@ -130,8 +130,8 @@ export async function signup({
 			expirationDate: new Date(Date.now() + SESSION_EXPIRATION_TIME),
 			user: {
 				create: {
-					email,
-					username,
+					email: email.toLowerCase(),
+					username: username.toLowerCase(),
 					name,
 					password: {
 						create: {

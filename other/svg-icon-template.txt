@@ -1,5 +1,5 @@
 // THIS FILE IS GENERATED, edit ./other/svg-icon-template.txt instead
-// then run "npm run gen-svg-sprite"
+// then run "npm run build:icons"
 
 import { type SVGProps } from 'react'
 import { cn } from '~/utils/misc.ts'

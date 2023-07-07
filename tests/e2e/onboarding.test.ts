@@ -7,6 +7,7 @@ import {
 	test,
 } from '../playwright-utils.ts'
 import { readEmail } from '../mocks/utils.ts'
+import { createUser } from 'tests/db-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
@@ -14,19 +15,17 @@ function extractUrl(text: string) {
 	return match?.groups?.url
 }
 
-test('onboarding with link', async ({ page }) => {
-	const firstName = faker.person.firstName()
-	const lastName = faker.person.lastName()
-	const username = faker.internet
-		.userName({ firstName, lastName })
-		.slice(0, 20)
-		.replace(/[^a-z0-9_]/g, '_')
+function getOnboardingData() {
+	const userData = createUser()
 	const onboardingData = {
-		name: `${firstName} ${lastName}`,
-		username,
-		email: `${username}@example.com`,
+		...userData,
 		password: faker.internet.password(),
 	}
+	return onboardingData
+}
+
+test('onboarding with link', async ({ page }) => {
+	const onboardingData = getOnboardingData()
 
 	await page.goto('/')
 
@@ -52,7 +51,7 @@ test('onboarding with link', async ({ page }) => {
 
 	const email = await readEmail(onboardingData.email)
 	invariant(email, 'Email not found')
-	expect(email.to).toBe(onboardingData.email)
+	expect(email.to).toBe(onboardingData.email.toLowerCase())
 	expect(email.from).toBe('hello@mud.chat')
 	expect(email.subject).toMatch(/welcome/i)
 	const onboardingUrl = extractUrl(email.text)
@@ -94,15 +93,7 @@ test('onboarding with link', async ({ page }) => {
 })
 
 test('onboarding with a short code', async ({ page }) => {
-	const firstName = faker.person.firstName()
-	const lastName = faker.person.lastName()
-	const username = faker.internet.userName({ firstName, lastName }).slice(0, 15)
-	const onboardingData = {
-		name: `${firstName} ${lastName}`,
-		username,
-		email: `${username}@example.com`,
-		password: faker.internet.password(),
-	}
+	const onboardingData = getOnboardingData()
 
 	await page.goto('/signup')
 
@@ -118,7 +109,7 @@ test('onboarding with a short code', async ({ page }) => {
 
 	const email = await readEmail(onboardingData.email)
 	invariant(email, 'Email not found')
-	expect(email.to).toBe(onboardingData.email)
+	expect(email.to).toBe(onboardingData.email.toLowerCase())
 	expect(email.from).toBe('hello@mud.chat')
 	expect(email.subject).toMatch(/welcome/i)
 	const codeMatch = email.text.match(
@@ -167,7 +158,7 @@ test('reset password with a link', async ({ page }) => {
 	const email = await readEmail(user.email)
 	invariant(email, 'Email not found')
 	expect(email.subject).toMatch(/password reset/i)
-	expect(email.to).toBe(user.email)
+	expect(email.to).toBe(user.email.toLowerCase())
 	expect(email.from).toBe('hello@mud.chat')
 	const resetPasswordUrl = extractUrl(email.text)
 	invariant(resetPasswordUrl, 'Reset password URL not found')

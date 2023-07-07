@@ -126,7 +126,7 @@ export default function ForgotPasswordRoute() {
 	})
 
 	return (
-		<div className="container mx-auto pb-32 pt-20">
+		<div className="container pb-32 pt-20">
 			<div className="flex flex-col justify-center">
 				<div className="text-center">
 					<h1 className="text-h1">Forgot Password</h1>

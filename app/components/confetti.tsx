@@ -5,6 +5,8 @@ import { ClientOnly } from 'remix-utils'
  * confetti is a unique random identifier which re-renders the component
  */
 export function Confetti({ confetti }: { confetti?: string }) {
+	if (!confetti) return null
+
 	return (
 		<ClientOnly>
 			{() => (

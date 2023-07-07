@@ -1,13 +1,15 @@
-import * as React from 'react'
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
+import { Button } from '~/components/ui/button.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
@@ -74,7 +76,9 @@ export async function action({ request }: DataFunctionArgs) {
 	} else {
 		note = await prisma.note.create({ data, select })
 	}
-	return redirect(`/users/${note.owner.username}/notes/${note.id}`)
+	return redirectWithToast(`/users/${note.owner.username}/notes/${note.id}`, {
+		title: id ? 'Note updated' : 'Note created',
+	})
 }
 
 export function NoteEditor({
@@ -83,8 +87,6 @@ export function NoteEditor({
 	note?: { id: string; title: string; content: string }
 }) {
 	const noteEditorFetcher = useFetcher<typeof action>()
-	const [content, setContent] = React.useState(note?.content ?? '')
-	const [title, setTitle] = React.useState(note?.title ?? '')
 
 	const [form, fields] = useForm({
 		id: 'note-editor',
@@ -93,6 +95,10 @@ export function NoteEditor({
 		onValidate({ formData }) {
 			return parse(formData, { schema: NoteEditorSchema })
 		},
+		defaultValue: {
+			title: note?.title,
+			content: note?.content,
+		},
 		shouldRevalidate: 'onBlur',
 	})
 
@@ -100,117 +106,48 @@ export function NoteEditor({
 		<noteEditorFetcher.Form
 			method="post"
 			action="/resources/note-editor"
+			className="flex gap-y-4 h-full flex-col overflow-x-hidden px-10 pt-12 pb-28"
 			{...form.props}
 		>
 			<input name="id" type="hidden" value={note?.id} />
 			<Field
-				labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
+				labelProps={{ children: 'Title' }}
 				inputProps={{
-					value: title,
-					onChange: event => setTitle(event.currentTarget.value),
 					...conform.input(fields.title),
 					autoComplete: 'title',
 					autoFocus: true,
 				}}
 				errors={fields.title.errors}
+				className="flex flex-col gap-y-2"
 			/>
-			<Button
-				className="mb-10"
-				type="button"
-				variant="secondary"
-				size="pill"
-				onClick={event => {
-					event.preventDefault()
-
-					// @ts-expect-error we'll fix this later probably...
-					const content = event.currentTarget.form.elements.content.value
-
-					const sse = new EventSource(
-						`/resources/completions?${new URLSearchParams({ content })}`,
-					)
-
-					sse.addEventListener('message', event => {
-						setTitle(
-							prevTitle => prevTitle + event.data.replace('__NEWLINE__', '\n'),
-						)
-					})
-
-					sse.addEventListener('error', event => {
-						console.log('error: ', event)
-						sse.close()
-					})
-				}}
-			>
-				Generate Title
-			</Button>
 			<TextareaField
-				labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
+				labelProps={{ children: 'Content' }}
 				textareaProps={{
-					value: content,
-					onChange: event => setContent(event.currentTarget.value),
 					...conform.textarea(fields.content),
 					autoComplete: 'content',
 				}}
 				errors={fields.content.errors}
+				className="flex flex-col gap-y-2 flex-1 [&_textarea]:flex-1 [&_textarea]:resize-none"
 			/>
-			<Button
-				className="mb-10"
-				type="button"
-				variant="secondary"
-				size="pill"
-				onClick={event => {
-					event.preventDefault()
-
-					// @ts-expect-error we'll fix this later probably...
-					const title = event.currentTarget.form.elements.title.value
-
-					const sse = new EventSource(
-						`/resources/completions?${new URLSearchParams({ title })}`,
-					)
-
-					sse.addEventListener('message', event => {
-						setContent(
-							prevContent =>
-								prevContent + event.data.replace('__NEWLINE__', '\n'),
-						)
-					})
-
-					sse.addEventListener('error', event => {
-						console.log('error: ', event)
-						sse.close()
-					})
-				}}
-			>
-				Generate Content
-			</Button>
 			<ErrorList errors={form.errors} id={form.errorId} />
-			<div className="flex justify-end gap-4">
-				<Button
-					size="default"
-					variant="secondary"
-					type="reset"
-					onClick={() => {
-						// because this is a controlled form, we need to reset the state
-						// because the built-in browser behavior will no longer work.
-						setContent(note?.content ?? '')
-						setTitle(note?.title ?? '')
-					}}
-				>
-					Reset
+			<div className="floating-toolbar grid grid-cols-2 min-[525px]:flex justify-end">
+				<Button variant="destructive" type="reset" className="min-[525px]:max-md:px-0 min-[525px]:max-md:aspect-square">
+					<Icon name="reset" className="md:mr-2 scale-125 max-md:scale-150" />
+					<span className="max-md:hidden">Reset</span>
 				</Button>
-				<Button
-					size="default"
-					variant="default"
-					// status={
-					// 	noteEditorFetcher.state === 'submitting'
-					// 		? 'pending'
-					// 		: noteEditorFetcher.data?.status ?? 'idle'
-					// }
+				<StatusButton
+					status={
+						noteEditorFetcher.state === 'submitting'
+							? 'pending'
+							: noteEditorFetcher.data?.status ?? 'idle'
+					}
 					type="submit"
 					disabled={noteEditorFetcher.state !== 'idle'}
+					className="min-[525px]:max-md:px-0 min-[525px]:max-md:aspect-square"
 				>
-					Submit
-				</Button>
+					<Icon name="arrow-right" className="md:mr-2 scale-125 max-md:scale-150" />
+					<span className="max-md:hidden">Submit</span>
+				</StatusButton>
 			</div>
 		</noteEditorFetcher.Form>
 	)
