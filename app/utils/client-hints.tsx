@@ -118,7 +118,9 @@ for (const hint of hints) {
 		document.cookie = hint.name + '=' + hint.actual;
 	}
 }
-if (cookieChanged) {
+// if the cookie changed, reload the page, unless the browser doesn't support
+// cookies (in which case we would enter an infinite loop of reloads)
+if (cookieChanged && navigator.cookieEnabled) {
 	window.location.reload();
 }
 			`,
