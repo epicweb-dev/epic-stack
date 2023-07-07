@@ -20,7 +20,7 @@ test('onboarding with link', async ({ page }) => {
 	const username = faker.internet
 		.userName({ firstName, lastName })
 		.slice(0, 20)
-		.replace(/[^a-z0-9_]/g, '_')
+		.toLowerCase()
 	const onboardingData = {
 		name: `${firstName} ${lastName}`,
 		username,
@@ -96,7 +96,10 @@ test('onboarding with link', async ({ page }) => {
 test('onboarding with a short code', async ({ page }) => {
 	const firstName = faker.person.firstName()
 	const lastName = faker.person.lastName()
-	const username = faker.internet.userName({ firstName, lastName }).slice(0, 15)
+	const username = faker.internet
+		.userName({ firstName, lastName })
+		.slice(0, 15)
+		.toLowerCase()
 	const onboardingData = {
 		name: `${firstName} ${lastName}`,
 		username,
