@@ -7,7 +7,7 @@
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "type": "module",
   "scripts": {
-    "postinstall": "patch-package --patch-dir ./other/patches",
+    "postinstall": "patch-package --patch-dir ./other/patches && npm run gen-svg-sprite",
     "build": "run-s build:*",
     "build:remix": "remix build --sourcemap",
     "build:server": "tsx ./other/build-server.ts",
@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "gen-svg-sprite": "rmx svg-sprite other/svg-icons app/components/ui/icon.tsx --template=./other/svg-icon-template.txt",
-    "setup": "prisma generate && prisma migrate deploy && prisma db seed && playwright install",
+    "setup": "npm run gen-svg-sprite && prisma generate && prisma migrate deploy && prisma db seed && playwright install",
     "start": "cross-env NODE_ENV=production node .",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
     "test": "vitest",

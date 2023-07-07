@@ -50,11 +50,9 @@ export function Field({
 				aria-describedby={errorId}
 				{...inputProps}
 			/>
-			{errorId ? (
-				<div className="min-h-[32px] px-4 pb-3 pt-1">
-					<ErrorList id={errorId} errors={errors} />
-				</div>
-			) : null}
+			<div className="min-h-[32px] px-4 pb-3 pt-1">
+				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+			</div>
 		</div>
 	)
 }
@@ -82,11 +80,9 @@ export function TextareaField({
 				aria-describedby={errorId}
 				{...textareaProps}
 			/>
-			{errorId ? (
-				<div className="px-4 pb-3 pt-1">
-					<ErrorList id={errorId} errors={errors} />
-				</div>
-				) : null}
+			<div className="px-4 pb-3 pt-1">
+				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+			</div>
 		</div>
 	)
 }
@@ -144,11 +140,9 @@ export function CheckboxField({
 					className="self-center text-body-xs text-muted-foreground"
 				/>
 			</div>
-			{errorId ? (
-				<div className="px-4 pb-3 pt-1">
-					<ErrorList id={errorId} errors={errors} />
-				</div>
-			 ) : null}
+			<div className="px-4 pb-3 pt-1">
+				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+			</div>
 		</div>
 	)
 }

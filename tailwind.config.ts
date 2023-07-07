@@ -1,6 +1,5 @@
 import type { Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
-import plugin from 'tailwindcss/plugin.js'
 import animatePlugin from 'tailwindcss-animate'
 import radixPlugin from 'tailwindcss-radix'
 
@@ -121,15 +120,5 @@ export default {
 			},
 		},
 	},
-	plugins: [
-		animatePlugin,
-		radixPlugin,
-		plugin(function ({ addComponents }) {
-			addComponents({
-				'.floating-toolbar': {
-					'@apply flex items-center absolute left-3 right-3 bottom-3 p-4 pl-5 md:pl-7 rounded-lg shadow-accent shadow-xl gap-2 md:gap-4 bg-muted/80 backdrop-blur-sm': {},
-				},
-			})
-		}),
-	],
+	plugins: [animatePlugin, radixPlugin],
 } satisfies Config

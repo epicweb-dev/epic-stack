@@ -21,5 +21,9 @@ export async function loader({ params, request }: DataFunctionArgs) {
 export default function NoteEdit() {
 	const data = useLoaderData<typeof loader>()
 
-	return <NoteEditor note={data.note} />
+	return (
+		<div className="absolute inset-0">
+			<NoteEditor note={data.note} />
+		</div>
+	)
 }
