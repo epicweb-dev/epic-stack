@@ -4,10 +4,11 @@ export const usernameSchema = z
 	.string()
 	.min(3, { message: 'Username is too short' })
 	.max(20, { message: 'Username is too long' })
-	.regex(/^[a-z0-9_]+$/, {
-		message:
-			'Username can only include lower case letters, numbers, and underscores',
+	.regex(/^[a-zA-Z0-9_]+$/, {
+		message: 'Username can only include letters, numbers, and underscores',
 	})
+	// users can type the username in any case, but we store it in lowercase
+	.transform(value => value.toLowerCase())
 
 export const passwordSchema = z
 	.string()

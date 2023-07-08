@@ -33,8 +33,8 @@ export function Field({
 	errors,
 	className,
 }: {
-	labelProps: Omit<React.LabelHTMLAttributes<HTMLLabelElement>, 'className'>
-	inputProps: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>
+	labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
+	inputProps: React.InputHTMLAttributes<HTMLInputElement>
 	errors?: ListOfErrors
 	className?: string
 }) {

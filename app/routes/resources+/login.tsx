@@ -130,7 +130,11 @@ export function InlineLogin({
 				>
 					<Field
 						labelProps={{ children: 'Username' }}
-						inputProps={{ ...conform.input(fields.username), autoFocus: true }}
+						inputProps={{
+							...conform.input(fields.username),
+							autoFocus: true,
+							className: 'lowercase',
+						}}
 						errors={fields.username.errors}
 					/>
 
