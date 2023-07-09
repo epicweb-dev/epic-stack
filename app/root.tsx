@@ -115,7 +115,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				path: new URL(request.url).pathname,
 				userPrefs: {
 					theme: getTheme(request),
-				} as const,
+				},
 			},
 			ENV: getEnv(),
 			flash,
