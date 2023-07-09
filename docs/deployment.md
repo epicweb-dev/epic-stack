@@ -21,8 +21,8 @@ Prior to your first deployment, you'll need to do a few things:
 
    > **Note**: If you have more than one Fly account, ensure that you are signed
    > into the same account in the Fly CLI as you are in the browser. In your
-   > terminal, run `fly auth whoami` and ensure the email matches the Fly account
-   > signed into the browser.
+   > terminal, run `fly auth whoami` and ensure the email matches the Fly
+   > account signed into the browser.
 
 3. Create two apps on Fly, one for staging and one for production:
 
@@ -30,9 +30,9 @@ Prior to your first deployment, you'll need to do a few things:
    fly apps create [YOUR_APP_NAME]
    fly apps create [YOUR_APP_NAME]-staging
    ```
-   
-   > **Note**: Make sure this name matches the `app` set in your `fly.toml` file.
-   > Otherwise, you will not be able to deploy.
+
+   > **Note**: Make sure this name matches the `app` set in your `fly.toml`
+   > file. Otherwise, you will not be able to deploy.
 
 4. Initialize Git.
 
@@ -74,7 +74,7 @@ Prior to your first deployment, you'll need to do a few things:
    based on your needs and the region of your choice
    (`https://fly.io/docs/reference/regions/`). If you do change the region, make
    sure you change the `primary_region` in fly.toml as well):
-   
+
    ```sh
    fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]
    fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]-staging
@@ -82,8 +82,8 @@ Prior to your first deployment, you'll need to do a few things:
 
 7. Attach Consul:
 
-- Attach consul to your app. Consul is a fly-managed service that manages your
-  primary instance for data replication
+- Consul is a fly-managed service that manages your primary instance for data
+  replication
   ([learn more about configuring consul](https://fly.io/docs/litefs/getting-started/#lease-configuration)).
 
   ```sh
@@ -93,14 +93,14 @@ Prior to your first deployment, you'll need to do a few things:
 
 8. Commit!
 
-   The Epic Stack comes with a GitHub Action that handles automatically deploying
-   your app to production and staging environments.
-   
-   Now that everything is set up you can commit and push your changes to your repo.
-   Every commit to your `main` branch will trigger a deployment to your production
-   environment, and every commit to your `dev` branch will trigger a deployment to
-   your staging environment.
-   
+   The Epic Stack comes with a GitHub Action that handles automatically
+   deploying your app to production and staging environments.
+
+   Now that everything is set up you can commit and push your changes to your
+   repo. Every commit to your `main` branch will trigger a deployment to your
+   production environment, and every commit to your `dev` branch will trigger a
+   deployment to your staging environment.
+
 ---
 
 ### Optional: Email service setup
