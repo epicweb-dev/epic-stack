@@ -1,9 +1,9 @@
 import type { DataFunctionArgs } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import invariant from 'tiny-invariant'
 import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
 import { lruCache } from '~/utils/cache.server.ts'
+import { invariantResponse } from '~/utils/misc.ts'
 import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request, params }: DataFunctionArgs) {
@@ -16,7 +16,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
 	await ensureInstance(instance)
 
 	const { cacheKey } = params
-	invariant(cacheKey, 'cacheKey is required')
+	invariantResponse(cacheKey, 'cacheKey is required')
 	return json({
 		instance: {
 			hostname: instance,

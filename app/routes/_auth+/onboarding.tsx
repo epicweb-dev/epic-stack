@@ -166,8 +166,7 @@ export default function OnboardingPage() {
 							autoFocus:
 								typeof actionData === 'undefined' ||
 								typeof fields.username.initialError !== 'undefined',
-							onChange: e =>
-								(e.currentTarget.value = e.currentTarget.value.toLowerCase()),
+							className: 'lowercase',
 						}}
 						errors={fields.username.errors}
 					/>

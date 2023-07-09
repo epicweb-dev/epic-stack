@@ -34,7 +34,6 @@ import { Toaster } from './components/ui/toaster.tsx'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
 import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
-import './styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -114,8 +113,8 @@ export async function loader({ request }: DataFunctionArgs) {
 				hints: getHints(request),
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
-				session: {
-					theme: await getTheme(request),
+				userPrefs: {
+					theme: getTheme(request),
 				},
 			},
 			ENV: getEnv(),
@@ -182,7 +181,7 @@ function App() {
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
-						<ThemeSwitch userPreference={data.requestInfo.session.theme} />
+						<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 					</div>
 				</div>
 				<Confetti confetti={data.flash?.confetti} />

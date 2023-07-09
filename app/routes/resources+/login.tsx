@@ -5,17 +5,17 @@ import { Link, useFetcher } from '@remix-run/react'
 import { AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
 import { safeRedirect } from 'remix-utils'
-import invariant from 'tiny-invariant'
 import { z } from 'zod'
+import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
+import { invariantResponse } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
 import { unverifiedSessionKey } from './verify.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
 
 const ROUTE_PATH = '/resources/login'
 
@@ -74,7 +74,7 @@ export async function action({ request }: DataFunctionArgs) {
 		where: { id: sessionId },
 		select: { userId: true, expirationDate: true },
 	})
-	invariant(session, 'newly created session not found')
+	invariantResponse(session, 'newly created session not found')
 
 	const user2FA = await prisma.verification.findFirst({
 		where: { type: twoFAVerificationType, target: session.userId },
@@ -130,7 +130,11 @@ export function InlineLogin({
 				>
 					<Field
 						labelProps={{ children: 'Username' }}
-						inputProps={{ ...conform.input(fields.username), autoFocus: true }}
+						inputProps={{
+							...conform.input(fields.username),
+							autoFocus: true,
+							className: 'lowercase',
+						}}
 						errors={fields.username.errors}
 					/>
 
