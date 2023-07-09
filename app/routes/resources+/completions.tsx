@@ -5,9 +5,9 @@ import {
 	Configuration,
 	OpenAIApi,
 } from 'openai'
-import invariant from 'tiny-invariant'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { invariantResponse } from '~/utils/misc.ts'
 
 const openai = new OpenAIApi(
 	new Configuration({
@@ -58,7 +58,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		  ]
 		: null
 
-	invariant(messages, 'Must provide title or content')
+	invariantResponse(messages, 'Must provide title or content')
 
 	const response = await openai.createChatCompletion(
 		{
