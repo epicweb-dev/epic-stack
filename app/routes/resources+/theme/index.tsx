@@ -9,12 +9,7 @@ import { ErrorList } from '~/components/forms.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { useHints } from '~/utils/client-hints.tsx'
 import { useRequestInfo } from '~/utils/request-info.ts'
-import {
-	commitSession,
-	deleteTheme,
-	getSession,
-	setTheme,
-} from './theme-session.server.ts'
+import { setTheme } from './theme-session.server.ts'
 
 const ROUTE_PATH = '/resources/theme'
 
@@ -41,16 +36,10 @@ export async function action({ request }: DataFunctionArgs) {
 	if (submission.intent !== 'submit') {
 		return json({ status: 'success', submission } as const)
 	}
-	const session = await getSession(request.headers.get('cookie'))
 	const { redirectTo, theme } = submission.value
-	if (theme === 'system') {
-		deleteTheme(session)
-	} else {
-		setTheme(session, theme)
-	}
 
 	const responseInit = {
-		headers: { 'Set-Cookie': await commitSession(session) },
+		headers: { 'Set-Cookie': setTheme(theme === 'system' ? undefined : theme) },
 	}
 	if (redirectTo) {
 		return redirect(safeRedirect(redirectTo), responseInit)
@@ -62,7 +51,7 @@ export async function action({ request }: DataFunctionArgs) {
 export function ThemeSwitch({
 	userPreference,
 }: {
-	userPreference: 'light' | 'dark' | null
+	userPreference?: 'light' | 'dark'
 }) {
 	const requestInfo = useRequestInfo()
 	const fetcher = useFetcher()
@@ -133,7 +122,7 @@ export function useTheme() {
 	if (optimisticMode) {
 		return optimisticMode === 'system' ? hints.theme : optimisticMode
 	}
-	return requestInfo.session.theme ?? hints.theme
+	return requestInfo.userPrefs.theme ?? hints.theme
 }
 
 /**

@@ -113,9 +113,9 @@ export async function loader({ request }: DataFunctionArgs) {
 				hints: getHints(request),
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
-				session: {
-					theme: await getTheme(request),
-				},
+				userPrefs: {
+					theme: getTheme(request),
+				} as const,
 			},
 			ENV: getEnv(),
 			flash,
@@ -181,7 +181,7 @@ function App() {
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
-						<ThemeSwitch userPreference={data.requestInfo.session.theme} />
+						<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 					</div>
 				</div>
 				<Confetti confetti={data.flash?.confetti} />
