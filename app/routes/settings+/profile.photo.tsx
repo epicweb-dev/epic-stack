@@ -221,7 +221,7 @@ export default function PhotoChooserModal() {
 				<DialogClose asChild>
 					<Link
 						to=".."
-            onClick={() => setOpen(false)}
+						onClick={() => setOpen(false)}
 						preventScrollReset
 						aria-label="Close"
 						className="absolute right-10 top-10"
