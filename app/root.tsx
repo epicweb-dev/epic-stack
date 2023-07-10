@@ -295,20 +295,7 @@ export function ErrorBoundary() {
 
 	return (
 		<Document nonce={nonce}>
-			<GeneralErrorBoundary
-				statusHandlers={{
-					404: () => (
-						<div>
-							<h1>We can't find that page</h1>
-							<div className="flex justify-between">
-								<div className="flex-1 text-lg underline">
-									<Link to="/">Back to home</Link>
-								</div>
-							</div>
-						</div>
-					),
-				}}
-			/>
+			<GeneralErrorBoundary />
 		</Document>
 	)
 }
