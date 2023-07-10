@@ -76,7 +76,7 @@ export const links: LinksFunction = () => {
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Epic Notes' : 'That page does not exist' },
+		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
 		{ name: 'description', content: `Your own captain's log` },
 	]
 }
@@ -137,11 +137,21 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-function Document({ children }: { children: React.ReactNode }) {
-	const nonce = useNonce()
+function Document({
+	children,
+	nonce,
+	theme = 'light',
+	env = {},
+}: {
+	children: React.ReactNode
+	nonce: string
+	theme?: 'dark' | 'light'
+	env?: Record<string, string>
+}) {
 	return (
-		<html lang="en" className="h-full overflow-x-hidden">
+		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
 			<head>
+				<ClientHintCheck nonce={nonce} />
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -149,6 +159,12 @@ function Document({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="bg-background text-foreground">
 				{children}
+				<script
+					nonce={nonce}
+					dangerouslySetInnerHTML={{
+						__html: `window.ENV = ${JSON.stringify(env)}`,
+					}}
+				/>
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
 				<LiveReload nonce={nonce} />
@@ -165,59 +181,41 @@ function App() {
 	useToast(data.flash?.toast)
 
 	return (
-		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
-			<head>
-				<ClientHintCheck nonce={nonce} />
-				<Meta />
-				<meta charSet="utf-8" />
-				<meta name="viewport" content="width=device-width,initial-scale=1" />
-				<Links />
-			</head>
-			<body className="bg-background text-foreground">
-				<div className="flex h-screen flex-col justify-between">
-					<header className="container py-6">
-						<nav className="flex justify-between">
-							<Link to="/">
-								<div className="font-light">epic</div>
-								<div className="font-bold">notes</div>
-							</Link>
-							<div className="flex items-center gap-10">
-								{user ? (
-									<UserDropdown />
-								) : (
-									<Button asChild variant="default" size="sm">
-										<Link to="/login">Log In</Link>
-									</Button>
-								)}
-							</div>
-						</nav>
-					</header>
-
-					<div className="flex-1">
-						<Outlet />
-					</div>
-
-					<div className="container flex justify-between pb-5">
+		<Document nonce={nonce} theme={theme} env={data.ENV}>
+			<div className="flex h-screen flex-col justify-between">
+				<header className="container py-6">
+					<nav className="flex justify-between">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
-						<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-					</div>
+						<div className="flex items-center gap-10">
+							{user ? (
+								<UserDropdown />
+							) : (
+								<Button asChild variant="default" size="sm">
+									<Link to="/login">Log In</Link>
+								</Button>
+							)}
+						</div>
+					</nav>
+				</header>
+
+				<div className="flex-1">
+					<Outlet />
 				</div>
-				<Confetti confetti={data.flash?.confetti} />
-				<Toaster />
-				<ScrollRestoration nonce={nonce} />
-				<Scripts nonce={nonce} />
-				<script
-					nonce={nonce}
-					dangerouslySetInnerHTML={{
-						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
-					}}
-				/>
-				<LiveReload nonce={nonce} />
-			</body>
-		</html>
+
+				<div className="container flex justify-between pb-5">
+					<Link to="/">
+						<div className="font-light">epic</div>
+						<div className="font-bold">notes</div>
+					</Link>
+					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+				</div>
+			</div>
+			<Confetti confetti={data.flash?.confetti} />
+			<Toaster />
+		</Document>
 	)
 }
 export default withSentry(App)
@@ -284,8 +282,19 @@ function UserDropdown() {
 }
 
 export function ErrorBoundary() {
+	// the nonce doesn't rely on the loader so we can access that
+	const nonce = useNonce()
+
+	// NOTE: you cannot use useLoaderData in an ErrorBoundary because the loader
+	// likely failed to run so we have to do the best we can.
+	// We could probably do better than this (it's possible the loader did run).
+	// This would require a change in Remix.
+
+	// Just make sure your root route never errors out and you'll always be able
+	// to give the user a better UX.
+
 	return (
-		<Document>
+		<Document nonce={nonce}>
 			<GeneralErrorBoundary
 				statusHandlers={{
 					404: () => (
