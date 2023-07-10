@@ -21,6 +21,7 @@ import {
 import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
+import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Button } from './components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -73,10 +74,10 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: 'Epic Notes' },
-		{ name: 'description', content: 'Find yourself in outer space' },
+		{ title: data ? 'Epic Notes' : 'That page does not exist' },
+		{ name: 'description', content: `Your own captain's log` },
 	]
 }
 
@@ -134,6 +135,26 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
 	}
 	return headers
+}
+
+function Document({ children }: { children: React.ReactNode }) {
+	const nonce = useNonce()
+	return (
+		<html lang="en" className="h-full overflow-x-hidden">
+			<head>
+				<Meta />
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width,initial-scale=1" />
+				<Links />
+			</head>
+			<body className="bg-background text-foreground">
+				{children}
+				<ScrollRestoration nonce={nonce} />
+				<Scripts nonce={nonce} />
+				<LiveReload nonce={nonce} />
+			</body>
+		</html>
+	)
 }
 
 function App() {
@@ -259,5 +280,26 @@ function UserDropdown() {
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
+	)
+}
+
+export function ErrorBoundary() {
+	return (
+		<Document>
+			<GeneralErrorBoundary
+				statusHandlers={{
+					404: () => (
+						<div>
+							<h1>We can't find that page</h1>
+							<div className="flex justify-between">
+								<div className="flex-1 text-lg underline">
+									<Link to="/">Back to home</Link>
+								</div>
+							</div>
+						</div>
+					),
+				}}
+			/>
+		</Document>
 	)
 }
