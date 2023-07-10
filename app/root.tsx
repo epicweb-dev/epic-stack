@@ -21,6 +21,7 @@ import {
 import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
+import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Button } from './components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -32,7 +33,7 @@ import {
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
-import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
+import { getTheme } from './routes/resources+/theme/theme.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
@@ -73,10 +74,10 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: 'Epic Notes' },
-		{ name: 'description', content: 'Find yourself in outer space' },
+		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
+		{ name: 'description', content: `Your own captain's log` },
 	]
 }
 
@@ -136,13 +137,17 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-function App() {
-	const data = useLoaderData<typeof loader>()
-	const nonce = useNonce()
-	const user = useOptionalUser()
-	const theme = useTheme()
-	useToast(data.flash?.toast)
-
+function Document({
+	children,
+	nonce,
+	theme = 'light',
+	env = {},
+}: {
+	children: React.ReactNode
+	nonce: string
+	theme?: 'dark' | 'light'
+	env?: Record<string, string>
+}) {
 	return (
 		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
 			<head>
@@ -153,50 +158,64 @@ function App() {
 				<Links />
 			</head>
 			<body className="bg-background text-foreground">
-				<div className="flex h-screen flex-col justify-between">
-					<header className="container py-6">
-						<nav className="flex justify-between">
-							<Link to="/">
-								<div className="font-light">epic</div>
-								<div className="font-bold">notes</div>
-							</Link>
-							<div className="flex items-center gap-10">
-								{user ? (
-									<UserDropdown />
-								) : (
-									<Button asChild variant="default" size="sm">
-										<Link to="/login">Log In</Link>
-									</Button>
-								)}
-							</div>
-						</nav>
-					</header>
+				{children}
+				<script
+					nonce={nonce}
+					dangerouslySetInnerHTML={{
+						__html: `window.ENV = ${JSON.stringify(env)}`,
+					}}
+				/>
+				<ScrollRestoration nonce={nonce} />
+				<Scripts nonce={nonce} />
+				<LiveReload nonce={nonce} />
+			</body>
+		</html>
+	)
+}
 
-					<div className="flex-1">
-						<Outlet />
-					</div>
+function App() {
+	const data = useLoaderData<typeof loader>()
+	const nonce = useNonce()
+	const user = useOptionalUser()
+	const theme = useTheme()
+	useToast(data.flash?.toast)
 
-					<div className="container flex justify-between pb-5">
+	return (
+		<Document nonce={nonce} theme={theme} env={data.ENV}>
+			<div className="flex h-screen flex-col justify-between">
+				<header className="container py-6">
+					<nav className="flex justify-between">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
-						<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-					</div>
+						<div className="flex items-center gap-10">
+							{user ? (
+								<UserDropdown />
+							) : (
+								<Button asChild variant="default" size="sm">
+									<Link to="/login">Log In</Link>
+								</Button>
+							)}
+						</div>
+					</nav>
+				</header>
+
+				<div className="flex-1">
+					<Outlet />
 				</div>
-				<Confetti confetti={data.flash?.confetti} />
-				<Toaster />
-				<ScrollRestoration nonce={nonce} />
-				<Scripts nonce={nonce} />
-				<script
-					nonce={nonce}
-					dangerouslySetInnerHTML={{
-						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
-					}}
-				/>
-				<LiveReload nonce={nonce} />
-			</body>
-		</html>
+
+				<div className="container flex justify-between pb-5">
+					<Link to="/">
+						<div className="font-light">epic</div>
+						<div className="font-bold">notes</div>
+					</Link>
+					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+				</div>
+			</div>
+			<Confetti confetti={data.flash?.confetti} />
+			<Toaster />
+		</Document>
 	)
 }
 export default withSentry(App)
@@ -259,5 +278,24 @@ function UserDropdown() {
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
+	)
+}
+
+export function ErrorBoundary() {
+	// the nonce doesn't rely on the loader so we can access that
+	const nonce = useNonce()
+
+	// NOTE: you cannot use useLoaderData in an ErrorBoundary because the loader
+	// likely failed to run so we have to do the best we can.
+	// We could probably do better than this (it's possible the loader did run).
+	// This would require a change in Remix.
+
+	// Just make sure your root route never errors out and you'll always be able
+	// to give the user a better UX.
+
+	return (
+		<Document nonce={nonce}>
+			<GeneralErrorBoundary />
+		</Document>
 	)
 }

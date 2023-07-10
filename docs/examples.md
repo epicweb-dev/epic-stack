@@ -26,16 +26,20 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions):
   An example of the Epic Stack with Prisma Client extensions activated for enum
   like behavior in SQLite.
-- [Epic Stack + Storybook](https://github.com/moishinetzer/epic-stack-with-storybook): by
-  [@moishinetzer](https://github.com/moishinetzer): An example of the Epic Stack
-  with Storybook. It also showcases creating a Remix stub, which is very helpful for
-  isolating Remix-specific components inside of Storybook.
+- [Epic Stack + Storybook](https://github.com/moishinetzer/epic-stack-with-storybook):
+  by [@moishinetzer](https://github.com/moishinetzer): An example of the Epic
+  Stack with Storybook. It also showcases creating a Remix stub, which is very
+  helpful for isolating Remix-specific components inside of Storybook.
 - [Socket.IO](https://github.com/L-Steinmacher/epic-stack-with-socket.io): by
-  [@L-Steinmacher](https://github.com/L-Steinmacher):
-  An example of setting up using websockets in the Epic Stack using the `Socket.IO` library.
-- [User Impersonation](https://github.com/alan2207/epic-stack-with-user-impersonation) by
-  [@alan2207](https://github.com/alan2207): 
-  An example Remix application showcasing how to implement user impersonation in the Epic Stack.
+  [@L-Steinmacher](https://github.com/L-Steinmacher): An example of setting up
+  using websockets in the Epic Stack using the `Socket.IO` library.
+- [User Impersonation](https://github.com/alan2207/epic-stack-with-user-impersonation)
+  by [@alan2207](https://github.com/alan2207): An example Remix application
+  showcasing how to implement user impersonation in the Epic Stack.
+- [Epic Stack Time Zone Client Hint](https://github.com/kiliman/epic-stack-time-zone):
+  by [@kiliman](https://github.com/kiliman) An example that adds a `time zone`
+  client hint and a helper function for formatting date/time on the server using
+  `Intl.DateTimeFormat`. Also honors the client's `accept-language` header.
 
 ## How to contribute
 

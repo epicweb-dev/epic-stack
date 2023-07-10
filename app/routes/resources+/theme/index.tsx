@@ -9,7 +9,7 @@ import { ErrorList } from '~/components/forms.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { useHints } from '~/utils/client-hints.tsx'
 import { useRequestInfo } from '~/utils/request-info.ts'
-import { setTheme } from './theme-session.server.ts'
+import { setTheme } from './theme.server.ts'
 
 const ROUTE_PATH = '/resources/theme'
 

@@ -38,9 +38,9 @@ headers proposed to the standard.
 
 The idea behind the standard is when the browser makes a request, instead of
 responding to the request immediately, the server instead responds to the client
-informing it there's a need for for certain headers. The client will then repeat
-the request with those headers added. The server can then respond with the
-correct content.
+informing it there's a need for certain headers. The client will then repeat the
+request with those headers added. The server can then respond with the correct
+content.
 
 Our solution is inspired by this, but instead of headers we use cookies. In
 `app/utils/client-hints.tsx` we have a component called `ClientHintCheck` which
