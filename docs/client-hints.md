@@ -38,7 +38,7 @@ headers proposed to the standard.
 
 The idea behind the standard is when the browser makes a request, instead of
 responding to the request immediately, the server instead responds to the client
-informing it there's a need for for certain headers. The client will then repeat
+informing it there's a need for certain headers. The client will then repeat
 the request with those headers added. The server can then respond with the
 correct content.
 
