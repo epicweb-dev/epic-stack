@@ -155,6 +155,11 @@ function Document({
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
+				<meta
+					// fix some iOS hyration issues
+					name="format-detection"
+					content="telephone=no, date=no, email=no, address=no"
+				/>
 				<Links />
 			</head>
 			<body className="bg-background text-foreground">
