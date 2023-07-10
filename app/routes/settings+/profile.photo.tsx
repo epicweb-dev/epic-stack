@@ -9,6 +9,7 @@ import {
 } from '@remix-run/node'
 import {
 	Form,
+	Link,
 	useActionData,
 	useFetcher,
 	useLoaderData,
@@ -218,13 +219,15 @@ export default function PhotoChooserModal() {
 					<ErrorList errors={form.errors} />
 				</Form>
 				<DialogClose asChild>
-					<button
-            onClick={dismissModal}
+					<Link
+						to=".."
+            onClick={() => setOpen(false)}
+						preventScrollReset
 						aria-label="Close"
 						className="absolute right-10 top-10"
 					>
 						<Icon name="cross-1" />
-					</button>
+					</Link>
 				</DialogClose>
 			</DialogContent>
 			<deleteImageFetcher.Form

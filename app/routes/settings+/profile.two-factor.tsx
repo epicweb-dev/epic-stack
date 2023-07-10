@@ -1,5 +1,5 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Outlet, useNavigate } from '@remix-run/react'
+import { Link, Outlet, useNavigate } from '@remix-run/react'
 import { Icon } from '~/components/ui/icon.tsx'
 import {
 	Dialog,
@@ -43,13 +43,15 @@ export default function TwoFactorRoute() {
 					<Outlet />
 				</div>
 				<DialogClose asChild>
-					<button
-            onClick={dismissModal}
+					<Link
+						to=".."
+            onClick={() => setOpen(false)}
+						preventScrollReset
 						aria-label="Close"
 						className="absolute right-10 top-10"
 					>
 						<Icon name="cross-1" />
-					</button>
+					</Link>
 				</DialogClose>
 			</DialogContent>
 		</Dialog>
