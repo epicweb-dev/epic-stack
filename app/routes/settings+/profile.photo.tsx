@@ -125,7 +125,7 @@ export async function action({ request }: DataFunctionArgs) {
 }
 
 export default function PhotoChooserModal() {
-	const data = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>() || {}
 	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
 	const navigate = useNavigate()
 	const deleteImageFetcher = useFetcher<typeof deleteImageRoute.action>()
@@ -139,11 +139,15 @@ export default function PhotoChooserModal() {
 		},
 		shouldRevalidate: 'onBlur',
 	})
+	const [open, setOpen] = useState(true)
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
-	const dismissModal = () => navigate('..', { preventScrollReset: true })
+	const dismissModal = () => {
+		setOpen(false)
+		navigate('..', { preventScrollReset: true })
+	}
 	return (
-		<Dialog open={true}>
+		<Dialog open={open}>
 			<DialogContent
 				onEscapeKeyDown={dismissModal}
 				onPointerDownOutside={dismissModal}
@@ -158,11 +162,15 @@ export default function PhotoChooserModal() {
 					className="mt-8 flex flex-col items-center justify-center gap-10"
 					onReset={() => setNewImageSrc(null)}
 					{...form.props}
+					onSubmit={dismissModal}
 				>
 					<img
-						src={newImageSrc ?? getUserImgSrc(data.user.imageId)}
+						src={
+							newImageSrc ??
+							(data.user ? getUserImgSrc(data.user?.imageId) : '')
+						}
 						className="h-64 w-64 rounded-full"
-						alt={data.user.name ?? data.user.username}
+						alt={data.user?.name ?? data.user?.username}
 					/>
 					<ErrorList errors={photoFile.errors} id={photoFile.id} />
 					<input
@@ -196,7 +204,7 @@ export default function PhotoChooserModal() {
 									<Icon name="pencil-1" /> Change
 								</label>
 							</Button>
-							{data.user.imageId ? (
+							{data.user?.imageId ? (
 								<Button
 									variant="destructive"
 									type="submit"
@@ -213,6 +221,7 @@ export default function PhotoChooserModal() {
 				<DialogClose asChild>
 					<Link
 						to=".."
+						onClick={() => setOpen(false)}
 						preventScrollReset
 						aria-label="Close"
 						className="absolute right-10 top-10"
@@ -227,7 +236,7 @@ export default function PhotoChooserModal() {
 				action={deleteImageRoute.ROUTE_PATH}
 			>
 				<input name="intent" type="hidden" value="submit" />
-				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
+				<input name="imageId" type="hidden" value={data.user?.imageId ?? ''} />
 			</deleteImageFetcher.Form>
 		</Dialog>
 	)

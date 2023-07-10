@@ -141,7 +141,7 @@ export async function action({ request }: DataFunctionArgs) {
 }
 
 export default function TwoFactorRoute() {
-	const data = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>() || {}
 	const toggle2FAFetcher = useFetcher<typeof action>()
 
 	const [form, fields] = useForm({
@@ -158,7 +158,7 @@ export default function TwoFactorRoute() {
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data.qrCode} className="w-56" />
+				<img alt="qr code" src={data?.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -169,7 +169,7 @@ export default function TwoFactorRoute() {
 						className="whitespace-pre-wrap break-all text-sm"
 						aria-label="One-time Password URI"
 					>
-						{data.otpUri}
+						{data?.otpUri}
 					</pre>
 				</div>
 				<p className="text-sm">
