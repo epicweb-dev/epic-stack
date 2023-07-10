@@ -144,7 +144,7 @@ Then you can run the deploy command:
 
 ```
 mv ./other/Dockerfile Dockerfile
-mv ./other/dockerignore .dockerignore
+mv ./other/.dockerignore .dockerignore
 fly deploy
 ```
 
