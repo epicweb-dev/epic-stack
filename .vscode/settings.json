@@ -4,9 +4,5 @@
     "@remix-run/router",
     "react-router"
   ],
-  "tailwindCSS.experimental.classRegex": [
-		[
-			"cn\\(([^)]*)\\)"
-		]
-	]
+  "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]]
 }
