@@ -115,7 +115,6 @@ export function NoteEditor({
 				labelProps={{ children: 'Title' }}
 				inputProps={{
 					...conform.input(fields.title),
-					autoComplete: 'title',
 					autoFocus: true,
 				}}
 				errors={fields.title.errors}
@@ -125,7 +124,6 @@ export function NoteEditor({
 				labelProps={{ children: 'Content' }}
 				textareaProps={{
 					...conform.textarea(fields.content),
-					autoComplete: 'content',
 					className: 'flex-1 resize-none',
 				}}
 				errors={fields.content.errors}
