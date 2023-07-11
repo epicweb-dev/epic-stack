@@ -126,6 +126,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 export default function PhotoChooserModal() {
 	const data = useLoaderData<typeof loader>() || {}
+	const [userImgId] = useState(data.user?.imageId);
 	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
 	const navigate = useNavigate()
 	const deleteImageFetcher = useFetcher<typeof deleteImageRoute.action>()
@@ -139,8 +140,8 @@ export default function PhotoChooserModal() {
 		},
 		shouldRevalidate: 'onBlur',
 	})
-	const [open, setOpen] = useState(true)
 
+	const [open, setOpen] = useState(true)
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
 	const dismissModal = () => {
 		setOpen(false)
@@ -167,7 +168,7 @@ export default function PhotoChooserModal() {
 					<img
 						src={
 							newImageSrc ??
-							(data.user ? getUserImgSrc(data.user?.imageId) : '')
+							(userImgId ? getUserImgSrc(userImgId) : '')
 						}
 						className="h-64 w-64 rounded-full"
 						alt={data.user?.name ?? data.user?.username}

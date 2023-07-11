@@ -3,6 +3,7 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher, useLoaderData } from '@remix-run/react'
 import * as QRCode from 'qrcode'
+import { useState } from 'react'
 import { z } from 'zod'
 import { Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
@@ -144,6 +145,8 @@ export default function TwoFactorRoute() {
 	const data = useLoaderData<typeof loader>() || {}
 	const toggle2FAFetcher = useFetcher<typeof action>()
 
+	const [qrImgSrc] = useState(data?.qrCode)
+
 	const [form, fields] = useForm({
 		id: 'signup-form',
 		constraint: getFieldsetConstraint(verifySchema),
@@ -158,7 +161,7 @@ export default function TwoFactorRoute() {
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data?.qrCode} className="h-56 w-56" />
+				<img alt="qr code" src={qrImgSrc} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
