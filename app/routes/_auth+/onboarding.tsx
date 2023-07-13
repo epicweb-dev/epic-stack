@@ -28,6 +28,7 @@ import {
 } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { redirectWithConfetti } from '~/utils/flash-session.server.ts'
+import { prisma } from '~/utils/db.server.ts'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
 
@@ -81,9 +82,25 @@ export async function action({ request }: DataFunctionArgs) {
 	}
 
 	const formData = await request.formData()
-	const submission = parse(formData, {
-		schema: onboardingFormSchema,
+	const submission = await parse(formData, {
+		schema: () => {
+			return onboardingFormSchema.superRefine(async (data, ctx) => {
+				const existingUser = await prisma.user.findUnique({
+					where: { username: data.username },
+					select: { id: true },
+				})
+				if (existingUser) {
+					ctx.addIssue({
+						path: ['username'],
+						code: z.ZodIssueCode.custom,
+						message: 'A user already exists with this username',
+					})
+					return
+				}
+			})
+		},
 		acceptMultipleErrors: () => true,
+		async: true,
 	})
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
