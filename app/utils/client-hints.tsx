@@ -117,7 +117,7 @@ ${Object.values(clientHints)
 for (const hint of hints) {
 	if (hint.cookie !== hint.actual) {
 		cookieChanged = true;
-		document.cookie = hint.name + '=' + hint.actual + ';path=/';
+		document.cookie = encodeURIComponent(hint.name) + '=' + encodeURIComponent(hint.actual) + ';path=/';
 	}
 }
 // if the cookie changed, reload the page, unless the browser doesn't support
