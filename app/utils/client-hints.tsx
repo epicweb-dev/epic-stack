@@ -15,6 +15,11 @@ export const clientHints = {
 			return value === 'dark' ? 'dark' : 'light'
 		},
 	},
+	timeZone: {
+		cookieName: 'CH-time-zone',
+		getValueCode: `Intl.DateTimeFormat().resolvedOptions().timeZone`,
+		fallback: 'UTC',
+	},
 	// add other hints here
 }
 
@@ -50,18 +55,18 @@ export function getHints(request?: Request) {
 	return Object.entries(clientHints).reduce(
 		(acc, [name, hint]) => {
 			const hintName = name as ClientHintNames
-			// using ignore because it's not an issue with only one hint, but will
-			// be with more than one...
-			// @ts-ignore PR to improve these types is welcome
-			acc[hintName] = hint.transform(
-				getCookieValue(cookieString, hintName) ?? hint.fallback,
-			)
+			// get value from cookie and transform it, if a transform function is defined.
+			if ('transform' in hint) {
+				acc[hintName] = hint.transform(
+					getCookieValue(cookieString, hintName) ?? hint.fallback,
+				)
+			} else {
+				acc[hintName] = getCookieValue(cookieString, hintName) ?? hint.fallback
+			}
 			return acc
 		},
 		{} as {
-			[name in ClientHintNames]: ReturnType<
-				(typeof clientHints)[name]['transform']
-			>
+			[name in ClientHintNames]: string
 		},
 	)
 }
