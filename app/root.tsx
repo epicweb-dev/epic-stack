@@ -145,7 +145,7 @@ function Document({
 }: {
 	children: React.ReactNode
 	nonce: string
-	theme?: 'dark' | 'light' | string
+	theme?: 'dark' | 'light'
 	env?: Record<string, string>
 }) {
 	return (
