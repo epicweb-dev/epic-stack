@@ -1,6 +1,6 @@
 # Community
 
-Here you can find useful learning resources built and maintained by the community, such as articles and videos. 
+Here you can find useful learning resources and tools built and maintained by the community, such as libraries, examples, articles, and videos. 
 
 ## Learning resources
 
