@@ -33,21 +33,13 @@ import { Icon } from '~/components/ui/icon.tsx'
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
-/*
-The preprocess call is needed because a current bug in @remix-run/web-fetch
-for more info see the bug (https://github.com/remix-run/web-std-io/pull/28)
-and the explanation here: https://conform.guide/file-upload
-*/
 const PhotoFormSchema = z.object({
-	photoFile: z.preprocess(
-		value => (value === '' ? new File([], '') : value),
-		z
-			.instanceof(File)
-			.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
-			.refine(file => {
-				return file.size <= MAX_SIZE
-			}, 'Image size must be less than 3MB'),
-	),
+	photoFile: z
+		.instanceof(File)
+		.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
+		.refine(file => {
+			return file.size <= MAX_SIZE
+		}, 'Image size must be less than 3MB'),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
