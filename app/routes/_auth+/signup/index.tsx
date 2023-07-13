@@ -34,22 +34,20 @@ const signupSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: () => {
-			return signupSchema.superRefine(async (data, ctx) => {
-				const existingUser = await prisma.user.findUnique({
-					where: { email: data.email },
-					select: { id: true },
-				})
-				if (existingUser) {
-					ctx.addIssue({
-						path: ['email'],
-						code: z.ZodIssueCode.custom,
-						message: 'A user already exists with this email',
-					})
-					return
-				}
+		schema: signupSchema.superRefine(async (data, ctx) => {
+			const existingUser = await prisma.user.findUnique({
+				where: { email: data.email },
+				select: { id: true },
 			})
-		},
+			if (existingUser) {
+				ctx.addIssue({
+					path: ['email'],
+					code: z.ZodIssueCode.custom,
+					message: 'A user already exists with this email',
+				})
+				return
+			}
+		}),
 		acceptMultipleErrors: () => true,
 		async: true,
 	})

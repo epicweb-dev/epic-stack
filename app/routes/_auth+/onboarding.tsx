@@ -83,22 +83,20 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: () => {
-			return onboardingFormSchema.superRefine(async (data, ctx) => {
-				const existingUser = await prisma.user.findUnique({
-					where: { username: data.username },
-					select: { id: true },
-				})
-				if (existingUser) {
-					ctx.addIssue({
-						path: ['username'],
-						code: z.ZodIssueCode.custom,
-						message: 'A user already exists with this username',
-					})
-					return
-				}
+		schema: onboardingFormSchema.superRefine(async (data, ctx) => {
+			const existingUser = await prisma.user.findUnique({
+				where: { username: data.username },
+				select: { id: true },
 			})
-		},
+			if (existingUser) {
+				ctx.addIssue({
+					path: ['username'],
+					code: z.ZodIssueCode.custom,
+					message: 'A user already exists with this username',
+				})
+				return
+			}
+		}),
 		acceptMultipleErrors: () => true,
 		async: true,
 	})
