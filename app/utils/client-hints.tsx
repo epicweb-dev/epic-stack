@@ -55,18 +55,22 @@ export function getHints(request?: Request) {
 	return Object.entries(clientHints).reduce(
 		(acc, [name, hint]) => {
 			const hintName = name as ClientHintNames
-			// get value from cookie and transform it, if a transform function is defined.
 			if ('transform' in hint) {
 				acc[hintName] = hint.transform(
 					getCookieValue(cookieString, hintName) ?? hint.fallback,
 				)
 			} else {
+				// @ts-expect-error - this is fine (PRs welcome though)
 				acc[hintName] = getCookieValue(cookieString, hintName) ?? hint.fallback
 			}
 			return acc
 		},
 		{} as {
-			[name in ClientHintNames]: string
+			[name in ClientHintNames]: (typeof clientHints)[name] extends {
+				transform: (value: infer T) => any
+			}
+				? ReturnType<(typeof clientHints)[name]['transform']>
+				: (typeof clientHints)[name]['fallback']
 		},
 	)
 }
