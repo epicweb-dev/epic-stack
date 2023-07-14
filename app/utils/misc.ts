@@ -116,6 +116,14 @@ export function invariantResponse(
 	}
 }
 
+/**
+ * Uses the request's accept-language header to determine the user's preferred
+ * locale and the client hint cookies for the user's timeZone returns a
+ * DateTimeFormat object for that locale and timezone.
+ *
+ * All options can be overridden by passing in an options object. By default,
+ * the options are all "numeric" and the timeZone.
+ */
 export function getDateTimeFormat(
 	request: Request,
 	options?: Intl.DateTimeFormatOptions,
@@ -136,7 +144,7 @@ export function getDateTimeFormat(
 	options = {
 		...defaultOptions,
 		...options,
-		timeZone: options?.timeZone ?? getHints(request).timeZone ?? 'UTC',
+		timeZone: options?.timeZone ?? getHints(request).timeZone,
 	}
 	return new Intl.DateTimeFormat(locale, options)
 }

@@ -36,10 +36,6 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [User Impersonation](https://github.com/alan2207/epic-stack-with-user-impersonation)
   by [@alan2207](https://github.com/alan2207): An example Remix application
   showcasing how to implement user impersonation in the Epic Stack.
-- [Epic Stack Time Zone Client Hint](https://github.com/kiliman/epic-stack-time-zone):
-  by [@kiliman](https://github.com/kiliman) An example that adds a `time zone`
-  client hint and a helper function for formatting date/time on the server using
-  `Intl.DateTimeFormat`. Also honors the client's `accept-language` header.
 
 ## How to contribute
 
