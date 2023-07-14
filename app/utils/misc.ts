@@ -162,7 +162,6 @@ export function useIsSubmitting({
 } = {}) {
 	const contextualFormAction = useFormAction()
 	const navigation = useNavigation()
-	debugger
 	return (
 		navigation.state === 'submitting' &&
 		navigation.formAction === (formAction ?? contextualFormAction) &&
