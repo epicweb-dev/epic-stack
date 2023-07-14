@@ -1,0 +1,51 @@
+# Security
+
+The Epic Stack has several security measures in place to protect your users and
+yourself. This (incomplete) document, explains some of the security measures
+that are in place and how to use them.
+
+## Content Security Policy
+
+The Epic Stack uses a strict
+[Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+This means that only resources from trusted sources are allowed to be loaded.
+However, by default, the CSP is set to `report-only` which means that the
+browser will report violations of the CSP without actually blocking the
+resource.
+
+This is to prevent new users of the Epic Stack from being blocked or surprised
+by the CSP by default. However, it is recommended to enable the CSP in
+`server/index.ts` by removing the `reportOnly: true` option.
+
+## Fly's Internal Network
+
+The Epic Stack uses [Fly](https://fly.io) for hosting. Fly has an internal
+network that allows you to connect services to each other without exposing them
+to the public internet. When running multiple instances of the Epic Stack, your
+instances communicate with each other over this internal network. Most of this
+happens behind the scenes with the consul service that Fly manages for us.
+
+But we also have an endpoint that allows instances to connect to each other to
+update the cache in the primary region. This uses internal URLs for that
+communication (via [`litefs-js`](https://github.com/fly-apps/litefs-js)), but as
+an added layer of security it uses a shared secret to validate the requests.
+
+> This could be changed if there's a way to determine if a request is coming
+> from the internal network. But I haven't found a way to do that yet. PRs
+> welcome!
+
+Outside of this, the Epic Stack does not access other first-party services or
+databases.
+
+## Secrets
+
+The currently recommended policy for managing secrets is to place them in a
+`.env` file in the root of the application (which is `.gitignore`d). There is a
+`.env.example` which can be used as a template for this file (and if you do not
+need to actually connect to real services, this can be used as
+`cp .env.example .env`).
+
+These secrets need to also be set on Fly using the `fly secrets` command.
+
+There are significant limitations to this approach and will probably be improved
+in the future.

@@ -4,6 +4,8 @@ Date: 2023-05-27
 
 Status: accepted
 
+Update: [022-report-only-csp.md](./022-report-only-csp.md)
+
 ## Context
 
 A Content Security Policy (CSP) allows a server to inform the browser about the
