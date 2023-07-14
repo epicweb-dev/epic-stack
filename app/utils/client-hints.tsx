@@ -15,6 +15,11 @@ export const clientHints = {
 			return value === 'dark' ? 'dark' : 'light'
 		},
 	},
+	timeZone: {
+		cookieName: 'CH-time-zone',
+		getValueCode: `Intl.DateTimeFormat().resolvedOptions().timeZone`,
+		fallback: 'UTC',
+	},
 	// add other hints here
 }
 
@@ -31,7 +36,7 @@ function getCookieValue(cookieString: string, name: ClientHintNames) {
 		.find(c => c.startsWith(hint.cookieName + '='))
 		?.split('=')[1]
 
-	return value ?? null
+	return value ? decodeURIComponent(value) : null
 }
 
 /**
@@ -50,18 +55,22 @@ export function getHints(request?: Request) {
 	return Object.entries(clientHints).reduce(
 		(acc, [name, hint]) => {
 			const hintName = name as ClientHintNames
-			// using ignore because it's not an issue with only one hint, but will
-			// be with more than one...
-			// @ts-ignore PR to improve these types is welcome
-			acc[hintName] = hint.transform(
-				getCookieValue(cookieString, hintName) ?? hint.fallback,
-			)
+			if ('transform' in hint) {
+				acc[hintName] = hint.transform(
+					getCookieValue(cookieString, hintName) ?? hint.fallback,
+				)
+			} else {
+				// @ts-expect-error - this is fine (PRs welcome though)
+				acc[hintName] = getCookieValue(cookieString, hintName) ?? hint.fallback
+			}
 			return acc
 		},
 		{} as {
-			[name in ClientHintNames]: ReturnType<
-				(typeof clientHints)[name]['transform']
-			>
+			[name in ClientHintNames]: (typeof clientHints)[name] extends {
+				transform: (value: any) => infer ReturnValue
+			}
+				? ReturnValue
+				: (typeof clientHints)[name]['fallback']
 		},
 	)
 }
@@ -115,7 +124,7 @@ ${Object.values(clientHints)
 	.join(',\n')}
 ];
 for (const hint of hints) {
-	if (hint.cookie !== hint.actual) {
+	if (decodeURIComponent(hint.cookie) !== hint.actual) {
 		cookieChanged = true;
 		document.cookie = encodeURIComponent(hint.name) + '=' + encodeURIComponent(hint.actual) + ';path=/';
 	}

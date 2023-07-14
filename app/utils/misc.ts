@@ -1,7 +1,9 @@
 import { useOutlet } from '@remix-run/react'
+import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { type ClassValue, clsx } from 'clsx'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { getHints } from './client-hints.tsx'
 
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/file/${imageId}` : `/img/user.png`
@@ -112,6 +114,39 @@ export function invariantResponse(
 			...responseInit,
 		})
 	}
+}
+
+/**
+ * Uses the request's accept-language header to determine the user's preferred
+ * locale and the client hint cookies for the user's timeZone returns a
+ * DateTimeFormat object for that locale and timezone.
+ *
+ * All options can be overridden by passing in an options object. By default,
+ * the options are all "numeric" and the timeZone.
+ */
+export function getDateTimeFormat(
+	request: Request,
+	options?: Intl.DateTimeFormatOptions,
+) {
+	const locales = parseAcceptLanguage(request.headers.get('accept-language'), {
+		validate: Intl.DateTimeFormat.supportedLocalesOf,
+	})
+	const locale = locales[0] ?? 'en-US'
+
+	// change your default options here
+	const defaultOptions: Intl.DateTimeFormatOptions = {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+	}
+	options = {
+		...defaultOptions,
+		...options,
+		timeZone: options?.timeZone ?? getHints(request).timeZone,
+	}
+	return new Intl.DateTimeFormat(locale, options)
 }
 
 export function AnimatedOutlet() {

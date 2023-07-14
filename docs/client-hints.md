@@ -56,4 +56,5 @@ first render, the client will have the correct cookies and the server will
 render the right thing every time thereafter.
 
 The built-in template currently only has support for the user's color scheme
-preference, but you can add more for your application's needs.
+preference and the user's timezone, but you can add more for your application's
+needs.
