@@ -67,9 +67,9 @@ export function getHints(request?: Request) {
 		},
 		{} as {
 			[name in ClientHintNames]: (typeof clientHints)[name] extends {
-				transform: (value: infer T) => any
+				transform: (value: any) => infer ReturnValue
 			}
-				? ReturnType<(typeof clientHints)[name]['transform']>
+				? ReturnValue
 				: (typeof clientHints)[name]['fallback']
 		},
 	)
