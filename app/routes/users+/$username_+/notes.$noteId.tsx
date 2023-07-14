@@ -20,6 +20,7 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import { getUserId, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
+import { getDateTimeFormat } from '~/utils/misc.ts'
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	const userId = await getUserId(request)
@@ -43,7 +44,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
 	return json({
 		note,
 		timeAgo,
-		dateDisplay: date.toLocaleDateString(),
+		dateDisplay: getDateTimeFormat(request).format(date),
 		isOwner: userId === note.ownerId,
 	})
 }
@@ -112,7 +113,7 @@ export default function NoteRoute() {
 			{data.isOwner ? (
 				<div className={floatingToolbarClassName}>
 					<span
-						className="text-sm text-foreground/90 max-[524px]:hidden"
+						className="inline-flex text-sm text-foreground/90 max-[524px]:hidden"
 						title={data.dateDisplay}
 					>
 						<Icon name="clock" className="mr-2 scale-125" />
