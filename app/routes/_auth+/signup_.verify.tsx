@@ -1,17 +1,12 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useFormAction,
-	useLoaderData,
-	useNavigation,
-} from '@remix-run/react'
+import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
+import { useIsSubmitting } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { verifyTOTP } from '~/utils/totp.server.ts'
 import { onboardingEmailSessionKey } from './onboarding.tsx'
@@ -117,9 +112,7 @@ async function validate(request: Request, body: URLSearchParams | FormData) {
 
 export default function SignupVerifyRoute() {
 	const data = useLoaderData<typeof loader>()
-	const formAction = useFormAction()
-	const navigation = useNavigation()
-	const isSubmitting = navigation.formAction === formAction
+	const isSubmitting = useIsSubmitting()
 	const actionData = useActionData<typeof action>()
 
 	const [form, fields] = useForm({

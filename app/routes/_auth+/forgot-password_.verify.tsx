@@ -6,20 +6,13 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useActionData,
-	useFormAction,
-	useLoaderData,
-	useNavigation,
-} from '@remix-run/react'
+import { Form, Link, useActionData, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { invariantResponse } from '~/utils/misc.ts'
+import { invariantResponse, useIsSubmitting } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { verifyTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
@@ -139,9 +132,7 @@ export const meta: V2_MetaFunction = () => {
 
 export default function ForgotPasswordVerifyRoute() {
 	const data = useLoaderData<typeof loader>()
-	const formAction = useFormAction()
-	const navigation = useNavigation()
-	const isSubmitting = navigation.formAction === formAction
+	const isSubmitting = useIsSubmitting()
 	const actionData = useActionData<typeof action>()
 
 	const [form, fields] = useForm({

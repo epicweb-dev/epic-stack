@@ -5,12 +5,16 @@ import {
 	Form,
 	Link,
 	useActionData,
-	useFormAction,
 	useLoaderData,
 	useLocation,
-	useNavigation,
 } from '@remix-run/react'
+import { useRef } from 'react'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import { z } from 'zod'
+import { ErrorList, Field } from '~/components/forms.tsx'
+import { Button } from '~/components/ui/button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import {
 	authenticator,
 	getPasswordHash,
@@ -18,8 +22,7 @@ import {
 	verifyLogin,
 } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { ErrorList, Field } from '~/components/forms.tsx'
-import { getUserImgSrc, AnimatedOutlet } from '~/utils/misc.ts'
+import { AnimatedOutlet, getUserImgSrc, useIsSubmitting } from '~/utils/misc.ts'
 import {
 	emailSchema,
 	nameSchema,
@@ -27,11 +30,6 @@ import {
 	usernameSchema,
 } from '~/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { useRef } from 'react'
-import { CSSTransition, SwitchTransition } from 'react-transition-group'
 
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
@@ -133,16 +131,11 @@ export async function action({ request }: DataFunctionArgs) {
 export default function EditUserProfile() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-	const navigation = useNavigation()
-	const formAction = useFormAction()
 
 	const location = useLocation()
 	const nodeRef = useRef(null)
 
-	const isSubmitting =
-		navigation.state === 'submitting' &&
-		navigation.formAction === formAction &&
-		navigation.formMethod === 'POST'
+	const isSubmitting = useIsSubmitting()
 
 	const [form, fields] = useForm({
 		id: 'edit-profile',

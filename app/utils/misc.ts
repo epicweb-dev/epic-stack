@@ -1,6 +1,6 @@
-import { useOutlet } from '@remix-run/react'
+import { useFormAction, useNavigation, useOutlet } from '@remix-run/react'
+import { clsx, type ClassValue } from 'clsx'
 import { parseAcceptLanguage } from 'intl-parse-accept-language'
-import { type ClassValue, clsx } from 'clsx'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
@@ -147,6 +147,26 @@ export function getDateTimeFormat(
 		timeZone: options?.timeZone ?? getHints(request).timeZone,
 	}
 	return new Intl.DateTimeFormat(locale, options)
+}
+
+/**
+ * Returns true if the current navigation is submitting the current route's
+ * form. Defaults to the current route's form action and method POST.
+ */
+export function useIsSubmitting({
+	formAction,
+	formMethod = 'POST',
+}: {
+	formAction?: string
+	formMethod?: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE'
+} = {}) {
+	const contextualFormAction = useFormAction()
+	const navigation = useNavigation()
+	return (
+		navigation.state === 'submitting' &&
+		(navigation.formAction === formAction ?? contextualFormAction) &&
+		navigation.formMethod === formMethod
+	)
 }
 
 export function AnimatedOutlet() {

@@ -6,19 +6,14 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useFormAction,
-	useNavigation,
-} from '@remix-run/react'
+import { Form, useActionData } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { getDomainUrl } from '~/utils/misc.ts'
+import { getDomainUrl, useIsSubmitting } from '~/utils/misc.ts'
 import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
 import { SignupEmail } from './email.server.tsx'
@@ -119,9 +114,7 @@ export const meta: V2_MetaFunction = () => {
 
 export default function SignupRoute() {
 	const actionData = useActionData<typeof action>()
-	const formAction = useFormAction()
-	const navigation = useNavigation()
-	const isSubmitting = navigation.formAction === formAction
+	const isSubmitting = useIsSubmitting()
 	const [form, fields] = useForm({
 		id: 'signup-form',
 		constraint: getFieldsetConstraint(signupSchema),
