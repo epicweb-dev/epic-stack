@@ -1,4 +1,4 @@
-import { useFormAction, useNavigation, useOutlet } from '@remix-run/react'
+import { useFormAction, useNavigation } from '@remix-run/react'
 import { clsx, type ClassValue } from 'clsx'
 import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { useState } from 'react'
@@ -169,8 +169,41 @@ export function useIsSubmitting({
 	)
 }
 
-export function AnimatedOutlet() {
-	const [outlet] = useState(useOutlet())
+function callAll<Args extends Array<unknown>>(
+	...fns: Array<((...args: Args) => unknown) | undefined>
+) {
+	return (...args: Args) => fns.forEach(fn => fn?.(...args))
+}
 
-	return outlet
+/**
+ * Use this hook with a button and it will make it so the first click sets a
+ * `doubleCheck` state to true, and the second click will actually trigger the
+ * `onClick` handler. This allows you to have a button that can be like a
+ * "are you sure?" experience for the user before doing destructive operations.
+ */
+export function useDoubleCheck() {
+	const [doubleCheck, setDoubleCheck] = useState(false)
+
+	function getButtonProps(
+		props?: React.ButtonHTMLAttributes<HTMLButtonElement>,
+	) {
+		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] =
+			() => setDoubleCheck(false)
+
+		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] =
+			doubleCheck
+				? undefined
+				: e => {
+						e.preventDefault()
+						setDoubleCheck(true)
+				  }
+
+		return {
+			...props,
+			onBlur: callAll(onBlur, props?.onBlur),
+			onClick: callAll(onClick, props?.onClick),
+		}
+	}
+
+	return { doubleCheck, getButtonProps }
 }

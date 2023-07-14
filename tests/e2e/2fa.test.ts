@@ -14,28 +14,23 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 	await page.getByRole('link', { name: /enable 2fa/i }).click()
 
 	await expect(page).toHaveURL(`/settings/profile/two-factor`)
-	const dialog = page.getByRole('dialog')
-	await dialog.getByRole('button', { name: /enable 2fa/i }).click()
-	const otpUriString = await dialog
+	const main = page.getByRole('main')
+	await main.getByRole('button', { name: /enable 2fa/i }).click()
+	const otpUriString = await main
 		.getByLabel(/One-Time Password URI/i)
 		.innerText()
 
 	const otpUri = new URL(otpUriString)
 	const options = Object.fromEntries(otpUri.searchParams.entries())
 
-	await dialog
+	await main
 		.getByRole('textbox', { name: /code/i })
 		.fill(generateTOTP(options).otp)
-	await dialog.getByRole('button', { name: /confirm/i }).click()
+	await main.getByRole('button', { name: /confirm/i }).click()
 
-	await expect(dialog).toHaveText(
-		/You have enabled two-factor authentication./i,
-	)
-	await expect(
-		dialog.getByRole('button', { name: /disable 2fa/i }),
-	).toBeVisible()
+	await expect(main).toHaveText(/You have enabled two-factor authentication./i)
+	await expect(main.getByRole('button', { name: /disable 2fa/i })).toBeVisible()
 
-	await dialog.getByRole('link', { name: /close/i }).click()
 	await page.getByRole('link', { name: user.name ?? user.username }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)

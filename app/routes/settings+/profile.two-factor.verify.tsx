@@ -5,11 +5,16 @@ import { useFetcher, useLoaderData } from '@remix-run/react'
 import * as QRCode from 'qrcode'
 import { z } from 'zod'
 import { Field } from '~/components/forms.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { getDomainUrl, invariantResponse } from '~/utils/misc.ts'
 import { getTOTPAuthUri, verifyTOTP } from '~/utils/totp.server.ts'
+
+export const handle = {
+	breadcrumb: <Icon name="check">Verify</Icon>,
+}
 
 export const verificationType = '2fa-verify'
 

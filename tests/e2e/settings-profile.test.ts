@@ -64,16 +64,10 @@ test('Users can update their profile photo', async ({ login, page }) => {
 	await expect(page).toHaveURL(`/settings/profile/photo`)
 
 	await page
-		.getByRole('dialog', { name: /profile photo/i })
 		.getByLabel(/change/i)
 		.setInputFiles('./tests/fixtures/test-profile.jpg')
 
-	await page
-		.getByRole('dialog', { name: /profile photo/i })
-		.getByRole('button', { name: /save/i })
-		.click()
-
-	await expect(page.getByRole('dialog')).toBeHidden()
+	await page.getByRole('button', { name: /save/i }).click()
 
 	await expect(
 		page,

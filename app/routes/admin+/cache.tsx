@@ -19,7 +19,7 @@ import {
 	lruCache,
 	searchCacheKeys,
 } from '~/utils/cache.server.ts'
-import { invariantResponse } from '~/utils/misc.ts'
+import { invariantResponse, useDoubleCheck } from '~/utils/misc.ts'
 import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -220,39 +220,6 @@ function CacheKeyRow({
 			</Link>
 		</div>
 	)
-}
-
-function callAll<Args extends Array<unknown>>(
-	...fns: Array<((...args: Args) => unknown) | undefined>
-) {
-	return (...args: Args) => fns.forEach(fn => fn?.(...args))
-}
-
-export function useDoubleCheck() {
-	const [doubleCheck, setDoubleCheck] = React.useState(false)
-
-	function getButtonProps(
-		props?: React.ButtonHTMLAttributes<HTMLButtonElement>,
-	) {
-		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] =
-			() => setDoubleCheck(false)
-
-		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] =
-			doubleCheck
-				? undefined
-				: e => {
-						e.preventDefault()
-						setDoubleCheck(true)
-				  }
-
-		return {
-			...props,
-			onBlur: callAll(onBlur, props?.onBlur),
-			onClick: callAll(onClick, props?.onClick),
-		}
-	}
-
-	return { doubleCheck, getButtonProps }
 }
 
 function debounce<Callback extends (...args: Parameters<Callback>) => void>(
