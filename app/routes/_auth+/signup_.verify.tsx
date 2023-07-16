@@ -1,9 +1,10 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
+import { PinField } from '~/components/pin-field.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { useIsSubmitting } from '~/utils/misc.ts'
@@ -114,6 +115,7 @@ export default function SignupVerifyRoute() {
 	const data = useLoaderData<typeof loader>()
 	const isSubmitting = useIsSubmitting()
 	const actionData = useActionData<typeof action>()
+	const submit = useSubmit()
 
 	const [form, fields] = useForm({
 		id: 'signup-verify-form',
@@ -148,16 +150,15 @@ export default function SignupVerifyRoute() {
 						...conform.input(fields.email),
 					}}
 					errors={fields.email.errors}
+					className='hidden'
 				/>
 				<Field
-					labelProps={{
-						htmlFor: fields.code.id,
-						children: 'Code',
-					}}
-					inputProps={{
-						...conform.input(fields.code),
-					}}
-					errors={fields.code.errors}
+					length={6}
+					autoFocus
+					oneTimeCode
+					{...conform.input(fields.code)}
+					onComplete={() => submit(form.ref.current, { replace: true })}
+					type='number'
 				/>
 				<ErrorList errors={form.errors} id={form.errorId} />
 				<StatusButton
