@@ -88,6 +88,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const responseInit = {
 		headers: {
 			'Set-Cookie': await commitSession(cookieSession, {
+				// Cookies with no expiration are cleared when the tab/window closes
 				expires: remember ? session.expirationDate : undefined,
 			}),
 		},
