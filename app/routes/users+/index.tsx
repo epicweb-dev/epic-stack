@@ -1,10 +1,20 @@
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import {
+	json,
+	redirect,
+	type DataFunctionArgs,
+	type HeadersFunction,
+} from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { SearchBar } from '~/components/search-bar.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { getUserImgSrc } from '~/utils/misc.ts'
+import {
+	combineServerTimings,
+	makeTimings,
+	time,
+} from '~/utils/timing.server.ts'
 
 const UserSearchResultSchema = z.object({
 	id: z.string(),
@@ -16,48 +26,61 @@ const UserSearchResultSchema = z.object({
 const UserSearchResultsSchema = z.array(UserSearchResultSchema)
 
 export async function loader({ request }: DataFunctionArgs) {
+	const timings = makeTimings('users loader')
 	const searchTerm = new URL(request.url).searchParams.get('search')
 	if (searchTerm === '') {
 		return redirect('/users')
 	}
 
-	let rawUsers: Array<unknown>
-
-	if (searchTerm) {
-		rawUsers = await prisma.$queryRaw`
-			SELECT id, username, name, imageId
-			FROM user
-			WHERE username LIKE ${`%${searchTerm ?? ''}%`}
-			OR name LIKE ${`%${searchTerm ?? ''}%`}
-			ORDER BY (
-				SELECT updatedAt
-				FROM note
-				WHERE ownerId = user.id
-				ORDER BY updatedAt DESC
-				LIMIT 1
-			) DESC
-			LIMIT 50
-		`
-	} else {
-		rawUsers = await prisma.$queryRaw`
-			SELECT id, username, name, imageId
-			FROM user
-			ORDER BY (
-				SELECT updatedAt
-				FROM note
-				WHERE ownerId = user.id
-				ORDER BY updatedAt DESC
-				LIMIT 1
-			) DESC
-			LIMIT 50
-		`
-	}
+	const rawUsers = await time(
+		async () => {
+			if (searchTerm) {
+				return prisma.$queryRaw`
+				SELECT id, username, name, imageId
+				FROM user
+				WHERE username LIKE ${`%${searchTerm ?? ''}%`}
+				OR name LIKE ${`%${searchTerm ?? ''}%`}
+				ORDER BY (
+					SELECT updatedAt
+					FROM note
+					WHERE ownerId = user.id
+					ORDER BY updatedAt DESC
+					LIMIT 1
+				) DESC
+				LIMIT 50
+			`
+			} else {
+				return await prisma.$queryRaw`
+				SELECT id, username, name, imageId
+				FROM user
+				ORDER BY (
+					SELECT updatedAt
+					FROM note
+					WHERE ownerId = user.id
+					ORDER BY updatedAt DESC
+					LIMIT 1
+				) DESC
+				LIMIT 50
+			`
+			}
+		},
+		{ timings, type: 'search users' },
+	)
 
 	const result = UserSearchResultsSchema.safeParse(rawUsers)
+	const headers = { 'Server-Timing': timings.toString() }
 	if (!result.success) {
-		return json({ status: 'error', error: result.error.message } as const)
+		return json({ status: 'error', error: result.error.message } as const, {
+			headers,
+		})
 	}
-	return json({ status: 'idle', users: result.data } as const)
+	return json({ status: 'idle', users: result.data } as const, { headers })
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+	return {
+		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
+	}
 }
 
 export default function UsersRoute() {
