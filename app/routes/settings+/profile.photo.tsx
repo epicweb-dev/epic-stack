@@ -182,6 +182,9 @@ export default function PhotoRoute() {
 							</label>
 						</Button>
 
+						{/* This is here for progressive enhancement. If the client doesn't
+						hydrate (or hasn't yet) this button will be available to submit the
+						selected photo. */}
 						<ServerOnly>
 							{() => (
 								<Button type="submit" className="server-only">
