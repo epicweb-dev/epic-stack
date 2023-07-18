@@ -123,5 +123,5 @@ model Note {
 
   // our user search orders by recently owners who have recently updated notes
   // so indexing on the owner ID helps with that (a LOT).
-  @@index([ownerId])
+  @@index([ownerId, updatedAt(sort: Desc)])
 }
