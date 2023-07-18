@@ -154,7 +154,7 @@ export default function PhotoRoute() {
 				<input
 					{...conform.input(photoFile, { type: 'file' })}
 					accept="image/*"
-					className="sr-only peer"
+					className="peer sr-only"
 					tabIndex={newImageSrc ? -1 : 0}
 					onChange={e => {
 						const file = e.currentTarget.files?.[0]
@@ -181,12 +181,14 @@ export default function PhotoRoute() {
 								<Icon name="pencil-1">Change</Icon>
 							</label>
 						</Button>
-            
-            <ServerOnly>
-              {() => (
-                <Button type="submit" className="server-only">Save Photo</Button>
-              )}
-            </ServerOnly>
+
+						<ServerOnly>
+							{() => (
+								<Button type="submit" className="server-only">
+									Save Photo
+								</Button>
+							)}
+						</ServerOnly>
 						{data.user?.imageId ? (
 							<Button
 								variant="destructive"
