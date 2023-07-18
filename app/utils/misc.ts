@@ -187,8 +187,8 @@ export function useIsSubmitting({
 export function useDelayedIsSubmitting({
 	formAction,
 	formMethod,
-	delay = 300,
-	minDuration = 200,
+	delay = 400,
+	minDuration = 300,
 }: Parameters<typeof useIsSubmitting>[0] &
 	Parameters<typeof useSpinDelay>[1] = {}) {
 	const isSubmitting = useIsSubmitting({ formAction, formMethod })

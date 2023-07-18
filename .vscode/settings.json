@@ -2,6 +2,8 @@
   "typescript.preferences.autoImportFileExcludePatterns": [
     "@remix-run/server-runtime",
     "@remix-run/router",
+    "express",
+    "@radix-ui/**",
     "react-router"
   ],
   "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]]

@@ -19,10 +19,11 @@ import { z } from 'zod'
 import { ErrorList } from '~/components/forms.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, useDoubleCheck } from '~/utils/misc.ts'
+import { getUserImgSrc, useDoubleCheck, useIsSubmitting } from '~/utils/misc.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,
@@ -131,6 +132,8 @@ export default function PhotoRoute() {
 		shouldRevalidate: 'onBlur',
 	})
 
+	const isSubmitting = useIsSubmitting()
+
 	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
@@ -169,7 +172,12 @@ export default function PhotoRoute() {
 				/>
 				{newImageSrc ? (
 					<div className="flex gap-4">
-						<Button type="submit">Save Photo</Button>
+						<StatusButton
+							type="submit"
+							status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
+						>
+							Save Photo
+						</StatusButton>
 						<Button type="reset" variant="secondary">
 							Reset
 						</Button>
