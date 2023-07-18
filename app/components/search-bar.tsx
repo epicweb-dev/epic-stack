@@ -3,7 +3,7 @@ import { Icon } from './ui/icon.tsx'
 import { Input } from './ui/input.tsx'
 import { Label } from './ui/label.tsx'
 import { StatusButton } from './ui/status-button.tsx'
-import { useDebounce, useDelayedIsSubmitting } from '~/utils/misc.ts'
+import { useDebounce, useIsSubmitting } from '~/utils/misc.ts'
 
 export function SearchBar({
 	status,
@@ -16,7 +16,7 @@ export function SearchBar({
 }) {
 	const [searchParams] = useSearchParams()
 	const submit = useSubmit()
-	const isSubmitting = useDelayedIsSubmitting({
+	const isSubmitting = useIsSubmitting({
 		formMethod: 'GET',
 		formAction: '/users',
 	})
