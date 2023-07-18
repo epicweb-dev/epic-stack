@@ -64,7 +64,7 @@ test('Users can update their profile photo', async ({ login, page }) => {
 	await expect(page).toHaveURL(`/settings/profile/photo`)
 
 	await page
-		.locator('input[type=file]')
+		.getByRole('textbox', { name: /change/i })
 		.setInputFiles('./tests/fixtures/test-profile.jpg')
 
 	await page.getByRole('button', { name: /save/i }).click()

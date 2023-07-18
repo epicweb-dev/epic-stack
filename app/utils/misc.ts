@@ -2,6 +2,7 @@ import { useFormAction, useNavigation } from '@remix-run/react'
 import { clsx, type ClassValue } from 'clsx'
 import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSpinDelay } from 'spin-delay'
 import { twMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
 
@@ -152,6 +153,12 @@ export function getDateTimeFormat(
 /**
  * Returns true if the current navigation is submitting the current route's
  * form. Defaults to the current route's form action and method POST.
+ *
+ * If GET, then this uses navigation.state === 'loading' instead of submitting.
+ *
+ * NOTE: the default formAction will include query params, but the
+ * navigation.formAction will not, so don't use the default formAction if you
+ * want to know if a form is submitting without specific query params.
  */
 export function useIsSubmitting({
 	formAction,
@@ -163,10 +170,33 @@ export function useIsSubmitting({
 	const contextualFormAction = useFormAction()
 	const navigation = useNavigation()
 	return (
-		navigation.state === 'submitting' &&
+		navigation.state === (formMethod === 'GET' ? 'loading' : 'submitting') &&
 		navigation.formAction === (formAction ?? contextualFormAction) &&
 		navigation.formMethod === formMethod
 	)
+}
+
+/**
+ * This combines useSpinDelay (from https://npm.im/spin-delay) and useIsSubmitting
+ * from our own utilities to give you a nice way to show a loading spinner for
+ * a minimum amount of time, even if the request finishes right after the delay.
+ *
+ * This avoids a flash of loading state regardless of how fast or slow the
+ * request is.
+ */
+export function useDelayedIsSubmitting({
+	formAction,
+	formMethod,
+	delay,
+	minDuration,
+}: Parameters<typeof useIsSubmitting>[0] &
+	Parameters<typeof useSpinDelay>[1] = {}) {
+	const isSubmitting = useIsSubmitting({ formAction, formMethod })
+	const delayedIsSubmitting = useSpinDelay(isSubmitting, {
+		delay,
+		minDuration,
+	})
+	return delayedIsSubmitting
 }
 
 function callAll<Args extends Array<unknown>>(

@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { SearchBar } from '~/components/search-bar.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc } from '~/utils/misc.ts'
+import { cn, getUserImgSrc, useDelayedIsSubmitting } from '~/utils/misc.ts'
 import {
 	combineServerTimings,
 	makeTimings,
@@ -85,6 +85,10 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 
 export default function UsersRoute() {
 	const data = useLoaderData<typeof loader>()
+	const isSubmitting = useDelayedIsSubmitting({
+		formMethod: 'GET',
+		formAction: '/users',
+	})
 
 	return (
 		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
@@ -92,37 +96,48 @@ export default function UsersRoute() {
 			<div className="w-full max-w-[700px] ">
 				<SearchBar status={data.status} autoFocus autoSubmit />
 			</div>
-			{data.status === 'idle' ? (
-				<ul className="flex w-full flex-wrap items-center justify-center gap-4">
-					{data.users.map(user => (
-						<li key={user.id}>
-							<Link
-								to={user.username}
-								className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
-							>
-								<img
-									alt={user.name ?? user.username}
-									src={getUserImgSrc(user.imageId)}
-									className="h-16 w-16 rounded-full"
-								/>
-								{user.name ? (
-									<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
-										{user.name}
-									</span>
-								) : null}
-								<span className="w-full overflow-hidden text-ellipsis text-center text-body-sm text-muted-foreground">
-									{user.username}
-								</span>
-							</Link>
-						</li>
-					))}
-				</ul>
-			) : (
-				<>
-					<div>Uh oh... An error happened!</div>
-					<pre>{data.error}</pre>
-				</>
-			)}
+			<main>
+				{data.status === 'idle' ? (
+					data.users.length ? (
+						<ul
+							className={cn(
+								'flex w-full flex-wrap items-center justify-center gap-4 delay-200',
+								{ 'opacity-50': isSubmitting },
+							)}
+						>
+							{data.users.map(user => (
+								<li key={user.id}>
+									<Link
+										to={user.username}
+										className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
+									>
+										<img
+											alt={user.name ?? user.username}
+											src={getUserImgSrc(user.imageId)}
+											className="h-16 w-16 rounded-full"
+										/>
+										{user.name ? (
+											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
+												{user.name}
+											</span>
+										) : null}
+										<span className="w-full overflow-hidden text-ellipsis text-center text-body-sm text-muted-foreground">
+											{user.username}
+										</span>
+									</Link>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p>No users found</p>
+					)
+				) : (
+					<>
+						<div>Uh oh... An error happened!</div>
+						<pre>{data.error}</pre>
+					</>
+				)}
+			</main>
 		</div>
 	)
 }
