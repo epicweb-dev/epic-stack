@@ -16,12 +16,14 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useMatches,
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
+import { SearchBar } from './components/search-bar.tsx'
 import { Button } from './components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -178,17 +180,24 @@ function App() {
 	const nonce = useNonce()
 	const user = useOptionalUser()
 	const theme = useTheme()
+	const matches = useMatches()
+	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
 	useToast(data.flash?.toast)
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
 			<div className="flex h-screen flex-col justify-between">
 				<header className="container py-6">
-					<nav className="flex justify-between">
+					<nav className="flex items-center justify-between">
 						<Link to="/">
 							<div className="font-light">epic</div>
 							<div className="font-bold">notes</div>
 						</Link>
+						{isOnSearchPage ? null : (
+							<div className="ml-auto max-w-sm flex-1 pr-10">
+								<SearchBar status="idle" />
+							</div>
+						)}
 						<div className="flex items-center gap-10">
 							{user ? (
 								<UserDropdown />

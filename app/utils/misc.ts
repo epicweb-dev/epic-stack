@@ -1,7 +1,7 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
 import { clsx, type ClassValue } from 'clsx'
 import { parseAcceptLanguage } from 'intl-parse-accept-language'
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
 
@@ -206,4 +206,40 @@ export function useDoubleCheck() {
 	}
 
 	return { doubleCheck, getButtonProps }
+}
+
+/**
+ * Simple debounce implementation
+ */
+function debounce<Callback extends (...args: Parameters<Callback>) => void>(
+	fn: Callback,
+	delay: number,
+) {
+	let timer: ReturnType<typeof setTimeout> | null = null
+	return (...args: Parameters<Callback>) => {
+		if (timer) clearTimeout(timer)
+		timer = setTimeout(() => {
+			fn(...args)
+		}, delay)
+	}
+}
+
+/**
+ * Debounce a callback function
+ */
+export function useDebounce<
+	Callback extends (...args: Parameters<Callback>) => ReturnType<Callback>,
+>(callback: Callback, delay: number) {
+	const callbackRef = useRef(callback)
+	useEffect(() => {
+		callbackRef.current = callback
+	})
+	return useMemo(
+		() =>
+			debounce(
+				(...args: Parameters<Callback>) => callbackRef.current(...args),
+				delay,
+			),
+		[delay],
+	)
 }

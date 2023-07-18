@@ -29,7 +29,7 @@ export async function loader({ params }: DataFunctionArgs) {
 	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
 }
 
-export default function UsernameIndex() {
+export default function UsernameRoute() {
 	const data = useLoaderData<typeof loader>()
 	const user = data.user
 	const userDisplayName = user.name ?? user.username

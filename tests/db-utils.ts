@@ -10,10 +10,14 @@ export function createUser() {
 
 	const username = uniqueUsernameEnforcer
 		.enforce(() => {
-			return faker.internet.userName({
-				firstName: firstName.toLowerCase(),
-				lastName: lastName.toLowerCase(),
-			})
+			return (
+				faker.string.alphanumeric({ length: 5 }) +
+				' ' +
+				faker.internet.userName({
+					firstName: firstName.toLowerCase(),
+					lastName: lastName.toLowerCase(),
+				})
+			)
 		})
 		.slice(0, 20)
 		.replace(/[^a-z0-9_]/g, '_')
