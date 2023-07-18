@@ -14,6 +14,7 @@ import {
 	useLoaderData,
 } from '@remix-run/react'
 import { useState } from 'react'
+import { ServerOnly } from 'remix-utils'
 import { z } from 'zod'
 import { ErrorList } from '~/components/forms.tsx'
 import { Button } from '~/components/ui/button.tsx'
@@ -153,7 +154,7 @@ export default function PhotoRoute() {
 				<input
 					{...conform.input(photoFile, { type: 'file' })}
 					accept="image/*"
-					className="sr-only"
+					className="sr-only peer"
 					tabIndex={newImageSrc ? -1 : 0}
 					onChange={e => {
 						const file = e.currentTarget.files?.[0]
@@ -174,12 +175,18 @@ export default function PhotoRoute() {
 						</Button>
 					</div>
 				) : (
-					<div className="flex gap-4">
+					<div className="flex gap-4 peer-invalid:[&>.server-only[type='submit']]:hidden">
 						<Button asChild className="cursor-pointer">
 							<label htmlFor={photoFile.id}>
 								<Icon name="pencil-1">Change</Icon>
 							</label>
 						</Button>
+            
+            <ServerOnly>
+              {() => (
+                <Button type="submit" className="server-only">Save Photo</Button>
+              )}
+            </ServerOnly>
 						{data.user?.imageId ? (
 							<Button
 								variant="destructive"
