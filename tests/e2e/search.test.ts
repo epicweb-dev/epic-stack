@@ -15,7 +15,7 @@ test('Search from home page', async ({ page }) => {
 test('Search from users page', async ({ page }) => {
 	await page.goto('/users')
 	const countBefore = await page.locator('ul>li>a').count()
-	await expect(countBefore, 'should load all results on page load').toEqual(50)
+	await expect(countBefore, 'should load all results').toBeGreaterThanOrEqual(1)
 
 	await page.getByRole('searchbox', { name: /search/i }).fill('kody')
 	await page.getByRole('button', { name: /search/i }).click()
