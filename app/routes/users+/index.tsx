@@ -36,32 +36,32 @@ export async function loader({ request }: DataFunctionArgs) {
 		async () => {
 			if (searchTerm) {
 				return prisma.$queryRaw`
-				SELECT id, username, name, imageId
-				FROM user
-				WHERE username LIKE ${`%${searchTerm ?? ''}%`}
-				OR name LIKE ${`%${searchTerm ?? ''}%`}
-				ORDER BY (
-					SELECT updatedAt
-					FROM note
-					WHERE ownerId = user.id
-					ORDER BY updatedAt DESC
-					LIMIT 1
-				) DESC
-				LIMIT 50
-			`
+					SELECT id, username, name, imageId
+					FROM user
+					WHERE username LIKE ${`%${searchTerm ?? ''}%`}
+					OR name LIKE ${`%${searchTerm ?? ''}%`}
+					ORDER BY (
+						SELECT updatedAt
+						FROM note
+						WHERE ownerId = user.id
+						ORDER BY updatedAt DESC
+						LIMIT 1
+					) DESC
+					LIMIT 50
+				`
 			} else {
 				return await prisma.$queryRaw`
-				SELECT id, username, name, imageId
-				FROM user
-				ORDER BY (
-					SELECT updatedAt
-					FROM note
-					WHERE ownerId = user.id
-					ORDER BY updatedAt DESC
-					LIMIT 1
-				) DESC
-				LIMIT 50
-			`
+					SELECT id, username, name, imageId
+					FROM user
+					ORDER BY (
+						SELECT updatedAt
+						FROM note
+						WHERE ownerId = user.id
+						ORDER BY updatedAt DESC
+						LIMIT 1
+					) DESC
+					LIMIT 50
+				`
 			}
 		},
 		{ timings, type: 'search users' },
