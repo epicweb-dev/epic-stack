@@ -68,9 +68,10 @@ export default function UsernameRoute() {
 							<Button type="submit" variant="link" size="pill">
 								<Icon
 									name="exit"
-									className="scale-125 max-md:scale-150 md:mr-2"
-								/>
-								<span>Logout</span>
+									className="scale-125 max-md:scale-150 md:mr-1"
+								>
+									Logout
+								</Icon>
 							</Button>
 						</Form>
 					) : null}
