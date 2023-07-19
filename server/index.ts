@@ -27,6 +27,18 @@ const fastify = Fastify({
 
 await fastify.register(import('@fastify/compress'))
 
+const getHost = (req: any) =>
+	req.headers['X-Forwarded-Host'] ?? req.hostname ?? ''
+
+fastify.addHook('onRequest', async (req, reply) => {
+	const proto = req.headers['X-Forwarded-Proto']
+	const host = getHost(req)
+	if (proto === 'http') {
+		reply.header('X-Forwarded-Proto', 'https')
+		await reply.redirect(301, `https://${host}${req.originalUrl}`)
+	}
+})
+
 const cspNonce = crypto.randomBytes(16).toString('hex')
 
 fastify.register(helmet, {
