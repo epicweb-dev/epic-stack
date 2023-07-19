@@ -225,6 +225,9 @@ export default function PhotoRoute() {
 				action={deleteImageRoute.ROUTE_PATH}
 				onSubmit={() => setNewImageSrc(null)}
 			>
+				<ServerOnly>
+					{() => <input name="serverOnly" type="hidden" value="true" />}
+				</ServerOnly>
 				<input name="intent" type="hidden" value="submit" />
 				<input name="imageId" type="hidden" value={data.user?.imageId ?? ''} />
 			</deleteImageFetcher.Form>
