@@ -7,6 +7,7 @@ import { Form, Link, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 import { Button } from '~/components/ui/button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { getUserImgSrc, invariantResponse } from '~/utils/misc.ts'
 import { useOptionalUser } from '~/utils/user.ts'
@@ -64,8 +65,12 @@ export default function UsernameRoute() {
 					</p>
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">
-							<Button type="submit" variant="secondary" size="pill">
-								Logout
+							<Button type="submit" variant="link" size="pill">
+								<Icon
+									name="exit"
+									className="scale-125 max-md:scale-150 md:mr-2"
+								/>
+								<span>Logout</span>
 							</Button>
 						</Form>
 					) : null}
