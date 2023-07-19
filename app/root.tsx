@@ -16,10 +16,11 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useMatches,
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { useRef } from 'react'
+import { lazy, useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Button } from './components/ui/button.tsx'
@@ -46,6 +47,11 @@ import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useToast } from './utils/useToast.tsx'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import rdtStylesheetUrl from 'remix-development-tools/stylesheet.css'
+const RemixDevTools =
+	process.env.NODE_ENV === 'development'
+		? lazy(() => import('remix-development-tools'))
+		: undefined
 
 export const links: LinksFunction = () => {
 	return [
@@ -55,6 +61,9 @@ export const links: LinksFunction = () => {
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
+		...(rdtStylesheetUrl && process.env.NODE_ENV === 'development'
+			? [{ rel: 'preload', as: 'style', href: rdtStylesheetUrl }]
+			: []),
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
 			rel: 'alternate icon',
@@ -70,6 +79,10 @@ export const links: LinksFunction = () => {
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
+		{ rel: 'stylesheet', href: rdtStylesheetUrl },
+		...(rdtStylesheetUrl && process.env.NODE_ENV === 'development'
+			? [{ rel: 'stylesheet', href: rdtStylesheetUrl }]
+			: []),
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
 }
@@ -215,6 +228,7 @@ function App() {
 			</div>
 			<Confetti confetti={data.flash?.confetti} />
 			<Toaster />
+			{RemixDevTools && <RemixDevTools />}
 		</Document>
 	)
 }
