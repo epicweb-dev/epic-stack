@@ -7,8 +7,11 @@ import {
 	useSearchParams,
 	useSubmit,
 } from '@remix-run/react'
-import { getAllInstances, getInstanceInfo } from 'litefs-js'
-import { ensureInstance } from 'litefs-js/remix.js'
+import {
+	getAllInstances,
+	getInstanceInfo,
+	ensureInstance,
+} from '~/utils/litefs.server.ts'
 import * as React from 'react'
 import { Field } from '~/components/forms.tsx'
 import { Spacer } from '~/components/spacer.tsx'
