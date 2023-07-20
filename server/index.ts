@@ -4,14 +4,16 @@ import chokidar from 'chokidar'
 import address from 'address'
 import Fastify from 'fastify'
 import { remixFastifyPlugin } from '@mcansh/remix-fastify'
+import { type ServerBuild, broadcastDevReady, installGlobals } from '@remix-run/node'
+installGlobals()
 import fastifyStatic from '@fastify/static'
 import helmet from '@fastify/helmet'
+import fastifyUrlData from '@fastify/url-data'
 import crypto from 'crypto'
 import getPort, { portNumbers } from 'get-port'
-import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
 import chalk from 'chalk'
-
 import * as remixBuild from '../build/index.js'
+
 const MODE = process.env.NODE_ENV
 
 const BUILD_PATH = '../build/index.js'
@@ -21,11 +23,13 @@ const build = remixBuild as unknown as ServerBuild
 let devBuild = build
 
 const fastify = Fastify({
+	// logger: true,
 	ignoreTrailingSlash: true,
 	ignoreDuplicateSlashes: true,
 })
 
 await fastify.register(import('@fastify/compress'))
+fastify.register(fastifyUrlData)
 
 const getHost = (req: any) =>
 	req.headers['X-Forwarded-Host'] ?? req.hostname ?? ''
@@ -36,6 +40,15 @@ fastify.addHook('onRequest', async (req, reply) => {
 	if (proto === 'http') {
 		reply.header('X-Forwarded-Proto', 'https')
 		await reply.redirect(301, `https://${host}${req.originalUrl}`)
+	}
+})
+
+fastify.addHook('onRequest', async (req, reply) => {
+	const urlData = req.urlData()
+	const { path, query } = urlData
+	if (path.endsWith('/') && path.length > 1) {
+		const safepath = path.slice(0, -1).replace(/\/+/g, '/')
+		await reply.redirect(301, `${safepath}?${query}`)
 	}
 })
 

@@ -30,14 +30,12 @@ export const handle = {
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
 const PhotoFormSchema = z.object({
-	photoFile: typeof window === 'undefined'
-		? z.undefined()
-		: z
-			.instanceof(File)
-			.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
-			.refine(file => {
-				return file.size <= MAX_SIZE
-			}, 'Image size must be less than 3MB'),
+	photoFile: z
+		.instanceof(File)
+		.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
+		.refine(file => {
+			return file.size <= MAX_SIZE
+		}, 'Image size must be less than 3MB'),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
