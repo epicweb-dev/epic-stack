@@ -116,7 +116,7 @@ export default function NoteRoute() {
 						className="text-sm text-foreground/90 max-[524px]:hidden"
 						title={data.dateDisplay}
 					>
-						<Icon name="clock" className="mr-2 scale-125">
+						<Icon name="clock" className="scale-125">
 							{data.timeAgo} ago
 						</Icon>
 					</span>
@@ -127,11 +127,9 @@ export default function NoteRoute() {
 							className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
 						>
 							<Link to="edit">
-								<Icon
-									name="pencil-1"
-									className="scale-125 max-md:scale-150 md:mr-2"
-								/>
-								<span className="max-md:hidden">Edit</span>
+								<Icon name="pencil-1" className="scale-125 max-md:scale-150">
+									<span className="max-md:hidden">Edit</span>
+								</Icon>
 							</Link>
 						</Button>
 					</div>
@@ -173,8 +171,9 @@ export function DeleteNote({ id }: { id: string }) {
 				disabled={navigation.state !== 'idle'}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
-				<Icon name="trash" className="scale-125 max-md:scale-150 md:mr-2" />
-				<span className="max-md:hidden">Delete</span>
+				<Icon name="trash" className="scale-125 max-md:scale-150">
+					<span className="max-md:hidden">Delete</span>
+				</Icon>
 			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />
 		</Form>

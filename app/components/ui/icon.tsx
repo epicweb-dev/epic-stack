@@ -18,9 +18,9 @@ const sizeClassName = {
 type Size = keyof typeof sizeClassName
 
 const childrenSizeClassName = {
-	font: 'gap-1',
-	xs: 'gap-1',
-	sm: 'gap-1',
+	font: 'gap-1.5',
+	xs: 'gap-1.5',
+	sm: 'gap-1.5',
 	md: 'gap-2',
 	lg: 'gap-2',
 	xl: 'gap-3',
@@ -46,7 +46,7 @@ export function Icon({
 }) {
 	if (children) {
 		return (
-			<span className={`inline-flex ${childrenSizeClassName[size]}`}>
+			<span className={`inline-flex items-center ${childrenSizeClassName[size]}`}>
 				<Icon name={name} size={size} className={className} {...props} />
 				{children}
 			</span>
