@@ -1,6 +1,9 @@
 import 'dotenv/config'
 import closeWithGrace from 'close-with-grace'
 import chalk from 'chalk'
+import { installGlobals } from '@remix-run/node'
+
+installGlobals()
 
 closeWithGrace(async ({ err }) => {
 	if (err) {
