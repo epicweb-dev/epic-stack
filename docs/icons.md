@@ -6,6 +6,24 @@ You'll find raw SVGs in the `./other/svg-icons` directory. These are then
 compiled into a sprite using the `npm run build:icons` script which generates
 the `app/components/ui/icon.tsx` file and its associated `icon.svg` file.
 
+You can use [Sly](https://github.com/jacobparis-insiders/sly/tree/main/cli) to
+add new icons from the command line.
+
+To add the `trash`, `pencil-1`, and `avatar` icons, run:
+
+```sh
+npx sly add @radix-ui/icons trash pencil-1 avatar
+```
+
+If you don't specify the icons, Sly will show an interactive list of all the
+icons available in the `@radix-ui/icons` collection and let you select the ones
+you want to add.
+
+Sly has been configured in the Epic Stack to automatically add the icons to the
+`./other/svg-icons` directory and to run the `npm run build:icons` script
+automatically, so there are no extra steps to take. You can see the
+configuration in the `./other/sly/sly.json` file.
+
 The SVGs used by default in the Epic Stack come from
 [icons.radix-ui.com](https://icons.radix-ui.com/). You can download additional
 SVG icons from there, or provide your own. Once you've added new files in the

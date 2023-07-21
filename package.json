@@ -101,6 +101,7 @@
     "@remix-run/dev": "^1.18.1",
     "@remix-run/eslint-config": "^1.18.1",
     "@remix-run/serve": "^1.18.1",
+    "@sly-cli/sly": "^1.4.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@total-typescript/ts-reset": "^0.4.2",
     "@types/bcryptjs": "^2.4.2",
