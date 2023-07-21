@@ -1,25 +1,17 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
-import chokidar from 'chokidar'
 import address from 'address'
-import Fastify from 'fastify'
-import { remixFastifyPlugin } from '@mcansh/remix-fastify'
-import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
-import fastifyStatic from '@fastify/static'
-import helmet from '@fastify/helmet'
-import fastifyUrlData from '@fastify/url-data'
-import crypto from 'crypto'
-import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
-import * as remixBuild from '../build/index.js'
+import chokidar from 'chokidar'
+import Fastify from 'fastify'
+import fastifyAutoload from '@fastify/autoload'
+import getPort, { portNumbers } from 'get-port'
+import { broadcastDevReady } from '@remix-run/node'
 
 const MODE = process.env.NODE_ENV
 
 const BUILD_PATH = '../build/index.js'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const build = remixBuild as unknown as ServerBuild
-let devBuild = build
 
 const fastify = Fastify({
 	// logger: true,
@@ -27,86 +19,15 @@ const fastify = Fastify({
 	ignoreDuplicateSlashes: true,
 })
 
-await fastify.register(import('@fastify/compress'))
-fastify.register(fastifyUrlData)
-
-const getHost = (req: any) =>
-	req.headers['X-Forwarded-Host'] ?? req.hostname ?? ''
-
-fastify.addHook('onRequest', async (req, reply) => {
-	const proto = req.headers['X-Forwarded-Proto']
-	const host = getHost(req)
-	if (proto === 'http') {
-		reply.header('X-Forwarded-Proto', 'https')
-		await reply.redirect(301, `https://${host}${req.originalUrl}`)
-	}
-})
-
-fastify.addHook('onRequest', async (req, reply) => {
-	const urlData = req.urlData()
-	const { path, query } = urlData
-	if (path.endsWith('/') && path.length > 1) {
-		const safepath = path.slice(0, -1).replace(/\/+/g, '/')
-		await reply.redirect(301, `${safepath}?${query}`)
-	}
-})
-
-const cspNonce = crypto.randomBytes(16).toString('hex')
-
-fastify.register(helmet, {
-	crossOriginEmbedderPolicy: false,
-	enableCSPNonces: true,
-	contentSecurityPolicy: {
-		// NOTE: Remove reportOnly when you're ready to enforce this CSP
-		reportOnly: true,
-		directives: {
-			'connect-src': [
-				MODE === 'development' ? 'ws:' : null,
-				process.env.SENTRY_DSN ? '*.ingest.sentry.io' : null,
-				"'self'",
-			].filter(Boolean),
-			'font-src': ["'self'"],
-			'frame-src': ["'self'"],
-			'img-src': ["'self'", 'data:'],
-			'script-src': [
-				"'strict-dynamic'",
-				"'self'",
-				// @ts-expect-error
-				(_, res) => (res.scriptNonce	= cspNonce),
-			],
-			'script-src-attr': [
-				(_, res) => `'nonce-${cspNonce}'`,
-			],
-			'upgrade-insecure-requests': null,
-		},
+await fastify.register(fastifyAutoload, {
+	dir: path.join(dirname, 'plugins'),
+	encapsulate: false,
+	maxDepth: 0,
+	options: {
+		dirname,
+		buildPath: BUILD_PATH,
+		mode: MODE,
 	},
-})
-
-await fastify.register(remixFastifyPlugin, {
-	build,
-	mode: MODE,
-	getLoadContext: () => ({}),
-	rootDir: dirname,
-	purgeRequireCacheInDevelopment: false,
-	unstable_earlyHints: true
-})
-
-fastify.register(fastifyStatic, {
-	root: path.join(dirname, '../public/build'),
-	prefix: '/build',
-	decorateReply: false
-})
-
-fastify.register(fastifyStatic, {
-	root: path.join(dirname, '../public/fonts'),
-	prefix: '/fonts',
-	decorateReply: false
-})
-
-fastify.register(fastifyStatic, {
-	root: path.join(dirname, '../public'),
-	prefix: '/public',
-	decorateReply: false
 })
 
 const desiredPort = Number(process.env.PORT || 3000)
@@ -121,10 +42,7 @@ const start = async () => {
 			host: '0.0.0.0', // all IPv4, see https://fastify.dev/docs/latest/Reference/Server/#listentextresolver
 		})
 		const { port: actualPort } = fastify.addresses()[0]
-		const portUsed =
-			desiredPort === portToUse
-				? desiredPort
-				: actualPort
+		const portUsed = desiredPort === portToUse ? desiredPort : actualPort
 
 		if (portUsed !== desiredPort) {
 			console.warn(
@@ -153,26 +71,22 @@ ${lanUrl ? `${chalk.bold('On Your Network:')}  ${chalk.cyan(lanUrl)}` : ''}
 ${chalk.bold('Press Ctrl+C to stop')}
 		`.trim(),
 		)
-
-		if (MODE === 'development') {
-			broadcastDevReady(build)
-		}
-
 	} catch (err) {
 		console.log(err)
 		fastify.log.error(err)
 		process.exit(1)
 	}
 }
+
 start()
 
+let devBuild
 if (MODE === 'development') {
 	async function reloadBuild() {
 		devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
 		broadcastDevReady(devBuild)
 	}
 
-	const dirname = path.dirname(fileURLToPath(import.meta.url))
 	const watchPath = path.join(dirname, BUILD_PATH).replace(/\\/g, '/')
 	const watcher = chokidar.watch(watchPath, { ignoreInitial: true })
 	watcher.on('all', reloadBuild)

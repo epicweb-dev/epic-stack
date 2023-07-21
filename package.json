@@ -39,6 +39,7 @@
   "dependencies": {
     "@conform-to/react": "^0.7.2",
     "@conform-to/zod": "^0.7.2",
+    "@fastify/autoload": "^5.7.1",
     "@fastify/compress": "^6.4.0",
     "@fastify/express": "^2.3.0",
     "@fastify/helmet": "^11.0.0",
