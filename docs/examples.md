@@ -37,7 +37,8 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@alan2207](https://github.com/alan2207): An example Remix application
   showcasing how to implement user impersonation in the Epic Stack.
 - [Epic Stack + Tailwind CSS Plugin](https://github.com/hakimLyon/epic-stack-with-tailwind-css-plugin)
-  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Tailwind CSS Plugin.
+  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
+  with Tailwind CSS Plugin.
 
 ## How to contribute
 
