@@ -3,66 +3,57 @@ import * as path from 'node:path'
 import { glob } from 'glob'
 import { parse } from 'node-html-parser'
 
-const inputFolder = path.join(process.cwd(), 'other', 'svg-icons')
-const outputFolder = path.join(process.cwd(), 'app', 'components', 'ui')
+const cwd = process.cwd()
+const inputDir = path.join(cwd, 'other', 'svg-icons')
+const inputDirRelative = path.relative(cwd, inputDir)
+const outputDir = path.join(cwd, 'app', 'components', 'ui')
+const outputDirRelative = path.relative(cwd, outputDir)
 
 const files = glob.sync('**/*.svg', {
-	cwd: inputFolder,
+	cwd: inputDir,
 })
 
 if (files.length === 0) {
-	console.log('No SVG files found in inputFolder')
+	console.log(`No SVG files found in ${inputDirRelative}`)
 	process.exit(0)
 }
 
-console.log(
-	`Generating sprite for ${path.relative(process.cwd(), inputFolder)}`,
-)
+console.log(`Generating sprite for ${inputDirRelative}`)
 
 await generateSvgSprite({
 	files,
-	inputFolder,
-	outputPath: path.join(outputFolder, 'icon.svg'),
+	inputDir,
+	outputPath: path.join(outputDir, 'icon.svg'),
 })
 
 for (const file of files) {
 	console.log('✅', file)
 }
-console.log(
-	`Saved to ${path.relative(
-		process.cwd(),
-		path.join(outputFolder, 'icon.svg'),
-	)}`,
-)
+console.log(`Saved to ${path.join(outputDirRelative, 'icon.svg')}`)
 
 await generateJson({
 	files,
-	outputPath: path.join(outputFolder, 'icons.json'),
+	outputPath: path.join(outputDir, 'icons.json'),
 })
 
-console.log(
-	`Manifest saved to ${path.relative(
-		process.cwd(),
-		path.join(outputFolder, 'icons.json'),
-	)}`,
-)
+console.log(`Manifest saved to ${path.join(outputDirRelative, 'icons.json')}`)
 
 /**
  * Creates a single SVG file that contains all the icons
  */
 async function generateSvgSprite({
 	files,
-	inputFolder,
+	inputDir,
 	outputPath,
 }: {
 	files: string[]
-	inputFolder: string
+	inputDir: string
 	outputPath: string
 }) {
 	// Each SVG becomes a symbol and we wrap them all in a single SVG
 	const symbols = await Promise.all(
 		files.map(async file => {
-			const input = await fs.readFile(path.join(inputFolder, file), 'utf8')
+			const input = await fs.readFile(path.join(inputDir, file), 'utf8')
 			const root = parse(input)
 
 			const svg = root.querySelector('svg')
@@ -89,12 +80,6 @@ async function generateSvgSprite({
 		`</defs>`,
 		`</svg>`,
 	].join('\n')
-
-	const existingOutput = await fs.readFile(outputPath, 'utf8')
-	if (existingOutput === output) {
-		// No changes
-		return
-	}
 
 	return fs.writeFile(outputPath, output, 'utf8')
 }
