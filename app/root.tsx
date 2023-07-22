@@ -228,7 +228,7 @@ function App() {
 			</div>
 			<Confetti confetti={data.flash?.confetti} />
 			<Toaster />
-			{RemixDevTools && <RemixDevTools />}
+			{RemixDevTools && <RemixDevTools showRouteBoundaries />}
 		</Document>
 	)
 }
