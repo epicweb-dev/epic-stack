@@ -23,4 +23,4 @@ node_modules
 
 # generated files
 /app/components/ui/icon.svg
-/app/components/ui/icon.tsx
+/app/components/ui/icons.json
