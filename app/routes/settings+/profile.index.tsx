@@ -11,7 +11,7 @@ import {
 	authenticator,
 	getPasswordHash,
 	requireUserId,
-	verifyLogin,
+	verifyUserPassword,
 } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { getUserImgSrc, useIsSubmitting } from '~/utils/misc.ts'
@@ -70,7 +70,7 @@ export async function action({ request }: DataFunctionArgs) {
 					})
 				}
 				if (currentPassword && newPassword) {
-					const user = await verifyLogin(username, currentPassword)
+					const user = await verifyUserPassword({ id: userId }, currentPassword)
 					if (!user) {
 						ctx.addIssue({
 							path: ['currentPassword'],

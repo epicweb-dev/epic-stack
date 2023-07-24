@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { expect, insertNewUser, test } from '../playwright-utils.ts'
 import { createUser } from '../../tests/db-utils.ts'
-import { verifyLogin } from '~/utils/auth.server.ts'
+import { verifyUserPassword } from '~/utils/auth.server.ts'
 
 test('Users can update their basic info', async ({ login, page }) => {
 	await login()
@@ -41,12 +41,13 @@ test('Users can update their password', async ({ login, page }) => {
 
 	await expect(page).toHaveURL(`/users/${user.username}`)
 
+	const { username } = user
 	expect(
-		await verifyLogin(user.username, oldPassword),
+		await verifyUserPassword({ username }, oldPassword),
 		'Old password still works',
 	).toEqual(null)
 	expect(
-		await verifyLogin(user.username, newPassword),
+		await verifyUserPassword({ username }, newPassword),
 		'New password does not work',
 	).toEqual({ id: user.id })
 })
