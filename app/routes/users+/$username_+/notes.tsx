@@ -13,6 +13,7 @@ import {
 	makeTimings,
 	time,
 } from '~/utils/timing.server.ts'
+import { useOptionalUser } from '~/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
 	const timings = makeTimings('notes loader')
@@ -61,11 +62,12 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 
 export default function NotesRoute() {
 	const data = useLoaderData<typeof loader>()
+	const user = useOptionalUser()
 	const ownerDisplayName = data.owner.name ?? data.owner.username
 	const navLinkDefaultClassName =
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
-		<div className="container flex h-full min-h-[400px] pb-12">
+		<main className="container flex h-full min-h-[400px] pb-12">
 			<div className="grid w-full flex-grow grid-cols-4 bg-muted pl-2 md:container md:mx-2 md:rounded-3xl md:pr-0">
 				<div className="relative col-span-1">
 					<div className="absolute inset-0 flex flex-col">
@@ -83,18 +85,20 @@ export default function NotesRoute() {
 							</h1>
 						</Link>
 						<ul className="overflow-y-auto overflow-x-hidden pb-12">
-							<li>
-								<NavLink
-									to="new"
-									className={({ isActive }) =>
-										cn(navLinkDefaultClassName, isActive && 'bg-accent')
-									}
-								>
-									<Icon name="plus">New Note</Icon>
-								</NavLink>
-							</li>
+							{user?.id === data.owner.id ? (
+								<li className="p-1 pr-0">
+									<NavLink
+										to="new"
+										className={({ isActive }) =>
+											cn(navLinkDefaultClassName, isActive && 'bg-accent')
+										}
+									>
+										<Icon name="plus">New Note</Icon>
+									</NavLink>
+								</li>
+							) : null}
 							{data.notes.map(note => (
-								<li key={note.id}>
+								<li key={note.id} className="p-1 pr-0">
 									<NavLink
 										to={note.id}
 										className={({ isActive }) =>
@@ -112,7 +116,7 @@ export default function NotesRoute() {
 					<Outlet />
 				</main>
 			</div>
-		</div>
+		</main>
 	)
 }
 

@@ -70,6 +70,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 		fs.rm(path.join(rootDirectory, 'CONTRIBUTING.md')),
 		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/notes.test.ts')),
+		fs.rm(path.join(rootDirectory, 'tests/e2e/search.test.ts')),
 
 		// .git could exist if pointing to a local version of the template rather
 		// than the github version, and there's not any situation we'd want that.

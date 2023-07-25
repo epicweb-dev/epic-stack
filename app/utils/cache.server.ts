@@ -10,7 +10,7 @@ import {
 	type CachifiedOptions,
 } from 'cachified'
 import fs from 'fs'
-import { getInstanceInfo, getInstanceInfoSync } from 'litefs-js'
+import { getInstanceInfo, getInstanceInfoSync } from '~/utils/litefs.server.ts'
 import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
 import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite.tsx'

@@ -7,6 +7,7 @@ import { Form, Link, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 import { Button } from '~/components/ui/button.tsx'
+import { Icon } from '~/components/ui/icon.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { getUserImgSrc, invariantResponse } from '~/utils/misc.ts'
 import { useOptionalUser } from '~/utils/user.ts'
@@ -29,7 +30,7 @@ export async function loader({ params }: DataFunctionArgs) {
 	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
 }
 
-export default function UsernameIndex() {
+export default function UsernameRoute() {
 	const data = useLoaderData<typeof loader>()
 	const user = data.user
 	const userDisplayName = user.name ?? user.username
@@ -64,8 +65,10 @@ export default function UsernameIndex() {
 					</p>
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">
-							<Button type="submit" variant="secondary" size="pill">
-								Logout
+							<Button type="submit" variant="link" size="pill">
+								<Icon name="exit" className="scale-125 max-md:scale-150">
+									Logout
+								</Icon>
 							</Button>
 						</Form>
 					) : null}

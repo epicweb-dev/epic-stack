@@ -150,3 +150,6 @@ CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "_PermissionToRole"("A", "B
 
 -- CreateIndex
 CREATE INDEX "_PermissionToRole_B_index" ON "_PermissionToRole"("B");
+
+-- CreateIndex
+CREATE INDEX "Note_ownerId_updatedAt_idx" ON "Note"("ownerId", "updatedAt" DESC);

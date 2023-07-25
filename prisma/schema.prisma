@@ -120,4 +120,8 @@ model Note {
 
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId String
+
+  // our user search orders by recently owners who have recently updated notes
+  // so indexing on the owner ID helps with that (a LOT).
+  @@index([ownerId, updatedAt(sort: Desc)])
 }

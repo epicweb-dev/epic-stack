@@ -14,14 +14,16 @@ import {
 	useLoaderData,
 } from '@remix-run/react'
 import { useState } from 'react'
+import { ServerOnly } from 'remix-utils'
 import { z } from 'zod'
 import { ErrorList } from '~/components/forms.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, useDoubleCheck } from '~/utils/misc.ts'
+import { getUserImgSrc, useDoubleCheck, useIsSubmitting } from '~/utils/misc.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,
@@ -130,6 +132,8 @@ export default function PhotoRoute() {
 		shouldRevalidate: 'onBlur',
 	})
 
+	const isSubmitting = useIsSubmitting()
+
 	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
 
 	const deleteProfilePhotoFormId = 'delete-profile-photo'
@@ -153,7 +157,7 @@ export default function PhotoRoute() {
 				<input
 					{...conform.input(photoFile, { type: 'file' })}
 					accept="image/*"
-					className="sr-only"
+					className="peer sr-only"
 					tabIndex={newImageSrc ? -1 : 0}
 					onChange={e => {
 						const file = e.currentTarget.files?.[0]
@@ -168,18 +172,34 @@ export default function PhotoRoute() {
 				/>
 				{newImageSrc ? (
 					<div className="flex gap-4">
-						<Button type="submit">Save Photo</Button>
+						<StatusButton
+							type="submit"
+							status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
+						>
+							Save Photo
+						</StatusButton>
 						<Button type="reset" variant="secondary">
 							Reset
 						</Button>
 					</div>
 				) : (
-					<div className="flex gap-4">
+					<div className="flex gap-4 peer-invalid:[&>.server-only[type='submit']]:hidden">
 						<Button asChild className="cursor-pointer">
 							<label htmlFor={photoFile.id}>
 								<Icon name="pencil-1">Change</Icon>
 							</label>
 						</Button>
+
+						{/* This is here for progressive enhancement. If the client doesn't
+						hydrate (or hasn't yet) this button will be available to submit the
+						selected photo. */}
+						<ServerOnly>
+							{() => (
+								<Button type="submit" className="server-only">
+									Save Photo
+								</Button>
+							)}
+						</ServerOnly>
 						{data.user?.imageId ? (
 							<Button
 								variant="destructive"
@@ -205,6 +225,15 @@ export default function PhotoRoute() {
 				action={deleteImageRoute.ROUTE_PATH}
 				onSubmit={() => setNewImageSrc(null)}
 			>
+				<ServerOnly>
+					{() => (
+						<input
+							name="redirectTo"
+							value="/settings/profile/photo"
+							type="hidden"
+						/>
+					)}
+				</ServerOnly>
 				<input name="intent" type="hidden" value="submit" />
 				<input name="imageId" type="hidden" value={data.user?.imageId ?? ''} />
 			</deleteImageFetcher.Form>

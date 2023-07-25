@@ -67,12 +67,17 @@ test('Users can delete notes', async ({ login, page }) => {
 	await expect(page.getByRole('heading', { name: newNote.title })).toBeVisible()
 	// count links on page
 
-	// find links with  href prefix
-	let countBefore = await page.locator('ul>li>a').count()
+	// find links with href prefix
+	const noteLinks = page
+		.getByRole('main')
+		.getByRole('list')
+		.getByRole('listitem')
+		.getByRole('link')
+	const countBefore = await noteLinks.count()
 	await page.getByRole('button', { name: /delete/i }).click()
 	await expect(page.getByText('Note deleted', { exact: true })).toBeVisible()
 	await expect(page).toHaveURL(`/users/${user.username}/notes`)
-	let countAfter = await page.locator('ul>li>a').count()
+	const countAfter = await noteLinks.count()
 	expect(countAfter).toEqual(countBefore - 1)
 })
 

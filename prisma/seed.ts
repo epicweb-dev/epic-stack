@@ -28,38 +28,44 @@ async function seed() {
 	const users = await Promise.all(
 		Array.from({ length: totalUsers }, async (_, index) => {
 			const userData = createUser()
-			const user = await prisma.user.create({
-				data: {
-					...userData,
-					password: {
-						create: createPassword(userData.username),
-					},
-					image: {
-						create: {
-							contentType: 'image/jpeg',
-							file: {
-								create: {
-									blob: await fs.promises.readFile(
-										`./tests/fixtures/images/user/${index % 10}.jpg`,
-									),
+			const userCreatedUpdated = getCreatedAndUpdated()
+			const user = await prisma.user
+				.create({
+					select: { id: true },
+					data: {
+						...userData,
+						...userCreatedUpdated,
+						password: {
+							create: createPassword(userData.username),
+						},
+						image: {
+							create: {
+								contentType: 'image/jpeg',
+								file: {
+									create: {
+										blob: await fs.promises.readFile(
+											`./tests/fixtures/images/user/${index % 10}.jpg`,
+										),
+									},
 								},
 							},
 						},
+						notes: {
+							create: Array.from({
+								length: faker.number.int({ min: 0, max: 10 }),
+							}).map(() => ({
+								title: faker.lorem.sentence(),
+								content: faker.lorem.paragraphs(),
+								...getCreatedAndUpdated(userCreatedUpdated.createdAt),
+							})),
+						},
 					},
-					notes: {
-						create: Array.from({
-							length: faker.number.int({ min: 0, max: 10 }),
-						}).map(() => ({
-							title: faker.lorem.sentence(),
-							content: faker.lorem.paragraphs(),
-						})),
-					},
-				},
-			})
+				})
+				.catch(() => null)
 			return user
 		}),
-	)
-	console.timeEnd(`👤 Created ${totalUsers} users...`)
+	).then(users => users.filter(Boolean))
+	console.timeEnd(`👤 Created ${users.length} users...`)
 
 	console.time(
 		`🐨 Created user "kody" with the password "kodylovesyou" and admin role`,
@@ -113,6 +119,12 @@ async function seed() {
 	)
 
 	console.timeEnd(`🌱 Database has been seeded`)
+}
+
+function getCreatedAndUpdated(from: Date = new Date(2020, 0, 1)) {
+	const createdAt = faker.date.between({ from, to: new Date() })
+	const updatedAt = faker.date.between({ from: createdAt, to: new Date() })
+	return { createdAt, updatedAt }
 }
 
 seed()
