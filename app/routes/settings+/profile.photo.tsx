@@ -195,7 +195,12 @@ export default function PhotoRoute() {
 						selected photo. */}
 						<ServerOnly>
 							{() => (
-								<Button type="submit" className="server-only">
+								<Button
+									type="submit"
+									name="redirectTo"
+									value="/settings/profile/photo"
+									className="server-only"
+								>
 									Save Photo
 								</Button>
 							)}
