@@ -195,12 +195,7 @@ export default function PhotoRoute() {
 						selected photo. */}
 						<ServerOnly>
 							{() => (
-								<Button
-									type="submit"
-									name="redirectTo"
-									value="/settings/profile/photo"
-									className="server-only"
-								>
+								<Button type="submit" className="server-only">
 									Save Photo
 								</Button>
 							)}
@@ -231,7 +226,13 @@ export default function PhotoRoute() {
 				onSubmit={() => setNewImageSrc(null)}
 			>
 				<ServerOnly>
-					{() => <input name="serverOnly" type="hidden" value="true" />}
+					{() => (
+						<input
+							name="redirectTo"
+							value="/settings/profile/photo"
+							type="hidden"
+						/>
+					)}
 				</ServerOnly>
 				<input name="intent" type="hidden" value="submit" />
 				<input name="imageId" type="hidden" value={data.user?.imageId ?? ''} />
