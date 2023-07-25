@@ -1,10 +1,10 @@
-// THIS FILE IS GENERATED, edit ./other/svg-icon-template.txt instead
-// then run "npm run build:icons"
-
 import { type SVGProps } from 'react'
 import { cn } from '~/utils/misc.ts'
-import href from './icon.svg'
+import href from './icons/sprite.svg'
+
+import { type IconName } from '@/icon-name'
 export { href }
+export { IconName }
 
 const sizeClassName = {
 	font: 'w-[1em] h-[1em]',
