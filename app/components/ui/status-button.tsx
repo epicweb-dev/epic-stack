@@ -48,7 +48,7 @@ export const StatusButton = React.forwardRef<
 			className={cn('flex justify-center gap-4', className)}
 			{...props}
 		>
-			<div>{children}</div>
+			{children}
 			{message ? (
 				<TooltipProvider>
 					<Tooltip>
