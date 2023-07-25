@@ -1,5 +1,6 @@
 import { parse } from '@conform-to/zod'
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
@@ -8,6 +9,7 @@ export const ROUTE_PATH = '/resources/delete-image'
 
 const DeleteFormSchema = z.object({
 	imageId: z.string(),
+	redirectTo: z.string().optional(),
 })
 
 export async function action({ request }: DataFunctionArgs) {
@@ -29,7 +31,7 @@ export async function action({ request }: DataFunctionArgs) {
 	if (submission.intent !== 'submit') {
 		return json({ status: 'success', submission } as const)
 	}
-	const { imageId } = submission.value
+	const { imageId, redirectTo } = submission.value
 	const image = await prisma.image.findFirst({
 		select: { fileId: true },
 		where: {
@@ -51,6 +53,10 @@ export async function action({ request }: DataFunctionArgs) {
 	await prisma.image.delete({
 		where: { fileId: image.fileId },
 	})
+
+	if (redirectTo) {
+		return redirect(safeRedirect(redirectTo))
+	}
 
 	return json({ status: 'success' } as const)
 }
