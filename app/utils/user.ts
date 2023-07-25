@@ -7,7 +7,7 @@ function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
 }
 
 export function useOptionalUser() {
-	const data = useRouteLoaderData('root') as SerializeFrom<typeof rootLoader>
+	const data = useRouteLoaderData<typeof rootLoader>('root')
 	if (!data || !isUser(data.user)) {
 		return undefined
 	}
