@@ -67,8 +67,7 @@ COPY --from=build /myapp/build /myapp/build
 COPY --from=build /myapp/public /myapp/public
 COPY --from=build /myapp/package.json /myapp/package.json
 COPY --from=build /myapp/prisma /myapp/prisma
-COPY --from=build /myapp/app/components/ui/icon.svg /myapp/app/components/ui/icon.svg
-COPY --from=build /myapp/app/components/ui/icon.tsx /myapp/app/components/ui/icon.tsx
+COPY --from=build /myapp/app/components/ui/icons /myapp/app/components/ui/icons
 
 # prepare for litefs
 COPY --from=flyio/litefs:0.5.1 /usr/local/bin/litefs /usr/local/bin/litefs
