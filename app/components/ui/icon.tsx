@@ -1,10 +1,10 @@
 import { type SVGProps } from 'react'
 import { cn } from '~/utils/misc.ts'
-import href from './icon.svg'
+import href from './icons/sprite.svg'
 
-import type { iconNames } from './icons.json'
+import { type IconName } from '@/icon-name'
 export { href }
-export type IconName = keyof typeof iconNames
+export { IconName }
 
 const sizeClassName = {
 	font: 'w-[1em] h-[1em]',

@@ -22,5 +22,4 @@ node_modules
 *.local.*
 
 # generated files
-/app/components/ui/icon.svg
-/app/components/ui/icons.json
+/app/components/ui/icons
