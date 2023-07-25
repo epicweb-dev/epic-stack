@@ -12,6 +12,7 @@
     "build:icons": "tsx ./other/build-icons.ts",
     "build:remix": "remix build --sourcemap",
     "build:server": "tsx ./other/build-server.ts",
+    "predev": "npm run build:icons --silent",
     "dev": "remix dev -c \"node ./server/dev-server.js\" --no-restart",
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
