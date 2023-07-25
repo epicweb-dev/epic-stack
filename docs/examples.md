@@ -39,6 +39,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Tailwind CSS Plugin](https://github.com/hakimLyon/epic-stack-with-tailwind-css-plugin)
   by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
   with Tailwind CSS Plugin.
+- [Epic Stack + GitHub Auth](https://github.com/kentcdodds/epic-github-auth) by
+  [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
+  with GitHub Auth.
 
 ## How to contribute
 
