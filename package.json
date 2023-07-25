@@ -137,6 +137,7 @@
     "prettier": "^2.8.8",
     "prettier-plugin-sql": "^0.15.1",
     "prettier-plugin-tailwindcss": "^0.3.0",
+    "remix-development-tools": "^1.2.2",
     "remix-flat-routes": "^0.5.10",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^3.12.7",
