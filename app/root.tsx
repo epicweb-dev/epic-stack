@@ -81,10 +81,6 @@ export const links: LinksFunction = () => {
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
-		{ rel: 'stylesheet', href: rdtStylesheetUrl },
-		...(rdtStylesheetUrl && process.env.NODE_ENV === 'development'
-			? [{ rel: 'stylesheet', href: rdtStylesheetUrl }]
-			: []),
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 		rdtStylesheetUrl && process.env.NODE_ENV === 'development'
 			? { rel: 'stylesheet', href: rdtStylesheetUrl }
