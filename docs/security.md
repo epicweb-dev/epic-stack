@@ -4,6 +4,32 @@ The Epic Stack has several security measures in place to protect your users and
 yourself. This (incomplete) document, explains some of the security measures
 that are in place and how to use them.
 
+## TOTP and Two-Factor Authentication
+
+Two factor authentication is built-into the Epic Stack. It's managed using a
+custom built TOTP (Time-based One Time Passwords) utility that's been fully
+tested with Google Authenticator and 1Password and is based loosely on existing
+(but outdated) libraries.
+
+You can read more about the decision to use TOTP in
+[the totp decision document](./decisions/014-totp.md). The secret and other
+pertinent information is stored in a `verification` model (check the Prisma
+schema). This verification model is used as the basis for all TOTP secrets. This
+is used for non-expiring Two-Factor Authentication secrets as well as temporary
+TOTP codes which are emailed to verify a user's ownership of an email/account.
+So it's used for onboarding, forgot password, and change email flows.
+
+When a user has 2FA enabled on their account, they also are required to enter
+their 2FA code within 2 hours of performing destructive actions like changing
+their email or disabling 2FA. This time is controlled by the
+`shouldRequestTwoFA` utility in the `login` full stack component in the resource
+routes.
+
+In some cases, entering a TOTP happens in the `/verify` route. This is the
+approach taken for email ownership verification. However, in other cases,
+verification happens inline to reduce disorienting the user. This is the
+approach taken for performing destructive actions.
+
 ## Content Security Policy
 
 The Epic Stack uses a strict
