@@ -9,7 +9,7 @@ import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
-import { invariant, useIsSubmitting } from '~/utils/misc.ts'
+import { invariant, useIsSubmitting } from '~/utils/misc.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
 import {

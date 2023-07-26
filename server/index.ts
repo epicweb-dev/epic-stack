@@ -91,6 +91,7 @@ app.use((_, res, next) => {
 
 app.use(
 	helmet({
+		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
 			// NOTE: Remove reportOnly when you're ready to enforce this CSP

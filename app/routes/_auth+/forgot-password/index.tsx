@@ -20,7 +20,7 @@ import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { ForgotPasswordEmail } from './email.server.tsx'
-import { invariant, invariantResponse } from '~/utils/misc.ts'
+import { invariant, invariantResponse } from '~/utils/misc.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { resetPasswordUsernameSessionKey } from '../reset-password.tsx'
 

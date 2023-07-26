@@ -18,18 +18,35 @@ export async function insertNewUser({
 	password,
 }: { username?: string; password?: string } = {}) {
 	const userData = createUser()
-	const user = await prisma.user.create({
-		data: {
-			...userData,
-			username: username ?? userData.username,
-			password: {
-				create: {
-					hash: await getPasswordHash(password || userData.username),
+	username = username ?? userData.username
+	const user = (await prisma.user
+		.create({
+			data: {
+				...userData,
+				username,
+				password: {
+					create: {
+						hash: await getPasswordHash(password || userData.username),
+					},
 				},
 			},
-		},
-		select: { id: true, name: true, username: true, email: true },
-	})
+			select: { id: true, name: true, username: true, email: true },
+		})
+		.catch(async err => {
+			// sometimes the tests fail before data cleanup can happen. So we'll just
+			// delete the user and try again.
+			if (
+				err instanceof Error &&
+				err.message.includes(
+					'Unique constraint failed on the fields: (`username`)',
+				)
+			) {
+				await prisma.user.delete({ where: { username } })
+				return insertNewUser({ username, password })
+			} else {
+				throw err
+			}
+		})) as { id: string; name: string; username: string; email: string }
 	dataCleanup.users.add(user.id)
 	return user
 }

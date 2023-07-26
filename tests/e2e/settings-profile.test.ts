@@ -3,7 +3,7 @@ import { expect, insertNewUser, test } from '../playwright-utils.ts'
 import { createUser } from '../../tests/db-utils.ts'
 import { verifyUserPassword } from '~/utils/auth.server.ts'
 import { readEmail } from 'tests/mocks/utils.ts'
-import { invariant } from '~/utils/misc.ts'
+import { invariant } from '~/utils/misc.tsx'
 import { prisma } from '~/utils/db.server.ts'
 
 test('Users can update their basic info', async ({ login, page }) => {

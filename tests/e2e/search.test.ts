@@ -1,4 +1,4 @@
-import { invariant } from '~/utils/misc.ts'
+import { invariant } from '~/utils/misc.tsx'
 import { expect, insertNewUser, test } from '../playwright-utils.ts'
 
 test('Search from home page', async ({ page }) => {

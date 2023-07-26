@@ -3,7 +3,7 @@ import { json } from '@remix-run/node'
 import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
 import { lruCache } from '~/utils/cache.server.ts'
-import { invariantResponse } from '~/utils/misc.ts'
+import { invariantResponse } from '~/utils/misc.tsx'
 import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request, params }: DataFunctionArgs) {

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { twMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
+import { redirect } from '@remix-run/node'
+import { ServerOnly, safeRedirect } from 'remix-utils'
 
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/file/${imageId}` : `/img/user.png`
@@ -36,6 +38,66 @@ export function getDomainUrl(request: Request) {
 	}
 	const protocol = host.includes('localhost') ? 'http' : 'https'
 	return `${protocol}://${host}`
+}
+
+export function getReferrerRoute(request: Request) {
+	// spelling errors and whatever makes this annoyingly inconsistent
+	// in my own testing, `referer` returned the right value, but 🤷‍♂️
+	const referrer =
+		request.headers.get('referer') ??
+		request.headers.get('referrer') ??
+		request.referrer
+	const domain = getDomainUrl(request)
+	if (referrer?.startsWith(domain)) {
+		return referrer.slice(domain.length)
+	} else {
+		return '/'
+	}
+}
+
+/**
+ * If the noJs boolean is true, this throws a redirect to the referrer route
+ * with the given responseInit options. This should be used in combination with
+ * the EnsurePE component in your form.
+ *
+ * NOTE: This is only necessary when your form is posting to a different action
+ * from the current route. If your form is posting to the current route, things
+ * will work whether you redirect or return json from your action.
+ */
+export async function ensurePE(
+	data: FormData | URLSearchParams,
+	request: Request,
+	responseInit?:
+		| ResponseInit
+		| (() => ResponseInit)
+		| (() => Promise<ResponseInit>),
+) {
+	if (data.get('no-js') === 'true') {
+		throw redirect(
+			safeRedirect(getReferrerRoute(request)),
+			await (typeof responseInit === 'function'
+				? responseInit()
+				: responseInit),
+		)
+	}
+}
+
+/**
+ * Renders a hidden input with the name "no-js" and value "true". It is removed
+ * when JavaScript hydrates. This is so we can detect if the user has javascript
+ * loaded or not. It should be used in combination with the ensurePE utility
+ * in your action function.
+ *
+ * NOTE: This is only necessary when your form is posting to a different action
+ * from the current route. If your form is posting to the current route, things
+ * will work whether you redirect or return json from your action.
+ */
+export function EnsurePE() {
+	return (
+		<ServerOnly>
+			{() => <input type="hidden" name="no-js" value="true" />}
+		</ServerOnly>
+	)
 }
 
 /**

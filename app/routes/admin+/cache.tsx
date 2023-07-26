@@ -22,7 +22,11 @@ import {
 	lruCache,
 	searchCacheKeys,
 } from '~/utils/cache.server.ts'
-import { invariantResponse, useDebounce, useDoubleCheck } from '~/utils/misc.ts'
+import {
+	invariantResponse,
+	useDebounce,
+	useDoubleCheck,
+} from '~/utils/misc.tsx'
 import { requireAdmin } from '~/utils/permissions.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {

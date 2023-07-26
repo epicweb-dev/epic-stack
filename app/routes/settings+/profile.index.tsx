@@ -14,7 +14,7 @@ import {
 	verifyUserPassword,
 } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, useIsSubmitting } from '~/utils/misc.ts'
+import { getUserImgSrc, useIsSubmitting } from '~/utils/misc.tsx'
 import {
 	nameSchema,
 	passwordSchema,

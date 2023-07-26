@@ -3,23 +3,20 @@ import {
 	type DataFunctionArgs,
 	type V2_MetaFunction,
 } from '@remix-run/node'
-import { useLoaderData, useSearchParams } from '@remix-run/react'
+import { useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
-import { authenticator, requireAnonymous } from '~/utils/auth.server.ts'
+import { requireAnonymous } from '~/utils/auth.server.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
-import { InlineLogin } from '../resources+/login.tsx'
+import { InlineLogin, getLoginLoaderData } from '../resources+/login.tsx'
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader(args: DataFunctionArgs) {
+	const { request } = args
 	await requireAnonymous(request)
 	const session = await getSession(request.headers.get('cookie'))
-	const error = session.get(authenticator.sessionErrorKey)
-	let errorMessage: string | null = null
-	if (typeof error?.message === 'string') {
-		errorMessage = error.message
-	}
+
 	return json(
-		{ formError: errorMessage },
+		{ loginLoaderData: await getLoginLoaderData(args) },
 		{ headers: { 'Set-Cookie': await commitSession(session) } },
 	)
 }
@@ -29,10 +26,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export default function LoginPage() {
-	const [searchParams] = useSearchParams()
 	const data = useLoaderData<typeof loader>()
-
-	const redirectTo = searchParams.get('redirectTo') || '/'
 
 	return (
 		<div className="flex min-h-full flex-col justify-center pb-32 pt-20">
@@ -44,7 +38,7 @@ export default function LoginPage() {
 					</p>
 				</div>
 				<Spacer size="xs" />
-				<InlineLogin redirectTo={redirectTo} formError={data.formError} />
+				<InlineLogin {...data.loginLoaderData} />
 			</div>
 		</div>
 	)

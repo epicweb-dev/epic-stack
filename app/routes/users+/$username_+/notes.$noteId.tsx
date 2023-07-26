@@ -20,7 +20,7 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import { getUserId, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
-import { getDateTimeFormat } from '~/utils/misc.ts'
+import { getDateTimeFormat } from '~/utils/misc.tsx'
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	const userId = await getUserId(request)

@@ -7,7 +7,7 @@ import {
 } from '../playwright-utils.ts'
 import { readEmail } from '../mocks/utils.ts'
 import { createUser } from 'tests/db-utils.ts'
-import { invariant } from '~/utils/misc.ts'
+import { invariant } from '~/utils/misc.tsx'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {

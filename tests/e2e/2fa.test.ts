@@ -45,7 +45,7 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 		.getByRole('textbox', { name: /code/i })
 		.fill(generateTOTP(options).otp)
 
-	await page.getByRole('button', { name: /log in/i }).click()
+	await page.getByRole('button', { name: /confirm/i }).click()
 
 	await expect(
 		page.getByRole('link', { name: user.name ?? user.username }),

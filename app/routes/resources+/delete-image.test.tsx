@@ -7,7 +7,7 @@ import { createPassword, createUser } from 'tests/db-utils.ts'
 import { BASE_URL, getSessionSetCookieHeader } from 'tests/vitest-utils.ts'
 import { expect, test } from 'vitest'
 import { prisma } from '~/utils/db.server.ts'
-import { invariantResponse } from '~/utils/misc.ts'
+import { invariantResponse } from '~/utils/misc.tsx'
 import { ROUTE_PATH, action } from './delete-image.tsx'
 
 const RESOURCE_URL = `${BASE_URL}${ROUTE_PATH}`

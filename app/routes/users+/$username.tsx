@@ -9,7 +9,7 @@ import { Spacer } from '~/components/spacer.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, invariantResponse } from '~/utils/misc.ts'
+import { getUserImgSrc, invariantResponse } from '~/utils/misc.tsx'
 import { useOptionalUser } from '~/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {

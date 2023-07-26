@@ -23,7 +23,11 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, useDoubleCheck, useIsSubmitting } from '~/utils/misc.ts'
+import {
+	getUserImgSrc,
+	useDoubleCheck,
+	useIsSubmitting,
+} from '~/utils/misc.tsx'
 
 export const handle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,

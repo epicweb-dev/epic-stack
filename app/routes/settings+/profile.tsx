@@ -5,7 +5,7 @@ import { Spacer } from '~/components/spacer.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { authenticator, requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { cn } from '~/utils/misc.ts'
+import { cn } from '~/utils/misc.tsx'
 import { useUser } from '~/utils/user.ts'
 
 export const handle = {

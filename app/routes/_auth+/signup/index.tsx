@@ -14,7 +14,7 @@ import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prepareVerification } from '~/routes/resources+/verify.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { useIsSubmitting } from '~/utils/misc.ts'
+import { useIsSubmitting } from '~/utils/misc.tsx'
 import { emailSchema } from '~/utils/user-validation.ts'
 import { SignupEmail } from './email.server.tsx'
 

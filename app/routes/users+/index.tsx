@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { SearchBar } from '~/components/search-bar.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { cn, getUserImgSrc, useDelayedIsSubmitting } from '~/utils/misc.ts'
+import { cn, getUserImgSrc, useDelayedIsSubmitting } from '~/utils/misc.tsx'
 import {
 	combineServerTimings,
 	makeTimings,

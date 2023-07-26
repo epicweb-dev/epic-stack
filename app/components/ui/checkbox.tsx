@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 
-import { cn } from '~/utils/misc.ts'
+import { cn } from '~/utils/misc.tsx'
 
 export type CheckboxProps = Omit<
 	React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>,
