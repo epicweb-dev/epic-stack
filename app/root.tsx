@@ -20,7 +20,7 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { lazy, useRef } from 'react'
+import { Suspense, lazy, useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { SearchBar } from './components/search-bar.tsx'
@@ -240,7 +240,7 @@ function App() {
 			</div>
 			<Confetti confetti={data.flash?.confetti} />
 			<Toaster />
-			{RemixDevTools && <RemixDevTools showRouteBoundaries />}
+			<Suspense>{RemixDevTools && <RemixDevTools showRouteBoundaries />}</Suspense>
 		</Document>
 	)
 }
