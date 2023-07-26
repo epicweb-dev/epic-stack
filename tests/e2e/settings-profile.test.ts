@@ -93,7 +93,7 @@ test('Users can change their email address', async ({ page, login }) => {
 	await page.getByRole('link', { name: /change email/i }).click()
 	await page.getByRole('textbox', { name: /new email/i }).fill(newEmailAddress)
 	await page.getByRole('button', { name: /send confirmation/i }).click()
-	// await expect(page.getByText(/check your email/i)).toBeVisible()
+	await expect(page.getByText(/check your email/i)).toBeVisible()
 	const email = await waitFor(() => readEmail(newEmailAddress), {
 		errorMessage: 'Confirmation email was not sent',
 	})

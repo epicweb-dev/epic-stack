@@ -14,9 +14,12 @@ import { commitSession, getSession } from '~/utils/session.server.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
 import {
 	prepareVerification,
+	Verify,
 	type VerifyFunctionArgs,
 } from '../../resources+/verify.tsx'
 import { EmailChangeEmail, EmailChangeNoticeEmail } from './email.server.tsx'
+import { shouldRequestTwoFA } from '~/routes/resources+/login.tsx'
+import { useUser } from '~/utils/user.ts'
 
 export const newEmailAddressSessionKey = 'new-email-address'
 
@@ -37,10 +40,15 @@ export async function loader({ request }: DataFunctionArgs) {
 			description: 'You must login first to change your email',
 		})
 	}
-	return json({ user })
+	const shouldReverify = await shouldRequestTwoFA(request)
+	return json({ user, shouldReverify })
 }
 
 export async function action({ request }: DataFunctionArgs) {
+	if (await shouldRequestTwoFA(request)) {
+		// looks like they waited too long enter the email
+		return redirect(request.url)
+	}
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 	const submission = await parse(formData, {
@@ -134,6 +142,7 @@ export async function handleVerification({
 
 export default function ChangeEmailIndex() {
 	const data = useLoaderData<typeof loader>()
+	const user = useUser()
 	const actionData = useActionData<typeof action>()
 
 	const [form, fields] = useForm({
@@ -153,21 +162,30 @@ export default function ChangeEmailIndex() {
 			<p>
 				An email notice will also be sent to your old address {data.user.email}.
 			</p>
-			<Form method="POST" {...form.props}>
-				<Field
-					labelProps={{ children: 'New Email' }}
-					inputProps={conform.input(fields.email)}
-					errors={fields.email.errors}
-				/>
-				<ErrorList id={form.errorId} errors={form.errors} />
-				<div>
-					<StatusButton
-						status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
-					>
-						Send Confirmation
-					</StatusButton>
-				</div>
-			</Form>
+			<div className="mx-auto mt-5 max-w-sm">
+				{data.shouldReverify ? (
+					<>
+						<p>Please reverify your account by submitting your 2FA code</p>
+						<Verify target={user.id} type="2fa" />
+					</>
+				) : (
+					<Form method="POST" {...form.props}>
+						<Field
+							labelProps={{ children: 'New Email' }}
+							inputProps={conform.input(fields.email)}
+							errors={fields.email.errors}
+						/>
+						<ErrorList id={form.errorId} errors={form.errors} />
+						<div>
+							<StatusButton
+								status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
+							>
+								Send Confirmation
+							</StatusButton>
+						</div>
+					</Form>
+				)}
+			</div>
 		</div>
 	)
 }

@@ -236,7 +236,11 @@ function App() {
 			</div>
 			<Confetti confetti={data.flash?.confetti} />
 			<Toaster />
-			{RemixDevTools && <Suspense><RemixDevTools showRouteBoundaries /></Suspense>}
+			{RemixDevTools && (
+				<Suspense>
+					<RemixDevTools showRouteBoundaries />
+				</Suspense>
+			)}
 		</Document>
 	)
 }

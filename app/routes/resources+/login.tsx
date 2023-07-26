@@ -12,10 +12,15 @@ import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
-import { authenticator } from '~/utils/auth.server.ts'
+import { authenticator, getUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
-import { EnsurePE, ensurePE, getReferrerRoute } from '~/utils/misc.tsx'
+import {
+	EnsurePE,
+	ensurePE,
+	getReferrerRoute,
+	invariant,
+} from '~/utils/misc.tsx'
 import {
 	commitSession,
 	destroySession,
@@ -23,7 +28,11 @@ import {
 } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
-import { isCodeValid } from './verify.tsx'
+import {
+	type VerificationTypes,
+	isCodeValid,
+	type VerifyFunctionArgs,
+} from './verify.tsx'
 
 const ROUTE_PATH = '/resources/login'
 
@@ -51,19 +60,58 @@ const LoginFormSchema = z.object({
 	remember: checkboxSchema(),
 })
 
+const verifiedTimeKey = 'verified-time'
 const unverifiedSessionIdKey = 'unverified-session-id'
 const loginSubmissionKey = 'login-submission'
+const inlineLoginFormId = 'inline-login'
+const inlineTwoFAFormId = 'inline-two-fa'
+const verificationType = '2fa' satisfies VerificationTypes
 
-async function shouldRequestTwoFA(request: Request) {
-	const session = await getSession(request.headers.get('cookie'))
-	return session.has(unverifiedSessionIdKey)
+export async function handleVerification({
+	request,
+	body,
+	submission,
+}: VerifyFunctionArgs) {
+	invariant(submission.value, 'Submission should have a value by this point')
+	const cookieSession = await getSession(request.headers.get('cookie'))
+	const { redirectTo } = submission.value
+	cookieSession.set(verifiedTimeKey, Date.now())
+	const responseInit = {
+		headers: { 'Set-Cookie': await commitSession(cookieSession) },
+	}
+
+	if (redirectTo) {
+		return redirect(safeRedirect(redirectTo), responseInit)
+	} else {
+		ensurePE(body, request, responseInit)
+		return json({ status: 'success', submission } as const, responseInit)
+	}
+}
+
+export async function shouldRequestTwoFA(request: Request) {
+	const cookieSession = await getSession(request.headers.get('cookie'))
+	if (cookieSession.has(unverifiedSessionIdKey)) return true
+	const userId = await getUserId(request)
+	if (!userId) return false
+	// if it's over two hours since they last verified, we should request 2FA again
+	const userHasTwoFA = await prisma.verification.findUnique({
+		select: { id: true },
+		where: { target_type: { target: userId, type: verificationType } },
+	})
+	if (!userHasTwoFA) return false
+	const verifiedTime = cookieSession.get(verifiedTimeKey) ?? new Date(0)
+	const twoHours = 1000 * 60 * 60 * 2
+	return Date.now() - verifiedTime > twoHours
 }
 
 export async function action(args: DataFunctionArgs) {
-	if (await shouldRequestTwoFA(args.request)) {
+	const form = (await args.request.clone().formData()).get('form')
+	if (form === inlineTwoFAFormId) {
 		return inlineTwoFAAction(args)
-	} else {
+	} else if (form === inlineLoginFormId) {
 		return inlineLoginAction(args)
+	} else {
+		throw new Response('Invalid form', { status: 400 })
 	}
 }
 
@@ -134,7 +182,7 @@ async function inlineLoginAction({ request }: DataFunctionArgs) {
 	const { remember, redirectTo, session } = submission.value
 
 	const verification = await prisma.verification.findUnique({
-		where: { target_type: { target: session.userId, type: '2fa' } },
+		where: { target_type: { target: session.userId, type: verificationType } },
 		select: { id: true },
 	})
 	const userHasTwoFactor = Boolean(verification)
@@ -192,7 +240,7 @@ function InlineLoginForm({
 	const loginFetcher = useFetcher<typeof inlineLoginAction>()
 
 	const [form, fields] = useForm({
-		id: 'inline-login',
+		id: inlineLoginFormId,
 		defaultValue: { redirectTo },
 		constraint: getFieldsetConstraint(LoginFormSchema),
 		lastSubmission: loginFetcher.data?.submission ?? submission,
@@ -211,6 +259,7 @@ function InlineLoginForm({
 					name="login"
 					{...form.props}
 				>
+					<input type="hidden" name="form" value={form.id} />
 					<EnsurePE />
 					<Field
 						labelProps={{ children: 'Username' }}
@@ -316,7 +365,7 @@ async function inlineTwoFAAction({ request }: DataFunctionArgs) {
 		schema: TwoFAFormSchema.superRefine(async (data, ctx) => {
 			const codeIsValid = await isCodeValid({
 				code: data.code,
-				type: '2fa',
+				type: verificationType,
 				target: session.userId,
 			})
 			if (!codeIsValid) {
@@ -351,6 +400,7 @@ async function inlineTwoFAAction({ request }: DataFunctionArgs) {
 	}
 
 	const { redirectTo } = submission.value
+	cookieSession.set(verifiedTimeKey, Date.now())
 	cookieSession.unset(unverifiedSessionIdKey)
 	cookieSession.set(authenticator.sessionKey, session.id)
 	const responseInit = {
@@ -377,7 +427,7 @@ function InlineTwoFA({
 	const twoFAFetcher = useFetcher<typeof inlineTwoFAAction>()
 
 	const [form, fields] = useForm({
-		id: 'inline-two-fa',
+		id: inlineTwoFAFormId,
 		defaultValue: { redirectTo },
 		constraint: getFieldsetConstraint(TwoFAFormSchema),
 		lastSubmission: twoFAFetcher.data?.submission ?? submission,
@@ -389,6 +439,7 @@ function InlineTwoFA({
 
 	return (
 		<twoFAFetcher.Form method="POST" action={ROUTE_PATH} {...form.props}>
+			<input type="hidden" name="form" value={form.id} />
 			{/* Putting this at the top so we can have the tab order of cancel first,
 			but have "enter" submit the confirmation. */}
 			<button type="submit" className="hidden" name="intent" value="confirm" />

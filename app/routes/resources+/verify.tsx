@@ -6,12 +6,13 @@ import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { getDomainUrl, useIsSubmitting } from '~/utils/misc.tsx'
+import { EnsurePE, getDomainUrl, useIsSubmitting } from '~/utils/misc.tsx'
 import { generateTOTP, verifyTOTP } from '~/utils/totp.server.ts'
 import { handleVerification as handleForgotPasswordVerification } from '../_auth+/forgot-password/index.tsx'
 import { handleVerification as handleOnboardingVerification } from '../_auth+/onboarding.tsx'
 import { handleVerification as handleChangeEmailVerification } from '../settings+/profile.change-email.index/index.tsx'
 import { handleVerification as handleEnableTwoFactorVerification } from '../settings+/profile.two-factor.verify.tsx'
+import { handleVerification as handleReverifyVerification } from './login.tsx'
 
 export const ROUTE_PATH = '/resources/verify'
 
@@ -100,6 +101,7 @@ export type VerifySubmission = Submission<z.infer<typeof VerifySchema>>
 export type VerifyFunctionArgs = {
 	request: Request
 	submission: Submission<z.infer<typeof VerifySchema>>
+	body: FormData | URLSearchParams
 }
 
 export async function isCodeValid({
@@ -181,18 +183,21 @@ export async function validateRequest(
 	switch (submissionValue[typeQueryParam]) {
 		case 'forgot-password': {
 			await deleteVerification()
-			return handleForgotPasswordVerification({ request, submission })
+			return handleForgotPasswordVerification({ request, body, submission })
 		}
 		case 'onboarding': {
 			await deleteVerification()
-			return handleOnboardingVerification({ request, submission })
+			return handleOnboardingVerification({ request, body, submission })
 		}
 		case '2fa-verify': {
-			return handleEnableTwoFactorVerification({ request, submission })
+			return handleEnableTwoFactorVerification({ request, body, submission })
+		}
+		case '2fa': {
+			return handleReverifyVerification({ request, body, submission })
 		}
 		case 'change-email': {
 			await deleteVerification()
-			return await handleChangeEmailVerification({ request, submission })
+			return await handleChangeEmailVerification({ request, body, submission })
 		}
 		default: {
 			submission.error[''] = ['Invalid verification type']
@@ -254,6 +259,7 @@ export function Verify({
 					{...form.props}
 					className="flex-1"
 				>
+					<EnsurePE />
 					<input
 						{...conform.input(fields[typeQueryParam], { type: 'hidden' })}
 					/>
