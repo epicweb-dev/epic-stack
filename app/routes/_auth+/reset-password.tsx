@@ -27,7 +27,7 @@ import { passwordSchema } from '~/utils/user-validation.ts'
 
 export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 
-const resetPasswordSchema = z
+const ResetPasswordSchema = z
 	.object({
 		password: passwordSchema,
 		confirmPassword: passwordSchema,
@@ -46,33 +46,22 @@ export async function loader({ request }: DataFunctionArgs) {
 		return redirect('/login')
 	}
 	return json(
-		{
-			formError: error?.message,
-			resetPasswordUsername,
-		},
-		{
-			headers: { 'Set-Cookie': await commitSession(session) },
-		},
+		{ formError: error?.message, resetPasswordUsername },
+		{ headers: { 'Set-Cookie': await commitSession(session) } },
 	)
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
-		schema: resetPasswordSchema,
+		schema: ResetPasswordSchema,
 		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 	const { password } = submission.value
 
@@ -100,10 +89,10 @@ export default function ResetPasswordPage() {
 
 	const [form, fields] = useForm({
 		id: 'reset-password',
-		constraint: getFieldsetConstraint(resetPasswordSchema),
+		constraint: getFieldsetConstraint(ResetPasswordSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: resetPasswordSchema })
+			return parse(formData, { schema: ResetPasswordSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
