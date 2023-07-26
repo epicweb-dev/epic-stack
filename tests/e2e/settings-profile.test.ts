@@ -2,6 +2,9 @@ import { faker } from '@faker-js/faker'
 import { expect, insertNewUser, test } from '../playwright-utils.ts'
 import { createUser } from '../../tests/db-utils.ts'
 import { verifyUserPassword } from '~/utils/auth.server.ts'
+import { readEmail } from 'tests/mocks/utils.ts'
+import { invariant } from '~/utils/misc.ts'
+import { prisma } from '~/utils/db.server.ts'
 
 test('Users can update their basic info', async ({ login, page }) => {
 	await login()
@@ -80,4 +83,32 @@ test('Users can update their profile photo', async ({ login, page }) => {
 		.getAttribute('src')
 
 	expect(beforeSrc).not.toEqual(afterSrc)
+})
+
+test('Users can change their email address', async ({ page, login }) => {
+	const user = await login()
+	const newEmailAddress = faker.internet.email().toLowerCase()
+	expect(user.email).not.toEqual(newEmailAddress)
+	await page.goto('/settings/profile')
+	await page.getByRole('link', { name: /change email/i }).click()
+	await page.getByRole('textbox', { name: /new email/i }).fill(newEmailAddress)
+	await page.getByRole('button', { name: /send confirmation/i }).click()
+	await expect(page.getByText(/check your email/i)).toBeVisible()
+	const email = await readEmail(newEmailAddress)
+	invariant(email, 'Email was not sent')
+	const codeMatch = email.text.match(
+		/Here's your verification code: (?<code>\d+)/,
+	)
+	const code = codeMatch?.groups?.code
+	invariant(code, 'Onboarding code not found')
+	await page.getByRole('textbox', { name: /code/i }).fill(code)
+	await page.getByRole('button', { name: /submit/i }).click()
+	await expect(page.getByText(newEmailAddress)).toBeVisible()
+
+	const updatedUser = await prisma.user.findUnique({
+		where: { id: user.id },
+		select: { email: true },
+	})
+	invariant(updatedUser, 'Updated user not found')
+	expect(updatedUser.email).toBe(newEmailAddress)
 })

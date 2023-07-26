@@ -16,7 +16,6 @@ import {
 import { prisma } from '~/utils/db.server.ts'
 import { getUserImgSrc, useIsSubmitting } from '~/utils/misc.ts'
 import {
-	emailSchema,
 	nameSchema,
 	passwordSchema,
 	usernameSchema,
@@ -26,7 +25,6 @@ import { twoFAVerificationType } from './profile.two-factor.tsx'
 const profileFormSchema = z.object({
 	name: nameSchema.optional(),
 	username: usernameSchema,
-	email: emailSchema.optional(),
 	currentPassword: z
 		.union([passwordSchema, z.string().min(0).max(0)])
 		.optional(),
@@ -89,11 +87,7 @@ export async function action({ request }: DataFunctionArgs) {
 	if (!submission.value) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
-	const { name, username, email, newPassword } = submission.value
-
-	if (email) {
-		// TODO: send a confirmation email
-	}
+	const { name, username, newPassword } = submission.value
 
 	const updatedUser = await prisma.user.update({
 		select: { id: true, username: true },
@@ -130,7 +124,6 @@ export default function EditUserProfile() {
 		defaultValue: {
 			username: data.user.username,
 			name: data.user.name ?? '',
-			email: data.user.email,
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -177,16 +170,6 @@ export default function EditUserProfile() {
 						inputProps={conform.input(fields.name)}
 						errors={fields.name.errors}
 					/>
-					<Field
-						className="col-span-3"
-						labelProps={{ htmlFor: fields.email.id, children: 'Email' }}
-						inputProps={{
-							...conform.input(fields.email),
-							// TODO: support changing your email address
-							disabled: true,
-						}}
-						errors={fields.email.errors}
-					/>
 
 					<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
 					<fieldset className="col-span-6">
@@ -220,13 +203,22 @@ export default function EditUserProfile() {
 							/>
 						</div>
 					</fieldset>
-					<Link to="two-factor" className="col-span-full">
-						{data.isTwoFactorEnabled ? (
-							<Icon name="lock-closed"> 2FA is enabled</Icon>
-						) : (
-							<Icon name="lock-open-1">Enable 2FA</Icon>
-						)}
-					</Link>
+					<div className="col-span-full my-3">
+						<Link to="change-email">
+							<Icon name="envelope-closed">
+								Change email from {data.user.email}
+							</Icon>
+						</Link>
+					</div>
+					<div className="col-span-full my-3">
+						<Link to="two-factor">
+							{data.isTwoFactorEnabled ? (
+								<Icon name="lock-closed"> 2FA is enabled</Icon>
+							) : (
+								<Icon name="lock-open-1">Enable 2FA</Icon>
+							)}
+						</Link>
+					</div>
 				</div>
 
 				<ErrorList errors={form.errors} id={form.errorId} />

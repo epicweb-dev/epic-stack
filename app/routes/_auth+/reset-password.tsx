@@ -118,6 +118,7 @@ export default function ResetPasswordPage() {
 					inputProps={{
 						...conform.input(fields.password, { type: 'password' }),
 						autoComplete: 'new-password',
+						autoFocus: true,
 					}}
 					errors={fields.password.errors}
 				/>

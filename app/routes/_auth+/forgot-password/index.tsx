@@ -12,6 +12,7 @@ import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import {
+	type VerifyFunctionArgs,
 	getRedirectToUrl,
 	prepareVerification,
 } from '~/routes/resources+/verify.tsx'
@@ -19,6 +20,9 @@ import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { ForgotPasswordEmail } from './email.server.tsx'
+import { invariant, invariantResponse } from '~/utils/misc.ts'
+import { commitSession, getSession } from '~/utils/session.server.ts'
+import { resetPasswordUsernameSessionKey } from '../reset-password.tsx'
 
 const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([emailSchema, usernameSchema]),
@@ -28,20 +32,20 @@ export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = await parse(formData, {
 		schema: ForgotPasswordSchema.superRefine(async (data, ctx) => {
-			if (data.usernameOrEmail.includes('@')) return
-
-			// check the username exists. Usernames have to be unique anyway so anyone
-			// signing up can check whether a username exists by trying to sign up
-			// with it.
-			const user = await prisma.user.findUnique({
-				where: { username: data.usernameOrEmail },
+			const user = await prisma.user.findFirst({
+				where: {
+					OR: [
+						{ email: data.usernameOrEmail },
+						{ username: data.usernameOrEmail },
+					],
+				},
 				select: { id: true },
 			})
 			if (!user) {
 				ctx.addIssue({
 					path: ['usernameOrEmail'],
 					code: z.ZodIssueCode.custom,
-					message: 'No user exists with this username',
+					message: 'No user exists with this username or email',
 				})
 				return
 			}
@@ -62,41 +66,53 @@ export async function action({ request }: DataFunctionArgs) {
 		target: usernameOrEmail,
 	})
 
-	// fire, forget, and don't wait to combat timing attacks
-	void sendVerifyEmail({ request, target: usernameOrEmail })
-
-	return redirect(redirectTo.toString())
-}
-
-async function sendVerifyEmail({
-	request,
-	target,
-}: {
-	request: Request
-	target: string
-}) {
 	const user = await prisma.user.findFirst({
-		where: { OR: [{ email: target }, { username: target }] },
+		where: { OR: [{ email: usernameOrEmail }, { username: usernameOrEmail }] },
 		select: { email: true, username: true },
 	})
-	if (!user) {
-		// maybe they're trying to see whether a user exists? We're not gonna tell them...
-		return
-	}
+	invariantResponse(user, 'User should exist')
 
 	const { verifyUrl, otp } = await prepareVerification({
 		period: 10 * 60,
 		request,
 		type: 'forgot-password',
-		target,
+		target: usernameOrEmail,
 	})
 
-	await sendEmail({
+	const response = await sendEmail({
 		to: user.email,
 		subject: `Epic Notes Password Reset`,
 		react: (
 			<ForgotPasswordEmail onboardingUrl={verifyUrl.toString()} otp={otp} />
 		),
+	})
+
+	if (response.status === 'success') {
+		return redirect(redirectTo.toString())
+	} else {
+		submission.error[''] = response.error.message
+		return json({ status: 'error', submission } as const, { status: 500 })
+	}
+}
+
+export async function handleVerification({
+	request,
+	submission,
+}: VerifyFunctionArgs) {
+	invariant(submission.value, 'submission.value should be defined by now')
+	const target = submission.value.target
+	const user = await prisma.user.findFirst({
+		where: { OR: [{ email: target }, { username: target }] },
+		select: { email: true, username: true },
+	})
+	// we don't want to say the user is not found if the email is not found
+	// because that would allow an attacker to check if an email is registered
+	invariantResponse(user, 'Invalid code')
+
+	const session = await getSession(request.headers.get('cookie'))
+	session.set(resetPasswordUsernameSessionKey, user.username)
+	return redirect('/reset-password', {
+		headers: { 'Set-Cookie': await commitSession(session) },
 	})
 }
 

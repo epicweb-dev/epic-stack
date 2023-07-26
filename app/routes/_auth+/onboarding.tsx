@@ -29,6 +29,8 @@ import {
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { redirectWithConfetti } from '~/utils/flash-session.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { invariant } from '~/utils/misc.ts'
+import { type VerifyFunctionArgs } from '../resources+/verify.tsx'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
 
@@ -122,6 +124,18 @@ export async function action({ request }: DataFunctionArgs) {
 	})
 	return redirectWithConfetti(safeRedirect(redirectTo, '/'), {
 		headers: { 'Set-Cookie': newCookie },
+	})
+}
+
+export async function handleVerification({
+	request,
+	submission,
+}: VerifyFunctionArgs) {
+	invariant(submission.value, 'submission.value should be defined by now')
+	const session = await getSession(request.headers.get('cookie'))
+	session.set(onboardingEmailSessionKey, submission.value.target)
+	return redirect('/onboarding', {
+		headers: { 'Set-Cookie': await commitSession(session) },
 	})
 }
 

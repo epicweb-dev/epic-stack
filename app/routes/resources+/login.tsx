@@ -8,26 +8,30 @@ import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
-import { authenticator } from '~/utils/auth.server.ts'
+import {
+	TwoFactorCodeInvalidError,
+	TwoFactorCodeRequiredError,
+	authenticator,
+} from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { invariantResponse } from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { passwordSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { checkboxSchema } from '~/utils/zod-extensions.ts'
-import { type VerificationTypes, Verify } from './verify.tsx'
 
 const ROUTE_PATH = '/resources/login'
-export const unverifiedSessionKey = 'unverified-sessionId'
 
 export const LoginFormSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 	redirectTo: z.string().optional(),
 	remember: checkboxSchema(),
+	code: z.string().optional(),
 })
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
+	const twoFARequired = formData.get('twoFARequired') === 'true'
 	const submission = parse(formData, {
 		schema: LoginFormSchema,
 		acceptMultipleErrors: () => true,
@@ -38,10 +42,12 @@ export async function action({ request }: DataFunctionArgs) {
 	delete submission.value?.password
 
 	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const)
+		return json({ status: 'idle', twoFARequired, submission } as const)
 	}
 	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 })
+		return json({ status: 'error', twoFARequired, submission } as const, {
+			status: 400,
+		})
 	}
 
 	let sessionId: string | null = null
@@ -52,9 +58,31 @@ export async function action({ request }: DataFunctionArgs) {
 		})
 	} catch (error) {
 		if (error instanceof AuthorizationError) {
+			if (error.message === TwoFactorCodeRequiredError) {
+				if (twoFARequired) {
+					submission.error.code = TwoFactorCodeRequiredError
+					return json({ status: 'error', twoFARequired, submission } as const, {
+						status: 400,
+					})
+				} else {
+					return json(
+						{ status: 'idle', twoFARequired: true, submission } as const,
+						{
+							status: 400,
+						},
+					)
+				}
+			}
+			if (error.message === TwoFactorCodeInvalidError) {
+				submission.error.code = TwoFactorCodeInvalidError
+				return json({ status: 'error', twoFARequired, submission } as const, {
+					status: 400,
+				})
+			}
 			return json(
 				{
 					status: 'error',
+					twoFARequired,
 					submission: {
 						...submission,
 						error: {
@@ -75,14 +103,8 @@ export async function action({ request }: DataFunctionArgs) {
 	})
 	invariantResponse(session, 'newly created session not found')
 
-	const user2FA = await prisma.verification.findFirst({
-		where: { type: '2fa' satisfies VerificationTypes, target: session.userId },
-		select: { id: true },
-	})
-
 	const cookieSession = await getSession(request.headers.get('cookie'))
-	const cookieToSet = user2FA ? unverifiedSessionKey : authenticator.sessionKey
-	cookieSession.set(cookieToSet, sessionId)
+	cookieSession.set(authenticator.sessionKey, sessionId)
 	const { remember, redirectTo } = submission.value
 	const responseInit = {
 		headers: {
@@ -93,13 +115,11 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	}
 
-	if (user2FA) {
+	if (!redirectTo) {
 		return json(
-			{ status: '2fa-required', submission, userId: session.userId } as const,
+			{ status: 'success', twoFARequired, submission } as const,
 			responseInit,
 		)
-	} else if (!redirectTo) {
-		return json({ status: 'success', submission } as const, responseInit)
 	} else {
 		throw redirect(safeRedirect(redirectTo), responseInit)
 	}
@@ -128,88 +148,88 @@ export function InlineLogin({
 	return (
 		<div>
 			<div className="mx-auto w-full max-w-md px-8">
-				{loginFetcher.data?.status === '2fa-required' ? (
-					<Verify
-						target={loginFetcher.data?.userId ?? ''}
-						type="2fa"
-						fieldLabel="Enter your 2FA code"
-						redirectTo={redirectTo}
+				<loginFetcher.Form
+					method="POST"
+					action={ROUTE_PATH}
+					name="login"
+					{...form.props}
+				>
+					<Field
+						labelProps={{ children: 'Username' }}
+						inputProps={{
+							...conform.input(fields.username),
+							autoFocus: true,
+							className: 'lowercase',
+						}}
+						errors={fields.username.errors}
 					/>
-				) : (
-					<>
-						<loginFetcher.Form
-							method="POST"
-							action={ROUTE_PATH}
-							name="login"
-							{...form.props}
-						>
-							<Field
-								labelProps={{ children: 'Username' }}
-								inputProps={{
-									...conform.input(fields.username),
-									autoFocus: true,
-									className: 'lowercase',
-								}}
-								errors={fields.username.errors}
-							/>
 
-							<Field
-								labelProps={{ children: 'Password' }}
-								inputProps={conform.input(fields.password, {
-									type: 'password',
-								})}
-								errors={fields.password.errors}
-							/>
+					<Field
+						labelProps={{ children: 'Password' }}
+						inputProps={conform.input(fields.password, {
+							type: 'password',
+						})}
+						errors={fields.password.errors}
+					/>
 
-							<div className="flex justify-between">
-								<CheckboxField
-									labelProps={{
-										htmlFor: fields.remember.id,
-										children: 'Remember me',
-									}}
-									buttonProps={conform.input(fields.remember, {
-										type: 'checkbox',
-									})}
-									errors={fields.remember.errors}
-								/>
+					<input
+						type="hidden"
+						name="twoFARequired"
+						value={loginFetcher.data?.twoFARequired ? 'true' : 'false'}
+					/>
 
-								<div>
-									<Link
-										to="/forgot-password"
-										className="text-body-xs font-semibold"
-									>
-										Forgot password?
-									</Link>
-								</div>
-							</div>
+					{loginFetcher.data?.twoFARequired ? (
+						<Field
+							labelProps={{ children: '2FA Code' }}
+							inputProps={{ ...conform.input(fields.code), autoFocus: true }}
+							errors={fields.code.errors}
+						/>
+					) : null}
 
-							<input {...conform.input(fields.redirectTo)} type="hidden" />
-							<ErrorList
-								errors={[...form.errors, formError]}
-								id={form.errorId}
-							/>
+					<div className="flex justify-between">
+						<CheckboxField
+							labelProps={{
+								htmlFor: fields.remember.id,
+								children: 'Remember me',
+							}}
+							buttonProps={conform.input(fields.remember, {
+								type: 'checkbox',
+							})}
+							errors={fields.remember.errors}
+						/>
 
-							<div className="flex items-center justify-between gap-6 pt-3">
-								<StatusButton
-									className="w-full"
-									status={
-										loginFetcher.state === 'submitting'
-											? 'pending'
-											: loginFetcher.data?.status ?? 'idle'
-									}
-									type="submit"
-									disabled={loginFetcher.state !== 'idle'}
-								>
-									Log in
-								</StatusButton>
-							</div>
-						</loginFetcher.Form>
-						<div className="flex items-center justify-center gap-2 pt-6">
-							<span className="text-muted-foreground">New here?</span>
-							<Link to="/signup">Create an account</Link>
+						<div>
+							<Link
+								to="/forgot-password"
+								className="text-body-xs font-semibold"
+							>
+								Forgot password?
+							</Link>
 						</div>
-					</>
-				)}
+					</div>
+
+					<input {...conform.input(fields.redirectTo)} type="hidden" />
+					<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
+
+					<div className="flex items-center justify-between gap-6 pt-3">
+						<StatusButton
+							className="w-full"
+							status={
+								loginFetcher.state === 'submitting'
+									? 'pending'
+									: loginFetcher.data?.status ?? 'idle'
+							}
+							type="submit"
+							disabled={loginFetcher.state !== 'idle'}
+						>
+							Log in
+						</StatusButton>
+					</div>
+				</loginFetcher.Form>
+				<div className="flex items-center justify-center gap-2 pt-6">
+					<span className="text-muted-foreground">New here?</span>
+					<Link to="/signup">Create an account</Link>
+				</div>
 			</div>
 		</div>
 	)

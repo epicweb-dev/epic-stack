@@ -5,10 +5,15 @@ import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getDomainUrl, invariantResponse } from '~/utils/misc.ts'
+import { getDomainUrl, invariant, invariantResponse } from '~/utils/misc.ts'
 import { getTOTPAuthUri } from '~/utils/totp.server.ts'
 import { useUser } from '~/utils/user.ts'
-import { type VerificationTypes, Verify } from '../resources+/verify.tsx'
+import {
+	type VerificationTypes,
+	Verify,
+	type VerifyFunctionArgs,
+} from '../resources+/verify.tsx'
+import { safeRedirect } from 'remix-utils'
 
 export const handle = {
 	breadcrumb: <Icon name="check">Verify</Icon>,
@@ -56,6 +61,27 @@ export async function action({ request }: DataFunctionArgs) {
 		where: { type: verificationType, target: userId },
 	})
 	return redirect('/settings/profile/two-factor')
+}
+
+export async function handleVerification({ submission }: VerifyFunctionArgs) {
+	invariant(submission.value, 'submission.value should be defined by now')
+	const verification = await prisma.verification.findUniqueOrThrow({
+		where: {
+			target_type: {
+				type: submission.value.type,
+				target: submission.value.target,
+			},
+		},
+		select: { id: true },
+	})
+	await prisma.verification.update({
+		where: { id: verification.id },
+		data: { type: '2fa' satisfies VerificationTypes },
+	})
+	if (submission.value.redirectTo) {
+		return redirect(safeRedirect(submission.value.redirectTo))
+	}
+	return json({ status: 'success', submission } as const)
 }
 
 export default function TwoFactorRoute() {

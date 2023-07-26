@@ -1,11 +1,12 @@
 import { type Password, type User } from '@prisma/client'
 import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
-import { Authenticator } from 'remix-auth'
+import { Authenticator, AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
 import { prisma } from '~/utils/db.server.ts'
-import { invariant } from './misc.ts'
 import { sessionStorage } from './session.server.ts'
+import { z } from 'zod'
+import { verifyTOTP } from './totp.server.ts'
 
 export type { User }
 
@@ -15,20 +16,45 @@ export const authenticator = new Authenticator<string>(sessionStorage, {
 
 const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
 
+const signInForm = z.object({
+	username: z.string(),
+	password: z.string(),
+	code: z.string().nullable().optional(),
+})
+
+export const TwoFactorCodeRequiredError = '2FA code required'
+export const TwoFactorCodeInvalidError = '2FA code invalid'
+
 authenticator.use(
 	new FormStrategy(async ({ form }) => {
-		const username = form.get('username')
-		const password = form.get('password')
-
-		invariant(typeof username === 'string', 'username must be a string')
-		invariant(username.length > 0, 'username must not be empty')
-
-		invariant(typeof password === 'string', 'password must be a string')
-		invariant(password.length > 0, 'password must not be empty')
+		const { username, password, code } = signInForm.parse({
+			username: form.get('username'),
+			password: form.get('password'),
+			code: form.get('code'),
+		})
 
 		const user = await verifyUserPassword({ username }, password)
 		if (!user) {
-			throw new Error('Invalid username or password')
+			throw new AuthorizationError('Invalid username or password')
+		}
+		const verification = await prisma.verification.findUnique({
+			where: { target_type: { target: user.id, type: '2fa' } },
+			select: { secret: true, algorithm: true, period: true },
+		})
+		if (verification) {
+			if (!code) {
+				throw new AuthorizationError(TwoFactorCodeRequiredError)
+			}
+			const result = verifyTOTP({
+				otp: code,
+				secret: verification.secret,
+				algorithm: verification.algorithm,
+				period: verification.period,
+				window: 1,
+			})
+			if (!result) {
+				throw new AuthorizationError(TwoFactorCodeInvalidError)
+			}
 		}
 		const session = await prisma.session.create({
 			data: {

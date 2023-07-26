@@ -1,6 +1,10 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useLoaderData, useSearchParams } from '@remix-run/react'
-import { Verify, codeQueryParam, validate } from '../resources+/verify.tsx'
+import {
+	Verify,
+	codeQueryParam,
+	validateRequest,
+} from '../resources+/verify.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -17,7 +21,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			},
 		} as const)
 	}
-	return validate(request, params)
+	return validateRequest(request, params)
 }
 
 export default function VerifyRoute() {

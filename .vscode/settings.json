@@ -4,7 +4,9 @@
     "@remix-run/router",
     "express",
     "@radix-ui/**",
-    "react-router"
+    "react-router",
+    "stream/consumers",
+    "node:stream/consumers"
   ],
   "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]]
 }

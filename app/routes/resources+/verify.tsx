@@ -1,24 +1,17 @@
 import { conform, useForm, type Submission } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import {
-	getDomainUrl,
-	invariantResponse,
-	useIsSubmitting,
-} from '~/utils/misc.ts'
-import { commitSession, getSession } from '~/utils/session.server.ts'
+import { getDomainUrl, useIsSubmitting } from '~/utils/misc.ts'
 import { generateTOTP, verifyTOTP } from '~/utils/totp.server.ts'
-import { onboardingEmailSessionKey } from '../_auth+/onboarding.tsx'
-import { resetPasswordUsernameSessionKey } from '../_auth+/reset-password.tsx'
-import { unverifiedSessionKey } from './login.tsx'
-import { redirectWithToast } from '~/utils/flash-session.server.ts'
-import { authenticator } from '~/utils/auth.server.ts'
-import { safeRedirect } from 'remix-utils'
+import { handleVerification as handleForgotPasswordVerification } from '../_auth+/forgot-password/index.tsx'
+import { handleVerification as handleOnboardingVerification } from '../_auth+/onboarding.tsx'
+import { handleVerification as handleChangeEmailVerification } from '../settings+/profile.change-email.index/index.tsx'
+import { handleVerification as handleEnableTwoFactorVerification } from '../settings+/profile.two-factor.verify.tsx'
 
 export const ROUTE_PATH = '/resources/verify'
 
@@ -26,12 +19,19 @@ export const codeQueryParam = 'code'
 export const targetQueryParam = 'target'
 export const typeQueryParam = 'type'
 export const redirectToQueryParam = 'redirectTo'
-const types = ['forgot-password', 'onboarding', '2fa', '2fa-verify'] as const
+const types = [
+	'forgot-password',
+	'onboarding',
+	'2fa',
+	'2fa-verify',
+	'change-email',
+] as const
 export type VerificationTypes = (typeof types)[number]
 
 const typeOTPConfig: Record<VerificationTypes, { window: number }> = {
 	'forgot-password': { window: 0 },
 	onboarding: { window: 0 },
+	'change-email': { window: 0 },
 	'2fa': { window: 1 },
 	'2fa-verify': { window: 1 },
 }
@@ -92,53 +92,60 @@ export async function prepareVerification({
 }
 
 export async function action({ request }: DataFunctionArgs) {
-	return validate(request, await request.formData())
+	return validateRequest(request, await request.formData())
 }
 
-export async function validate(
+export type VerifySubmission = Submission<z.infer<typeof VerifySchema>>
+
+export type VerifyFunctionArgs = {
+	request: Request
+	submission: Submission<z.infer<typeof VerifySchema>>
+}
+
+export async function isCodeValid({
+	code,
+	type,
+	target,
+}: {
+	code: string
+	type: VerificationTypes
+	target: string
+}) {
+	const verification = await prisma.verification.findFirst({
+		where: {
+			OR: [
+				{ type, target, expiresAt: { gt: new Date() } },
+				{ type, target, expiresAt: null },
+			],
+		},
+		select: { algorithm: true, secret: true, period: true },
+	})
+	if (!verification) return false
+	const result = verifyTOTP({
+		otp: code,
+		secret: verification.secret,
+		algorithm: verification.algorithm,
+		period: verification.period,
+		...typeOTPConfig[type],
+	})
+	if (!result) return false
+
+	return true
+}
+
+export async function validateRequest(
 	request: Request,
 	body: URLSearchParams | FormData,
 ) {
 	const submission = await parse(body, {
 		schema: () =>
 			VerifySchema.superRefine(async (data, ctx) => {
-				const verification = await prisma.verification.findFirst({
-					where: {
-						OR: [
-							{
-								type: data[typeQueryParam],
-								target: data[targetQueryParam],
-								expiresAt: { gt: new Date() },
-							},
-							{
-								type: data[typeQueryParam],
-								target: data[targetQueryParam],
-								expiresAt: null,
-							},
-						],
-					},
-					select: {
-						algorithm: true,
-						secret: true,
-						period: true,
-					},
+				const codeIsValid = await isCodeValid({
+					code: data[codeQueryParam],
+					type: data[typeQueryParam],
+					target: data[targetQueryParam],
 				})
-				if (!verification) {
-					ctx.addIssue({
-						path: ['code'],
-						code: z.ZodIssueCode.custom,
-						message: `Invalid code`,
-					})
-					return
-				}
-				const result = verifyTOTP({
-					otp: data[codeQueryParam],
-					secret: verification.secret,
-					algorithm: verification.algorithm,
-					period: verification.period,
-					...typeOTPConfig[data[typeQueryParam]],
-				})
-				if (!result) {
+				if (!codeIsValid) {
 					ctx.addIssue({
 						path: ['code'],
 						code: z.ZodIssueCode.custom,
@@ -150,10 +157,6 @@ export async function validate(
 		acceptMultipleErrors: () => true,
 		async: true,
 	})
-	// delete the code from the submission
-	delete submission.payload[codeQueryParam]
-	// @ts-expect-error conform should probably have support for doing this
-	delete submission.value?.[codeQueryParam]
 
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
@@ -161,82 +164,35 @@ export async function validate(
 	if (!submission.value) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
-	switch (submission.value[typeQueryParam]) {
-		case 'forgot-password': {
-			await prisma.verification.deleteMany({
-				where: {
-					type: submission.value[typeQueryParam],
-					target: submission.value[targetQueryParam],
-				},
-			})
-			const { target } = submission.value
-			const user = await prisma.user.findFirst({
-				where: { OR: [{ email: target }, { username: target }] },
-				select: { email: true, username: true },
-			})
-			// we don't want to say the user is not found if the email is not found
-			// because that would allow an attacker to check if an email is registered
-			invariantResponse(user, 'Invalid code')
 
-			const session = await getSession(request.headers.get('cookie'))
-			session.set(resetPasswordUsernameSessionKey, user.username)
-			return redirect('/reset-password', {
-				headers: { 'Set-Cookie': await commitSession(session) },
-			})
+	const { value: submissionValue } = submission
+
+	async function deleteVerification() {
+		return prisma.verification.delete({
+			where: {
+				target_type: {
+					type: submissionValue[typeQueryParam],
+					target: submissionValue[targetQueryParam],
+				},
+			},
+		})
+	}
+
+	switch (submissionValue[typeQueryParam]) {
+		case 'forgot-password': {
+			await deleteVerification()
+			return handleForgotPasswordVerification({ request, submission })
 		}
 		case 'onboarding': {
-			await prisma.verification.deleteMany({
-				where: {
-					type: submission.value[typeQueryParam],
-					target: submission.value[targetQueryParam],
-				},
-			})
-			const session = await getSession(request.headers.get('cookie'))
-			session.set(onboardingEmailSessionKey, submission.value[targetQueryParam])
-			return redirect('/onboarding', {
-				headers: { 'Set-Cookie': await commitSession(session) },
-			})
-		}
-		case '2fa': {
-			const cookieSession = await getSession(request.headers.get('Cookie'))
-			const sessionId = cookieSession.get(unverifiedSessionKey)
-			if (!sessionId) {
-				// they should not be able to get here
-				return redirectWithToast('/login', {
-					title: 'Unable to verify',
-					description: 'Something went wrong. Please try again.',
-				})
-			}
-			cookieSession.unset(unverifiedSessionKey)
-			cookieSession.set(authenticator.sessionKey, sessionId)
-			const newCookie = await commitSession(cookieSession)
-			if (submission.value[redirectToQueryParam]) {
-				return redirect(safeRedirect(submission.value[redirectToQueryParam]), {
-					headers: { 'Set-Cookie': newCookie },
-				})
-			}
-			return json({ status: 'success', submission } as const, {
-				headers: { 'Set-Cookie': newCookie },
-			})
+			await deleteVerification()
+			return handleOnboardingVerification({ request, submission })
 		}
 		case '2fa-verify': {
-			const verification = await prisma.verification.findFirst({
-				where: {
-					type: submission.value[typeQueryParam],
-					target: submission.value[targetQueryParam],
-				},
-				select: { id: true },
-			})
-			// this should not be possible... but just in case...
-			invariantResponse(verification, 'Invalid code')
-			await prisma.verification.update({
-				where: { id: verification.id },
-				data: { type: '2fa' satisfies VerificationTypes },
-			})
-			if (submission.value[redirectToQueryParam]) {
-				return redirect(safeRedirect(submission.value[redirectToQueryParam]))
-			}
-			return json({ status: 'success', submission } as const)
+			return handleEnableTwoFactorVerification({ request, submission })
+		}
+		case 'change-email': {
+			await deleteVerification()
+			return await handleChangeEmailVerification({ request, submission })
 		}
 		default: {
 			submission.error[''] = ['Invalid verification type']

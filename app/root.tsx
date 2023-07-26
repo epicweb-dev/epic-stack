@@ -50,7 +50,7 @@ import { useToast } from './utils/useToast.tsx'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import rdtStylesheetUrl from 'remix-development-tools/stylesheet.css'
 const RemixDevTools =
-	process.env.NODE_ENV === 'development'
+	process.env.NODE_ENV === 'development' && false
 		? lazy(() => import('remix-development-tools'))
 		: undefined
 
