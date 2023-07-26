@@ -47,7 +47,10 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	if (await shouldRequestTwoFA(request)) {
 		// looks like they waited too long enter the email
-		return redirect(request.url)
+		return redirectWithToast(request.url, {
+			title: 'Please Reverify',
+			description: 'Please reverify your account before proceeding',
+		})
 	}
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
