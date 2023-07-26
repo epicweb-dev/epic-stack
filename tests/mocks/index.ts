@@ -6,7 +6,7 @@ import { faker } from '@faker-js/faker'
 
 const handlers = [
 	process.env.REMIX_DEV_HTTP_ORIGIN
-		? rest.post(`${process.env.REMIX_DEV_HTTP_ORIGIN}/ping`, req =>
+		? rest.post(`${process.env.REMIX_DEV_HTTP_ORIGIN}ping`, req =>
 				req.passthrough(),
 		  )
 		: null,
