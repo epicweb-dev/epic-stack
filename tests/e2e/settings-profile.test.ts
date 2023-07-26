@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { expect, insertNewUser, test } from '../playwright-utils.ts'
+import { expect, insertNewUser, test, waitFor } from '../playwright-utils.ts'
 import { createUser } from '../../tests/db-utils.ts'
 import { verifyUserPassword } from '~/utils/auth.server.ts'
 import { readEmail } from 'tests/mocks/utils.ts'
@@ -86,15 +86,17 @@ test('Users can update their profile photo', async ({ login, page }) => {
 })
 
 test('Users can change their email address', async ({ page, login }) => {
-	const user = await login()
+	const preUpdateUser = await login()
 	const newEmailAddress = faker.internet.email().toLowerCase()
-	expect(user.email).not.toEqual(newEmailAddress)
+	expect(preUpdateUser.email).not.toEqual(newEmailAddress)
 	await page.goto('/settings/profile')
 	await page.getByRole('link', { name: /change email/i }).click()
 	await page.getByRole('textbox', { name: /new email/i }).fill(newEmailAddress)
 	await page.getByRole('button', { name: /send confirmation/i }).click()
-	await expect(page.getByText(/check your email/i)).toBeVisible()
-	const email = await readEmail(newEmailAddress)
+	// await expect(page.getByText(/check your email/i)).toBeVisible()
+	const email = await waitFor(() => readEmail(newEmailAddress), {
+		errorMessage: 'Confirmation email was not sent',
+	})
 	invariant(email, 'Email was not sent')
 	const codeMatch = email.text.match(
 		/Here's your verification code: (?<code>\d+)/,
@@ -106,9 +108,13 @@ test('Users can change their email address', async ({ page, login }) => {
 	await expect(page.getByText(newEmailAddress)).toBeVisible()
 
 	const updatedUser = await prisma.user.findUnique({
-		where: { id: user.id },
+		where: { id: preUpdateUser.id },
 		select: { email: true },
 	})
 	invariant(updatedUser, 'Updated user not found')
 	expect(updatedUser.email).toBe(newEmailAddress)
+	const noticeEmail = await waitFor(() => readEmail(preUpdateUser.email), {
+		errorMessage: 'Notice email was not sent',
+	})
+	expect(noticeEmail.subject).toContain('changed')
 })

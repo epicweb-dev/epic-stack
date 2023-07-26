@@ -16,7 +16,7 @@ import {
 	prepareVerification,
 	type VerifyFunctionArgs,
 } from '../../resources+/verify.tsx'
-import { EmailChangeEmail } from './email.server.tsx'
+import { EmailChangeEmail, EmailChangeNoticeEmail } from './email.server.tsx'
 
 export const newEmailAddressSessionKey = 'new-email-address'
 
@@ -107,13 +107,23 @@ export async function handleVerification({
 		]
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
-	await prisma.user.update({
+	const preUpdateUser = await prisma.user.findFirstOrThrow({
+		select: { email: true },
 		where: { id: submission.value.target },
-		select: { email: true, username: true },
+	})
+	const user = await prisma.user.update({
+		where: { id: submission.value.target },
+		select: { id: true, email: true, username: true },
 		data: { email: newEmail },
 	})
 
 	cookieSession.unset(newEmailAddressSessionKey)
+
+	void sendEmail({
+		to: preUpdateUser.email,
+		subject: 'Epic Stack email changed',
+		react: <EmailChangeNoticeEmail userId={user.id} />,
+	})
 
 	return redirectWithToast(
 		'/settings/profile',
