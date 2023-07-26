@@ -13,7 +13,7 @@
     "build:remix": "remix build --sourcemap",
     "build:server": "tsx ./other/build-server.ts",
     "predev": "npm run build:icons --silent",
-    "dev": "remix dev -c \"node ./server/dev-server.js\" --no-restart",
+    "dev": "remix dev -c \"node ./server/dev-server.js\" --manual",
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
     "lint": "eslint .",
