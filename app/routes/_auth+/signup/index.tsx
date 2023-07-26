@@ -11,10 +11,10 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
+import { prepareVerification } from '~/routes/resources+/verify.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { getDomainUrl, useIsSubmitting } from '~/utils/misc.ts'
-import { generateTOTP } from '~/utils/totp.server.ts'
+import { useIsSubmitting } from '~/utils/misc.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
 import { SignupEmail } from './email.server.tsx'
 
@@ -22,14 +22,14 @@ export const onboardingOTPQueryParam = 'code'
 export const onboardingEmailQueryParam = 'email'
 export const verificationType = 'onboarding'
 
-const signupSchema = z.object({
+const SignupSchema = z.object({
 	email: emailSchema,
 })
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: signupSchema.superRefine(async (data, ctx) => {
+		schema: SignupSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
 				where: { email: data.email },
 				select: { id: true },
@@ -50,61 +50,27 @@ export async function action({ request }: DataFunctionArgs) {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 	const { email } = submission.value
-
-	const thirtyMinutesInSeconds = 30 * 60
-	const { otp, secret, algorithm, period, digits } = generateTOTP({
-		algorithm: 'SHA256',
-		period: thirtyMinutesInSeconds,
+	const { verifyUrl, redirectTo, otp } = await prepareVerification({
+		period: 10 * 60,
+		request,
+		type: 'onboarding',
+		target: email,
 	})
-	// delete old verifications. Users should not have more than one verification
-	// of a specific type for a specific target at a time.
-	await prisma.verification.deleteMany({
-		where: { type: verificationType, target: email },
-	})
-	await prisma.verification.create({
-		data: {
-			type: verificationType,
-			target: email,
-			algorithm,
-			secret,
-			period,
-			digits,
-			expiresAt: new Date(Date.now() + period * 1000),
-		},
-	})
-	const onboardingUrl = new URL(`${getDomainUrl(request)}/signup/verify`)
-	onboardingUrl.searchParams.set(onboardingEmailQueryParam, email)
-	const redirectTo = new URL(onboardingUrl.toString())
-
-	// add the otp to the url we'll email the user.
-	onboardingUrl.searchParams.set(onboardingOTPQueryParam, otp)
 
 	const response = await sendEmail({
 		to: email,
 		subject: `Welcome to Epic Notes!`,
-		react: <SignupEmail onboardingUrl={onboardingUrl.toString()} otp={otp} />,
+		react: <SignupEmail onboardingUrl={verifyUrl.toString()} otp={otp} />,
 	})
 
 	if (response.status === 'success') {
-		return redirect(redirectTo.pathname + redirectTo.search)
+		return redirect(redirectTo.toString())
 	} else {
 		submission.error[''] = response.error.message
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 500 },
-		)
+		return json({ status: 'error', submission } as const, { status: 500 })
 	}
 }
 
@@ -117,10 +83,10 @@ export default function SignupRoute() {
 	const isSubmitting = useIsSubmitting()
 	const [form, fields] = useForm({
 		id: 'signup-form',
-		constraint: getFieldsetConstraint(signupSchema),
+		constraint: getFieldsetConstraint(SignupSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			const result = parse(formData, { schema: signupSchema })
+			const result = parse(formData, { schema: SignupSchema })
 			return result
 		},
 		shouldRevalidate: 'onBlur',

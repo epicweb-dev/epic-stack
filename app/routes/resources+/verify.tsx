@@ -1,71 +1,121 @@
-import { conform, useForm } from '@conform-to/react'
+import { conform, useForm, type Submission } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
-import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
-import { twoFAVerificationType } from '~/routes/settings+/profile.two-factor.tsx'
-import { authenticator } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { invariantResponse } from '~/utils/misc.ts'
+import {
+	getDomainUrl,
+	invariantResponse,
+	useIsSubmitting,
+} from '~/utils/misc.ts'
 import { commitSession, getSession } from '~/utils/session.server.ts'
-import { verifyTOTP } from '~/utils/totp.server.ts'
+import { generateTOTP, verifyTOTP } from '~/utils/totp.server.ts'
+import { onboardingEmailSessionKey } from '../_auth+/onboarding.tsx'
+import { resetPasswordUsernameSessionKey } from '../_auth+/reset-password.tsx'
+import { unverifiedSessionKey } from './login.tsx'
+import { redirectWithToast } from '~/utils/flash-session.server.ts'
+import { authenticator } from '~/utils/auth.server.ts'
+import { safeRedirect } from 'remix-utils'
 
-const ROUTE_PATH = '/resources/verify'
-export const unverifiedSessionKey = 'unverified-sessionId'
+export const ROUTE_PATH = '/resources/verify'
 
-const verifySchema = z.union([
-	z.object({
-		intent: z.literal('cancel'),
-	}),
-	z.object({
-		intent: z.literal('confirm'),
-		code: z.string().min(6).max(6),
-		redirectTo: z.string().optional(),
-	}),
-])
+export const codeQueryParam = 'code'
+export const targetQueryParam = 'target'
+export const typeQueryParam = 'type'
+export const redirectToQueryParam = 'redirectTo'
+const types = ['forgot-password', 'onboarding', '2fa', '2fa-verify'] as const
+export type VerificationTypes = (typeof types)[number]
 
-export async function action({ request }: DataFunctionArgs) {
-	const form = await request.formData()
+const typeOTPConfig: Record<VerificationTypes, { window: number }> = {
+	'forgot-password': { window: 0 },
+	onboarding: { window: 0 },
+	'2fa': { window: 1 },
+	'2fa-verify': { window: 1 },
+}
 
-	const cookieSession = await getSession(request.headers.get('cookie'))
-	const sessionId = cookieSession.get(unverifiedSessionKey)
-	if (!sessionId) {
-		// TODO: think about this edge case a bit more...
-		throw redirect('/login')
-	}
-	const session = await prisma.session.findFirst({
-		where: { id: sessionId },
-		select: { userId: true },
+const VerifySchema = z.object({
+	[codeQueryParam]: z.string().min(6).max(6),
+	[typeQueryParam]: z.enum(types),
+	[targetQueryParam]: z.string(),
+	[redirectToQueryParam]: z.string().optional(),
+})
+
+export function getRedirectToUrl({
+	request,
+	type,
+	target,
+}: {
+	request: Request
+	type: VerificationTypes
+	target: string
+}) {
+	const redirectToUrl = new URL(`${getDomainUrl(request)}/verify`)
+	redirectToUrl.searchParams.set(typeQueryParam, type)
+	redirectToUrl.searchParams.set(targetQueryParam, target)
+	return redirectToUrl
+}
+
+export async function prepareVerification({
+	period,
+	request,
+	type,
+	target,
+}: {
+	period: number
+	request: Request
+	type: VerificationTypes
+	target: string
+}) {
+	const verifyUrl = getRedirectToUrl({ request, type, target })
+	const redirectTo = new URL(verifyUrl.toString())
+
+	const { otp, ...otpConfig } = generateTOTP({ algorithm: 'SHA256', period })
+	// delete old verifications. Users should not have more than one verification
+	// of a specific type for a specific target at a time.
+	await prisma.verification.deleteMany({ where: { type, target } })
+	await prisma.verification.create({
+		data: {
+			type,
+			target,
+			...otpConfig,
+			expiresAt: new Date(Date.now() + otpConfig.period * 1000),
+		},
 	})
 
-	// if there's no session for their session ID, something is *way* wrong.
-	// destory it and let them try over again... Or we'll do that if they wanna cancel.
-	if (!session || form.get('intent') === 'cancel') {
-		const redirectTo = form.get('redirectTo')
-		const params =
-			typeof redirectTo === 'string' && redirectTo && redirectTo !== '/'
-				? new URLSearchParams({ redirectTo })
-				: null
-		cookieSession.unset(unverifiedSessionKey)
-		throw redirect(['/login', params?.toString()].filter(Boolean).join('?'), {
-			headers: {
-				'Set-Cookie': await commitSession(cookieSession),
-			},
-		})
-	}
+	// add the otp to the url we'll email the user.
+	verifyUrl.searchParams.set(codeQueryParam, otp)
 
-	const submission = await parse(form, {
+	return { otp, redirectTo, verifyUrl }
+}
+
+export async function action({ request }: DataFunctionArgs) {
+	return validate(request, await request.formData())
+}
+
+export async function validate(
+	request: Request,
+	body: URLSearchParams | FormData,
+) {
+	const submission = await parse(body, {
 		schema: () =>
-			verifySchema.superRefine(async (data, ctx) => {
-				if (data.intent === 'cancel') return
-
+			VerifySchema.superRefine(async (data, ctx) => {
 				const verification = await prisma.verification.findFirst({
 					where: {
-						type: twoFAVerificationType,
-						target: session.userId,
+						OR: [
+							{
+								type: data[typeQueryParam],
+								target: data[targetQueryParam],
+								expiresAt: { gt: new Date() },
+							},
+							{
+								type: data[typeQueryParam],
+								target: data[targetQueryParam],
+								expiresAt: null,
+							},
+						],
 					},
 					select: {
 						algorithm: true,
@@ -82,11 +132,11 @@ export async function action({ request }: DataFunctionArgs) {
 					return
 				}
 				const result = verifyTOTP({
-					otp: data.code,
+					otp: data[codeQueryParam],
 					secret: verification.secret,
 					algorithm: verification.algorithm,
 					period: verification.period,
-					window: 1,
+					...typeOTPConfig[data[typeQueryParam]],
 				})
 				if (!result) {
 					ctx.addIssue({
@@ -100,90 +150,175 @@ export async function action({ request }: DataFunctionArgs) {
 		acceptMultipleErrors: () => true,
 		async: true,
 	})
+	// delete the code from the submission
+	delete submission.payload[codeQueryParam]
+	// @ts-expect-error conform should probably have support for doing this
+	delete submission.value?.[codeQueryParam]
+
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
+	switch (submission.value[typeQueryParam]) {
+		case 'forgot-password': {
+			await prisma.verification.deleteMany({
+				where: {
+					type: submission.value[typeQueryParam],
+					target: submission.value[targetQueryParam],
+				},
+			})
+			const { target } = submission.value
+			const user = await prisma.user.findFirst({
+				where: { OR: [{ email: target }, { username: target }] },
+				select: { email: true, username: true },
+			})
+			// we don't want to say the user is not found if the email is not found
+			// because that would allow an attacker to check if an email is registered
+			invariantResponse(user, 'Invalid code')
 
-	invariantResponse(submission.value.intent === 'confirm', 'invalid intent')
-
-	const { redirectTo } = submission.value
-	cookieSession.unset(unverifiedSessionKey)
-	cookieSession.set(authenticator.sessionKey, sessionId)
-	const newCookie = await commitSession(cookieSession)
-	if (redirectTo) {
-		throw redirect(safeRedirect(redirectTo), {
-			headers: { 'Set-Cookie': newCookie },
-		})
+			const session = await getSession(request.headers.get('cookie'))
+			session.set(resetPasswordUsernameSessionKey, user.username)
+			return redirect('/reset-password', {
+				headers: { 'Set-Cookie': await commitSession(session) },
+			})
+		}
+		case 'onboarding': {
+			await prisma.verification.deleteMany({
+				where: {
+					type: submission.value[typeQueryParam],
+					target: submission.value[targetQueryParam],
+				},
+			})
+			const session = await getSession(request.headers.get('cookie'))
+			session.set(onboardingEmailSessionKey, submission.value[targetQueryParam])
+			return redirect('/onboarding', {
+				headers: { 'Set-Cookie': await commitSession(session) },
+			})
+		}
+		case '2fa': {
+			const cookieSession = await getSession(request.headers.get('Cookie'))
+			const sessionId = cookieSession.get(unverifiedSessionKey)
+			if (!sessionId) {
+				// they should not be able to get here
+				return redirectWithToast('/login', {
+					title: 'Unable to verify',
+					description: 'Something went wrong. Please try again.',
+				})
+			}
+			cookieSession.unset(unverifiedSessionKey)
+			cookieSession.set(authenticator.sessionKey, sessionId)
+			const newCookie = await commitSession(cookieSession)
+			if (submission.value[redirectToQueryParam]) {
+				return redirect(safeRedirect(submission.value[redirectToQueryParam]), {
+					headers: { 'Set-Cookie': newCookie },
+				})
+			}
+			return json({ status: 'success', submission } as const, {
+				headers: { 'Set-Cookie': newCookie },
+			})
+		}
+		case '2fa-verify': {
+			const verification = await prisma.verification.findFirst({
+				where: {
+					type: submission.value[typeQueryParam],
+					target: submission.value[targetQueryParam],
+				},
+				select: { id: true },
+			})
+			// this should not be possible... but just in case...
+			invariantResponse(verification, 'Invalid code')
+			await prisma.verification.update({
+				where: { id: verification.id },
+				data: { type: '2fa' satisfies VerificationTypes },
+			})
+			if (submission.value[redirectToQueryParam]) {
+				return redirect(safeRedirect(submission.value[redirectToQueryParam]))
+			}
+			return json({ status: 'success', submission } as const)
+		}
+		default: {
+			submission.error[''] = ['Invalid verification type']
+			return json({ status: 'error', submission } as const, { status: 400 })
+		}
 	}
-	return json({ status: 'success', submission } as const, {
-		headers: { 'Set-Cookie': newCookie },
-	})
 }
 
-export function Verifier({
+export function Verify({
+	initialSubmission,
+	code,
+	type,
+	target,
 	redirectTo,
-	formError,
+	submitChildren = 'Confirm',
+	cancelButton,
+	fieldLabel = 'Code',
 }: {
+	initialSubmission?: Submission<z.infer<typeof VerifySchema>>
+	code?: string
+	type: VerificationTypes
+	target: string
 	redirectTo?: string
-	formError?: string | null
+	submitChildren?: React.ReactNode
+	cancelButton?: React.ReactNode
+	fieldLabel?: string
 }) {
-	const fetcher = useFetcher<typeof action>()
+	const isSubmitting = useIsSubmitting()
+	const verifyFetcher = useFetcher<typeof action>()
 
 	const [form, fields] = useForm({
-		id: 'inline-verifier',
-		constraint: getFieldsetConstraint(verifySchema),
-		lastSubmission: fetcher.data?.submission,
+		id: 'verify-form',
+		constraint: getFieldsetConstraint(VerifySchema),
+		lastSubmission: verifyFetcher.data?.submission ?? initialSubmission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: verifySchema })
+			return parse(formData, { schema: VerifySchema })
 		},
-		shouldRevalidate: 'onBlur',
+		defaultValue: { code, type, target, redirectTo },
 	})
 
 	return (
-		<fetcher.Form action={ROUTE_PATH} method="POST" {...form.props}>
-			<input type="hidden" name="redirectTo" value={redirectTo} />
-			<Field
-				labelProps={{ children: '2FA Code' }}
-				inputProps={{ ...conform.input(fields.code), autoFocus: true }}
-				errors={fields.code.errors}
-			/>
-			<div className="flex flex-row-reverse justify-between">
-				<StatusButton
-					type="submit"
-					name="intent"
-					value="confirm"
-					status={
-						fetcher.state === 'submitting'
-							? 'pending'
-							: fetcher.data?.status ?? 'idle'
-					}
-				>
-					Confirm
-				</StatusButton>
-				<StatusButton
-					type="submit"
-					variant="secondary"
-					name="intent"
-					value="cancel"
-					status={
-						fetcher.state === 'submitting'
-							? 'pending'
-							: fetcher.data?.status ?? 'idle'
-					}
-				>
-					Cancel
-				</StatusButton>
+		<div className="mx-auto flex flex-col justify-center gap-1">
+			<div>
+				<Field
+					labelProps={{
+						htmlFor: fields[codeQueryParam].id,
+						children: fieldLabel,
+					}}
+					inputProps={conform.input(fields[codeQueryParam])}
+					errors={fields[codeQueryParam].errors}
+				/>
+				<ErrorList errors={form.errors} id={form.errorId} />
 			</div>
-			<ErrorList errors={[...form.errors, formError]} id={form.errorId} />
-		</fetcher.Form>
+			<div className="flex w-full gap-2">
+				{cancelButton}
+				<verifyFetcher.Form
+					method="POST"
+					action={ROUTE_PATH}
+					{...form.props}
+					className="flex-1"
+				>
+					<input
+						{...conform.input(fields[typeQueryParam], { type: 'hidden' })}
+					/>
+					<input
+						{...conform.input(fields[targetQueryParam], { type: 'hidden' })}
+					/>
+					<input
+						{...conform.input(fields[redirectToQueryParam], { type: 'hidden' })}
+					/>
+					<StatusButton
+						className="w-full"
+						status={
+							isSubmitting ? 'pending' : verifyFetcher.data?.status ?? 'idle'
+						}
+						type="submit"
+						disabled={isSubmitting}
+					>
+						{submitChildren}
+					</StatusButton>
+				</verifyFetcher.Form>
+			</div>
+		</div>
 	)
 }

@@ -11,4 +11,24 @@ export const sessionStorage = createCookieSessionStorage({
 	},
 })
 
-export const { getSession, commitSession, destroySession } = sessionStorage
+const {
+	getSession,
+	commitSession: rootCommitSession,
+	destroySession,
+} = sessionStorage
+export { getSession, destroySession }
+
+// we have to do this because every time you commit the session you overwrite it
+// so we store the expiration time in the cookie and reset it every time we commit
+export async function commitSession(
+	...args: Parameters<typeof rootCommitSession>
+) {
+	const [session, options] = args
+	if (options?.expires) {
+		session.set('expires', options.expires)
+	}
+	const expires = session.get('expires')
+		? new Date(session.get('expires'))
+		: undefined
+	return rootCommitSession(session, { expires, ...options })
+}

@@ -11,101 +11,93 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
+import {
+	getRedirectToUrl,
+	prepareVerification,
+} from '~/routes/resources+/verify.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { getDomainUrl } from '~/utils/misc.ts'
-import { generateTOTP } from '~/utils/totp.server.ts'
 import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { ForgotPasswordEmail } from './email.server.tsx'
 
-export const forgotPasswordOTPQueryParam = 'code'
-export const forgotPasswordTargetQueryParam = 'usernameOrEmail'
-export const verificationType = 'forgot-password'
-
-const forgotPasswordSchema = z.object({
+const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([emailSchema, usernameSchema]),
 })
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	const submission = parse(formData, {
-		schema: forgotPasswordSchema,
+	const submission = await parse(formData, {
+		schema: ForgotPasswordSchema.superRefine(async (data, ctx) => {
+			if (data.usernameOrEmail.includes('@')) return
+
+			// check the username exists. Usernames have to be unique anyway so anyone
+			// signing up can check whether a username exists by trying to sign up
+			// with it.
+			const user = await prisma.user.findUnique({
+				where: { username: data.usernameOrEmail },
+				select: { id: true },
+			})
+			if (!user) {
+				ctx.addIssue({
+					path: ['usernameOrEmail'],
+					code: z.ZodIssueCode.custom,
+					message: 'No user exists with this username',
+				})
+				return
+			}
+		}),
+		async: true,
 		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 	const { usernameOrEmail } = submission.value
+	const redirectTo = getRedirectToUrl({
+		request,
+		type: 'forgot-password',
+		target: usernameOrEmail,
+	})
 
-	const resetPasswordUrl = new URL(
-		`${getDomainUrl(request)}/forgot-password/verify`,
-	)
-	resetPasswordUrl.searchParams.set(
-		forgotPasswordTargetQueryParam,
-		usernameOrEmail,
-	)
-	const redirectTo = new URL(resetPasswordUrl.toString())
+	// fire, forget, and don't wait to combat timing attacks
+	void sendVerifyEmail({ request, target: usernameOrEmail })
 
+	return redirect(redirectTo.toString())
+}
+
+async function sendVerifyEmail({
+	request,
+	target,
+}: {
+	request: Request
+	target: string
+}) {
 	const user = await prisma.user.findFirst({
-		where: { OR: [{ email: usernameOrEmail }, { username: usernameOrEmail }] },
+		where: { OR: [{ email: target }, { username: target }] },
 		select: { email: true, username: true },
 	})
-	if (user) {
-		// fire and forget to avoid timing attacks
-
-		const tenMinutesInSeconds = 10 * 60
-		// using username or email as the verification target allows us to
-		// avoid leaking whether a username or email is registered. It also
-		// allows a user who forgot one to use the other to reset their password.
-		// And displaying what the user provided rather than the other ensures we
-		// don't leak the association between the two.
-		const target = usernameOrEmail
-		const { otp, secret, algorithm, period, digits } = generateTOTP({
-			algorithm: 'SHA256',
-			period: tenMinutesInSeconds,
-		})
-		// delete old verifications. Users should not have more than one verification
-		// of a specific type for a specific target at a time.
-		await prisma.verification.deleteMany({
-			where: { type: verificationType, target },
-		})
-		await prisma.verification.create({
-			data: {
-				type: verificationType,
-				target,
-				algorithm,
-				secret,
-				period,
-				digits,
-				expiresAt: new Date(Date.now() + period * 1000),
-			},
-		})
-
-		// add the otp to the url we'll email the user.
-		resetPasswordUrl.searchParams.set(forgotPasswordOTPQueryParam, otp)
-
-		await sendEmail({
-			to: user.email,
-			subject: `Epic Notes Password Reset`,
-			react: (
-				<ForgotPasswordEmail
-					onboardingUrl={resetPasswordUrl.toString()}
-					otp={otp}
-				/>
-			),
-		})
+	if (!user) {
+		// maybe they're trying to see whether a user exists? We're not gonna tell them...
+		return
 	}
 
-	return redirect(redirectTo.pathname + redirectTo.search)
+	const { verifyUrl, otp } = await prepareVerification({
+		period: 10 * 60,
+		request,
+		type: 'forgot-password',
+		target,
+	})
+
+	await sendEmail({
+		to: user.email,
+		subject: `Epic Notes Password Reset`,
+		react: (
+			<ForgotPasswordEmail onboardingUrl={verifyUrl.toString()} otp={otp} />
+		),
+	})
 }
 
 export const meta: V2_MetaFunction = () => {
@@ -117,10 +109,10 @@ export default function ForgotPasswordRoute() {
 
 	const [form, fields] = useForm({
 		id: 'forgot-password-form',
-		constraint: getFieldsetConstraint(forgotPasswordSchema),
+		constraint: getFieldsetConstraint(ForgotPasswordSchema),
 		lastSubmission: forgotPassword.data?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: forgotPasswordSchema })
+			return parse(formData, { schema: ForgotPasswordSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})

@@ -32,7 +32,7 @@ import { prisma } from '~/utils/db.server.ts'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
 
-const onboardingFormSchema = z
+const OnboardingFormSchema = z
 	.object({
 		username: usernameSchema,
 		name: nameSchema,
@@ -66,11 +66,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const message = error?.message ?? null
 	return json(
 		{ formError: typeof message === 'string' ? message : null },
-		{
-			headers: {
-				'Set-Cookie': await commitSession(session),
-			},
-		},
+		{ headers: { 'Set-Cookie': await commitSession(session) } },
 	)
 }
 
@@ -83,7 +79,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: onboardingFormSchema.superRefine(async (data, ctx) => {
+		schema: OnboardingFormSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
 				where: { username: data.username },
 				select: { id: true },
@@ -104,13 +100,7 @@ export async function action({ request }: DataFunctionArgs) {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 	const {
 		username,
@@ -148,10 +138,10 @@ export default function OnboardingPage() {
 
 	const [form, fields] = useForm({
 		id: 'onboarding',
-		constraint: getFieldsetConstraint(onboardingFormSchema),
+		constraint: getFieldsetConstraint(OnboardingFormSchema),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: onboardingFormSchema })
+			return parse(formData, { schema: OnboardingFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})

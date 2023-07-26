@@ -62,9 +62,9 @@ export const links: LinksFunction = () => {
 		{ rel: 'preload', href: fontStylestylesheetUrl, as: 'style' },
 		{ rel: 'preload', href: tailwindStylesheetUrl, as: 'style' },
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
-		...(rdtStylesheetUrl && process.env.NODE_ENV === 'development'
-			? [{ rel: 'preload', as: 'style', href: rdtStylesheetUrl }]
-			: []),
+		rdtStylesheetUrl && process.env.NODE_ENV === 'development'
+			? { rel: 'preload', href: rdtStylesheetUrl, as: 'style' }
+			: null,
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
 			rel: 'alternate icon',
@@ -77,6 +77,7 @@ export const links: LinksFunction = () => {
 			href: '/site.webmanifest',
 			crossOrigin: 'use-credentials',
 		} as const, // necessary to make typescript happy
+		//These should match the css preloads above to avoid css as render blocking resource
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
@@ -85,6 +86,9 @@ export const links: LinksFunction = () => {
 			? [{ rel: 'stylesheet', href: rdtStylesheetUrl }]
 			: []),
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
+		rdtStylesheetUrl && process.env.NODE_ENV === 'development'
+			? { rel: 'stylesheet', href: rdtStylesheetUrl }
+			: null,
 	].filter(Boolean)
 }
 
