@@ -36,8 +36,8 @@ async function generateIconFiles() {
 
 	const iconNames = files.map(file => iconName(file))
 
-	const spriteUpToDate = iconNames.every(name => currentSprite.includes(name))
-	const typesUpToDate = iconNames.every(name => currentTypes.includes(name))
+	const spriteUpToDate = iconNames.every(name => currentSprite.includes(`id=${name}`))
+	const typesUpToDate = iconNames.every(name => currentTypes.includes(`"${name}"`))
 
 	if (spriteUpToDate && typesUpToDate) {
 		console.log(`Icons are up to date`)
