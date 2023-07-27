@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { $, execa } from 'execa'
 import fs from 'fs/promises'
 import inquirer from 'inquirer'
+import open from 'open';
 import path from 'path'
 import toml from '@iarna/toml'
 
@@ -197,13 +198,11 @@ async function setupDeployment({ rootDirectory }) {
 		)
 		console.log(`  Starting with staging`)
 		await $I`fly deploy --app ${APP_NAME}-staging`
-		// "fly open" was having trouble with opening the staging app
-		// so we'll just use "open" instead.
-		await $I`open https://${APP_NAME}-staging.fly.dev/`
+		await open(`https://${APP_NAME}-staging.fly.dev/`)
 
 		console.log(`  Staging deployed... Deploying production...`)
 		await $I`fly deploy --app ${APP_NAME}`
-		await $I`open https://${APP_NAME}.fly.dev/`
+		await open(`https://${APP_NAME}.fly.dev/`)
 		console.log(`  Production deployed...`)
 		console.log('  Moving Dockerfile and .dockerignore back to other/')
 		await fs.rename(
@@ -231,7 +230,7 @@ async function setupDeployment({ rootDirectory }) {
 		console.log(
 			`Opening repo.new. Please create a new repo and paste the URL below.`,
 		)
-		await $I`open https://repo.new`
+		await open(`https://repo.new`)
 
 		const { repoURL } = await inquirer.prompt([
 			{
@@ -250,8 +249,8 @@ async function setupDeployment({ rootDirectory }) {
 		console.log(
 			`Opening Fly Tokens Dashboard and GitHub Action Secrets pages. Please create a new token on Fly and set it as the value for a new secret called FLY_API_TOKEN on GitHub.`,
 		)
-		await $I`open https://web.fly.io/user/personal_access_tokens/new`
-		await $I`open ${repoURL}/settings/secrets/actions/new`
+		await open(`https://web.fly.io/user/personal_access_tokens/new`)
+		await open(`${repoURL}/settings/secrets/actions/new`)
 
 		console.log(
 			`Once you're finished with setting the token, you should be good to add the remote, commit, and push!`,
