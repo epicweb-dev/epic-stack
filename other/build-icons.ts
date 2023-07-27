@@ -127,6 +127,7 @@ export async function generateSvgSprite({
 		...symbols,
 		`</defs>`,
 		`</svg>`,
+		'', // trailing newline
 	].join('\n')
 
 	return writeIfChanged(outputPath, output)
