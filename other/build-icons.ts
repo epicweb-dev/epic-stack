@@ -89,7 +89,7 @@ function iconName(file: string) {
 /**
  * Creates a single SVG file that contains all the icons
  */
-async function generateSvgSprite({
+export async function generateSvgSprite({
 	files,
 	inputDir,
 	outputPath,
