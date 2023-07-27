@@ -112,9 +112,9 @@ export default function NotesRoute() {
 						</ul>
 					</div>
 				</div>
-				<main className="relative col-span-3 bg-accent md:rounded-r-3xl">
+				<div className="relative col-span-3 bg-accent md:rounded-r-3xl">
 					<Outlet />
-				</main>
+				</div>
 			</div>
 		</main>
 	)
