@@ -27,6 +27,13 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		remixContext,
 		loadContext,
 	] = args
+	const context =
+		process.env.NODE_ENV === 'development'
+			? await import('remix-development-tools').then(
+					({ initRouteBoundariesServer }) =>
+						initRouteBoundariesServer(remixContext),
+			  )
+			: remixContext
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
 	responseHeaders.set('fly-region', process.env.FLY_REGION ?? 'unknown')
 	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
@@ -47,7 +54,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
-				<RemixServer context={remixContext} url={request.url} />
+				<RemixServer context={context} url={request.url} />
 			</NonceProvider>,
 			{
 				[callbackName]: () => {

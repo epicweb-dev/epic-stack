@@ -238,7 +238,7 @@ function App() {
 			<Toaster />
 			{RemixDevTools && (
 				<Suspense>
-					<RemixDevTools showRouteBoundaries />
+					<RemixDevTools />
 				</Suspense>
 			)}
 		</Document>
