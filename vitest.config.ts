@@ -8,7 +8,7 @@ export default defineConfig({
 	plugins: [react(), tsconfigPaths()],
 	css: { postcss: { plugins: [] } },
 	test: {
-		include: ['./app/**/*.test.{ts,tsx}', './other/**/*.test.{ts,tsx}'],
+		include: ['./app/**/*.test.{ts,tsx}'],
 		environment: 'jsdom',
 		setupFiles: ['./tests/setup/setup-test-env.ts'],
 		globalSetup: ['./tests/setup/global-setup.ts'],
