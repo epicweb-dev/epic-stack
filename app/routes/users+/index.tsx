@@ -4,7 +4,7 @@ import {
 	type DataFunctionArgs,
 	type HeadersFunction,
 } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData, useNavigation } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { SearchBar } from '~/components/search-bar.tsx'
@@ -84,6 +84,7 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 }
 
 export default function UsersRoute() {
+	const navigation = useNavigation()
 	const data = useLoaderData<typeof loader>()
 	const isSubmitting = useDelayedIsSubmitting({
 		formMethod: 'GET',
@@ -94,7 +95,11 @@ export default function UsersRoute() {
 		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
 			<h1 className="text-h1">Epic Notes Users</h1>
 			<div className="w-full max-w-[700px] ">
-				<SearchBar status={data.status} autoFocus autoSubmit />
+				<SearchBar
+					status={data.status}
+					autoFocus={navigation.state !== 'loading'}
+					autoSubmit
+				/>
 			</div>
 			<main>
 				{data.status === 'idle' ? (
