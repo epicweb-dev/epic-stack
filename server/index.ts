@@ -13,13 +13,22 @@ import {
 	createRequestHandler as _createRequestHandler,
 } from '@remix-run/express'
 import { wrapExpressCreateRequestHandler } from '@sentry/remix'
-import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
+import {
+	type ServerBuild,
+	broadcastDevReady,
+	installGlobals
+} from '@remix-run/node'
 import getPort, { portNumbers } from 'get-port'
 import chalk from 'chalk'
+import sourceMapSupport from 'source-map-support'
 
 // @ts-ignore - this file may not exist if you haven't built yet, but it will
 // definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
+
+sourceMapSupport.install()
+installGlobals()
+
 const MODE = process.env.NODE_ENV
 
 const createRequestHandler = wrapExpressCreateRequestHandler(
