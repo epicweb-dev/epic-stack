@@ -17,5 +17,5 @@ fly secrets set RESEND_API_KEY="re_blAh_blaHBlaHblahBLAhBlAh" --app [YOUR_APP_NA
 ```
 
 Setup a [custom sending domain](https://resend.com/domains) and then make sure
-to update the `from` email address in `app/utils/email.server.ts` to the one you
+to update the `from` email address in `app/utils/email.server.ts` and the `expect(email.from).toBe` in `tests/e2e/onboarding.test.ts` to the one you
 want your emails to come from.
