@@ -40,6 +40,7 @@
   "dependencies": {
     "@conform-to/react": "^0.7.4",
     "@conform-to/zod": "^0.7.4",
+    "@epic-web/totp": "^1.0.2",
     "@prisma/client": "^5.0.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
@@ -73,6 +74,7 @@
     "eslint-plugin-remix-react-routes": "^1.0.5",
     "execa": "^7.1.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^6.8.1",
     "get-port": "^7.0.0",
     "helmet": "^7.0.0",
     "intl-parse-accept-language": "^1.0.0",

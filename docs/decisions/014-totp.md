@@ -102,7 +102,8 @@ to implement 2FA which we'll do in the future. This also allows us to remove the
 `ENCRIPTION_SECRET` from the list of environment variables you need to manage.
 And we can swap the `encryption.server.ts` utility for a `totp.server.ts`
 utility which, while not simpler is a fair trade (and could definitely be
-developed and externalized into an open source library).
+developed and externalized into an open source library). **Update:** This has
+now been published as [@epic-web/totp](https://npm.im/@epic-web/totp).
 
 This also means we now need a new table in the database. This can be designed in
 such a way that there's no migration cost and it's purely additive.
