@@ -5,7 +5,8 @@ import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ServerOnly, safeRedirect } from 'remix-utils'
 import { useSpinDelay } from 'spin-delay'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+import twConfig from 'tailwind.config.ts'
 import { getHints } from './client-hints.tsx'
 
 export function getUserImgSrc(imageId?: string | null) {
@@ -26,8 +27,42 @@ export function getErrorMessage(error: unknown) {
 	return 'Unknown Error'
 }
 
+function formatColors() {
+	const colors = []
+	for (const [key, color] of Object.entries(twConfig.theme.extend.colors)) {
+		if (typeof color === 'string') {
+			colors.push(key)
+		} else {
+			const colorGroup = Object.keys(color).map(subKey =>
+				subKey === 'DEFAULT' ? '' : subKey,
+			)
+			colors.push({ [key]: colorGroup })
+		}
+	}
+	return colors
+}
+
+const customTwMerge = extendTailwindMerge({
+	theme: {
+		colors: formatColors(),
+		borderRadius: Object.keys(twConfig.theme.extend.borderRadius),
+	},
+	classGroups: {
+		'font-size': [
+			{
+				text: Object.keys(twConfig.theme.extend.fontSize),
+			},
+		],
+		animate: [
+			{
+				animate: Object.keys(twConfig.theme.extend.animation),
+			},
+		],
+	},
+})
+
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs))
+	return customTwMerge(clsx(inputs))
 }
 
 export function getDomainUrl(request: Request) {
