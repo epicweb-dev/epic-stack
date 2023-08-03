@@ -42,6 +42,8 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + GitHub Auth](https://github.com/kentcdodds/epic-github-auth) by
   [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
   with GitHub Auth.
+- [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb) by
+  [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Prisma using MongoDB as the database.
 
 ## How to contribute
 
