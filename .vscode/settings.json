@@ -8,5 +8,6 @@
     "stream/consumers",
     "node:stream/consumers"
   ],
-  "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]]
+  "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]],
+  "css.lint.unknownAtRules": "ignore",
 }
