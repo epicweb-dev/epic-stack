@@ -12,7 +12,7 @@ import { handleVerification as handleForgotPasswordVerification } from '../_auth
 import { handleVerification as handleOnboardingVerification } from '../_auth+/onboarding.tsx'
 import { handleVerification as handleChangeEmailVerification } from '../settings+/profile.change-email.index/index.tsx'
 import { handleVerification as handleEnableTwoFactorVerification } from '../settings+/profile.two-factor.verify.tsx'
-import { handleVerification as handleReverifyVerification } from './login.tsx'
+import { handleVerification as handleLoginTwoFactorVerification } from './login.tsx'
 
 export const ROUTE_PATH = '/resources/verify'
 
@@ -193,7 +193,7 @@ export async function validateRequest(
 			return handleEnableTwoFactorVerification({ request, body, submission })
 		}
 		case '2fa': {
-			return handleReverifyVerification({ request, body, submission })
+			return handleLoginTwoFactorVerification({ request, body, submission })
 		}
 		case 'change-email': {
 			await deleteVerification()

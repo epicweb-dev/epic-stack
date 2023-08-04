@@ -224,7 +224,7 @@ export default function EditUserProfile() {
 					<div className="col-span-full my-3">
 						<Link to="two-factor">
 							{data.isTwoFactorEnabled ? (
-								<Icon name="lock-closed"> 2FA is enabled</Icon>
+								<Icon name="lock-closed">2FA is enabled</Icon>
 							) : (
 								<Icon name="lock-open-1">Enable 2FA</Icon>
 							)}
