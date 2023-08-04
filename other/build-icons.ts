@@ -50,8 +50,6 @@ async function generateIconFiles() {
 
 	logVerbose(`Generating sprite for ${inputDirRelative}`)
 
-	await fsExtra.ensureDir(outputDir)
-
 	const spriteChanged = await generateSvgSprite({
 		files,
 		inputDir,
