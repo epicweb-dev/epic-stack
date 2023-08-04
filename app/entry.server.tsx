@@ -29,9 +29,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 	] = args
 	const context =
 		process.env.NODE_ENV === 'development'
-			? await import('remix-development-tools').then(
-					({ initRouteBoundariesServer }) =>
-						initRouteBoundariesServer(remixContext),
+			? await import('remix-development-tools').then(({ initServer }) =>
+					initServer(remixContext),
 			  )
 			: remixContext
 	const { currentInstance, primaryInstance } = await getInstanceInfo()

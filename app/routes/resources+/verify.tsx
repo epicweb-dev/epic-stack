@@ -7,12 +7,12 @@ import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { EnsurePE, getDomainUrl, useIsSubmitting } from '~/utils/misc.tsx'
-import { generateTOTP, verifyTOTP } from '~/utils/totp.server.ts'
+import { generateTOTP, verifyTOTP } from '@epic-web/totp'
 import { handleVerification as handleForgotPasswordVerification } from '../_auth+/forgot-password/index.tsx'
 import { handleVerification as handleOnboardingVerification } from '../_auth+/onboarding.tsx'
 import { handleVerification as handleChangeEmailVerification } from '../settings+/profile.change-email.index/index.tsx'
 import { handleVerification as handleEnableTwoFactorVerification } from '../settings+/profile.two-factor.verify.tsx'
-import { handleVerification as handleReverifyVerification } from './login.tsx'
+import { handleVerification as handleLoginTwoFactorVerification } from './login.tsx'
 
 export const ROUTE_PATH = '/resources/verify'
 
@@ -193,7 +193,7 @@ export async function validateRequest(
 			return handleEnableTwoFactorVerification({ request, body, submission })
 		}
 		case '2fa': {
-			return handleReverifyVerification({ request, body, submission })
+			return handleLoginTwoFactorVerification({ request, body, submission })
 		}
 		case 'change-email': {
 			await deleteVerification()
