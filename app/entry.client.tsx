@@ -8,7 +8,15 @@ if (ENV.MODE === 'development') {
 if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
 	import('~/utils/monitoring.client.tsx').then(({ init }) => init())
 }
-
-startTransition(() => {
-	hydrateRoot(document, <RemixBrowser />)
-})
+const callback = () =>
+	startTransition(() => {
+		hydrateRoot(document, <RemixBrowser />)
+	})
+if (process.env.NODE_ENV === 'development') {
+	import('remix-development-tools').then(({ initClient }) => {
+		initClient()
+		callback()
+	})
+} else {
+	callback()
+}
