@@ -26,7 +26,7 @@ Once you see the onboarding page which has the DSN, copy that somewhere (this
 becomes `SENTRY_DSN`). Then click
 [this](https://sentry.io/orgredirect/settings/:orgslug/developer-settings/new-internal/)
 to create an internal integration. Give it a name and add the scope for
-`Releases:Admin`. Press Save, find the auth token at the bottom of the page, and
+`Releases:Admin`. Press Save, find the auth token at the bottom of the page under "Tokens", and
 copy that to secure location (this becomes `SENTRY_AUTH_TOKEN`). Then vist the
 organization settings page and copy that organization slug (`SENTRY_ORG_SLUG`).
 
