@@ -7,11 +7,6 @@ import {
 	useSearchParams,
 	useSubmit,
 } from '@remix-run/react'
-import {
-	getAllInstances,
-	getInstanceInfo,
-	ensureInstance,
-} from '~/utils/litefs.server.ts'
 import * as React from 'react'
 import { Field } from '~/components/forms.tsx'
 import { Spacer } from '~/components/spacer.tsx'
@@ -22,6 +17,11 @@ import {
 	lruCache,
 	searchCacheKeys,
 } from '~/utils/cache.server.ts'
+import {
+	getAllInstances,
+	getInstanceInfo,
+	ensureInstance,
+} from '~/utils/litefs.server.ts'
 import {
 	invariantResponse,
 	useDebounce,

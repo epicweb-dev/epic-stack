@@ -1,12 +1,12 @@
+import { redirect } from '@remix-run/node'
 import { useFormAction, useNavigation } from '@remix-run/react'
 import { clsx, type ClassValue } from 'clsx'
 import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { ServerOnly, safeRedirect } from 'remix-utils'
 import { useSpinDelay } from 'spin-delay'
 import { twMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
-import { redirect } from '@remix-run/node'
-import { ServerOnly, safeRedirect } from 'remix-utils'
 
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/file/${imageId}` : `/img/user.png`

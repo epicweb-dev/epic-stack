@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import Database from 'better-sqlite3'
+import { z } from 'zod'
 
 /**
  * Deletes all data from all tables in the database, (except for the

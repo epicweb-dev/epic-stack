@@ -1,6 +1,6 @@
 import * as path from 'node:path'
-import { glob } from 'glob'
 import fsExtra from 'fs-extra'
+import { glob } from 'glob'
 import { parse } from 'node-html-parser'
 
 const cwd = process.cwd()

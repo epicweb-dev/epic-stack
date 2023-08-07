@@ -1,5 +1,6 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher, useLoaderData } from '@remix-run/react'
+import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
@@ -9,7 +10,6 @@ import { useUser } from '~/utils/user.ts'
 import { shouldRequestTwoFA } from '../resources+/login.tsx'
 import { Verify } from '../resources+/verify.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
 
 export const handle = {
 	breadcrumb: <Icon name="lock-open-1">Disable</Icon>,

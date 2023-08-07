@@ -46,8 +46,8 @@ import { getFlashSession } from './utils/flash-session.server.ts'
 import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
-import { useToast } from './utils/useToast.tsx'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { useToast } from './utils/useToast.tsx'
 
 export const links: LinksFunction = () => {
 	return [

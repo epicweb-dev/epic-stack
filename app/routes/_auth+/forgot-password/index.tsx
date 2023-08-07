@@ -18,11 +18,11 @@ import {
 } from '~/routes/resources+/verify.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
-import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
-import { ForgotPasswordEmail } from './email.server.tsx'
 import { invariant, invariantResponse } from '~/utils/misc.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
+import { emailSchema, usernameSchema } from '~/utils/user-validation.ts'
 import { resetPasswordUsernameSessionKey } from '../reset-password.tsx'
+import { ForgotPasswordEmail } from './email.server.tsx'
 
 const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([emailSchema, usernameSchema]),

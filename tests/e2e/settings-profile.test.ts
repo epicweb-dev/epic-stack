@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
-import { expect, insertNewUser, test, waitFor } from '../playwright-utils.ts'
-import { createUser } from '../../tests/db-utils.ts'
-import { verifyUserPassword } from '~/utils/auth.server.ts'
 import { readEmail } from 'tests/mocks/utils.ts'
-import { invariant } from '~/utils/misc.tsx'
+import { verifyUserPassword } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
+import { invariant } from '~/utils/misc.tsx'
+import { createUser } from '../../tests/db-utils.ts'
+import { expect, insertNewUser, test, waitFor } from '../playwright-utils.ts'
 
 test('Users can update their basic info', async ({ login, page }) => {
 	await login()

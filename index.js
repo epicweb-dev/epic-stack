@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import closeWithGrace from 'close-with-grace'
 import chalk from 'chalk'
+import closeWithGrace from 'close-with-grace'
 
 closeWithGrace(async ({ err }) => {
 	if (err) {

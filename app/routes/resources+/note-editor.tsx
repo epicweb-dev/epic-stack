@@ -3,14 +3,14 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { z } from 'zod'
+import { floatingToolbarClassName } from '~/components/floating-toolbar.tsx'
+import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
 import { Button } from '~/components/ui/button.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
+import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { ErrorList, Field, TextareaField } from '~/components/forms.tsx'
 import { redirectWithToast } from '~/utils/flash-session.server.ts'
-import { floatingToolbarClassName } from '~/components/floating-toolbar.tsx'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),

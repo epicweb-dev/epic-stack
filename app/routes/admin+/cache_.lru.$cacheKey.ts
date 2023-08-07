@@ -1,5 +1,4 @@
-import type { DataFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
 import { lruCache } from '~/utils/cache.server.ts'

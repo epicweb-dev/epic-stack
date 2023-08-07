@@ -3,9 +3,9 @@ import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator, AuthorizationError } from 'remix-auth'
 import { FormStrategy } from 'remix-auth-form'
+import { z } from 'zod'
 import { prisma } from '~/utils/db.server.ts'
 import { sessionStorage } from './session.server.ts'
-import { z } from 'zod'
 
 export type { User }
 

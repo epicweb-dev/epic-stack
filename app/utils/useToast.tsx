@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { type ToastMessage } from './flash-session.server.ts'
 import { toast } from '~/components/ui/use-toast.ts'
+import { type ToastMessage } from './flash-session.server.ts'
 
 export const useToast = (message?: ToastMessage) => {
 	useEffect(() => {

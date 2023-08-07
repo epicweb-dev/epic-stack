@@ -1,11 +1,11 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { useLoaderData, useSearchParams } from '@remix-run/react'
+import { Spacer } from '~/components/spacer.tsx'
 import {
 	Verify,
 	codeQueryParam,
 	validateRequest,
 } from '../resources+/verify.tsx'
-import { Spacer } from '~/components/spacer.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const params = new URL(request.url).searchParams

@@ -5,6 +5,7 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '~/components/forms.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
+import { shouldRequestTwoFA } from '~/routes/resources+/login.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { sendEmail } from '~/utils/email.server.ts'
@@ -12,14 +13,13 @@ import { redirectWithToast } from '~/utils/flash-session.server.ts'
 import { invariant, useIsSubmitting } from '~/utils/misc.tsx'
 import { commitSession, getSession } from '~/utils/session.server.ts'
 import { emailSchema } from '~/utils/user-validation.ts'
+import { useUser } from '~/utils/user.ts'
 import {
 	prepareVerification,
 	Verify,
 	type VerifyFunctionArgs,
 } from '../../resources+/verify.tsx'
 import { EmailChangeEmail, EmailChangeNoticeEmail } from './email.server.tsx'
-import { shouldRequestTwoFA } from '~/routes/resources+/login.tsx'
-import { useUser } from '~/utils/user.ts'
 
 export const newEmailAddressSessionKey = 'new-email-address'
 
