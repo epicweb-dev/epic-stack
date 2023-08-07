@@ -6,8 +6,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ServerOnly, safeRedirect } from 'remix-utils'
 import { useSpinDelay } from 'spin-delay'
 import { extendTailwindMerge } from 'tailwind-merge'
-import twConfig from 'tailwind.config.ts'
 import { getHints } from './client-hints.tsx'
+import { extendedTheme } from './extendedTheme.ts'
 
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/file/${imageId}` : `/img/user.png`
@@ -29,7 +29,7 @@ export function getErrorMessage(error: unknown) {
 
 function formatColors() {
 	const colors = []
-	for (const [key, color] of Object.entries(twConfig.theme.extend.colors)) {
+	for (const [key, color] of Object.entries(extendedTheme.colors)) {
 		if (typeof color === 'string') {
 			colors.push(key)
 		} else {
@@ -45,17 +45,17 @@ function formatColors() {
 const customTwMerge = extendTailwindMerge({
 	theme: {
 		colors: formatColors(),
-		borderRadius: Object.keys(twConfig.theme.extend.borderRadius),
+		borderRadius: Object.keys(extendedTheme.borderRadius),
 	},
 	classGroups: {
 		'font-size': [
 			{
-				text: Object.keys(twConfig.theme.extend.fontSize),
+				text: Object.keys(extendedTheme.fontSize),
 			},
 		],
 		animate: [
 			{
-				animate: Object.keys(twConfig.theme.extend.animation),
+				animate: Object.keys(extendedTheme.animation),
 			},
 		],
 	},
