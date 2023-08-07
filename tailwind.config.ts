@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import  { type Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
 import animatePlugin from 'tailwindcss-animate'
 import radixPlugin from 'tailwindcss-radix'

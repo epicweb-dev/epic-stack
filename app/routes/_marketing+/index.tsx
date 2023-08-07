@@ -1,4 +1,4 @@
-import type { V2_MetaFunction } from '@remix-run/node'
+import  { type V2_MetaFunction } from '@remix-run/node'
 import {
 	Tooltip,
 	TooltipContent,

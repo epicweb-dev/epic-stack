@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import { z } from 'zod'
-import type { ToastProps } from '~/components/ui/toast.tsx'
+import  { type ToastProps } from '~/components/ui/toast.tsx'
 
 const FLASH_SESSION = 'flash'
 
