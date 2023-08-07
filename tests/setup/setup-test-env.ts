@@ -1,12 +1,14 @@
-import './setup-env-vars.ts'
-import { afterAll, afterEach, expect } from 'vitest'
-import { installGlobals } from '@remix-run/node'
-import { matchers } from './matchers.cjs'
 import 'dotenv/config'
+import 'source-map-support/register.js'
+import './setup-env-vars.ts'
+
+import { installGlobals } from '@remix-run/node'
 import fs from 'fs'
+import { afterAll, afterEach, expect } from 'vitest'
+import { prisma } from '~/utils/db.server.ts'
+import { matchers } from './matchers.cjs'
 import { BASE_DATABASE_PATH, DATABASE_PATH } from './paths.ts'
 import { deleteAllData } from './utils.ts'
-import { prisma } from '~/utils/db.server.ts'
 
 expect.extend(matchers)
 

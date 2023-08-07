@@ -6,7 +6,8 @@
     "@radix-ui/**",
     "react-router",
     "stream/consumers",
-    "node:stream/consumers"
+    "node:stream/consumers",
+    "node:test"
   ],
   "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)"]]
 }
