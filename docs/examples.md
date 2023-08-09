@@ -44,6 +44,8 @@ This page links to examples of how to implement some things with the Epic Stack.
   with GitHub Auth.
 - [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb) by
   [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Prisma using MongoDB as the database.
+- [Epic Stack Custom Themes](https://github.com/kiliman/epic-stack-theme) by [@kiliman](https://github.com/kiliman):
+  An example showing how to create a custom theme using the [`shadcn-custom-theme`](https://github.com/kiliman/shadcn-custom-theme) tool.
 
 ## How to contribute
 
