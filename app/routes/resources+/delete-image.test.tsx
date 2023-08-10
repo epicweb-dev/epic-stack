@@ -105,7 +105,7 @@ test('validates the form', async () => {
 		status: 'error',
 		submission: {
 			error: {
-				imageId: 'Required',
+				imageId: ['Required'],
 			},
 			intent: 'submit',
 			payload: {
