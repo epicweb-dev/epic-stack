@@ -37,8 +37,8 @@
     "/server-build"
   ],
   "dependencies": {
-    "@conform-to/react": "^0.7.4",
-    "@conform-to/zod": "^0.7.4",
+    "@conform-to/react": "^0.8.0",
+    "@conform-to/zod": "^0.8.0",
     "@epic-web/totp": "^1.0.2",
     "@prisma/client": "^5.0.0",
     "@radix-ui/react-checkbox": "^1.0.4",

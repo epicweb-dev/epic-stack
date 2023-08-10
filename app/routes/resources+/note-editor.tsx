@@ -14,8 +14,8 @@ import { redirectWithToast } from '~/utils/flash-session.server.ts'
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(1),
-	content: z.string().min(1),
+	title: z.string(),
+	content: z.string(),
 })
 
 export async function action({ request }: DataFunctionArgs) {
@@ -23,7 +23,6 @@ export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
 		schema: NoteEditorSchema,
-		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)

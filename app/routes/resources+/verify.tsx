@@ -156,7 +156,6 @@ export async function validateRequest(
 					return
 				}
 			}),
-		acceptMultipleErrors: () => true,
 		async: true,
 	})
 
