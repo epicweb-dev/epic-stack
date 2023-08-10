@@ -95,3 +95,12 @@ currently. If this is a concern for you, we recommend you look at
 which has
 [CSRF-related utilities](https://github.com/sergiodxa/remix-utils#csrf) that can
 be used to avoid these issues.
+
+## Rate Limiting
+
+The Epic Stack uses a rate limiter to prevent abuse of the API. This is
+configured in the `server/index.ts` file and can be changed as needed. By
+default it uses [`express-rate-limit`](https://npm.im/express-rate-limit) with
+the in-memory store. There are trade-offs with this simpler approach, but it
+should be relatively simple to externalize the store into Redis as that's a
+built-in feature to express-rate-limit.

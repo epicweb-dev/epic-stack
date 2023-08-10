@@ -17,6 +17,7 @@ import chokidar from 'chokidar'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import express from 'express'
+import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -129,6 +130,54 @@ app.use(
 		},
 	}),
 )
+
+const rateLimitDefault = {
+	windowMs: 60 * 1000,
+	max: 1000,
+	standardHeaders: true,
+	legacyHeaders: false,
+}
+
+const strongestRateLimit = rateLimit({
+	...rateLimitDefault,
+	windowMs: 60 * 1000,
+	max: 10,
+})
+
+const strongRateLimit = rateLimit({
+	...rateLimitDefault,
+	windowMs: 60 * 1000,
+	max: 100,
+})
+
+const generalRateLimit = rateLimit(rateLimitDefault)
+app.use((req, res, next) => {
+	const strongPaths = [
+		'/login',
+		'/signup',
+		'/verify',
+		'/admin',
+		'/onboarding',
+		'/reset-password',
+		'/settings/profile',
+		'/resources/login',
+		'/resources/verify',
+	]
+	if (req.method !== 'GET' && req.method !== 'HEAD') {
+		if (strongPaths.some(p => req.path.includes(p))) {
+			return strongestRateLimit(req, res, next)
+		}
+		return strongRateLimit(req, res, next)
+	}
+
+	// the verify route is a special case because it's a GET route that
+	// can have a token in the query string
+	if (req.path.includes('/verify')) {
+		return strongestRateLimit(req, res, next)
+	}
+
+	return generalRateLimit(req, res, next)
+})
 
 function getRequestHandler(build: ServerBuild): RequestHandler {
 	function getLoadContext(_: any, res: any) {
