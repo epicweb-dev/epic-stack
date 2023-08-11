@@ -1,8 +1,10 @@
 {
   "recommendations": [
+    "bradlc.vscode-tailwindcss",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "prisma.prisma",
-    "bradlc.vscode-tailwindcss"
+    "qwtel.sqlite-viewer",
+    "yoavbls.pretty-ts-errors"
   ]
 }
