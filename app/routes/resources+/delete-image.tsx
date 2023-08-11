@@ -17,7 +17,6 @@ export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
 		schema: DeleteFormSchema,
-		acceptMultipleErrors: () => true,
 	})
 	if (!submission.value) {
 		return json({ status: 'error', submission } as const, { status: 400 })

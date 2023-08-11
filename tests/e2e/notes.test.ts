@@ -12,7 +12,7 @@ test('Users can create notes', async ({ login, page }) => {
 	await page.getByRole('button', { name: /submit/i }).click()
 	// count errors
 	await expect(
-		page.getByText('String must contain at least 1 character(s)'),
+		page.getByText('Required'),
 	).toHaveCount(2)
 
 	// fill in form and submit

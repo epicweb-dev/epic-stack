@@ -68,7 +68,6 @@ export async function action({ request }: DataFunctionArgs) {
 			}
 		}),
 		async: true,
-		acceptMultipleErrors: () => true,
 	})
 
 	if (submission.intent !== 'submit') {
@@ -99,7 +98,7 @@ export async function action({ request }: DataFunctionArgs) {
 			},
 		})
 	} else {
-		submission.error[''] = response.error.message
+		submission.error[''] = [response.error.message]
 		return json({ status: 'error', submission } as const, { status: 500 })
 	}
 }

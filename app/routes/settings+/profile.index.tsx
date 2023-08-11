@@ -25,10 +25,8 @@ import { twoFAVerificationType } from './profile.two-factor.tsx'
 const ProfileFormSchema = z.object({
 	name: nameSchema.optional(),
 	username: usernameSchema,
-	currentPassword: z
-		.union([passwordSchema, z.string().min(0).max(0)])
-		.optional(),
-	newPassword: z.union([passwordSchema, z.string().min(0).max(0)]).optional(),
+	currentPassword: passwordSchema.optional(),
+	newPassword: passwordSchema.optional(),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -90,7 +88,6 @@ export async function action({ request }: DataFunctionArgs) {
 				}
 			},
 		),
-		acceptMultipleErrors: () => true,
 	})
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)

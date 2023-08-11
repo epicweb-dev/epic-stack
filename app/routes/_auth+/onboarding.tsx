@@ -29,7 +29,6 @@ import {
 	passwordSchema,
 	usernameSchema,
 } from '~/utils/user-validation.ts'
-import { checkboxSchema } from '~/utils/zod-extensions.ts'
 import { type VerifyFunctionArgs } from '../resources+/verify.tsx'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
@@ -38,24 +37,30 @@ const OnboardingFormSchema = z
 	.object({
 		username: usernameSchema,
 		name: nameSchema,
-		password: passwordSchema,
-		confirmPassword: passwordSchema,
-		agreeToTermsOfServiceAndPrivacyPolicy: checkboxSchema(
-			'You must agree to the terms of service and privacy policy',
-		),
-		agreeToMailingList: checkboxSchema(),
-		remember: checkboxSchema(),
+		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
+			required_error:
+				'You must agree to the terms of service and privacy policy',
+		}),
+		agreeToMailingList: z.boolean().optional(),
+		remember: z.boolean().optional(),
 		redirectTo: z.string().optional(),
 	})
-	.superRefine(({ confirmPassword, password }, ctx) => {
-		if (confirmPassword !== password) {
-			ctx.addIssue({
-				path: ['confirmPassword'],
-				code: 'custom',
-				message: 'The passwords did not match',
+	.and(
+		z
+			.object({
+				password: passwordSchema,
+				confirmPassword: passwordSchema,
 			})
-		}
-	})
+			.superRefine(({ confirmPassword, password }, ctx) => {
+				if (confirmPassword !== password) {
+					ctx.addIssue({
+						path: ['confirmPassword'],
+						code: 'custom',
+						message: 'The passwords did not match',
+					})
+				}
+			}),
+	)
 
 export async function loader({ request }: DataFunctionArgs) {
 	await requireAnonymous(request)
@@ -95,7 +100,6 @@ export async function action({ request }: DataFunctionArgs) {
 				return
 			}
 		}),
-		acceptMultipleErrors: () => true,
 		async: true,
 	})
 	if (submission.intent !== 'submit') {
