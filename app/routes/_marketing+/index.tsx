@@ -1,4 +1,5 @@
-import  { type V2_MetaFunction } from '@remix-run/node'
+import { type V2_MetaFunction } from '@remix-run/node'
+import { Button } from '~/components/ui/button.tsx'
 import {
 	Tooltip,
 	TooltipContent,

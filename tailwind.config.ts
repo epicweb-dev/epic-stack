@@ -1,8 +1,8 @@
-import  { type Config } from 'tailwindcss'
+import { type Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
 import animatePlugin from 'tailwindcss-animate'
 import radixPlugin from 'tailwindcss-radix'
-import { extendedTheme } from '~/utils/extendedTheme.ts'
+import { extendedTheme } from './app/utils/extended-theme.ts'
 
 export default {
 	content: ['./app/**/*.{ts,tsx,jsx,js}'],
@@ -16,7 +16,7 @@ export default {
 			},
 		},
 		extend: {
-		...extendedTheme,
+			...extendedTheme,
 			fontFamily: {
 				sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
 			},

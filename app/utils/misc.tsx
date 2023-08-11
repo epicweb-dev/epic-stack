@@ -7,7 +7,7 @@ import { ServerOnly, safeRedirect } from 'remix-utils'
 import { useSpinDelay } from 'spin-delay'
 import { extendTailwindMerge } from 'tailwind-merge'
 import { getHints } from './client-hints.tsx'
-import { extendedTheme } from './extendedTheme.ts'
+import { extendedTheme } from './extended-theme.ts'
 
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/file/${imageId}` : `/img/user.png`

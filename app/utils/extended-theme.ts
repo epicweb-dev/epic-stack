@@ -1,3 +1,5 @@
+import { type Config } from 'tailwindcss'
+
 export const extendedTheme = {
 	colors: {
 		border: 'hsl(var(--border))',
@@ -99,4 +101,4 @@ export const extendedTheme = {
 		'accordion-down': 'accordion-down 0.2s ease-out',
 		'accordion-up': 'accordion-up 0.2s ease-out',
 	},
-	}
+} satisfies Config['theme']
