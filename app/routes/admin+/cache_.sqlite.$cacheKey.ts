@@ -3,10 +3,10 @@ import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
 import { cache } from '~/utils/cache.server.ts'
 import { invariantResponse } from '~/utils/misc.tsx'
-import { requireAdmin } from '~/utils/permissions.server.ts'
+import { requireUserWithRole } from '~/utils/permissions.ts'
 
 export async function loader({ request, params }: DataFunctionArgs) {
-	await requireAdmin(request)
+	await requireUserWithRole(request, 'admin')
 	const searchParams = new URL(request.url).searchParams
 	const currentInstanceInfo = await getInstanceInfo()
 	const allInstances = await getAllInstances()

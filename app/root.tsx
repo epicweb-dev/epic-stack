@@ -1,3 +1,5 @@
+import { useForm } from '@conform-to/react'
+import { parse } from '@conform-to/zod'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -15,15 +17,20 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	useFetcher,
+	useFetchers,
 	useLoaderData,
 	useMatches,
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
+import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
+import { ErrorList } from './components/forms.tsx'
 import { SearchBar } from './components/search-bar.tsx'
+import { EpicToaster } from './components/toaster.tsx'
 import { Button } from './components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -33,21 +40,24 @@ import {
 	DropdownMenuTrigger,
 } from './components/ui/dropdown-menu.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
-import { Toaster } from './components/ui/toaster.tsx'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
-import { getTheme } from './routes/resources+/theme/theme.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
+import { getConfetti } from './utils/confetti.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { getFlashSession } from './utils/flash-session.server.ts'
-import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
+import {
+	combineHeaders,
+	getDomainUrl,
+	getUserImgSrc,
+	invariantResponse,
+} from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
+import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
+import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
-import { useToast } from './utils/useToast.tsx'
 
 export const links: LinksFunction = () => {
 	return [
@@ -95,9 +105,22 @@ export async function loader({ request }: DataFunctionArgs) {
 	const user = userId
 		? await time(
 				() =>
-					prisma.user.findUnique({
+					prisma.user.findUniqueOrThrow({
+						select: {
+							id: true,
+							name: true,
+							username: true,
+							image: { select: { id: true } },
+							roles: {
+								select: {
+									name: true,
+									permissions: {
+										select: { entity: true, action: true, access: true },
+									},
+								},
+							},
+						},
 						where: { id: userId },
-						select: { id: true, name: true, username: true, imageId: true },
 					}),
 				{ timings, type: 'find user', desc: 'find user in root' },
 		  )
@@ -108,7 +131,8 @@ export async function loader({ request }: DataFunctionArgs) {
 		// them in the database. Maybe they were deleted? Let's log them out.
 		await authenticator.logout(request, { redirectTo: '/' })
 	}
-	const { flash, headers: flashHeaders } = await getFlashSession(request)
+	const { toast, headers: toastHeaders } = await getToast(request)
+	const { confettiId, headers: confettiHeaders } = getConfetti(request)
 
 	return json(
 		{
@@ -122,12 +146,14 @@ export async function loader({ request }: DataFunctionArgs) {
 				},
 			},
 			ENV: getEnv(),
-			flash,
+			toast,
+			confettiId,
 		},
 		{
 			headers: combineHeaders(
 				{ 'Server-Timing': timings.toString() },
-				flashHeaders,
+				toastHeaders,
+				confettiHeaders,
 			),
 		},
 	)
@@ -138,6 +164,34 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
 	}
 	return headers
+}
+
+const ThemeFormSchema = z.object({
+	theme: z.enum(['light', 'dark']),
+})
+
+export async function action({ request }: DataFunctionArgs) {
+	const formData = await request.formData()
+	invariantResponse(
+		formData.get('intent') === 'update-theme',
+		'Invalid intent',
+		{ status: 400 },
+	)
+	const submission = parse(formData, {
+		schema: ThemeFormSchema,
+	})
+	if (submission.intent !== 'submit') {
+		return json({ status: 'success', submission } as const)
+	}
+	if (!submission.value) {
+		return json({ status: 'error', submission } as const, { status: 400 })
+	}
+	const { theme } = submission.value
+
+	const responseInit = {
+		headers: { 'set-cookie': setTheme(theme) },
+	}
+	return json({ success: true, submission }, responseInit)
 }
 
 function Document({
@@ -183,7 +237,6 @@ function App() {
 	const theme = useTheme()
 	const matches = useMatches()
 	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
-	useToast(data.flash?.toast)
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
@@ -223,8 +276,8 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 				</div>
 			</div>
-			<Confetti confetti={data.flash?.confetti} />
-			<Toaster />
+			<Confetti id={data.confettiId} />
+			<EpicToaster toast={data.toast} />
 		</Document>
 	)
 }
@@ -247,7 +300,7 @@ function UserDropdown() {
 						<img
 							className="h-8 w-8 rounded-full object-cover"
 							alt={user.name ?? user.username}
-							src={getUserImgSrc(user.imageId)}
+							src={getUserImgSrc(user.image?.id)}
 						/>
 						<span className="text-body-sm font-bold">
 							{user.name ?? user.username}
@@ -288,6 +341,63 @@ function UserDropdown() {
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
+	)
+}
+
+function useTheme() {
+	const data = useLoaderData<typeof loader>()
+	const fetchers = useFetchers()
+	const themeFetcher = fetchers.find(
+		f => f.formData?.get('intent') === 'update-theme',
+	)
+	const optimisticTheme = themeFetcher?.formData?.get('theme')
+	if (optimisticTheme === 'light' || optimisticTheme === 'dark') {
+		return optimisticTheme
+	}
+	return data.requestInfo.userPrefs.theme
+}
+
+function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
+	const fetcher = useFetcher<typeof action>()
+
+	const [form] = useForm({
+		id: 'theme-switch',
+		lastSubmission: fetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: ThemeFormSchema })
+		},
+	})
+
+	const mode = userPreference ?? 'light'
+	const nextMode = mode === 'light' ? 'dark' : 'light'
+	const modeLabel = {
+		light: (
+			<Icon name="sun">
+				<span className="sr-only">Light</span>
+			</Icon>
+		),
+		dark: (
+			<Icon name="moon">
+				<span className="sr-only">Dark</span>
+			</Icon>
+		),
+	}
+
+	return (
+		<fetcher.Form method="POST" {...form.props}>
+			<input type="hidden" name="theme" value={nextMode} />
+			<div className="flex gap-2">
+				<button
+					name="intent"
+					value="update-theme"
+					type="submit"
+					className="flex h-8 w-8 cursor-pointer items-center justify-center"
+				>
+					{modeLabel[mode]}
+				</button>
+			</div>
+			<ErrorList errors={form.errors} id={form.errorId} />
+		</fetcher.Form>
 	)
 }
 

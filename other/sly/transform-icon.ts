@@ -1,4 +1,4 @@
-import  { type Meta } from '@sly-cli/sly'
+import { type Meta } from '@sly-cli/sly'
 
 /**
  * @type {import('@sly-cli/sly/dist').Transformer}

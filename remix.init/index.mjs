@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { $, execa } from 'execa'
 import fs from 'fs/promises'
 import inquirer from 'inquirer'
-import open from 'open';
+import open from 'open'
 import path from 'path'
 import toml from '@iarna/toml'
 

@@ -1,4 +1,4 @@
-import { expect, test } from '../playwright-utils.ts'
+import { expect, test } from '@playwright/test'
 
 test('Test root error boundary caught', async ({ page }) => {
 	await page.goto('/does-not-exist')

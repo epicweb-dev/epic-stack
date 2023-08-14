@@ -21,13 +21,11 @@ import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import sourceMapSupport from 'source-map-support'
 
 // @ts-ignore - this file may not exist if you haven't built yet, but it will
 // definitely exist by the time the dev or prod server actually runs.
 import * as remixBuild from '../build/index.js'
 
-sourceMapSupport.install()
 installGlobals()
 
 const MODE = process.env.NODE_ENV

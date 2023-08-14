@@ -1,13 +1,18 @@
 import { faker } from '@faker-js/faker'
+import { expect, test } from '@playwright/test'
 import { readEmail } from 'tests/mocks/utils.ts'
 import { verifyUserPassword } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { invariant } from '~/utils/misc.tsx'
-import { createUser } from '../../tests/db-utils.ts'
-import { expect, insertNewUser, test, waitFor } from '../playwright-utils.ts'
+import {
+	createUser,
+	insertNewUser,
+	loginPage,
+	waitFor,
+} from '../playwright-utils.ts'
 
-test('Users can update their basic info', async ({ login, page }) => {
-	await login()
+test('Users can update their basic info', async ({ page }) => {
+	await loginPage({ page })
 	await page.goto('/settings/profile')
 
 	const newUserData = createUser()
@@ -16,33 +21,30 @@ test('Users can update their basic info', async ({ login, page }) => {
 	await page
 		.getByRole('textbox', { name: /^username/i })
 		.fill(newUserData.username)
-	// TODO: support changing the email... probably test this in another test though
-	// await page.getByRole('textbox', {name: /^email/i}).fill(newUserData.email)
 
 	await page.getByRole('button', { name: /^save/i }).click()
-
-	await expect(page).toHaveURL(`/users/${newUserData.username}`)
 })
 
-test('Users can update their password', async ({ login, page }) => {
+test('Users can update their password', async ({ page }) => {
 	const oldPassword = faker.internet.password()
 	const newPassword = faker.internet.password()
 	const user = await insertNewUser({ password: oldPassword })
-	await login(user)
+	await loginPage({ page, user })
 	await page.goto('/settings/profile')
 
-	const fieldset = page.getByRole('group', { name: /change password/i })
+	await page.getByRole('link', { name: /change password/i }).click()
 
-	await fieldset
+	await page
 		.getByRole('textbox', { name: /^current password/i })
 		.fill(oldPassword)
-	await fieldset
-		.getByRole('textbox', { name: /^new password/i })
+	await page.getByRole('textbox', { name: /^new password/i }).fill(newPassword)
+	await page
+		.getByRole('textbox', { name: /^confirm new password/i })
 		.fill(newPassword)
 
-	await page.getByRole('button', { name: /^save/i }).click()
+	await page.getByRole('button', { name: /^change password/i }).click()
 
-	await expect(page).toHaveURL(`/users/${user.username}`)
+	await expect(page).toHaveURL(`/settings/profile`)
 
 	const { username } = user
 	expect(
@@ -55,8 +57,8 @@ test('Users can update their password', async ({ login, page }) => {
 	).toEqual({ id: user.id })
 })
 
-test('Users can update their profile photo', async ({ login, page }) => {
-	const user = await login()
+test('Users can update their profile photo', async ({ page }) => {
+	const user = await loginPage({ page })
 	await page.goto('/settings/profile')
 
 	const beforeSrc = await page
@@ -69,7 +71,7 @@ test('Users can update their profile photo', async ({ login, page }) => {
 
 	await page
 		.getByRole('textbox', { name: /change/i })
-		.setInputFiles('./tests/fixtures/test-profile.jpg')
+		.setInputFiles('./tests/fixtures/images/user/kody.png')
 
 	await page.getByRole('button', { name: /save/i }).click()
 
@@ -85,8 +87,8 @@ test('Users can update their profile photo', async ({ login, page }) => {
 	expect(beforeSrc).not.toEqual(afterSrc)
 })
 
-test('Users can change their email address', async ({ page, login }) => {
-	const preUpdateUser = await login()
+test('Users can change their email address', async ({ page }) => {
+	const preUpdateUser = await loginPage({ page })
 	const newEmailAddress = faker.internet.email().toLowerCase()
 	expect(preUpdateUser.email).not.toEqual(newEmailAddress)
 	await page.goto('/settings/profile')
@@ -105,7 +107,7 @@ test('Users can change their email address', async ({ page, login }) => {
 	invariant(code, 'Onboarding code not found')
 	await page.getByRole('textbox', { name: /code/i }).fill(code)
 	await page.getByRole('button', { name: /submit/i }).click()
-	await expect(page.getByText(newEmailAddress)).toBeVisible()
+	await expect(page.getByText(/email changed/i)).toBeVisible()
 
 	const updatedUser = await prisma.user.findUnique({
 		where: { id: preUpdateUser.id },

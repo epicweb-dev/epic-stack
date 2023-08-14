@@ -1,29 +1,36 @@
+import { conform, useForm } from '@conform-to/react'
+import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getTOTPAuthUri } from '@epic-web/totp'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import * as QRCode from 'qrcode'
-import { safeRedirect } from 'remix-utils'
+import { z } from 'zod'
+import { Field } from '~/components/forms.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
+import { isCodeValid } from '~/routes/_auth+/verify.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { getDomainUrl, invariant, invariantResponse } from '~/utils/misc.tsx'
-import { useUser } from '~/utils/user.ts'
-import {
-	type VerificationTypes,
-	Verify,
-	type VerifyFunctionArgs,
-} from '../resources+/verify.tsx'
+import { getDomainUrl, useIsPending } from '~/utils/misc.tsx'
+import { redirectWithToast } from '~/utils/toast.server.ts'
+import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 export const handle = {
 	breadcrumb: <Icon name="check">Verify</Icon>,
 }
-export const verificationType = '2fa-verify' satisfies VerificationTypes
+
+const VerifySchema = z.object({
+	code: z.string().min(6).max(6),
+})
+
+export const twoFAVerifyVerificationType = '2fa-verify'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const verification = await prisma.verification.findFirst({
-		where: { type: verificationType, target: userId },
+	const verification = await prisma.verification.findUnique({
+		where: {
+			target_type: { type: twoFAVerifyVerificationType, target: userId },
+		},
 		select: {
 			id: true,
 			algorithm: true,
@@ -35,14 +42,10 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!verification) {
 		return redirect('/settings/profile/two-factor')
 	}
-	const user = await prisma.user.findUnique({
+	const user = await prisma.user.findUniqueOrThrow({
 		where: { id: userId },
 		select: { email: true },
 	})
-	if (user == null) {
-		// This should not be possible
-		throw new Error(`user with ID "${userId}" is unknown`)
-	}
 	const issuer = new URL(getDomainUrl(request)).host
 	const otpUri = getTOTPAuthUri({
 		...verification,
@@ -56,43 +59,72 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	invariantResponse(formData.get('intent') === 'cancel', 'Invalid intent')
-	await prisma.verification.deleteMany({
-		where: { type: verificationType, target: userId },
-	})
-	return redirect('/settings/profile/two-factor')
-}
 
-export async function handleVerification({ submission }: VerifyFunctionArgs) {
-	invariant(submission.value, 'submission.value should be defined by now')
-	const verification = await prisma.verification.findUniqueOrThrow({
-		where: {
-			target_type: {
-				type: submission.value.type,
-				target: submission.value.target,
-			},
-		},
-		select: { id: true },
-	})
-	await prisma.verification.update({
-		where: { id: verification.id },
-		data: { type: '2fa' satisfies VerificationTypes },
-	})
-	if (submission.value.redirectTo) {
-		return redirect(safeRedirect(submission.value.redirectTo))
+	if (formData.get('intent') === 'cancel') {
+		await prisma.verification.deleteMany({
+			where: { type: twoFAVerifyVerificationType, target: userId },
+		})
+		return redirect('/settings/profile/two-factor')
 	}
-	return json({ status: 'success', submission } as const)
+	const submission = await parse(formData, {
+		schema: () =>
+			VerifySchema.superRefine(async (data, ctx) => {
+				const codeIsValid = await isCodeValid({
+					code: data.code,
+					type: twoFAVerifyVerificationType,
+					target: userId,
+				})
+				if (!codeIsValid) {
+					ctx.addIssue({
+						path: ['code'],
+						code: z.ZodIssueCode.custom,
+						message: `Invalid code`,
+					})
+					return
+				}
+			}),
+		async: true,
+	})
+
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
+		return json({ status: 'error', submission } as const, { status: 400 })
+	}
+
+	await prisma.verification.update({
+		where: {
+			target_type: { type: twoFAVerifyVerificationType, target: userId },
+		},
+		data: { type: twoFAVerificationType },
+	})
+	return redirectWithToast('/settings/profile/two-factor', {
+		type: 'success',
+		title: 'Enabled',
+		description: 'Two-factor authentication has been enabled.',
+	})
 }
 
 export default function TwoFactorRoute() {
 	const data = useLoaderData<typeof loader>()
-	const user = useUser()
-	const toggle2FAFetcher = useFetcher<typeof action>()
+	const actionData = useActionData<typeof action>()
+
+	const isPending = useIsPending()
+
+	const [form, fields] = useForm({
+		id: 'verify-form',
+		constraint: getFieldsetConstraint(VerifySchema),
+		lastSubmission: actionData?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: VerifySchema })
+		},
+	})
 
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data?.qrCode} className="h-56 w-56" />
+				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -103,7 +135,7 @@ export default function TwoFactorRoute() {
 						className="whitespace-pre-wrap break-all text-sm"
 						aria-label="One-time Password URI"
 					>
-						{data?.otpUri}
+						{data.otpUri}
 					</pre>
 				</div>
 				<p className="text-sm">
@@ -114,30 +146,24 @@ export default function TwoFactorRoute() {
 					lose access to your account.
 				</p>
 				<div className="flex w-full max-w-xs flex-col justify-center gap-4">
-					<Verify
-						type="2fa-verify"
-						target={user.id}
-						redirectTo="/settings/profile/two-factor"
-						cancelButton={
-							<toggle2FAFetcher.Form method="POST" className="w-full flex-1">
-								<StatusButton
-									variant="secondary"
-									type="submit"
-									name="intent"
-									value="cancel"
-									className="w-full"
-									status={
-										toggle2FAFetcher.state === 'loading' &&
-										toggle2FAFetcher.formData?.get('intent') === 'cancel'
-											? 'pending'
-											: 'idle'
-									}
-								>
-									Cancel
-								</StatusButton>
-							</toggle2FAFetcher.Form>
-						}
-					/>
+					<Form method="POST" {...form.props} className="flex-1">
+						<Field
+							labelProps={{
+								htmlFor: fields.code.id,
+								children: 'Code',
+							}}
+							inputProps={{ ...conform.input(fields.code), autoFocus: true }}
+							errors={fields.code.errors}
+						/>
+						<StatusButton
+							className="w-full"
+							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+							type="submit"
+							disabled={isPending}
+						>
+							Submit
+						</StatusButton>
+					</Form>
 				</div>
 			</div>
 		</div>

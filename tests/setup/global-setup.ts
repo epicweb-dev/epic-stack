@@ -1,26 +1,22 @@
-import path from 'path'
+import path from 'node:path'
 import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
-import { BASE_DATABASE_PATH, BASE_DATABASE_URL } from './paths.ts'
+
+export const BASE_DATABASE_PATH = path.join(
+	process.cwd(),
+	`./tests/prisma/base.db`,
+)
 
 export async function setup() {
-	await fsExtra.ensureDir(path.dirname(BASE_DATABASE_PATH))
-	await ensureDbReady()
-	return async function teardown() {}
-}
+	const databaseExists = await fsExtra.pathExists(BASE_DATABASE_PATH)
+	if (databaseExists) return
 
-async function ensureDbReady() {
-	if (!(await fsExtra.pathExists(BASE_DATABASE_PATH))) {
-		await execaCommand(
-			'prisma migrate reset --force --skip-seed --skip-generate',
-			{
-				stdio: 'inherit',
-				env: {
-					...process.env,
-					DATABASE_PATH: BASE_DATABASE_PATH,
-					DATABASE_URL: BASE_DATABASE_URL,
-				},
-			},
-		)
-	}
+	await execaCommand('prisma migrate reset --force --skip-generate', {
+		stdio: 'inherit',
+		env: {
+			...process.env,
+			MINIMAL_SEED: 'true',
+			DATABASE_URL: `file:${BASE_DATABASE_PATH}`,
+		},
+	})
 }

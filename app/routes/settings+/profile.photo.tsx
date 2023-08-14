@@ -7,12 +7,7 @@ import {
 	unstable_parseMultipartFormData,
 	type DataFunctionArgs,
 } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useFetcher,
-	useLoaderData,
-} from '@remix-run/react'
+import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 import { ServerOnly } from 'remix-utils'
 import { z } from 'zod'
@@ -20,13 +15,13 @@ import { ErrorList } from '~/components/forms.tsx'
 import { Button } from '~/components/ui/button.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
-import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
-import { authenticator, requireUserId } from '~/utils/auth.server.ts'
+import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import {
 	getUserImgSrc,
+	invariantResponse,
 	useDoubleCheck,
-	useIsSubmitting,
+	useIsPending,
 } from '~/utils/misc.tsx'
 
 export const handle = {
@@ -37,21 +32,23 @@ const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
 const PhotoFormSchema = z.object({
 	photoFile: z
-		.instanceof(File, { message: 'Image is required' })
-		.refine(file => {
-			return file.size <= MAX_SIZE
-		}, 'Image size must be less than 3MB'),
+		.instanceof(File)
+		.refine(file => file.size > 0, 'Image is required')
+		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 3MB'),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
-		select: { imageId: true, name: true, username: true },
+		select: {
+			id: true,
+			name: true,
+			username: true,
+			image: { select: { id: true } },
+		},
 	})
-	if (!user) {
-		throw await authenticator.logout(request, { redirectTo: '/' })
-	}
+	invariantResponse(user, 'User not found', { status: 404 })
 	return json({ user })
 }
 
@@ -61,8 +58,24 @@ export async function action({ request }: DataFunctionArgs) {
 		request,
 		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
 	)
+	const intent = formData.get('intent')
+	if (intent === 'delete') {
+		await prisma.userImage.deleteMany({ where: { userId } })
+		return redirect('/settings/profile')
+	}
 
-	const submission = parse(formData, { schema: PhotoFormSchema })
+	const submission = await parse(formData, {
+		schema: PhotoFormSchema.transform(async data => {
+			if (data.photoFile.size <= 0) return z.NEVER
+			return {
+				image: {
+					contentType: data.photoFile.type,
+					blob: Buffer.from(await data.photoFile.arrayBuffer()),
+				},
+			}
+		}),
+		async: true,
+	})
 
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
@@ -71,55 +84,27 @@ export async function action({ request }: DataFunctionArgs) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	const { photoFile } = submission.value
+	const { image } = submission.value
 
-	const newPrismaPhoto = {
-		contentType: photoFile.type,
-		file: {
-			create: {
-				blob: Buffer.from(await photoFile.arrayBuffer()),
-			},
-		},
-	}
-
-	const previousUserPhoto = await prisma.user.findUnique({
-		where: { id: userId },
-		select: { imageId: true },
+	await prisma.$transaction(async $prisma => {
+		await $prisma.userImage.deleteMany({ where: { userId } })
+		await $prisma.user.update({
+			where: { id: userId },
+			data: { image: { create: image } },
+		})
 	})
-
-	await prisma.user.update({
-		select: { id: true },
-		where: { id: userId },
-		data: {
-			image: {
-				upsert: {
-					update: newPrismaPhoto,
-					create: newPrismaPhoto,
-				},
-			},
-		},
-	})
-
-	if (previousUserPhoto?.imageId) {
-		void prisma.image
-			.delete({
-				where: { fileId: previousUserPhoto.imageId },
-			})
-			.catch(() => {}) // ignore the error, maybe it never existed?
-	}
 
 	return redirect('/settings/profile')
 }
 
 export default function PhotoRoute() {
-	const data = useLoaderData<typeof loader>() || {}
+	const data = useLoaderData<typeof loader>()
 
 	const doubleCheckDeleteImage = useDoubleCheck()
 
-	const deleteImageFetcher = useFetcher<typeof deleteImageRoute.action>()
 	const actionData = useActionData<typeof action>()
 
-	const [form, { photoFile }] = useForm({
+	const [form, fields] = useForm({
 		id: 'profile-photo',
 		constraint: getFieldsetConstraint(PhotoFormSchema),
 		lastSubmission: actionData?.submission,
@@ -129,11 +114,10 @@ export default function PhotoRoute() {
 		shouldRevalidate: 'onBlur',
 	})
 
-	const isSubmitting = useIsSubmitting()
+	const isPending = useIsPending()
 
 	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
 
-	const deleteProfilePhotoFormId = 'delete-profile-photo'
 	return (
 		<div>
 			<Form
@@ -145,14 +129,14 @@ export default function PhotoRoute() {
 			>
 				<img
 					src={
-						newImageSrc ?? (data.user ? getUserImgSrc(data.user?.imageId) : '')
+						newImageSrc ?? (data.user ? getUserImgSrc(data.user.image?.id) : '')
 					}
 					className="h-52 w-52 rounded-full object-cover"
 					alt={data.user?.name ?? data.user?.username}
 				/>
-				<ErrorList errors={photoFile.errors} id={photoFile.id} />
+				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />
 				<input
-					{...conform.input(photoFile, { type: 'file' })}
+					{...conform.input(fields.photoFile, { type: 'file' })}
 					accept="image/*"
 					className="peer sr-only"
 					tabIndex={newImageSrc ? -1 : 0}
@@ -171,7 +155,8 @@ export default function PhotoRoute() {
 					<div className="flex gap-4">
 						<StatusButton
 							type="submit"
-							status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
+							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+							disabled={isPending}
 						>
 							Save Photo
 						</StatusButton>
@@ -182,7 +167,7 @@ export default function PhotoRoute() {
 				) : (
 					<div className="flex gap-4 peer-invalid:[&>.server-only[type='submit']]:hidden">
 						<Button asChild className="cursor-pointer">
-							<label htmlFor={photoFile.id}>
+							<label htmlFor={fields.photoFile.id}>
 								<Icon name="pencil-1">Change</Icon>
 							</label>
 						</Button>
@@ -197,12 +182,13 @@ export default function PhotoRoute() {
 								</Button>
 							)}
 						</ServerOnly>
-						{data.user?.imageId ? (
+						{data.user.image?.id ? (
 							<Button
 								variant="destructive"
 								{...doubleCheckDeleteImage.getButtonProps({
 									type: 'submit',
-									form: deleteProfilePhotoFormId,
+									name: 'intent',
+									value: 'delete',
 								})}
 							>
 								<Icon name="trash">
@@ -216,24 +202,6 @@ export default function PhotoRoute() {
 				)}
 				<ErrorList errors={form.errors} />
 			</Form>
-			<deleteImageFetcher.Form
-				method="POST"
-				id={deleteProfilePhotoFormId}
-				action={deleteImageRoute.ROUTE_PATH}
-				onSubmit={() => setNewImageSrc(null)}
-			>
-				<ServerOnly>
-					{() => (
-						<input
-							name="redirectTo"
-							value="/settings/profile/photo"
-							type="hidden"
-						/>
-					)}
-				</ServerOnly>
-				<input name="intent" type="hidden" value="submit" />
-				<input name="imageId" type="hidden" value={data.user?.imageId ?? ''} />
-			</deleteImageFetcher.Form>
 		</div>
 	)
 }

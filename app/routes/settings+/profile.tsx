@@ -2,9 +2,9 @@ import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useMatches } from '@remix-run/react'
 import { Spacer } from '~/components/spacer.tsx'
 import { Icon } from '~/components/ui/icon.tsx'
-import { authenticator, requireUserId } from '~/utils/auth.server.ts'
+import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { cn } from '~/utils/misc.tsx'
+import { cn, invariantResponse } from '~/utils/misc.tsx'
 import { useUser } from '~/utils/user.ts'
 
 export const handle = {
@@ -15,13 +15,9 @@ export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
-		select: {
-			username: true,
-		},
+		select: { username: true },
 	})
-	if (!user) {
-		throw await authenticator.logout(request, { redirectTo: '/' })
-	}
+	invariantResponse(user, 'User not found', { status: 404 })
 	return json({})
 }
 

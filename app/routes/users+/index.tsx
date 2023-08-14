@@ -1,20 +1,11 @@
-import {
-	json,
-	redirect,
-	type DataFunctionArgs,
-	type HeadersFunction,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
+import { ErrorList } from '~/components/forms.tsx'
 import { SearchBar } from '~/components/search-bar.tsx'
 import { prisma } from '~/utils/db.server.ts'
-import { cn, getUserImgSrc, useDelayedIsSubmitting } from '~/utils/misc.tsx'
-import {
-	combineServerTimings,
-	makeTimings,
-	time,
-} from '~/utils/timing.server.ts'
+import { cn, getUserImgSrc, useDelayedIsPending } from '~/utils/misc.tsx'
 
 const UserSearchResultSchema = z.object({
 	id: z.string(),
@@ -26,69 +17,47 @@ const UserSearchResultSchema = z.object({
 const UserSearchResultsSchema = z.array(UserSearchResultSchema)
 
 export async function loader({ request }: DataFunctionArgs) {
-	const timings = makeTimings('users loader')
 	const searchTerm = new URL(request.url).searchParams.get('search')
 	if (searchTerm === '') {
 		return redirect('/users')
 	}
 
-	const rawUsers = await time(
-		async () => {
-			if (searchTerm) {
-				return prisma.$queryRaw`
-					SELECT id, username, name, imageId
-					FROM user
-					WHERE username LIKE ${`%${searchTerm ?? ''}%`}
-					OR name LIKE ${`%${searchTerm ?? ''}%`}
-					ORDER BY (
-						SELECT updatedAt
-						FROM note
-						WHERE ownerId = user.id
-						ORDER BY updatedAt DESC
-						LIMIT 1
-					) DESC
-					LIMIT 50
-				`
-			} else {
-				return await prisma.$queryRaw`
-					SELECT id, username, name, imageId
-					FROM user
-					ORDER BY (
-						SELECT updatedAt
-						FROM note
-						WHERE ownerId = user.id
-						ORDER BY updatedAt DESC
-						LIMIT 1
-					) DESC
-					LIMIT 50
-				`
-			}
-		},
-		{ timings, type: 'search users' },
-	)
+	const like = `%${searchTerm ?? ''}%`
+	const rawUsers = await prisma.$queryRaw`
+		SELECT user.id, user.username, user.name, image.id AS imageId
+		FROM User AS user
+		LEFT JOIN UserImage AS image ON user.id = image.userId
+		WHERE user.username LIKE ${like}
+		OR user.name LIKE ${like}
+		ORDER BY (
+			SELECT updatedAt
+			FROM Note
+			WHERE ownerId = user.id
+			ORDER BY updatedAt DESC
+			LIMIT 1
+		) DESC
+		LIMIT 50
+	`
 
 	const result = UserSearchResultsSchema.safeParse(rawUsers)
-	const headers = { 'Server-Timing': timings.toString() }
 	if (!result.success) {
 		return json({ status: 'error', error: result.error.message } as const, {
-			headers,
+			status: 400,
 		})
 	}
-	return json({ status: 'idle', users: result.data } as const, { headers })
-}
-
-export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
-	return {
-		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
-	}
+	return json({ status: 'idle', users: result.data } as const)
 }
 
 export default function UsersRoute() {
 	const data = useLoaderData<typeof loader>()
-	const isSubmitting = useDelayedIsSubmitting({
+	const isPending = useDelayedIsPending({
 		formMethod: 'GET',
 		formAction: '/users',
 	})
+
+	if (data.status === 'error') {
+		console.error(data.error)
+	}
 
 	return (
 		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
@@ -102,7 +71,7 @@ export default function UsersRoute() {
 						<ul
 							className={cn(
 								'flex w-full flex-wrap items-center justify-center gap-4 delay-200',
-								{ 'opacity-50': isSubmitting },
+								{ 'opacity-50': isPending },
 							)}
 						>
 							{data.users.map(user => (
@@ -131,12 +100,9 @@ export default function UsersRoute() {
 					) : (
 						<p>No users found</p>
 					)
-				) : (
-					<>
-						<div>Uh oh... An error happened!</div>
-						<pre>{data.error}</pre>
-					</>
-				)}
+				) : data.status === 'error' ? (
+					<ErrorList errors={['There was an error parsing the results']} />
+				) : null}
 			</main>
 		</div>
 	)

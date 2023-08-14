@@ -1,3 +1,4 @@
+import 'source-map-support/register.js'
 import 'dotenv/config'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'

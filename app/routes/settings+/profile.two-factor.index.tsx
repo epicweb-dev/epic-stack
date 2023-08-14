@@ -5,36 +5,39 @@ import { Icon } from '~/components/ui/icon.tsx'
 import { StatusButton } from '~/components/ui/status-button.tsx'
 import { requireUserId } from '~/utils/auth.server.ts'
 import { prisma } from '~/utils/db.server.ts'
-import { shouldRequestTwoFA } from '../resources+/login.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
-import { verificationType as verifyVerificationType } from './profile.two-factor.verify.tsx'
+import { twoFAVerifyVerificationType } from './profile.two-factor.verify.tsx'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const verification = await prisma.verification.findFirst({
-		where: { type: twoFAVerificationType, target: userId },
+	const verification = await prisma.verification.findUnique({
+		where: { target_type: { type: twoFAVerificationType, target: userId } },
 		select: { id: true },
 	})
-	const shouldReverify = await shouldRequestTwoFA(request)
-	return json({ is2FAEnabled: Boolean(verification), shouldReverify })
+	return json({ is2FAEnabled: Boolean(verification) })
 }
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const { otp: _otp, ...config } = generateTOTP()
-	// delete any existing entries
-	await prisma.verification.deleteMany({
-		where: { type: verifyVerificationType, target: userId },
-	})
-	await prisma.verification.create({
-		data: { ...config, type: verifyVerificationType, target: userId },
+	const verificationData = {
+		...config,
+		type: twoFAVerifyVerificationType,
+		target: userId,
+	}
+	await prisma.verification.upsert({
+		where: {
+			target_type: { target: userId, type: twoFAVerifyVerificationType },
+		},
+		create: verificationData,
+		update: verificationData,
 	})
 	return redirect('/settings/profile/two-factor/verify')
 }
 
 export default function TwoFactorRoute() {
 	const data = useLoaderData<typeof loader>()
-	const toggle2FAFetcher = useFetcher<typeof action>()
+	const enable2FAFetcher = useFetcher<typeof action>()
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -65,17 +68,17 @@ export default function TwoFactorRoute() {
 						</a>{' '}
 						to log in.
 					</p>
-					<toggle2FAFetcher.Form method="POST" preventScrollReset>
+					<enable2FAFetcher.Form method="POST" preventScrollReset>
 						<StatusButton
 							type="submit"
 							name="intent"
 							value="enable"
-							status={toggle2FAFetcher.state === 'loading' ? 'pending' : 'idle'}
+							status={enable2FAFetcher.state === 'loading' ? 'pending' : 'idle'}
 							className="mx-auto"
 						>
 							Enable 2FA
 						</StatusButton>
-					</toggle2FAFetcher.Form>
+					</enable2FAFetcher.Form>
 				</>
 			)}
 		</div>

@@ -1,9 +1,10 @@
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
-	json,
-	type DataFunctionArgs,
+	Form,
+	Link,
+	useLoaderData,
 	type V2_MetaFunction,
-} from '@remix-run/node'
-import { Form, Link, useLoaderData } from '@remix-run/react'
+} from '@remix-run/react'
 import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
 import { Spacer } from '~/components/spacer.tsx'
 import { Button } from '~/components/ui/button.tsx'
@@ -13,24 +14,25 @@ import { getUserImgSrc, invariantResponse } from '~/utils/misc.tsx'
 import { useOptionalUser } from '~/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
-	invariantResponse(params.username, 'Missing username')
-	const user = await prisma.user.findUnique({
-		where: { username: params.username },
+	const user = await prisma.user.findFirst({
 		select: {
 			id: true,
-			username: true,
 			name: true,
-			imageId: true,
+			username: true,
 			createdAt: true,
+			image: { select: { id: true } },
+		},
+		where: {
+			username: params.username,
 		},
 	})
-	if (!user) {
-		throw new Response('not found', { status: 404 })
-	}
+
+	invariantResponse(user, 'User not found', { status: 404 })
+
 	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
 }
 
-export default function UsernameRoute() {
+export default function ProfileRoute() {
 	const data = useLoaderData<typeof loader>()
 	const user = data.user
 	const userDisplayName = user.name ?? user.username
@@ -46,7 +48,7 @@ export default function UsernameRoute() {
 					<div className="absolute -top-40">
 						<div className="relative">
 							<img
-								src={getUserImgSrc(data.user.imageId)}
+								src={getUserImgSrc(data.user.image?.id)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
 							/>
@@ -100,6 +102,17 @@ export default function UsernameRoute() {
 	)
 }
 
+export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
+	const displayName = data?.user.name ?? params.username
+	return [
+		{ title: `${displayName} | Epic Notes` },
+		{
+			name: 'description',
+			content: `Profile of ${displayName} on Epic Notes`,
+		},
+	]
+}
+
 export function ErrorBoundary() {
 	return (
 		<GeneralErrorBoundary
@@ -110,15 +123,4 @@ export function ErrorBoundary() {
 			}}
 		/>
 	)
-}
-
-export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
-	const displayName = data?.user.name ?? params.username
-	return [
-		{ title: `${displayName} | Epic Notes` },
-		{
-			name: 'description',
-			content: `Profile of ${displayName} on Epic Notes`,
-		},
-	]
 }

@@ -15,7 +15,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const isAuthorized =
 		request.headers.get('Authorization') === `Bearer ${token}`
 	if (!isAuthorized) {
-		// rick roll them
+		// nah, you can't be here...
 		return redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 	}
 	const { key, cacheValue } = z

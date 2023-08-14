@@ -1,16 +1,16 @@
-import { redirect } from '@remix-run/node'
 import { useFormAction, useNavigation } from '@remix-run/react'
 import { clsx, type ClassValue } from 'clsx'
-import { parseAcceptLanguage } from 'intl-parse-accept-language'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ServerOnly, safeRedirect } from 'remix-utils'
 import { useSpinDelay } from 'spin-delay'
 import { extendTailwindMerge } from 'tailwind-merge'
-import { getHints } from './client-hints.tsx'
 import { extendedTheme } from './extended-theme.ts'
 
 export function getUserImgSrc(imageId?: string | null) {
-	return imageId ? `/resources/file/${imageId}` : `/img/user.png`
+	return imageId ? `/resources/user-images/${imageId}` : '/img/user.png'
+}
+
+export function getNoteImgSrc(imageId: string) {
+	return `/resources/note-images/${imageId}`
 }
 
 export function getErrorMessage(error: unknown) {
@@ -67,7 +67,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getDomainUrl(request: Request) {
 	const host =
-		request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
+		request.headers.get('X-Forwarded-Host') ??
+		request.headers.get('host') ??
+		new URL(request.url).host
 	if (!host) {
 		throw new Error('Could not determine domain URL.')
 	}
@@ -91,56 +93,14 @@ export function getReferrerRoute(request: Request) {
 }
 
 /**
- * If the noJs boolean is true, this throws a redirect to the referrer route
- * with the given responseInit options. This should be used in combination with
- * the EnsurePE component in your form.
- *
- * NOTE: This is only necessary when your form is posting to a different action
- * from the current route. If your form is posting to the current route, things
- * will work whether you redirect or return json from your action.
- */
-export async function ensurePE(
-	data: FormData | URLSearchParams,
-	request: Request,
-	responseInit?:
-		| ResponseInit
-		| (() => ResponseInit)
-		| (() => Promise<ResponseInit>),
-) {
-	if (data.get('no-js') === 'true') {
-		throw redirect(
-			safeRedirect(getReferrerRoute(request)),
-			await (typeof responseInit === 'function'
-				? responseInit()
-				: responseInit),
-		)
-	}
-}
-
-/**
- * Renders a hidden input with the name "no-js" and value "true". It is removed
- * when JavaScript hydrates. This is so we can detect if the user has javascript
- * loaded or not. It should be used in combination with the ensurePE utility
- * in your action function.
- *
- * NOTE: This is only necessary when your form is posting to a different action
- * from the current route. If your form is posting to the current route, things
- * will work whether you redirect or return json from your action.
- */
-export function EnsurePE() {
-	return (
-		<ServerOnly>
-			{() => <input type="hidden" name="no-js" value="true" />}
-		</ServerOnly>
-	)
-}
-
-/**
  * Merge multiple headers objects into one (uses set so headers are overridden)
  */
-export function mergeHeaders(...headers: Array<ResponseInit['headers']>) {
+export function mergeHeaders(
+	...headers: Array<ResponseInit['headers'] | null | undefined>
+) {
 	const merged = new Headers()
 	for (const header of headers) {
+		if (!header) continue
 		for (const [key, value] of new Headers(header).entries()) {
 			merged.set(key, value)
 		}
@@ -151,11 +111,30 @@ export function mergeHeaders(...headers: Array<ResponseInit['headers']>) {
 /**
  * Combine multiple header objects into one (uses append so headers are not overridden)
  */
-export function combineHeaders(...headers: Array<ResponseInit['headers']>) {
+export function combineHeaders(
+	...headers: Array<ResponseInit['headers'] | null | undefined>
+) {
 	const combined = new Headers()
 	for (const header of headers) {
+		if (!header) continue
 		for (const [key, value] of new Headers(header).entries()) {
 			combined.append(key, value)
+		}
+	}
+	return combined
+}
+
+/**
+ * Combine multiple response init objects into one (uses combineHeaders)
+ */
+export function combineResponseInits(
+	...responseInits: Array<ResponseInit | null | undefined>
+) {
+	let combined: ResponseInit = {}
+	for (const responseInit of responseInits) {
+		combined = {
+			...responseInit,
+			headers: combineHeaders(combined.headers, responseInit?.headers),
 		}
 	}
 	return combined
@@ -215,85 +194,58 @@ export function invariantResponse(
 }
 
 /**
- * Uses the request's accept-language header to determine the user's preferred
- * locale and the client hint cookies for the user's timeZone returns a
- * DateTimeFormat object for that locale and timezone.
- *
- * All options can be overridden by passing in an options object. By default,
- * the options are all "numeric" and the timeZone.
- */
-export function getDateTimeFormat(
-	request: Request,
-	options?: Intl.DateTimeFormatOptions,
-) {
-	const locales = parseAcceptLanguage(request.headers.get('accept-language'), {
-		validate: Intl.DateTimeFormat.supportedLocalesOf,
-	})
-	const locale = locales[0] ?? 'en-US'
-
-	// change your default options here
-	const defaultOptions: Intl.DateTimeFormatOptions = {
-		year: 'numeric',
-		month: 'numeric',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-	}
-	options = {
-		...defaultOptions,
-		...options,
-		timeZone: options?.timeZone ?? getHints(request).timeZone,
-	}
-	return new Intl.DateTimeFormat(locale, options)
-}
-
-/**
  * Returns true if the current navigation is submitting the current route's
  * form. Defaults to the current route's form action and method POST.
  *
- * If GET, then this uses navigation.state === 'loading' instead of submitting.
+ * Defaults state to 'non-idle'
  *
  * NOTE: the default formAction will include query params, but the
  * navigation.formAction will not, so don't use the default formAction if you
  * want to know if a form is submitting without specific query params.
  */
-export function useIsSubmitting({
+export function useIsPending({
 	formAction,
 	formMethod = 'POST',
+	state = 'non-idle',
 }: {
 	formAction?: string
 	formMethod?: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE'
+	state?: 'submitting' | 'loading' | 'non-idle'
 } = {}) {
 	const contextualFormAction = useFormAction()
 	const navigation = useNavigation()
+	const isPendingState =
+		state === 'non-idle'
+			? navigation.state !== 'idle'
+			: navigation.state === state
 	return (
-		navigation.state === (formMethod === 'GET' ? 'loading' : 'submitting') &&
+		isPendingState &&
 		navigation.formAction === (formAction ?? contextualFormAction) &&
 		navigation.formMethod === formMethod
 	)
 }
 
 /**
- * This combines useSpinDelay (from https://npm.im/spin-delay) and useIsSubmitting
+ * This combines useSpinDelay (from https://npm.im/spin-delay) and useIsPending
  * from our own utilities to give you a nice way to show a loading spinner for
  * a minimum amount of time, even if the request finishes right after the delay.
  *
  * This avoids a flash of loading state regardless of how fast or slow the
  * request is.
  */
-export function useDelayedIsSubmitting({
+export function useDelayedIsPending({
 	formAction,
 	formMethod,
 	delay = 400,
 	minDuration = 300,
-}: Parameters<typeof useIsSubmitting>[0] &
+}: Parameters<typeof useIsPending>[0] &
 	Parameters<typeof useSpinDelay>[1] = {}) {
-	const isSubmitting = useIsSubmitting({ formAction, formMethod })
-	const delayedIsSubmitting = useSpinDelay(isSubmitting, {
+	const isPending = useIsPending({ formAction, formMethod })
+	const delayedIsPending = useSpinDelay(isPending, {
 		delay,
 		minDuration,
 	})
-	return delayedIsSubmitting
+	return delayedIsPending
 }
 
 function callAll<Args extends Array<unknown>>(
@@ -325,10 +277,18 @@ export function useDoubleCheck() {
 						setDoubleCheck(true)
 				  }
 
+		const onKeyUp: React.ButtonHTMLAttributes<HTMLButtonElement>['onKeyUp'] =
+			e => {
+				if (e.key === 'Escape') {
+					setDoubleCheck(false)
+				}
+			}
+
 		return {
 			...props,
 			onBlur: callAll(onBlur, props?.onBlur),
 			onClick: callAll(onClick, props?.onClick),
+			onKeyUp: callAll(onKeyUp, props?.onKeyUp),
 		}
 	}
 
@@ -369,4 +329,20 @@ export function useDebounce<
 			),
 		[delay],
 	)
+}
+
+export async function downloadFile(url: string, retries: number = 0) {
+	const MAX_RETRIES = 3
+	try {
+		const response = await fetch(url)
+		if (!response.ok) {
+			throw new Error(`Failed to fetch image with status ${response.status}`)
+		}
+		const contentType = response.headers.get('content-type') ?? 'image/jpg'
+		const blob = Buffer.from(await response.arrayBuffer())
+		return { contentType, blob }
+	} catch (e) {
+		if (retries > MAX_RETRIES) throw e
+		return downloadFile(url, retries + 1)
+	}
 }
