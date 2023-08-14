@@ -1,9 +1,9 @@
 import { useInputEvent } from '@conform-to/react'
 import React, { useId, useRef } from 'react'
-import { Checkbox, type CheckboxProps } from './/ui/checkbox.tsx'
-import { Input } from './/ui/input.tsx'
-import { Label } from './/ui/label.tsx'
-import { Textarea } from './/ui/textarea.tsx'
+import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Input } from './ui/input.tsx'
+import { Label } from './ui/label.tsx'
+import { Textarea } from './ui/textarea.tsx'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
