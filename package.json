@@ -87,6 +87,7 @@
     "react-dom": "^18.2.0",
     "remix-auth": "^3.5.0",
     "remix-auth-form": "^1.3.0",
+    "remix-development-tools": "^2.0.0",
     "remix-utils": "^6.6.0",
     "source-map-support": "^0.5.21",
     "spin-delay": "^1.2.0",

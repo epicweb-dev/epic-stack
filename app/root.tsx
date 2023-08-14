@@ -20,7 +20,7 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { useRef } from 'react'
+import { Suspense, lazy, useRef } from 'react'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { SearchBar } from './components/search-bar.tsx'
@@ -48,6 +48,10 @@ import { useNonce } from './utils/nonce-provider.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
 import { useToast } from './utils/useToast.tsx'
+const RemixDevTools =
+	process.env.NODE_ENV === 'development'
+		? lazy(() => import('remix-development-tools'))
+		: null
 
 export const links: LinksFunction = () => {
 	return [
@@ -225,6 +229,11 @@ function App() {
 			</div>
 			<Confetti confetti={data.flash?.confetti} />
 			<Toaster />
+			{RemixDevTools ? (
+				<Suspense>
+					<RemixDevTools />
+				</Suspense>
+			) : null}
 		</Document>
 	)
 }
