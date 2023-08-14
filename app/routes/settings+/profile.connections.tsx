@@ -6,19 +6,19 @@ import {
 import { Form, useFetcher, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 import { z } from 'zod'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
+import { Icon } from '../../components/ui/icon.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '~/components/ui/tooltip.tsx'
-import { requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '~/utils/github-auth.server.ts'
-import { invariantResponse, useIsPending } from '~/utils/misc.tsx'
-import { createToastHeaders } from '~/utils/toast.server.ts'
+} from '../../components/ui/tooltip.tsx'
+import { requireUserId } from '../../utils/auth.server.ts'
+import { prisma } from '../../utils/db.server.ts'
+import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
+import { invariantResponse, useIsPending } from '../../utils/misc.tsx'
+import { createToastHeaders } from '../../utils/toast.server.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="link-2">Connections</Icon>,

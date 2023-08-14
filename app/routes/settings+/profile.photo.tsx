@@ -11,18 +11,18 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 import { ServerOnly } from 'remix-utils'
 import { z } from 'zod'
-import { ErrorList } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
+import { ErrorList } from '../../components/forms.tsx'
+import { Button } from '../../components/ui/button.tsx'
+import { Icon } from '../../components/ui/icon.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
+import { requireUserId } from '../../utils/auth.server.ts'
+import { prisma } from '../../utils/db.server.ts'
 import {
 	getUserImgSrc,
 	invariantResponse,
 	useDoubleCheck,
 	useIsPending,
-} from '~/utils/misc.tsx'
+} from '../../utils/misc.tsx'
 
 export const handle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,

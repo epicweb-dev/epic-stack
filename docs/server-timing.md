@@ -31,7 +31,7 @@ import {
 	combineServerTimings,
 	makeTimings,
 	time,
-} from '~/utils/timing.server.ts'
+} from '../utils/timing.server.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
 	const timings = makeTimings('notes loader') // <-- 1. Setup Timings

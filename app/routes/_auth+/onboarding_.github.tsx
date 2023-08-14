@@ -14,22 +14,22 @@ import {
 } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
-import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
-import { Spacer } from '~/components/spacer.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
+import { CheckboxField, ErrorList, Field } from '../../components/forms.tsx'
+import { Spacer } from '../../components/spacer.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
 import {
 	authenticator,
 	requireAnonymous,
 	sessionKey,
 	signupWithConnection,
-} from '~/utils/auth.server.ts'
-import { redirectWithConfetti } from '~/utils/confetti.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '~/utils/github-auth.server.ts'
-import { invariant, useIsPending } from '~/utils/misc.tsx'
-import { sessionStorage } from '~/utils/session.server.ts'
-import { NameSchema, UsernameSchema } from '~/utils/user-validation.ts'
-import { verifySessionStorage } from '~/utils/verification.server.ts'
+} from '../../utils/auth.server.ts'
+import { redirectWithConfetti } from '../../utils/confetti.server.ts'
+import { prisma } from '../../utils/db.server.ts'
+import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
+import { invariant, useIsPending } from '../../utils/misc.tsx'
+import { sessionStorage } from '../../utils/session.server.ts'
+import { NameSchema, UsernameSchema } from '../../utils/user-validation.ts'
+import { verifySessionStorage } from '../../utils/verification.server.ts'
 import { type VerifyFunctionArgs } from './verify.tsx'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'

@@ -3,7 +3,7 @@ import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils'
-import { prisma } from '~/utils/db.server.ts'
+import { prisma } from './db.server.ts'
 import {
 	GITHUB_PROVIDER_NAME,
 	getGitHubAuthStrategy,

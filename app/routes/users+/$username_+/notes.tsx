@@ -1,10 +1,10 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { prisma } from '~/utils/db.server.ts'
-import { cn, getUserImgSrc, invariantResponse } from '~/utils/misc.tsx'
-import { useOptionalUser } from '~/utils/user.ts'
+import { GeneralErrorBoundary } from '../../../components/error-boundary.tsx'
+import { Icon } from '../../../components/ui/icon.tsx'
+import { prisma } from '../../../utils/db.server.ts'
+import { cn, getUserImgSrc, invariantResponse } from '../../../utils/misc.tsx'
+import { useOptionalUser } from '../../../utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
 	const owner = await prisma.user.findFirst({

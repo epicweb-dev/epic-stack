@@ -4,7 +4,7 @@ import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '~/components/ui/tooltip.tsx'
+} from '../../components/ui/tooltip.tsx'
 import { logos, stars } from './logos/logos.ts'
 
 export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]

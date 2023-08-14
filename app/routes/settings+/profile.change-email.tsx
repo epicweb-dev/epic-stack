@@ -4,21 +4,21 @@ import * as E from '@react-email/components'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
-import { ErrorList, Field } from '~/components/forms.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
+import { ErrorList, Field } from '../../components/forms.tsx'
+import { Icon } from '../../components/ui/icon.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
 import {
 	prepareVerification,
 	requireRecentVerification,
 	type VerifyFunctionArgs,
-} from '~/routes/_auth+/verify.tsx'
-import { requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { sendEmail } from '~/utils/email.server.ts'
-import { invariant, useIsPending } from '~/utils/misc.tsx'
-import { redirectWithToast } from '~/utils/toast.server.ts'
-import { EmailSchema } from '~/utils/user-validation.ts'
-import { verifySessionStorage } from '~/utils/verification.server.ts'
+} from '../../routes/_auth+/verify.tsx'
+import { requireUserId } from '../../utils/auth.server.ts'
+import { prisma } from '../../utils/db.server.ts'
+import { sendEmail } from '../../utils/email.server.ts'
+import { invariant, useIsPending } from '../../utils/misc.tsx'
+import { redirectWithToast } from '../../utils/toast.server.ts'
+import { EmailSchema } from '../../utils/user-validation.ts'
+import { verifySessionStorage } from '../../utils/verification.server.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="envelope-closed">Change Email</Icon>,

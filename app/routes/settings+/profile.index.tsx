@@ -3,19 +3,19 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
-import { ErrorList, Field } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { requireUserId, sessionKey } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
+import { ErrorList, Field } from '../../components/forms.tsx'
+import { Button } from '../../components/ui/button.tsx'
+import { Icon } from '../../components/ui/icon.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
+import { requireUserId, sessionKey } from '../../utils/auth.server.ts'
+import { prisma } from '../../utils/db.server.ts'
 import {
 	getUserImgSrc,
 	invariantResponse,
 	useDoubleCheck,
-} from '~/utils/misc.tsx'
-import { sessionStorage } from '~/utils/session.server.ts'
-import { NameSchema, UsernameSchema } from '~/utils/user-validation.ts'
+} from '../../utils/misc.tsx'
+import { sessionStorage } from '../../utils/session.server.ts'
+import { NameSchema, UsernameSchema } from '../../utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 const ProfileFormSchema = z.object({

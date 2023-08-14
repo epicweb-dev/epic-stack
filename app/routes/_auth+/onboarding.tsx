@@ -14,20 +14,24 @@ import {
 } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
-import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
-import { Spacer } from '~/components/spacer.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { requireAnonymous, sessionKey, signup } from '~/utils/auth.server.ts'
-import { redirectWithConfetti } from '~/utils/confetti.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { invariant, useIsPending } from '~/utils/misc.tsx'
-import { sessionStorage } from '~/utils/session.server.ts'
+import { CheckboxField, ErrorList, Field } from '../../components/forms.tsx'
+import { Spacer } from '../../components/spacer.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
+import {
+	requireAnonymous,
+	sessionKey,
+	signup,
+} from '../../utils/auth.server.ts'
+import { redirectWithConfetti } from '../../utils/confetti.server.ts'
+import { prisma } from '../../utils/db.server.ts'
+import { invariant, useIsPending } from '../../utils/misc.tsx'
+import { sessionStorage } from '../../utils/session.server.ts'
 import {
 	NameSchema,
 	PasswordSchema,
 	UsernameSchema,
-} from '~/utils/user-validation.ts'
-import { verifySessionStorage } from '~/utils/verification.server.ts'
+} from '../../utils/user-validation.ts'
+import { verifySessionStorage } from '../../utils/verification.server.ts'
 import { type VerifyFunctionArgs } from './verify.tsx'
 
 const onboardingEmailSessionKey = 'onboardingEmail'

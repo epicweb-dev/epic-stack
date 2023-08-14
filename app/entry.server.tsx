@@ -14,7 +14,7 @@ init()
 global.ENV = getEnv()
 
 if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
-	import('~/utils/monitoring.server.ts').then(({ init }) => init())
+	import('./utils/monitoring.server.ts').then(({ init }) => init())
 }
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>

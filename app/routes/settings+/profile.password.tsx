@@ -3,19 +3,19 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useActionData } from '@remix-run/react'
 import { z } from 'zod'
-import { ErrorList, Field } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
+import { ErrorList, Field } from '../../components/forms.tsx'
+import { Button } from '../../components/ui/button.tsx'
+import { Icon } from '../../components/ui/icon.tsx'
+import { StatusButton } from '../../components/ui/status-button.tsx'
 import {
 	getPasswordHash,
 	requireUserId,
 	verifyUserPassword,
-} from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { useIsPending } from '~/utils/misc.tsx'
-import { redirectWithToast } from '~/utils/toast.server.ts'
-import { PasswordSchema } from '~/utils/user-validation.ts'
+} from '../../utils/auth.server.ts'
+import { prisma } from '../../utils/db.server.ts'
+import { useIsPending } from '../../utils/misc.tsx'
+import { redirectWithToast } from '../../utils/toast.server.ts'
+import { PasswordSchema } from '../../utils/user-validation.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="dots-horizontal">Password</Icon>,

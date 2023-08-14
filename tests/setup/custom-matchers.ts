@@ -1,15 +1,15 @@
 import matchers from '@testing-library/jest-dom/matchers.js'
 import * as setCookieParser from 'set-cookie-parser'
 import { expect } from 'vitest'
-import { convertSetCookieToCookie } from 'tests/utils.ts'
-import { sessionKey } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { sessionStorage } from '~/utils/session.server.ts'
+import { sessionKey } from '../../app/utils/auth.server.ts'
+import { prisma } from '../../app/utils/db.server.ts'
+import { sessionStorage } from '../../app/utils/session.server.ts'
 import {
 	type OptionalToast,
 	toastSessionStorage,
 	toastKey,
-} from '~/utils/toast.server.ts'
+} from '../../app/utils/toast.server.ts'
+import { convertSetCookieToCookie } from '../utils.ts'
 
 import '@testing-library/jest-dom/vitest.d.ts'
 expect.extend(matchers)

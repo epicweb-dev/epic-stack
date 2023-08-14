@@ -1,11 +1,11 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { ErrorList } from '~/components/forms.tsx'
-import { SearchBar } from '~/components/search-bar.tsx'
-import { prisma } from '~/utils/db.server.ts'
-import { cn, getUserImgSrc, useDelayedIsPending } from '~/utils/misc.tsx'
+import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
+import { ErrorList } from '../../components/forms.tsx'
+import { SearchBar } from '../../components/search-bar.tsx'
+import { prisma } from '../../utils/db.server.ts'
+import { cn, getUserImgSrc, useDelayedIsPending } from '../../utils/misc.tsx'
 
 const UserSearchResultSchema = z.object({
 	id: z.string(),

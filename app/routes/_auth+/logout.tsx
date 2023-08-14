@@ -1,5 +1,5 @@
 import { redirect, type DataFunctionArgs } from '@remix-run/node'
-import { logout } from '~/utils/auth.server.ts'
+import { logout } from '../../utils/auth.server.ts'
 
 export async function loader() {
 	return redirect('/')

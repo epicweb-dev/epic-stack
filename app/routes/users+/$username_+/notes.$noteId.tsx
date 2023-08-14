@@ -10,25 +10,25 @@ import {
 } from '@remix-run/react'
 import { formatDistanceToNow } from 'date-fns'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { floatingToolbarClassName } from '~/components/floating-toolbar.tsx'
-import { ErrorList } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
+import { GeneralErrorBoundary } from '../../../components/error-boundary.tsx'
+import { floatingToolbarClassName } from '../../../components/floating-toolbar.tsx'
+import { ErrorList } from '../../../components/forms.tsx'
+import { Button } from '../../../components/ui/button.tsx'
+import { Icon } from '../../../components/ui/icon.tsx'
+import { StatusButton } from '../../../components/ui/status-button.tsx'
+import { requireUserId } from '../../../utils/auth.server.ts'
+import { prisma } from '../../../utils/db.server.ts'
 import {
 	getNoteImgSrc,
 	invariantResponse,
 	useIsPending,
-} from '~/utils/misc.tsx'
+} from '../../../utils/misc.tsx'
 import {
 	requireUserWithPermission,
 	userHasPermission,
-} from '~/utils/permissions.ts'
-import { redirectWithToast } from '~/utils/toast.server.ts'
-import { useOptionalUser } from '~/utils/user.ts'
+} from '../../../utils/permissions.ts'
+import { redirectWithToast } from '../../../utils/toast.server.ts'
+import { useOptionalUser } from '../../../utils/user.ts'
 import { type loader as notesLoader } from './notes.tsx'
 
 export async function loader({ params }: DataFunctionArgs) {

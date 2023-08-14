@@ -38,7 +38,7 @@ be done in the `server/index.ts` file.
 Epic Stack uses SVG sprite icons for performance reasons. If you've received an
 error like this during local development:
 
-> X [ERROR] Could not resolve "~/components/ui/icon.tsx"
+> X [ERROR] Could not resolve "../components/ui/icon.tsx"
 
 You need to be manually regenerate the icon with `npm run build:icons`.
 

@@ -3,7 +3,7 @@ import { startTransition } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
 if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
-	import('~/utils/monitoring.client.tsx').then(({ init }) => init())
+	import('./utils/monitoring.client.tsx').then(({ init }) => init())
 }
 
 startTransition(() => {

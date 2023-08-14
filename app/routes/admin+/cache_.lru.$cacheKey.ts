@@ -1,9 +1,9 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { getAllInstances, getInstanceInfo } from 'litefs-js'
 import { ensureInstance } from 'litefs-js/remix.js'
-import { lruCache } from '~/utils/cache.server.ts'
-import { invariantResponse } from '~/utils/misc.tsx'
-import { requireUserWithRole } from '~/utils/permissions.ts'
+import { lruCache } from '../../utils/cache.server.ts'
+import { invariantResponse } from '../../utils/misc.tsx'
+import { requireUserWithRole } from '../../utils/permissions.ts'
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	await requireUserWithRole(request, 'admin')
