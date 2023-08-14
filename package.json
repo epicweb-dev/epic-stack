@@ -144,11 +144,9 @@
     "prettier-plugin-sql": "^0.15.1",
     "prettier-plugin-tailwindcss": "^0.5.2",
     "remix-flat-routes": "^0.5.10",
-    "tsconfig-paths": "^4.2.0",
     "tsx": "^3.12.7",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",
-    "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.34.1"
   },
   "engines": {
