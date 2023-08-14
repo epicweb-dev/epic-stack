@@ -111,7 +111,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: prisma/data.db
-          key: db-cache
+          key:
+            db-cache-schema_${{ hashFiles('./prisma/schema.prisma')
+            }}-migrations_${{ hashFiles('./prisma/migrations/*/migration.sql')
+            }}
 
       - name: 🏗 Build
         run: npm run build
