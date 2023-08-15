@@ -167,7 +167,7 @@ export async function handleVerification({
 }
 
 export const meta: V2_MetaFunction = () => {
-	return [{ title: 'Setup Epic Notes Account' }]
+	return [{ title: 'Setup Weab Dev Account' }]
 }
 
 export default function SignupRoute() {

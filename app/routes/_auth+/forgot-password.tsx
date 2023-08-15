@@ -109,7 +109,7 @@ function ForgotPasswordEmail({
 }
 
 export const meta: V2_MetaFunction = () => {
-	return [{ title: 'Password Recovery for Epic Notes' }]
+	return [{ title: 'Weab Dev Password Recovery Service' }]
 }
 
 export default function ForgotPasswordRoute() {
