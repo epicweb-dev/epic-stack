@@ -7,7 +7,13 @@ import {
 } from '../../components/ui/tooltip.tsx'
 import { logos, stars } from './logos/logos.ts'
 
-export const meta: V2_MetaFunction = () => [{ title: 'Epic Notes' }]
+export const meta: V2_MetaFunction = () => [
+	{ title: 'weab.dev' },
+	{
+		name: 'description',
+		content: `Learn to code like a weab and build amazing websites! Our guides are packed with anime references and cultural knowledge, so you'll be sure to have a fun time learning. Become a master weab developer and create websites that will make your waifus proud!`,
+	},
+]
 
 export default function Index() {
 	return (

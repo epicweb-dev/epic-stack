@@ -1,5 +1,5 @@
-app = "epic-stack-template"
-primary_region = "sjc"
+app = "weabdev"
+primary_region = "sea"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]

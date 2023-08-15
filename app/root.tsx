@@ -89,8 +89,11 @@ export const links: LinksFunction = () => {
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
-		{ name: 'description', content: `Your own captain's log` },
+		{ title: 'weab.dev' },
+		{
+			name: 'description',
+			content: `Learn to code like a weab and build amazing websites! Our guides are packed with anime references and cultural knowledge, so you'll be sure to have a fun time learning. Become a master weab developer and create websites that will make your waifus proud!`,
+		},
 	]
 }
 

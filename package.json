@@ -1,10 +1,10 @@
 {
-  "name": "epic-stack-template",
+  "name": "weabdev",
   "private": true,
   "sideEffects": false,
   "license": "MIT",
   "epic-stack": true,
-  "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
+  "author": "xHomu",
   "type": "module",
   "scripts": {
     "build": "run-s build:*",
