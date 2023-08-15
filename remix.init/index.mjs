@@ -1,12 +1,12 @@
 import { execSync } from 'child_process'
-import parseGitHubURL from 'parse-github-url'
 import crypto from 'crypto'
-import { $, execa } from 'execa'
 import fs from 'fs/promises'
-import inquirer from 'inquirer'
-import open from 'open'
 import path from 'path'
 import toml from '@iarna/toml'
+import { $, execa } from 'execa'
+import inquirer from 'inquirer'
+import open from 'open'
+import parseGitHubURL from 'parse-github-url'
 
 const escapeRegExp = string =>
 	// $& means the whole matched string
@@ -82,7 +82,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 
 	execSync('npm run setup', { cwd: rootDirectory, stdio: 'inherit' })
 
-	execSync('npm run format -- --loglevel warn', {
+	execSync('npm run format -- --log-level warn', {
 		cwd: rootDirectory,
 		stdio: 'inherit',
 	})
