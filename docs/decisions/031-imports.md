@@ -68,3 +68,9 @@ If someone wants to use the Epic Stack without Node.js, and their runtime
 doesn't support `package.json` imports (I'm not sure whether other runtimes do
 or not) they'll have to continue using the paths configuration. But that's not a
 consideration here.
+
+## Credits
+
+Big thank you to
+[Mateusz Burzyński](https://twitter.com/AndaristRake/status/1691807097078317287)
+for helping with this one!
