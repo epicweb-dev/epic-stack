@@ -19,11 +19,14 @@ import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
 import { invariant } from '../../utils/misc.tsx'
 import { sessionStorage } from '../../utils/session.server.ts'
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
-import { ROUTE_PATH, loader } from './auth.github.callback.ts'
+import { loader } from './auth.$provider.callback.ts'
+
+const ROUTE_PATH = '/auth/github/callback'
+const PARAMS = { provider: 'github' }
 
 test('a new user goes to onboarding', async () => {
 	const request = await setupRequest()
-	const response = await loader({ request, params: {}, context: {} }).catch(
+	const response = await loader({ request, params: PARAMS, context: {} }).catch(
 		e => e,
 	)
 	expect(response).toHaveRedirect('/onboarding/github')
@@ -36,7 +39,7 @@ test('when auth fails, send the user to login with a toast', async () => {
 		}),
 	)
 	const request = await setupRequest()
-	const response = await loader({ request, params: {}, context: {} }).catch(
+	const response = await loader({ request, params: PARAMS, context: {} }).catch(
 		e => e,
 	)
 	invariant(response instanceof Response, 'response should be a Response')
@@ -54,7 +57,7 @@ test('when auth fails, send the user to login with a toast', async () => {
 test('when a user is logged in, it creates the connection', async () => {
 	const session = await setupUser()
 	const request = await setupRequest(session.id)
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 	expect(response).toHaveRedirect('/settings/profile/connections')
 	await expect(response).toSendToast(
 		expect.objectContaining({
@@ -86,7 +89,7 @@ test(`when a user is logged in and has already connected, it doesn't do anything
 		},
 	})
 	const request = await setupRequest(session.id)
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 	expect(response).toHaveRedirect('/settings/profile/connections')
 	expect(response).toSendToast(
 		expect.objectContaining({
@@ -100,7 +103,7 @@ test('when a user exists with the same email, create connection and make session
 	const email = primaryGitHubEmail.email.toLowerCase()
 	const { userId } = await setupUser({ ...createUser(), email })
 	const request = await setupRequest()
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 
 	expect(response).toHaveRedirect('/')
 
@@ -140,7 +143,7 @@ test('gives an error if the account is already connected to another user', async
 	})
 	const session = await setupUser()
 	const request = await setupRequest(session.id)
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 	expect(response).toHaveRedirect('/settings/profile/connections')
 	await expect(response).toSendToast(
 		expect.objectContaining({
@@ -162,7 +165,7 @@ test('if a user is not logged in, but the connection exists, make a session', as
 		},
 	})
 	const request = await setupRequest()
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 	expect(response).toHaveRedirect('/')
 	await expect(response).toHaveSessionForUser(userId)
 })
@@ -185,7 +188,7 @@ test('if a user is not logged in, but the connection exists and they have enable
 		},
 	})
 	const request = await setupRequest()
-	const response = await loader({ request, params: {}, context: {} })
+	const response = await loader({ request, params: PARAMS, context: {} })
 	const searchParams = new URLSearchParams({
 		type: twoFAVerificationType,
 		target: userId,

@@ -12,6 +12,10 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
 import { ErrorList, Field } from '../../components/forms.tsx'
 import { StatusButton } from '../../components/ui/status-button.tsx'
+import {
+	ProviderConnectionForm,
+	providerNames,
+} from '../../utils/connections.tsx'
 import { prisma } from '../../utils/db.server.ts'
 import { sendEmail } from '../../utils/email.server.ts'
 import { useIsPending } from '../../utils/misc.tsx'
@@ -103,7 +107,6 @@ export const meta: V2_MetaFunction = () => {
 export default function SignupRoute() {
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
-	const isGitHubSubmitting = useIsPending({ formAction: '/auth/github' })
 	const [searchParams] = useSearchParams()
 	const redirectTo = searchParams.get('redirectTo')
 
@@ -146,20 +149,16 @@ export default function SignupRoute() {
 						Submit
 					</StatusButton>
 				</Form>
-				<Form
-					className="mt-5 flex items-center justify-center gap-2 border-t-2 border-border pt-3"
-					action="/auth/github"
-					method="POST"
-				>
-					<input type="hidden" name="redirectTo" value={redirectTo ?? '/'} />
-					<StatusButton
-						type="submit"
-						className="w-full"
-						status={isGitHubSubmitting ? 'pending' : 'idle'}
-					>
-						Sign up with GitHub
-					</StatusButton>
-				</Form>
+				<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+					{providerNames.map(providerName => (
+						<ProviderConnectionForm
+							key={providerName}
+							type="Signup"
+							providerName={providerName}
+							redirectTo={redirectTo}
+						/>
+					))}
+				</div>
 			</div>
 		</div>
 	)

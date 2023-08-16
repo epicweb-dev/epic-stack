@@ -3,12 +3,10 @@ import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils'
+import { providers } from './connections.server.ts'
 import { prisma } from './db.server.ts'
-import {
-	GITHUB_PROVIDER_NAME,
-	getGitHubAuthStrategy,
-} from './github-auth.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
+import { type ProviderUser } from './providers/provider.ts'
 import { sessionStorage } from './session.server.ts'
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
@@ -17,15 +15,11 @@ export const getSessionExpirationDate = () =>
 
 export const sessionKey = 'sessionId'
 
-export const authenticator = new Authenticator<{
-	id: string
-	email: string
-	username?: string
-	name?: string
-	imageUrl?: string
-}>(sessionStorage)
+export const authenticator = new Authenticator<ProviderUser>(sessionStorage)
 
-authenticator.use(getGitHubAuthStrategy(), GITHUB_PROVIDER_NAME)
+for (const [providerName, provider] of Object.entries(providers)) {
+	authenticator.use(provider.getAuthStrategy(), providerName)
+}
 
 export async function getUserId(request: Request) {
 	const cookieSession = await sessionStorage.getSession(

@@ -4,14 +4,14 @@ import {
 	getSessionExpirationDate,
 	getUserId,
 } from '../../utils/auth.server.ts'
+import { handleMockCallback } from '../../utils/connections.server.ts'
+import { ProviderNameSchema, providerLabels } from '../../utils/connections.tsx'
 import { prisma } from '../../utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
 import { combineHeaders } from '../../utils/misc.tsx'
 import {
 	destroyRedirectToHeader,
 	getRedirectCookieValue,
 } from '../../utils/redirect-cookie.server.ts'
-import { sessionStorage } from '../../utils/session.server.ts'
 import {
 	createToastHeaders,
 	redirectWithToast,
@@ -19,40 +19,21 @@ import {
 import { verifySessionStorage } from '../../utils/verification.server.ts'
 import { handleNewSession } from './login.tsx'
 import {
-	githubIdKey,
 	onboardingEmailSessionKey,
 	prefilledProfileKey,
-} from './onboarding_.github.tsx'
-
-export const ROUTE_PATH = '/auth/github/callback'
+	providerIdKey,
+} from './onboarding_.$provider.tsx'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
-export async function loader({ request }: DataFunctionArgs) {
-	const reqUrl = new URL(request.url)
+export async function loader({ request, params }: DataFunctionArgs) {
+	const providerName = ProviderNameSchema.parse(params.provider)
+	request = await handleMockCallback(providerName, request)
 	const redirectTo = getRedirectCookieValue(request)
-	debugger
-
-	// normally you *really* want to avoid including test/dev code in your source
-	// but this is one of those cases where it's worth it to make the dev
-	// experience better. The fact is it's basically impossible to test these
-	// kinds of integrations.
-	if (process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_')) {
-		const cookieSession = await sessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
-		const state = cookieSession.get('oauth2:state') ?? 'MOCK_STATE'
-		cookieSession.set('oauth2:state', state)
-		reqUrl.searchParams.set('state', state)
-		request.headers.set(
-			'cookie',
-			await sessionStorage.commitSession(cookieSession),
-		)
-		request = new Request(reqUrl.toString(), request)
-	}
+	const label = providerLabels[providerName]
 
 	const authResult = await authenticator
-		.authenticate(GITHUB_PROVIDER_NAME, request, { throwOnError: true })
+		.authenticate(providerName, request, { throwOnError: true })
 		.then(
 			data => ({ success: true, data }) as const,
 			error => ({ success: false, error }) as const,
@@ -64,7 +45,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			'/login',
 			{
 				title: 'Auth Failed',
-				description: 'There was an error authenticating with GitHub.',
+				description: `There was an error authenticating with ${label}.`,
 				type: 'error',
 			},
 			{ headers: destroyRedirectTo },
@@ -87,7 +68,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				'/settings/profile/connections',
 				{
 					title: 'Already Connected',
-					description: `Your "${profile.username}" GitHub account is already connected.`,
+					description: `Your "${profile.username}" ${label} account is already connected.`,
 				},
 				{ headers: destroyRedirectTo },
 			)
@@ -96,18 +77,18 @@ export async function loader({ request }: DataFunctionArgs) {
 				'/settings/profile/connections',
 				{
 					title: 'Already Connected',
-					description: `The "${profile.username}" GitHub account is already connected to another account.`,
+					description: `The "${profile.username}" ${label} account is already connected to another account.`,
 				},
 				{ headers: destroyRedirectTo },
 			)
 		}
 	}
 
-	// If we're already logged in, then link the GitHub account
+	// If we're already logged in, then link the account
 	if (userId) {
 		await prisma.connection.create({
 			data: {
-				providerName: GITHUB_PROVIDER_NAME,
+				providerName,
 				providerId: profile.id,
 				userId,
 			},
@@ -117,7 +98,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			{
 				title: 'Connected',
 				type: 'success',
-				description: `Your "${profile.username}" GitHub account has been connected.`,
+				description: `Your "${profile.username}" ${label} account has been connected.`,
 			},
 			{ headers: destroyRedirectTo },
 		)
@@ -128,7 +109,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		return makeSession({ request, userId: existingConnection.userId })
 	}
 
-	// if the github email matches a user in the db, then link the account and
+	// if the email matches a user in the db, then link the account and
 	// make a new session
 	const user = await prisma.user.findUnique({
 		select: { id: true },
@@ -137,7 +118,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (user) {
 		await prisma.connection.create({
 			data: {
-				providerName: GITHUB_PROVIDER_NAME,
+				providerName,
 				providerId: profile.id,
 				userId: user.id,
 			},
@@ -147,7 +128,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			{
 				headers: await createToastHeaders({
 					title: 'Connected',
-					description: `Your "${profile.username}" GitHub account has been connected.`,
+					description: `Your "${profile.username}" ${label} account has been connected.`,
 				}),
 			},
 		)
@@ -163,9 +144,9 @@ export async function loader({ request }: DataFunctionArgs) {
 		email: profile.email.toLowerCase(),
 		username: profile.username?.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase(),
 	})
-	verifySession.set(githubIdKey, profile.id)
+	verifySession.set(providerIdKey, profile.id)
 	const onboardingRedirect = [
-		'/onboarding/github',
+		`/onboarding/${providerName}`,
 		redirectTo ? new URLSearchParams({ redirectTo }) : null,
 	]
 		.filter(Boolean)

@@ -11,6 +11,7 @@ import {
 	useActionData,
 	useLoaderData,
 	useSearchParams,
+	type Params,
 } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
@@ -24,8 +25,8 @@ import {
 	signupWithConnection,
 } from '../../utils/auth.server.ts'
 import { redirectWithConfetti } from '../../utils/confetti.server.ts'
+import { ProviderNameSchema } from '../../utils/connections.tsx'
 import { prisma } from '../../utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
 import { invariant, useIsPending } from '../../utils/misc.tsx'
 import { sessionStorage } from '../../utils/session.server.ts'
 import { NameSchema, UsernameSchema } from '../../utils/user-validation.ts'
@@ -33,7 +34,7 @@ import { verifySessionStorage } from '../../utils/verification.server.ts'
 import { type VerifyFunctionArgs } from './verify.tsx'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
-export const githubIdKey = 'ghProfileId'
+export const providerIdKey = 'providerId'
 export const prefilledProfileKey = 'prefilledProfile'
 
 const SignupFormSchema = z.object({
@@ -47,24 +48,36 @@ const SignupFormSchema = z.object({
 	redirectTo: z.string().optional(),
 })
 
-async function requireOnboardingEmailAndGitHubId(request: Request) {
+async function requireData({
+	request,
+	params,
+}: {
+	request: Request
+	params: Params
+}) {
 	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const email = verifySession.get(onboardingEmailSessionKey)
-	const gitHubId = verifySession.get(githubIdKey)
+	const providerId = verifySession.get(providerIdKey)
 	const result = z
-		.object({ email: z.string(), gitHubId: z.string() })
-		.safeParse({ email, gitHubId: gitHubId })
+		.object({
+			email: z.string(),
+			providerName: ProviderNameSchema,
+			providerId: z.string(),
+		})
+		.safeParse({ email, providerName: params.provider, providerId })
 	if (result.success) {
 		return result.data
+	} else {
+		console.error(result.error)
+		throw redirect('/signup')
 	}
-	throw redirect('/signup')
 }
 
-export async function loader({ request }: DataFunctionArgs) {
-	const { email } = await requireOnboardingEmailAndGitHubId(request)
+export async function loader({ request, params }: DataFunctionArgs) {
+	const { email } = await requireData({ request, params })
 	const cookieSession = await sessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
@@ -89,8 +102,11 @@ export async function loader({ request }: DataFunctionArgs) {
 	})
 }
 
-export async function action({ request }: DataFunctionArgs) {
-	const { email, gitHubId } = await requireOnboardingEmailAndGitHubId(request)
+export async function action({ request, params }: DataFunctionArgs) {
+	const { email, providerId, providerName } = await requireData({
+		request,
+		params,
+	})
 	const formData = await request.formData()
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
@@ -114,8 +130,8 @@ export async function action({ request }: DataFunctionArgs) {
 			const session = await signupWithConnection({
 				...data,
 				email,
-				providerId: gitHubId,
-				providerName: GITHUB_PROVIDER_NAME,
+				providerId,
+				providerName,
 			})
 			return { ...data, session }
 		}),
