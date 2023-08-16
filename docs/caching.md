@@ -34,8 +34,8 @@ up by caching them and utilizing the stale-while-revalidate features in
 cachified. Here's how you would use cachified to do this:
 
 ```tsx
-import { cachified, cache } from '../utils/cache.server.ts'
-import { type Timings } from '../utils/timing.server.ts'
+import { cachified, cache } from '#app/utils/cache.server.ts'
+import { type Timings } from '#app/utils/timing.server.ts'
 
 const eventSchema = z.object({
 	/* the schema for events */

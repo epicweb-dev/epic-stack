@@ -1,7 +1,7 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { requireUserId } from '../../utils/auth.server.ts'
-import { prisma } from '../../utils/db.server.ts'
-import { getDomainUrl } from '../../utils/misc.tsx'
+import { requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { getDomainUrl } from '#app/utils/misc.tsx'
 
 export const ROUTE_PATH = '/resources/download-user-data'
 

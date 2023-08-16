@@ -64,6 +64,6 @@ ensure they continue to function properly as people tune things for their needs.
 
 Additionally, we'll need to account for the fact that some folks don't want to
 set up the GitHub login flow from the start (to keep in line with our
-[Minimize Setup Friction guiding principle](../guiding-principles.md)), so we'll
-have to make sure that the app still runs properly without GitHub auth
+[Minimize Setup Friction guiding principle](#app/guiding-principles.md)), so
+we'll have to make sure that the app still runs properly without GitHub auth
 configured.

@@ -1,7 +1,7 @@
 import { generateTOTP } from '@epic-web/totp'
 import { faker } from '@faker-js/faker'
 import { expect, test } from '@playwright/test'
-import { insertNewUser, loginPage } from '../playwright-utils.ts'
+import { insertNewUser, loginPage } from '#tests/playwright-utils.ts'
 
 test('Users can add 2FA to their account and use it when logging in', async ({
 	page,

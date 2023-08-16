@@ -1,6 +1,6 @@
 import { redirect, type DataFunctionArgs } from '@remix-run/node'
-import { authenticator, requireUserId } from '../utils/auth.server.ts'
-import { prisma } from '../utils/db.server.ts'
+import { authenticator, requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)

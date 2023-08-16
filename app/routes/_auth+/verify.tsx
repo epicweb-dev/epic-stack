@@ -9,17 +9,17 @@ import {
 	useSearchParams,
 } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
-import { ErrorList, Field } from '../../components/forms.tsx'
-import { Spacer } from '../../components/spacer.tsx'
-import { StatusButton } from '../../components/ui/status-button.tsx'
-import { handleVerification as handleChangeEmailVerification } from '../../routes/settings+/profile.change-email.tsx'
-import { requireUserId } from '../../utils/auth.server.ts'
-import { prisma } from '../../utils/db.server.ts'
-import { getDomainUrl, useIsPending } from '../../utils/misc.tsx'
-import { redirectWithToast } from '../../utils/toast.server.ts'
-import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
-import { type twoFAVerifyVerificationType } from '../settings+/profile.two-factor.verify.tsx'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { ErrorList, Field } from '#app/components/forms.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { handleVerification as handleChangeEmailVerification } from '#app/routes/settings+/profile.change-email.tsx'
+import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
+import { type twoFAVerifyVerificationType } from '#app/routes/settings+/profile.two-factor.verify.tsx'
+import { requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import {
 	handleVerification as handleLoginTwoFactorVerification,
 	shouldRequestTwoFA,

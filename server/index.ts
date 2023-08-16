@@ -24,7 +24,7 @@ import morgan from 'morgan'
 
 // @ts-ignore - this file may not exist if you haven't built yet, but it will
 // definitely exist by the time the dev or prod server actually runs.
-import * as remixBuild from '../build/index.js'
+import * as remixBuild from '#app/build/index.js'
 
 installGlobals()
 
@@ -34,7 +34,7 @@ const createRequestHandler = wrapExpressCreateRequestHandler(
 	_createRequestHandler,
 )
 
-const BUILD_PATH = '../build/index.js'
+const BUILD_PATH = '#app/build/index.js'
 
 const build = remixBuild as unknown as ServerBuild
 let devBuild = build

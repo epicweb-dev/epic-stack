@@ -1,6 +1,6 @@
 import { type DataFunctionArgs } from '@remix-run/node'
-import { prisma } from '../../utils/db.server.ts'
-import { invariantResponse } from '../../utils/misc.tsx'
+import { prisma } from '#app/utils/db.server.ts'
+import { invariantResponse } from '#app/utils/misc.tsx'
 
 export async function loader({ params }: DataFunctionArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })

@@ -45,7 +45,8 @@ stable version of Debian: v12).
 Folks should hopefully run into few compatibility issues. It's possible they
 will need features that are not back-ported to the current active LTS version,
 however it's trivial to update the Node.js version. Added documentation to the
-[managing updates](../managing-updates.md) docs should help people manage this.
+[managing updates](#app/managing-updates.md) docs should help people manage
+this.
 
 We'll need to update the Node.js version in the starter whenever the active LTS
 version changes.

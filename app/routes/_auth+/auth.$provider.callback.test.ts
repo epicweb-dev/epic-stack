@@ -2,23 +2,17 @@ import { generateTOTP } from '@epic-web/totp'
 import { faker } from '@faker-js/faker'
 import { http } from 'msw'
 import { expect, test } from 'vitest'
-import { createUser } from '../../../tests/db-utils.ts'
-import {
-	mockGithubProfile,
-	primaryGitHubEmail,
-} from '../../../tests/mocks/github.ts'
-import { server } from '../../../tests/mocks/index.ts'
-import { consoleError } from '../../../tests/setup/setup-test-env.ts'
-import { BASE_URL, convertSetCookieToCookie } from '../../../tests/utils.ts'
-import {
-	getSessionExpirationDate,
-	sessionKey,
-} from '../../utils/auth.server.ts'
-import { prisma } from '../../utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '../../utils/github-auth.server.ts'
-import { invariant } from '../../utils/misc.tsx'
-import { sessionStorage } from '../../utils/session.server.ts'
-import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
+import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
+import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { GITHUB_PROVIDER_NAME } from '#app/utils/github-auth.server.ts'
+import { invariant } from '#app/utils/misc.tsx'
+import { sessionStorage } from '#app/utils/session.server.ts'
+import { createUser } from '#tests/db-utils.ts'
+import { mockGithubProfile, primaryGitHubEmail } from '#tests/mocks/github.ts'
+import { server } from '#tests/mocks/index.ts'
+import { consoleError } from '#tests/setup/setup-test-env.ts'
+import { BASE_URL, convertSetCookieToCookie } from '#tests/utils.ts'
 import { loader } from './auth.$provider.callback.ts'
 
 const ROUTE_PATH = '/auth/github/callback'

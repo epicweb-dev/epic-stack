@@ -1,13 +1,13 @@
 import 'dotenv/config'
 import 'source-map-support/register.js'
 import './db-setup.ts'
-import '../../app/utils/env.server.ts'
+import '#app/utils/env.server.ts'
 // we need these to be imported first 👆
 
 import { installGlobals } from '@remix-run/node'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, expect, vi, type SpyInstance } from 'vitest'
-import { server } from '../mocks/index.ts'
+import { server } from '#tests/mocks/index.ts'
 import './custom-matchers.ts'
 
 installGlobals()

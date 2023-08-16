@@ -1,5 +1,5 @@
 import { Form, useSearchParams, useSubmit } from '@remix-run/react'
-import { useDebounce, useIsPending } from '../utils/misc.tsx'
+import { useDebounce, useIsPending } from '#app/utils/misc.tsx'
 import { Icon } from './ui/icon.tsx'
 import { Input } from './ui/input.tsx'
 import { Label } from './ui/label.tsx'

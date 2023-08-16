@@ -9,31 +9,31 @@ import {
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
-import { CheckboxField, ErrorList, Field } from '../../components/forms.tsx'
-import { Spacer } from '../../components/spacer.tsx'
-import { StatusButton } from '../../components/ui/status-button.tsx'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import {
 	getUserId,
 	login,
 	requireAnonymous,
 	sessionKey,
-} from '../../utils/auth.server.ts'
+} from '#app/utils/auth.server.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,
-} from '../../utils/connections.tsx'
-import { prisma } from '../../utils/db.server.ts'
+} from '#app/utils/connections.tsx'
+import { prisma } from '#app/utils/db.server.ts'
 import {
 	combineResponseInits,
 	invariant,
 	useIsPending,
-} from '../../utils/misc.tsx'
-import { sessionStorage } from '../../utils/session.server.ts'
-import { redirectWithToast } from '../../utils/toast.server.ts'
-import { PasswordSchema, UsernameSchema } from '../../utils/user-validation.ts'
-import { verifySessionStorage } from '../../utils/verification.server.ts'
-import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx'
+} from '#app/utils/misc.tsx'
+import { sessionStorage } from '#app/utils/session.server.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
+import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
+import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { getRedirectToUrl, type VerifyFunctionArgs } from './verify.tsx'
 
 const verifiedTimeKey = 'verified-time'

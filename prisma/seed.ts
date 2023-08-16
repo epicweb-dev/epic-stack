@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker'
 import { promiseHash } from 'remix-utils'
-import { prisma } from '../app/utils/db.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
 import {
 	createPassword,
 	createUser,
 	getNoteImages,
 	getUserImages,
 	img,
-} from '../tests/db-utils.ts'
+} from '#tests/db-utils.ts'
 
 async function seed() {
 	console.log('🌱 Seeding...')

@@ -5,13 +5,13 @@ import {
 	useLoaderData,
 	type V2_MetaFunction,
 } from '@remix-run/react'
-import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
-import { Spacer } from '../../components/spacer.tsx'
-import { Button } from '../../components/ui/button.tsx'
-import { Icon } from '../../components/ui/icon.tsx'
-import { prisma } from '../../utils/db.server.ts'
-import { getUserImgSrc, invariantResponse } from '../../utils/misc.tsx'
-import { useOptionalUser } from '../../utils/user.ts'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { Button } from '#app/components/ui/button.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { prisma } from '#app/utils/db.server.ts'
+import { getUserImgSrc, invariantResponse } from '#app/utils/misc.tsx'
+import { useOptionalUser } from '#app/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
 	const user = await prisma.user.findFirst({

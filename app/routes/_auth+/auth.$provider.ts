@@ -1,9 +1,9 @@
 import { redirect, type DataFunctionArgs } from '@remix-run/node'
-import { authenticator } from '../../utils/auth.server.ts'
-import { handleMockAction } from '../../utils/connections.server.ts'
-import { ProviderNameSchema } from '../../utils/connections.tsx'
-import { getReferrerRoute } from '../../utils/misc.tsx'
-import { getRedirectCookieHeader } from '../../utils/redirect-cookie.server.ts'
+import { authenticator } from '#app/utils/auth.server.ts'
+import { handleMockAction } from '#app/utils/connections.server.ts'
+import { ProviderNameSchema } from '#app/utils/connections.tsx'
+import { getReferrerRoute } from '#app/utils/misc.tsx'
+import { getRedirectCookieHeader } from '#app/utils/redirect-cookie.server.ts'
 
 export async function loader() {
 	return redirect('/login')

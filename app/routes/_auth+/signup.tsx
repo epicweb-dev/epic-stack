@@ -9,17 +9,17 @@ import {
 } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '../../components/error-boundary.tsx'
-import { ErrorList, Field } from '../../components/forms.tsx'
-import { StatusButton } from '../../components/ui/status-button.tsx'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { ErrorList, Field } from '#app/components/forms.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	ProviderConnectionForm,
 	providerNames,
-} from '../../utils/connections.tsx'
-import { prisma } from '../../utils/db.server.ts'
-import { sendEmail } from '../../utils/email.server.ts'
-import { useIsPending } from '../../utils/misc.tsx'
-import { EmailSchema } from '../../utils/user-validation.ts'
+} from '#app/utils/connections.tsx'
+import { prisma } from '#app/utils/db.server.ts'
+import { sendEmail } from '#app/utils/email.server.ts'
+import { useIsPending } from '#app/utils/misc.tsx'
+import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.tsx'
 
 const SignupSchema = z.object({
