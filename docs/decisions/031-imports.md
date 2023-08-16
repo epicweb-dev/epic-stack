@@ -6,7 +6,7 @@ Status: accepted
 
 ## Context
 
-Recently, we removed the `#*` and `tests/*` aliases in favor of relative
+Recently, we removed the `~/*` and `tests/*` aliases in favor of relative
 imports. The arguments for this are described in
 [026-path-aliases](./026-path-aliases.md). While the arguments are sound, the
 big challenge with this approach is the fact that there are some times where you
