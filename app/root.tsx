@@ -43,7 +43,7 @@ import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
-import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
+import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
 import { getConfetti } from './utils/confetti.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
@@ -54,6 +54,7 @@ import {
 	invariantResponse,
 } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
+import { useRequestInfo } from './utils/request-info.ts'
 import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
@@ -167,7 +168,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 }
 
 const ThemeFormSchema = z.object({
-	theme: z.enum(['light', 'dark']),
+	theme: z.enum(['system', 'light', 'dark']),
 })
 
 export async function action({ request }: DataFunctionArgs) {
@@ -202,7 +203,7 @@ function Document({
 }: {
 	children: React.ReactNode
 	nonce: string
-	theme?: 'dark' | 'light'
+	theme?: Theme
 	env?: Record<string, string>
 }) {
 	return (
@@ -344,20 +345,40 @@ function UserDropdown() {
 	)
 }
 
-function useTheme() {
-	const data = useLoaderData<typeof loader>()
+/**
+ * @returns the user's theme preference, or the client hint theme if the user
+ * has not set a preference.
+ */
+export function useTheme() {
+	const hints = useHints()
+	const requestInfo = useRequestInfo()
+	const optimisticMode = useOptimisticThemeMode()
+	if (optimisticMode) {
+		return optimisticMode === 'system' ? hints.theme : optimisticMode
+	}
+	return requestInfo.userPrefs.theme ?? hints.theme
+}
+
+/**
+ * If the user's changing their theme mode preference, this will return the
+ * value it's being changed to.
+ */
+export function useOptimisticThemeMode() {
 	const fetchers = useFetchers()
+
 	const themeFetcher = fetchers.find(
 		f => f.formData?.get('intent') === 'update-theme',
 	)
-	const optimisticTheme = themeFetcher?.formData?.get('theme')
-	if (optimisticTheme === 'light' || optimisticTheme === 'dark') {
-		return optimisticTheme
+
+	if (themeFetcher && themeFetcher.formData) {
+		const submission = parse(themeFetcher.formData, {
+			schema: ThemeFormSchema,
+		})
+		return submission.value?.theme
 	}
-	return data.requestInfo.userPrefs.theme
 }
 
-function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
+function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 	const fetcher = useFetcher<typeof action>()
 
 	const [form] = useForm({
@@ -368,8 +389,10 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
 		},
 	})
 
-	const mode = userPreference ?? 'light'
-	const nextMode = mode === 'light' ? 'dark' : 'light'
+	const optimisticMode = useOptimisticThemeMode()
+	const mode = optimisticMode ?? userPreference ?? 'system'
+	const nextMode =
+		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
 	const modeLabel = {
 		light: (
 			<Icon name="sun">
@@ -379,6 +402,11 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
 		dark: (
 			<Icon name="moon">
 				<span className="sr-only">Dark</span>
+			</Icon>
+		),
+		system: (
+			<Icon name="laptop">
+				<span className="sr-only">System</span>
 			</Icon>
 		),
 	}
