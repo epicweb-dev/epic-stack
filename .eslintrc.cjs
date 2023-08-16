@@ -32,7 +32,6 @@ module.exports = {
 					'sibling',
 					'index',
 				],
-				pathGroups: [{ pattern: '#*/**', group: 'internal' }],
 			},
 		],
 	},
