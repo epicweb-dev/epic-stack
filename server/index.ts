@@ -34,7 +34,7 @@ const createRequestHandler = wrapExpressCreateRequestHandler(
 	_createRequestHandler,
 )
 
-const BUILD_PATH = '#build/index.js'
+const BUILD_PATH = '../build/index.js'
 
 const build = remixBuild as unknown as ServerBuild
 let devBuild = build
