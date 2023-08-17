@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const here = (...s: Array<string>) => path.join(__dirname, ...s)
 const globsafe = (s: string) => s.replace(/\\/g, '/')
 
-const allFiles = globSync(globsafe(here('#app/server/**/*.*')), {
+const allFiles = globSync(globsafe(here('../server/**/*.*')), {
 	ignore: [
 		'server/dev-server.js', // for development only
 		'**/tsconfig.json',
@@ -24,10 +24,10 @@ for (const file of allFiles) {
 	if (/\.(ts|js|tsx|jsx)$/.test(file)) {
 		entries.push(file)
 	} else {
-		const dest = file.replace(here('#app/server'), here('#app/server-build'))
+		const dest = file.replace(here('../server'), here('../server-build'))
 		fsExtra.ensureDirSync(path.parse(dest).dir)
 		fsExtra.copySync(file, dest)
-		console.log(`copied: ${file.replace(`${here('#app/server')}/`, '')}`)
+		console.log(`copied: ${file.replace(`${here('../server')}/`, '')}`)
 	}
 }
 
@@ -37,7 +37,7 @@ console.log('building...')
 esbuild
 	.build({
 		entryPoints: entries,
-		outdir: here('#app/server-build'),
+		outdir: here('../server-build'),
 		target: [`node${pkg.engines.node}`],
 		platform: 'node',
 		sourcemap: true,
