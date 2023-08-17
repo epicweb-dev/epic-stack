@@ -26,6 +26,10 @@ const childrenSizeClassName = {
 	xl: 'gap-3',
 } satisfies Record<Size, string>
 
+export interface IconProps extends SVGProps<SVGSVGElement> {
+	name: IconName
+	size?: Size
+}
 /**
  * Renders an SVG icon. The icon defaults to the size of the font. To make it
  * align vertically with neighboring text, you can pass the text as a child of
@@ -40,10 +44,7 @@ export function Icon({
 	className,
 	children,
 	...props
-}: SVGProps<SVGSVGElement> & {
-	name: IconName
-	size?: Size
-}) {
+}: IconProps) {
 	if (children) {
 		return (
 			<span

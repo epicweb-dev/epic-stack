@@ -59,6 +59,7 @@ import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { iconLibraryPlugin } from './components/ui/iconLibrary.tsx'
  
 const RemixDevTools =
 	process.env.NODE_ENV === 'development'
@@ -286,7 +287,7 @@ function App() {
 		<EpicToaster toast={data.toast} />
 			{RemixDevTools ? (
 				<Suspense>
-					<RemixDevTools />
+					<RemixDevTools plugins={[iconLibraryPlugin()]} />
 				</Suspense>
 			) : null}
 		</Document>
