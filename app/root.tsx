@@ -24,7 +24,7 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { useRef } from 'react'
+import { Suspense, lazy, useRef } from 'react'
 import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
@@ -59,6 +59,11 @@ import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+ 
+const RemixDevTools =
+	process.env.NODE_ENV === 'development'
+		? lazy(() => import('remix-development-tools'))
+		: null
 
 export const links: LinksFunction = () => {
 	return [
@@ -277,8 +282,13 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 				</div>
 			</div>
-			<Confetti id={data.confettiId} />
-			<EpicToaster toast={data.toast} />
+		<Confetti id={data.confettiId} />
+		<EpicToaster toast={data.toast} />
+			{RemixDevTools ? (
+				<Suspense>
+					<RemixDevTools />
+				</Suspense>
+			) : null}
 		</Document>
 	)
 }
