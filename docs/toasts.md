@@ -7,10 +7,10 @@ something. They are often used to notify users of a successful or failed action.
 
 ![toasts](https://github.com/epicweb-dev/epic-stack/assets/1500684/715d754a-9e9f-4b61-814f-881121f2fa48)
 
-There are utilities in the Epic Stack for toast notifications. Additionally, the
-same code used to power a toast notification is also used to power the Confetti
-component which is used to celebrate when a user signs up for an account (feel
-free to remove that or use it for other things as well).
+There are utilities in the Epic Stack for toast notifications. Additionally,
+sometimes, you want to celebrate when a user signs up for an account so we have
+utilities for showing confetti as well (feel free to remove that or use it for
+other things as well).
 
 This is managed by a special session using a concept called "flash data" which
 is a temporary session value that is only available for the next request. This
@@ -19,13 +19,13 @@ the data persisting in the session. And you don't have to worry about managing
 state either. It all just lives in the cookie.
 
 There are two utilities you'll use for redirecting with toast/confetti
-notifications from the `app/utils/flash-session.server.ts` file:
-`redirectWithToast` and `redirectWithConfetti`. Here's a simple example of using
-these:
+notifications: `redirectWithToast` from `app/utils/toast.server.ts` and
+`redirectWithConfetti` from `app/utils/confetti.server.ts`. Here's a simple
+example of using these:
 
 ```tsx
 return redirectWithToast(`/users/${note.owner.username}/notes/${note.id}`, {
-	title: id ? 'Note updated' : 'Note created',
+	description: id ? 'Note updated' : 'Note created',
 })
 // or
 return redirectWithConfetti(safeRedirect(redirectTo, '/'))
@@ -34,31 +34,37 @@ return redirectWithConfetti(safeRedirect(redirectTo, '/'))
 Each of these accepts an additional argument for other `ResponseInit` options so
 you can set other headers, etc.
 
-If you don't wish to redirect, you could use the underlying `flashMessage`
-directly:
+If you don't wish to redirect, you could use the underlying `createToastHeaders`
+and `createConfettiHeaders` directly:
 
 ```tsx
 return json(
 	{ success: true },
 	{
-		headers: await flashMessage({
-			toast: {
-				title: 'Note updated',
-				type: 'success',
-			},
+		headers: await createToastHeaders({
+			description: 'Note updated',
+			type: 'success',
 		}),
 	},
 )
 ```
 
-And if you need to set multiple headers, you can pass them as a second argument
-to `flashMessage`:
+And if you need to set multiple headers, you can use the `combineHeaders`
+utility from `app/utils/misc.tsx`:
 
 ```tsx
-flashMessage(
+return json(
+	{ success: true },
 	{
-		/* ... */
+		headers: combineHeaders(
+			await createToastHeaders({
+				toast: {
+					description: 'Note updated',
+					type: 'success',
+				},
+			}),
+			{ 'x-foo': 'bar' },
+		),
 	},
-	{ 'X-My-Header': 'My value' },
 )
 ```

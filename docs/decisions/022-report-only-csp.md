@@ -16,7 +16,7 @@ users of the Epic Stack.
 
 There's an option for CSPs called `report-only` which allows the browser to
 report CSP violations without actually blocking the resource. This turns the CSP
-into an opt-in which follows our [guiding principle](../guiding-principles.md)
+into an opt-in which follows our [guiding principle](#app/guiding-principles.md)
 of "Minimize Setup Friction" (similar to deferring setup of third-party services
 until they're actually needed).
 

@@ -9,7 +9,7 @@
     "cssVariables": true
   },
   "aliases": {
-    "components": "~/components",
-    "utils": "~/utils/misc.tsx"
+    "components": "#app/components",
+    "utils": "#app/utils/misc.tsx"
   }
 }

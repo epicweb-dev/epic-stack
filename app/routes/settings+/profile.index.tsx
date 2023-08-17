@@ -1,147 +1,107 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import { Form, Link, useActionData, useLoaderData } from '@remix-run/react'
+import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
-import { ErrorList, Field } from '~/components/forms.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { Icon } from '~/components/ui/icon.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
+import { ErrorList, Field } from '#app/components/forms.tsx'
+import { Button } from '#app/components/ui/button.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
 import {
-	authenticator,
-	getPasswordHash,
-	requireUserId,
-	verifyUserPassword,
-} from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc, useIsSubmitting } from '~/utils/misc.tsx'
-import {
-	nameSchema,
-	passwordSchema,
-	usernameSchema,
-} from '~/utils/user-validation.ts'
+	getUserImgSrc,
+	invariantResponse,
+	useDoubleCheck,
+} from '#app/utils/misc.tsx'
+import { sessionStorage } from '#app/utils/session.server.ts'
+import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 const ProfileFormSchema = z.object({
-	name: nameSchema.optional(),
-	username: usernameSchema,
-	currentPassword: passwordSchema.optional(),
-	newPassword: passwordSchema.optional(),
+	name: NameSchema.optional(),
+	username: UsernameSchema,
 })
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
+	const user = await prisma.user.findUniqueOrThrow({
 		where: { id: userId },
 		select: {
 			id: true,
 			name: true,
 			username: true,
 			email: true,
-			imageId: true,
+			image: {
+				select: { id: true },
+			},
+			_count: {
+				select: {
+					sessions: {
+						where: {
+							expirationDate: { gt: new Date() },
+						},
+					},
+				},
+			},
 		},
 	})
-	const twoFactorVerification = await prisma.verification.findFirst({
-		where: { type: twoFAVerificationType, target: userId },
+
+	const twoFactorVerification = await prisma.verification.findUnique({
 		select: { id: true },
+		where: { target_type: { type: twoFAVerificationType, target: userId } },
 	})
-	if (!user) {
-		throw await authenticator.logout(request, { redirectTo: '/' })
-	}
-	return json({ user, isTwoFactorEnabled: Boolean(twoFactorVerification) })
+
+	const password = await prisma.password.findUnique({
+		select: { userId: true },
+		where: { userId },
+	})
+
+	return json({
+		user,
+		hasPassword: Boolean(password),
+		isTwoFactorEnabled: Boolean(twoFactorVerification),
+	})
 }
+
+type ProfileActionArgs = {
+	request: Request
+	userId: string
+	formData: FormData
+}
+const profileUpdateActionIntent = 'update-profile'
+const signOutOfSessionsActionIntent = 'sign-out-of-sessions'
+const deleteDataActionIntent = 'delete-data'
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const submission = await parse(formData, {
-		async: true,
-		schema: ProfileFormSchema.superRefine(
-			async ({ username, currentPassword, newPassword }, ctx) => {
-				const existingUser = await prisma.user.findUnique({
-					where: { username },
-					select: { id: true },
-				})
-				if (existingUser && existingUser.id !== userId) {
-					ctx.addIssue({
-						path: ['username'],
-						code: 'custom',
-						message: 'A user already exists with this username',
-					})
-				}
-				if (newPassword && !currentPassword) {
-					ctx.addIssue({
-						path: ['newPassword'],
-						code: 'custom',
-						message: 'Must provide current password to change password.',
-					})
-				}
-				if (currentPassword && newPassword) {
-					const user = await verifyUserPassword({ id: userId }, currentPassword)
-					if (!user) {
-						ctx.addIssue({
-							path: ['currentPassword'],
-							code: 'custom',
-							message: 'Incorrect password.',
-						})
-					}
-				}
-			},
-		),
-	})
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const)
+	const intent = formData.get('intent')
+	switch (intent) {
+		case profileUpdateActionIntent: {
+			return profileUpdateAction({ request, userId, formData })
+		}
+		case signOutOfSessionsActionIntent: {
+			return signOutOfSessionsAction({ request, userId, formData })
+		}
+		case deleteDataActionIntent: {
+			return deleteDataAction({ request, userId, formData })
+		}
+		default: {
+			throw new Response(`Invalid intent "${intent}"`, { status: 400 })
+		}
 	}
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 })
-	}
-	const { name, username, newPassword } = submission.value
-
-	const updatedUser = await prisma.user.update({
-		select: { id: true, username: true },
-		where: { id: userId },
-		data: {
-			name,
-			username,
-			password: newPassword
-				? {
-						update: {
-							hash: await getPasswordHash(newPassword),
-						},
-				  }
-				: undefined,
-		},
-	})
-
-	return redirect(`/users/${updatedUser.username}`, { status: 302 })
 }
 
 export default function EditUserProfile() {
 	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
-
-	const isSubmitting = useIsSubmitting()
-
-	const [form, fields] = useForm({
-		id: 'edit-profile',
-		constraint: getFieldsetConstraint(ProfileFormSchema),
-		lastSubmission: actionData?.submission,
-		onValidate({ formData }) {
-			return parse(formData, { schema: ProfileFormSchema })
-		},
-		defaultValue: {
-			username: data.user.username,
-			name: data.user.name ?? '',
-		},
-		shouldRevalidate: 'onBlur',
-	})
 
 	return (
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
 				<div className="relative h-52 w-52">
 					<img
-						src={getUserImgSrc(data.user.imageId)}
+						src={getUserImgSrc(data.user.image?.id)}
 						alt={data.user.username}
 						className="h-full w-full rounded-full object-cover"
 					/>
@@ -161,86 +121,233 @@ export default function EditUserProfile() {
 					</Button>
 				</div>
 			</div>
-			<Form method="POST" {...form.props}>
-				<div className="grid grid-cols-6 gap-x-10">
-					<Field
-						className="col-span-3"
-						labelProps={{
-							htmlFor: fields.username.id,
-							children: 'Username',
-						}}
-						inputProps={conform.input(fields.username)}
-						errors={fields.username.errors}
-					/>
-					<Field
-						className="col-span-3"
-						labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
-						inputProps={conform.input(fields.name)}
-						errors={fields.name.errors}
-					/>
+			<UpdateProfile />
 
-					<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
-					<fieldset className="col-span-6">
-						<legend className="pb-6 text-lg">Change password</legend>
-						<div className="flex justify-between gap-10">
-							<Field
-								className="flex-1"
-								labelProps={{
-									htmlFor: fields.currentPassword.id,
-									children: 'Current Password',
-								}}
-								inputProps={{
-									...conform.input(fields.currentPassword, {
-										type: 'password',
-									}),
-									autoComplete: 'current-password',
-								}}
-								errors={fields.currentPassword.errors}
-							/>
-							<Field
-								className="flex-1"
-								labelProps={{
-									htmlFor: fields.newPassword.id,
-									children: 'New Password',
-								}}
-								inputProps={{
-									...conform.input(fields.newPassword, { type: 'password' }),
-									autoComplete: 'new-password',
-								}}
-								errors={fields.newPassword.errors}
-							/>
-						</div>
-					</fieldset>
-					<div className="col-span-full my-3">
-						<Link to="change-email">
-							<Icon name="envelope-closed">
-								Change email from {data.user.email}
-							</Icon>
-						</Link>
-					</div>
-					<div className="col-span-full my-3">
-						<Link to="two-factor">
-							{data.isTwoFactorEnabled ? (
-								<Icon name="lock-closed">2FA is enabled</Icon>
-							) : (
-								<Icon name="lock-open-1">Enable 2FA</Icon>
-							)}
-						</Link>
-					</div>
+			<div className="col-span-6 mb-12 mt-6 h-1 border-b-[1.5px]" />
+			<div className="col-span-full flex flex-col gap-6">
+				<div>
+					<Link to="change-email">
+						<Icon name="envelope-closed">
+							Change email from {data.user.email}
+						</Icon>
+					</Link>
 				</div>
-
-				<ErrorList errors={form.errors} id={form.errorId} />
-
-				<div className="mt-8 flex justify-center">
-					<StatusButton
-						type="submit"
-						size="wide"
-						status={isSubmitting ? 'pending' : actionData?.status ?? 'idle'}
+				<div>
+					<Link to="two-factor">
+						{data.isTwoFactorEnabled ? (
+							<Icon name="lock-closed">2FA is enabled</Icon>
+						) : (
+							<Icon name="lock-open-1">Enable 2FA</Icon>
+						)}
+					</Link>
+				</div>
+				<div>
+					<Link to={data.hasPassword ? 'password' : 'password/create'}>
+						<Icon name="dots-horizontal">
+							{data.hasPassword ? 'Change Password' : 'Create a Password'}
+						</Icon>
+					</Link>
+				</div>
+				<div>
+					<Link to="connections">
+						<Icon name="link-2">Manage connections</Icon>
+					</Link>
+				</div>
+				<div>
+					<Link
+						reloadDocument
+						download="my-epic-notes-data.json"
+						to="/resources/download-user-data"
 					>
-						Save changes
-					</StatusButton>
+						<Icon name="download">Download your data</Icon>
+					</Link>
 				</div>
-			</Form>
+				<SignOutOfSessions />
+				<DeleteData />
+			</div>
+		</div>
+	)
+}
+
+async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
+	const submission = await parse(formData, {
+		async: true,
+		schema: ProfileFormSchema.superRefine(async ({ username }, ctx) => {
+			const existingUsername = await prisma.user.findUnique({
+				where: { username },
+				select: { id: true },
+			})
+			if (existingUsername && existingUsername.id !== userId) {
+				ctx.addIssue({
+					path: ['username'],
+					code: 'custom',
+					message: 'A user already exists with this username',
+				})
+			}
+		}),
+	})
+	if (submission.intent !== 'submit') {
+		return json({ status: 'idle', submission } as const)
+	}
+	if (!submission.value) {
+		return json({ status: 'error', submission } as const, { status: 400 })
+	}
+
+	const data = submission.value
+
+	await prisma.user.update({
+		select: { username: true },
+		where: { id: userId },
+		data: {
+			name: data.name,
+			username: data.username,
+		},
+	})
+
+	return json({ status: 'success', submission } as const)
+}
+
+function UpdateProfile() {
+	const data = useLoaderData<typeof loader>()
+
+	const fetcher = useFetcher<typeof profileUpdateAction>()
+
+	const [form, fields] = useForm({
+		id: 'edit-profile',
+		constraint: getFieldsetConstraint(ProfileFormSchema),
+		lastSubmission: fetcher.data?.submission,
+		onValidate({ formData }) {
+			return parse(formData, { schema: ProfileFormSchema })
+		},
+		defaultValue: {
+			username: data.user.username,
+			name: data.user.name ?? '',
+			email: data.user.email,
+		},
+	})
+
+	return (
+		<fetcher.Form method="POST" {...form.props}>
+			<div className="grid grid-cols-6 gap-x-10">
+				<Field
+					className="col-span-3"
+					labelProps={{
+						htmlFor: fields.username.id,
+						children: 'Username',
+					}}
+					inputProps={conform.input(fields.username)}
+					errors={fields.username.errors}
+				/>
+				<Field
+					className="col-span-3"
+					labelProps={{ htmlFor: fields.name.id, children: 'Name' }}
+					inputProps={conform.input(fields.name)}
+					errors={fields.name.errors}
+				/>
+			</div>
+
+			<ErrorList errors={form.errors} id={form.errorId} />
+
+			<div className="mt-8 flex justify-center">
+				<StatusButton
+					type="submit"
+					size="wide"
+					name="intent"
+					value={profileUpdateActionIntent}
+					status={
+						fetcher.state !== 'idle'
+							? 'pending'
+							: fetcher.data?.status ?? 'idle'
+					}
+				>
+					Save changes
+				</StatusButton>
+			</div>
+		</fetcher.Form>
+	)
+}
+
+async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
+	const cookieSession = await sessionStorage.getSession(
+		request.headers.get('cookie'),
+	)
+	const sessionId = cookieSession.get(sessionKey)
+	invariantResponse(
+		sessionId,
+		'You must be authenticated to sign out of other sessions',
+	)
+	await prisma.session.deleteMany({
+		where: {
+			userId,
+			id: { not: sessionId },
+		},
+	})
+	return json({ status: 'success' } as const)
+}
+
+function SignOutOfSessions() {
+	const data = useLoaderData<typeof loader>()
+	const dc = useDoubleCheck()
+
+	const fetcher = useFetcher<typeof signOutOfSessionsAction>()
+	const otherSessionsCount = data.user._count.sessions - 1
+	return (
+		<div>
+			{otherSessionsCount ? (
+				<fetcher.Form method="POST">
+					<StatusButton
+						{...dc.getButtonProps({
+							type: 'submit',
+							name: 'intent',
+							value: signOutOfSessionsActionIntent,
+						})}
+						variant={dc.doubleCheck ? 'destructive' : 'default'}
+						status={
+							fetcher.state !== 'idle'
+								? 'pending'
+								: fetcher.data?.status ?? 'idle'
+						}
+					>
+						<Icon name="avatar">
+							{dc.doubleCheck
+								? `Are you sure?`
+								: `Sign out of ${otherSessionsCount} other sessions`}
+						</Icon>
+					</StatusButton>
+				</fetcher.Form>
+			) : (
+				<Icon name="avatar">This is your only session</Icon>
+			)}
+		</div>
+	)
+}
+
+async function deleteDataAction({ userId }: ProfileActionArgs) {
+	await prisma.user.delete({ where: { id: userId } })
+	return redirect('/')
+}
+
+function DeleteData() {
+	const dc = useDoubleCheck()
+
+	const fetcher = useFetcher<typeof deleteDataAction>()
+	return (
+		<div>
+			<fetcher.Form method="POST">
+				<StatusButton
+					{...dc.getButtonProps({
+						type: 'submit',
+						name: 'intent',
+						value: deleteDataActionIntent,
+					})}
+					variant={dc.doubleCheck ? 'destructive' : 'default'}
+					status={fetcher.state !== 'idle' ? 'pending' : 'idle'}
+				>
+					<Icon name="trash">
+						{dc.doubleCheck ? `Are you sure?` : `Delete all your data`}
+					</Icon>
+				</StatusButton>
+			</fetcher.Form>
 		</div>
 	)
 }

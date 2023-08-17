@@ -1,13 +1,9 @@
 import { faker } from '@faker-js/faker'
-import { createUser } from 'tests/db-utils.ts'
-import { invariant } from '~/utils/misc.tsx'
-import { readEmail } from '../mocks/utils.ts'
-import {
-	deleteUserByUsername,
-	expect,
-	insertNewUser,
-	test,
-} from '../playwright-utils.ts'
+import { expect, test } from '@playwright/test'
+import { prisma } from '#app/utils/db.server.ts'
+import { invariant } from '#app/utils/misc.tsx'
+import { readEmail } from '#tests/mocks/utils.ts'
+import { createUser, insertNewUser } from '#tests/playwright-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
@@ -23,6 +19,15 @@ function getOnboardingData() {
 	}
 	return onboardingData
 }
+
+const usernamesToDelete = new Set<string>()
+
+test.afterEach(async () => {
+	for (const username of usernamesToDelete) {
+		await prisma.user.delete({ where: { username } })
+	}
+	usernamesToDelete.clear()
+})
 
 test('onboarding with link', async ({ page }) => {
 	const onboardingData = getOnboardingData()
@@ -71,10 +76,9 @@ test('onboarding with link', async ({ page }) => {
 
 	await page.getByLabel(/terms/i).check()
 
-	await page.getByLabel(/offers/i).check()
-
 	await page.getByLabel(/remember me/i).check()
 
+	usernamesToDelete.add(onboardingData.username)
 	await page.getByRole('button', { name: /Create an account/i }).click()
 
 	await expect(page).toHaveURL(`/`)
@@ -87,9 +91,6 @@ test('onboarding with link', async ({ page }) => {
 	await page.getByRole('link', { name: onboardingData.name }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
-
-	// have to do this here because we didn't use insertNewUser (because we're testing user create)
-	await deleteUserByUsername(onboardingData.username)
 })
 
 test('onboarding with a short code', async ({ page }) => {

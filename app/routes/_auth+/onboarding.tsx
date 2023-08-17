@@ -9,84 +9,73 @@ import {
 import {
 	Form,
 	useActionData,
-	useFormAction,
 	useLoaderData,
-	useNavigation,
 	useSearchParams,
 } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils'
 import { z } from 'zod'
-import { CheckboxField, ErrorList, Field } from '~/components/forms.tsx'
-import { Spacer } from '~/components/spacer.tsx'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { authenticator, requireAnonymous, signup } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { redirectWithConfetti } from '~/utils/flash-session.server.ts'
-import { invariant } from '~/utils/misc.tsx'
-import { commitSession, getSession } from '~/utils/session.server.ts'
+import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
+import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { invariant, useIsPending } from '#app/utils/misc.tsx'
+import { sessionStorage } from '#app/utils/session.server.ts'
 import {
-	nameSchema,
-	passwordSchema,
-	usernameSchema,
-} from '~/utils/user-validation.ts'
-import { type VerifyFunctionArgs } from '../resources+/verify.tsx'
+	NameSchema,
+	PasswordSchema,
+	UsernameSchema,
+} from '#app/utils/user-validation.ts'
+import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { type VerifyFunctionArgs } from './verify.tsx'
 
-export const onboardingEmailSessionKey = 'onboardingEmail'
+const onboardingEmailSessionKey = 'onboardingEmail'
 
-const OnboardingFormSchema = z
+const SignupFormSchema = z
 	.object({
-		username: usernameSchema,
-		name: nameSchema,
+		username: UsernameSchema,
+		name: NameSchema,
+		password: PasswordSchema,
+		confirmPassword: PasswordSchema,
 		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
 			required_error:
 				'You must agree to the terms of service and privacy policy',
 		}),
-		agreeToMailingList: z.boolean().optional(),
 		remember: z.boolean().optional(),
 		redirectTo: z.string().optional(),
 	})
-	.and(
-		z
-			.object({
-				password: passwordSchema,
-				confirmPassword: passwordSchema,
+	.superRefine(({ confirmPassword, password }, ctx) => {
+		if (confirmPassword !== password) {
+			ctx.addIssue({
+				path: ['confirmPassword'],
+				code: 'custom',
+				message: 'The passwords must match',
 			})
-			.superRefine(({ confirmPassword, password }, ctx) => {
-				if (confirmPassword !== password) {
-					ctx.addIssue({
-						path: ['confirmPassword'],
-						code: 'custom',
-						message: 'The passwords did not match',
-					})
-				}
-			}),
-	)
+		}
+	})
 
-export async function loader({ request }: DataFunctionArgs) {
+async function requireOnboardingEmail(request: Request) {
 	await requireAnonymous(request)
-	const session = await getSession(request.headers.get('cookie'))
-	const error = session.get(authenticator.sessionErrorKey)
-	const onboardingEmail = session.get(onboardingEmailSessionKey)
-	if (typeof onboardingEmail !== 'string' || !onboardingEmail) {
-		return redirect('/signup')
-	}
-	const message = error?.message ?? null
-	return json(
-		{ formError: typeof message === 'string' ? message : null },
-		{ headers: { 'Set-Cookie': await commitSession(session) } },
+	const verifySession = await verifySessionStorage.getSession(
+		request.headers.get('cookie'),
 	)
+	const email = verifySession.get(onboardingEmailSessionKey)
+	if (typeof email !== 'string' || !email) {
+		throw redirect('/signup')
+	}
+	return email
+}
+export async function loader({ request }: DataFunctionArgs) {
+	const email = await requireOnboardingEmail(request)
+	return json({ email })
 }
 
 export async function action({ request }: DataFunctionArgs) {
-	const cookieSession = await getSession(request.headers.get('cookie'))
-	const email = cookieSession.get(onboardingEmailSessionKey)
-	if (typeof email !== 'string' || !email) {
-		return redirect('/signup')
-	}
-
+	const email = await requireOnboardingEmail(request)
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: OnboardingFormSchema.superRefine(async (data, ctx) => {
+		schema: SignupFormSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
 				where: { username: data.username },
 				select: { id: true },
@@ -99,36 +88,42 @@ export async function action({ request }: DataFunctionArgs) {
 				})
 				return
 			}
+		}).transform(async data => {
+			const session = await signup({ ...data, email })
+			return { ...data, session }
 		}),
 		async: true,
 	})
+
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
-	if (!submission.value) {
+	if (!submission.value?.session) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
-	const {
-		username,
-		name,
-		password,
-		// TODO: add user to mailing list if they agreed to it
-		// agreeToMailingList,
-		remember,
-		redirectTo,
-	} = submission.value
 
-	const session = await signup({ email, username, password, name })
+	const { session, remember, redirectTo } = submission.value
 
-	cookieSession.set(authenticator.sessionKey, session.id)
-	cookieSession.unset(onboardingEmailSessionKey)
+	const cookieSession = await sessionStorage.getSession(
+		request.headers.get('cookie'),
+	)
+	cookieSession.set(sessionKey, session.id)
+	const verifySession = await verifySessionStorage.getSession(
+		request.headers.get('cookie'),
+	)
+	const headers = new Headers()
+	headers.append(
+		'set-cookie',
+		await sessionStorage.commitSession(cookieSession, {
+			expires: remember ? session.expirationDate : undefined,
+		}),
+	)
+	headers.append(
+		'set-cookie',
+		await verifySessionStorage.destroySession(verifySession),
+	)
 
-	const newCookie = await commitSession(cookieSession, {
-		expires: remember ? session.expirationDate : undefined,
-	})
-	return redirectWithConfetti(safeRedirect(redirectTo, '/'), {
-		headers: { 'Set-Cookie': newCookie },
-	})
+	return redirectWithConfetti(safeRedirect(redirectTo), { headers })
 }
 
 export async function handleVerification({
@@ -136,10 +131,14 @@ export async function handleVerification({
 	submission,
 }: VerifyFunctionArgs) {
 	invariant(submission.value, 'submission.value should be defined by now')
-	const session = await getSession(request.headers.get('cookie'))
-	session.set(onboardingEmailSessionKey, submission.value.target)
+	const verifySession = await verifySessionStorage.getSession(
+		request.headers.get('cookie'),
+	)
+	verifySession.set(onboardingEmailSessionKey, submission.value.target)
 	return redirect('/onboarding', {
-		headers: { 'Set-Cookie': await commitSession(session) },
+		headers: {
+			'set-cookie': await verifySessionStorage.commitSession(verifySession),
+		},
 	})
 }
 
@@ -147,30 +146,29 @@ export const meta: V2_MetaFunction = () => {
 	return [{ title: 'Setup Epic Notes Account' }]
 }
 
-export default function OnboardingPage() {
-	const [searchParams] = useSearchParams()
+export default function SignupRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-	const navigation = useNavigation()
-	const formAction = useFormAction()
+	const isPending = useIsPending()
+	const [searchParams] = useSearchParams()
+	const redirectTo = searchParams.get('redirectTo')
 
 	const [form, fields] = useForm({
-		id: 'onboarding',
-		constraint: getFieldsetConstraint(OnboardingFormSchema),
+		id: 'signup-form',
+		constraint: getFieldsetConstraint(SignupFormSchema),
+		defaultValue: { redirectTo },
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			return parse(formData, { schema: OnboardingFormSchema })
+			return parse(formData, { schema: SignupFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
-
-	const redirectTo = searchParams.get('redirectTo') || '/'
 
 	return (
 		<div className="container flex min-h-full flex-col justify-center pb-32 pt-20">
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
-					<h1 className="text-h1">Welcome aboard!</h1>
+					<h1 className="text-h1">Welcome aboard {data.email}!</h1>
 					<p className="text-body-md text-muted-foreground">
 						Please enter your details.
 					</p>
@@ -186,9 +184,6 @@ export default function OnboardingPage() {
 						inputProps={{
 							...conform.input(fields.username),
 							autoComplete: 'username',
-							autoFocus:
-								typeof actionData === 'undefined' ||
-								typeof fields.username.initialError !== 'undefined',
 							className: 'lowercase',
 						}}
 						errors={fields.username.errors}
@@ -234,19 +229,6 @@ export default function OnboardingPage() {
 						)}
 						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
 					/>
-
-					<CheckboxField
-						labelProps={{
-							htmlFor: fields.agreeToMailingList.id,
-							children:
-								'Would you like to receive special discounts and offers?',
-						}}
-						buttonProps={conform.input(fields.agreeToMailingList, {
-							type: 'checkbox',
-						})}
-						errors={fields.agreeToMailingList.errors}
-					/>
-
 					<CheckboxField
 						labelProps={{
 							htmlFor: fields.remember.id,
@@ -256,29 +238,15 @@ export default function OnboardingPage() {
 						errors={fields.remember.errors}
 					/>
 
-					<input
-						name={fields.redirectTo.name}
-						type="hidden"
-						value={redirectTo}
-					/>
-
-					<ErrorList
-						errors={[...form.errors, data.formError]}
-						id={form.errorId}
-					/>
+					<input {...conform.input(fields.redirectTo, { type: 'hidden' })} />
+					<ErrorList errors={form.errors} id={form.errorId} />
 
 					<div className="flex items-center justify-between gap-6">
 						<StatusButton
 							className="w-full"
-							status={
-								navigation.state === 'submitting' &&
-								navigation.formAction === formAction &&
-								navigation.formMethod === 'POST'
-									? 'pending'
-									: actionData?.status ?? 'idle'
-							}
+							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
 							type="submit"
-							disabled={navigation.state !== 'idle'}
+							disabled={isPending}
 						>
 							Create an account
 						</StatusButton>

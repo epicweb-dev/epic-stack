@@ -1,18 +1,15 @@
 import { Index as ConfettiShower } from 'confetti-react'
 import { ClientOnly } from 'remix-utils'
 
-/**
- * confetti is a unique random identifier which re-renders the component
- */
-export function Confetti({ confetti }: { confetti?: string }) {
-	if (!confetti) return null
+export function Confetti({ id }: { id?: string | null }) {
+	if (!id) return null
 
 	return (
 		<ClientOnly>
 			{() => (
 				<ConfettiShower
-					key={confetti}
-					run={Boolean(confetti)}
+					key={id}
+					run={Boolean(id)}
 					recycle={false}
 					numberOfPieces={500}
 					width={window.innerWidth}

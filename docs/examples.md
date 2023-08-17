@@ -42,10 +42,17 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + GitHub Auth](https://github.com/kentcdodds/epic-github-auth) by
   [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
   with GitHub Auth.
-- [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb) by
-  [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Prisma using MongoDB as the database.
-- [Epic Stack Custom Themes](https://github.com/kiliman/epic-stack-theme) by [@kiliman](https://github.com/kiliman):
-  An example showing how to create a custom theme using the [`shadcn-custom-theme`](https://github.com/kiliman/shadcn-custom-theme) tool.
+- [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
+  with Prisma using MongoDB as the database.
+- [Epic Stack Custom Themes](https://github.com/kiliman/epic-stack-theme) by
+  [@kiliman](https://github.com/kiliman): An example showing how to create a
+  custom theme using the
+  [`shadcn-custom-theme`](https://github.com/kiliman/shadcn-custom-theme) tool.
+- [Epic Stack + OpenID Connect Auth (Google)](https://github.com/kentcdodds/epic-oidc)
+  by [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
+  with OpenID Connect Auth (Google) using [web-oidc](https://npm.im/web-oidc)
+  and [remix-auth](https://npm.im/remix-auth).
 
 ## How to contribute
 

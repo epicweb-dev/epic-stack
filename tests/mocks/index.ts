@@ -1,42 +1,38 @@
-import { faker } from '@faker-js/faker'
 import closeWithGrace from 'close-with-grace'
-import { rest } from 'msw'
+import { passthrough, http } from 'msw'
 import { setupServer } from 'msw/node'
-import { requiredHeader, writeEmail } from './utils.ts'
+import { handlers as githubHandlers } from './github.ts'
+import { handlers as resendHandlers } from './resend.ts'
 
-const handlers = [
+const miscHandlers = [
 	process.env.REMIX_DEV_HTTP_ORIGIN
-		? rest.post(`${process.env.REMIX_DEV_HTTP_ORIGIN}ping`, req =>
-				req.passthrough(),
-		  )
-		: null,
-
-	// feel free to remove this conditional from the mock once you've set up resend
-	process.env.RESEND_API_KEY
-		? rest.post(`https://api.resend.com/emails`, async (req, res, ctx) => {
-				requiredHeader(req.headers, 'Authorization')
-				const body = await req.json()
-				console.info('🔶 mocked email contents:', body)
-
-				await writeEmail(body)
-
-				return res(
-					ctx.json({
-						id: faker.string.uuid(),
-						from: body.from,
-						to: body.to,
-						created_at: new Date().toISOString(),
-					}),
-				)
-		  })
+		? http.post(`${process.env.REMIX_DEV_HTTP_ORIGIN}ping`, passthrough)
 		: null,
 ].filter(Boolean)
 
-const server = setupServer(...handlers)
+export const server = setupServer(
+	...miscHandlers,
+	...resendHandlers,
+	...githubHandlers,
+)
 
-server.listen({ onUnhandledRequest: 'warn' })
-console.info('🔶 Mock server installed')
-
-closeWithGrace(() => {
-	server.close()
+server.listen({
+	onUnhandledRequest(request, print) {
+		if (
+			request.url.includes(process.cwd()) ||
+			request.url.includes('node_modules') ||
+			request.url.startsWith('node:')
+		) {
+			return
+		}
+		print.warning()
+	},
 })
+
+if (process.env.NODE_ENV !== 'test') {
+	console.info('🔶 Mock server installed')
+
+	closeWithGrace(() => {
+		server.close()
+	})
+}

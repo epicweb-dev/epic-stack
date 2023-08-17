@@ -32,11 +32,6 @@ module.exports = {
 					'sibling',
 					'index',
 				],
-				pathGroups: [
-					{ pattern: '~/**', group: 'internal' },
-					{ pattern: 'test/**', group: 'internal' },
-					{ pattern: '@/icon-name', group: 'internal' },
-				],
 			},
 		],
 	},

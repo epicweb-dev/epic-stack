@@ -1,23 +1,30 @@
 import 'dotenv/config'
 import 'source-map-support/register.js'
-import './setup-env-vars.ts'
+import './db-setup.ts'
+import '#app/utils/env.server.ts'
+// we need these to be imported first 👆
 
-import fs from 'fs'
 import { installGlobals } from '@remix-run/node'
-import { afterAll, afterEach, expect } from 'vitest'
-import { prisma } from '~/utils/db.server.ts'
-import { matchers } from './matchers.cjs'
-import { BASE_DATABASE_PATH, DATABASE_PATH } from './paths.ts'
-import { deleteAllData } from './utils.ts'
-
-expect.extend(matchers)
+import { cleanup } from '@testing-library/react'
+import { afterEach, beforeEach, expect, vi, type SpyInstance } from 'vitest'
+import { server } from '#tests/mocks/index.ts'
+import './custom-matchers.ts'
 
 installGlobals()
-fs.copyFileSync(BASE_DATABASE_PATH, DATABASE_PATH)
 
-afterEach(() => deleteAllData())
+afterEach(() => server.resetHandlers())
+afterEach(() => cleanup())
 
-afterAll(async () => {
-	await prisma.$disconnect()
-	await fs.promises.rm(DATABASE_PATH)
+export let consoleError: SpyInstance<Parameters<(typeof console)['error']>>
+
+beforeEach(() => {
+	consoleError = vi.spyOn(console, 'error')
+	consoleError.mockImplementation(() => {})
+})
+
+afterEach(() => {
+	expect(
+		consoleError,
+		'make sure to call mockClear in any test you expect console.error to be called',
+	).not.toHaveBeenCalled()
 })
