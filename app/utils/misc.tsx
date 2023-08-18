@@ -202,15 +202,29 @@ export function invariantResponse(
  * NOTE: the default formAction will include query params, but the
  * navigation.formAction will not, so don't use the default formAction if you
  * want to know if a form is submitting without specific query params.
+ *
+ * how-to-use with multiple forms
+ * as described in: https://github.com/edmundhung/conform/discussions/250
+ * you can add a hidden input with name 'form', then return this value along 
+ * with submission, finally extract this value from `useActionData` to enable
+ * this hook
+ * ```ts
+ * const actionData = useActionData<typeof action>()
+ * const isPending = useIsPending({
+ * 	enabled: actionData?.form === 'your_hidden_input_value'
+ * })
+ * ```
  */
 export function useIsPending({
 	formAction,
 	formMethod = 'POST',
 	state = 'non-idle',
+	enabled = true,
 }: {
 	formAction?: string
 	formMethod?: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE'
 	state?: 'submitting' | 'loading' | 'non-idle'
+	enabled?: boolean
 } = {}) {
 	const contextualFormAction = useFormAction()
 	const navigation = useNavigation()
@@ -219,6 +233,7 @@ export function useIsPending({
 			? navigation.state !== 'idle'
 			: navigation.state === state
 	return (
+		enabled &&
 		isPendingState &&
 		navigation.formAction === (formAction ?? contextualFormAction) &&
 		navigation.formMethod === formMethod
