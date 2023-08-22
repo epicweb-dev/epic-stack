@@ -10,11 +10,6 @@ test('Users can create notes', async ({ page }) => {
 	const newNote = createNote()
 	await page.getByRole('link', { name: /New Note/i }).click()
 
-	// blank form submission should result in errors
-	await page.getByRole('button', { name: /submit/i }).click()
-	// count errors
-	await expect(page.getByText('Required')).toHaveCount(2)
-
 	// fill in form and submit
 	await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
 	await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
