@@ -70,9 +70,6 @@ export function getDomainUrl(request: Request) {
 		request.headers.get('X-Forwarded-Host') ??
 		request.headers.get('host') ??
 		new URL(request.url).host
-	if (!host) {
-		throw new Error('Could not determine domain URL.')
-	}
 	const protocol = host.includes('localhost') ? 'http' : 'https'
 	return `${protocol}://${host}`
 }
