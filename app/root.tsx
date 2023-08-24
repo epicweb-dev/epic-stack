@@ -59,6 +59,7 @@ import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { honeypot } from './utils/honeypot.server.ts'
 
 const RemixDevTools =
 	process.env.NODE_ENV === 'development'
@@ -151,6 +152,7 @@ export async function loader({ request }: DataFunctionArgs) {
 					theme: getTheme(request),
 				},
 			},
+			honeypot: honeypot.getInputProps(),
 			ENV: getEnv(),
 			toast,
 			confettiId,

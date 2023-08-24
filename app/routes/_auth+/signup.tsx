@@ -28,14 +28,11 @@ import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.tsx'
 import { honeypot } from '#app/utils/honeypot.server.ts'
 import { HoneypotInputs } from 'remix-utils'
+import { HoneypotFields } from '#app/components/honeypot.tsx'
 
 const SignupSchema = z.object({
 	email: EmailSchema,
 })
-
-export async function loader() {
-	return json({ honepotProps: honeypot.getInputProps() })
-}
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
@@ -117,7 +114,6 @@ export const meta: MetaFunction = () => {
 }
 
 export default function SignupRoute() {
-	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()
@@ -153,7 +149,7 @@ export default function SignupRoute() {
 						errors={fields.email.errors}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
-					<HoneypotInputs {...data.honepotProps} />
+					<HoneypotFields />
 					<StatusButton
 						className="w-full"
 						status={isPending ? 'pending' : actionData?.status ?? 'idle'}
