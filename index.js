@@ -1,7 +1,10 @@
 import 'source-map-support/register.js'
 import 'dotenv/config'
+import { installGlobals } from '@remix-run/node'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
+
+installGlobals()
 
 closeWithGrace(async ({ err }) => {
 	if (err) {
