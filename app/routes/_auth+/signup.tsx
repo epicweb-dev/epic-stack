@@ -7,7 +7,12 @@ import {
 	type DataFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node'
-import { Form, useActionData, useSearchParams } from '@remix-run/react'
+import {
+	Form,
+	useActionData,
+	useLoaderData,
+	useSearchParams,
+} from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -21,13 +26,20 @@ import { sendEmail } from '#app/utils/email.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.tsx'
+import { honeypot } from '#app/utils/honeypot.server.ts'
+import { HoneypotInputs } from 'remix-utils'
 
 const SignupSchema = z.object({
 	email: EmailSchema,
 })
 
+export async function loader() {
+	return json({ honepotProps: honeypot.getInputProps() })
+}
+
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
+	honeypot.check(formData)
 	const submission = await parse(formData, {
 		schema: SignupSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
@@ -105,6 +117,7 @@ export const meta: MetaFunction = () => {
 }
 
 export default function SignupRoute() {
+	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()
@@ -140,6 +153,7 @@ export default function SignupRoute() {
 						errors={fields.email.errors}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
+					<HoneypotInputs {...data.honepotProps} />
 					<StatusButton
 						className="w-full"
 						status={isPending ? 'pending' : actionData?.status ?? 'idle'}
