@@ -5,8 +5,8 @@ import { handlers as githubHandlers } from './github.ts'
 import { handlers as resendHandlers } from './resend.ts'
 
 const miscHandlers = [
-	process.env.REMIX_DEV_HTTP_ORIGIN
-		? http.post(`${process.env.REMIX_DEV_HTTP_ORIGIN}ping`, passthrough)
+	process.env.REMIX_DEV_ORIGIN
+		? http.post(`${process.env.REMIX_DEV_ORIGIN}ping`, passthrough)
 		: null,
 ].filter(Boolean)
 

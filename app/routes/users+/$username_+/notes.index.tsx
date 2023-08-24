@@ -1,4 +1,4 @@
-import { type V2_MetaFunction } from '@remix-run/react'
+import { type MetaFunction } from '@remix-run/react'
 import { type loader as notesLoader } from './notes.tsx'
 
 export default function NotesIndexRoute() {
@@ -9,7 +9,7 @@ export default function NotesIndexRoute() {
 	)
 }
 
-export const meta: V2_MetaFunction<
+export const meta: MetaFunction<
 	null,
 	{ 'routes/users+/$username_+/notes': typeof notesLoader }
 > = ({ params, matches }) => {

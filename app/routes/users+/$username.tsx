@@ -1,10 +1,5 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useLoaderData,
-	type V2_MetaFunction,
-} from '@remix-run/react'
+import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
@@ -102,7 +97,7 @@ export default function ProfileRoute() {
 	)
 }
 
-export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
+export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 	const displayName = data?.user.name ?? params.username
 	return [
 		{ title: `${displayName} | Epic Notes` },
