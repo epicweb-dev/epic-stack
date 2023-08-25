@@ -7,12 +7,7 @@ import {
 	type DataFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useSearchParams,
-} from '@remix-run/react'
+import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -28,7 +23,6 @@ import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.tsx'
 import { honeypot } from '#app/utils/honeypot.server.ts'
 import { HoneypotInputs } from 'remix-utils'
-import { HoneypotFields } from '#app/components/honeypot.tsx'
 
 const SignupSchema = z.object({
 	email: EmailSchema,
@@ -149,7 +143,7 @@ export default function SignupRoute() {
 						errors={fields.email.errors}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
-					<HoneypotFields />
+					<HoneypotInputs />
 					<StatusButton
 						className="w-full"
 						status={isPending ? 'pending' : actionData?.status ?? 'idle'}

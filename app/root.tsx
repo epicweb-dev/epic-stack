@@ -25,6 +25,7 @@ import {
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { Suspense, lazy, useRef } from 'react'
+import { HoneypotProvider } from 'remix-utils'
 import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
@@ -47,6 +48,7 @@ import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
 import { getConfetti } from './utils/confetti.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
+import { honeypot } from './utils/honeypot.server.ts'
 import {
 	combineHeaders,
 	getDomainUrl,
@@ -55,11 +57,10 @@ import {
 } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { useRequestInfo } from './utils/request-info.ts'
-import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
+import { getTheme, setTheme, type Theme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
-import { honeypot } from './utils/honeypot.server.ts'
 
 const RemixDevTools =
 	process.env.NODE_ENV === 'development'
@@ -294,7 +295,17 @@ function App() {
 		</Document>
 	)
 }
-export default withSentry(App)
+
+function AppWithProviders() {
+	const data = useLoaderData<typeof loader>()
+	return (
+		<HoneypotProvider {...data.honeypot}>
+			<App />
+		</HoneypotProvider>
+	)
+}
+
+export default withSentry(AppWithProviders)
 
 function UserDropdown() {
 	const user = useUser()

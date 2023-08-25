@@ -121,21 +121,23 @@ index 3d016c5..5cb38a6 100644
    | "no-referrer-when-downgrade"
    | "no-referrer"
 diff --git a/node_modules/remix-utils/build/react/honeypot-inputs.d.ts b/node_modules/remix-utils/build/react/honeypot-inputs.d.ts
-index 60056da..0c18cb6 100644
+index 60056da..2ebb235 100644
 --- a/node_modules/remix-utils/build/react/honeypot-inputs.d.ts
 +++ b/node_modules/remix-utils/build/react/honeypot-inputs.d.ts
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  /// <reference types="react" />
--export declare function HoneypotInputs(): JSX.Element;
-+export declare function HoneypotInputs(props: {nameFieldName: string, validFromFieldName: string, encryptedValidFrom: string}): JSX.Element;
+ export declare function HoneypotInputs(): JSX.Element;
++export declare function HoneypotProvider(props: {children: React.ReactNode, nameFieldName: string, validFromFieldName: string, encryptedValidFrom: string}): JSX.Element;
 diff --git a/node_modules/remix-utils/build/react/honeypot-inputs.js b/node_modules/remix-utils/build/react/honeypot-inputs.js
-index a42c3b8..8234570 100644
+index a42c3b8..fa88785 100644
 --- a/node_modules/remix-utils/build/react/honeypot-inputs.js
 +++ b/node_modules/remix-utils/build/react/honeypot-inputs.js
-@@ -1,38 +1,23 @@
+@@ -1,41 +1,39 @@
  import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 -import { useRouteLoaderData } from "@remix-run/react";
--export function HoneypotInputs() {
++import { createContext, useContext } from "react";
++const HoneyPotContext = createContext(null);
+ export function HoneypotInputs() {
 -  let rootLoaderData = useRouteLoaderData("root");
 -  if (!rootLoaderData) throw new Error("Missing loader data from root");
 -  if (!rootLoaderData.nameFieldName) {
@@ -151,7 +153,7 @@ index a42c3b8..8234570 100644
 -      "Missing Honeypot's encryptedValidFrom on root loader data",
 -    );
 -  }
-+export function HoneypotInputs({nameFieldName, validFromFieldName, encryptedValidFrom}) {
++  const {nameFieldName, validFromFieldName, encryptedValidFrom} = useContext(HoneyPotContext);
    return _jsxs("div", {
 -    id: `${rootLoaderData.nameFieldName}_wrap`,
 +    id: `${nameFieldName}_wrap`,
@@ -178,6 +180,19 @@ index a42c3b8..8234570 100644
          autoComplete: "off",
          tabIndex: -1,
        }),
+     ],
+   });
+ }
++export function HoneypotProvider({children, nameFieldName, validFromFieldName, encryptedValidFrom}) {
++  return _jsx(HoneyPotContext.Provider, {
++    value: {
++      nameFieldName,
++      validFromFieldName,
++      encryptedValidFrom,
++    },
++    children: children,
++  });
++}
 diff --git a/node_modules/remix-utils/build/react/server-only.js b/node_modules/remix-utils/build/react/server-only.js
 index de8dfa7..35dd0a1 100644
 --- a/node_modules/remix-utils/build/react/server-only.js
