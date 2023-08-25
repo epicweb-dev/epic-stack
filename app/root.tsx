@@ -61,6 +61,8 @@ import { getTheme, setTheme, type Theme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
+import { csrf } from './utils/csrf.server.ts'
+import { AuthenticityTokenProvider } from 'remix-utils'
 
 const RemixDevTools =
 	process.env.NODE_ENV === 'development'
@@ -141,6 +143,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	}
 	const { toast, headers: toastHeaders } = await getToast(request)
 	const { confettiId, headers: confettiHeaders } = getConfetti(request)
+	const [csrfToken, csrfCookieHeader] = await csrf.commitToken()
 
 	return json(
 		{
@@ -157,12 +160,14 @@ export async function loader({ request }: DataFunctionArgs) {
 			ENV: getEnv(),
 			toast,
 			confettiId,
+			csrfToken,
 		},
 		{
 			headers: combineHeaders(
 				{ 'Server-Timing': timings.toString() },
 				toastHeaders,
 				confettiHeaders,
+				{ 'set-cookie': csrfCookieHeader },
 			),
 		},
 	)
@@ -299,9 +304,11 @@ function App() {
 function AppWithProviders() {
 	const data = useLoaderData<typeof loader>()
 	return (
-		<HoneypotProvider {...data.honeypot}>
-			<App />
-		</HoneypotProvider>
+		<AuthenticityTokenProvider token={data.csrfToken}>
+			<HoneypotProvider {...data.honeypot}>
+				<App />
+			</HoneypotProvider>
+		</AuthenticityTokenProvider>
 	)
 }
 

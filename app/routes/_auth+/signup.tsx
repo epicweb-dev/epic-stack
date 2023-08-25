@@ -1,3 +1,15 @@
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { ErrorList, Field } from '#app/components/forms.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	ProviderConnectionForm,
+	providerNames,
+} from '#app/utils/connections.tsx'
+import { prisma } from '#app/utils/db.server.ts'
+import { sendEmail } from '#app/utils/email.server.ts'
+import { honeypot } from '#app/utils/honeypot.server.ts'
+import { useIsPending } from '#app/utils/misc.tsx'
+import { EmailSchema } from '#app/utils/user-validation.ts'
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import * as E from '@react-email/components'
@@ -8,21 +20,10 @@ import {
 	type MetaFunction,
 } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
+import { AuthenticityTokenInput, HoneypotInputs } from 'remix-utils'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, Field } from '#app/components/forms.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
-import {
-	ProviderConnectionForm,
-	providerNames,
-} from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
-import { sendEmail } from '#app/utils/email.server.ts'
-import { useIsPending } from '#app/utils/misc.tsx'
-import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.tsx'
-import { honeypot } from '#app/utils/honeypot.server.ts'
-import { HoneypotInputs } from 'remix-utils'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 
 const SignupSchema = z.object({
 	email: EmailSchema,
@@ -31,6 +32,7 @@ const SignupSchema = z.object({
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
 	honeypot.check(formData)
+	await validateCSRF(formData, request.headers)
 	const submission = await parse(formData, {
 		schema: SignupSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
@@ -143,6 +145,7 @@ export default function SignupRoute() {
 						errors={fields.email.errors}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
+					<AuthenticityTokenInput />
 					<HoneypotInputs />
 					<StatusButton
 						className="w-full"
