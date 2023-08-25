@@ -1,0 +1,166 @@
+diff --git a/node_modules/remix-utils/build/react/honeypot-inputs.js b/node_modules/remix-utils/build/react/honeypot-inputs.js
+index 9b2aabb..fb47966 100644
+--- a/node_modules/remix-utils/build/react/honeypot-inputs.js
++++ b/node_modules/remix-utils/build/react/honeypot-inputs.js
+@@ -1,42 +1,47 @@
+-import * as React from "react";
+-import { useRouteLoaderData } from "@remix-run/react";
++import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
++import { createContext, useContext } from "react";
++const HoneyPotContext = createContext(null);
+ export function HoneypotInputs() {
+-  let rootLoaderData = useRouteLoaderData("root");
+-  if (!rootLoaderData) throw new Error("Missing loader data from root");
+-  if (!rootLoaderData.nameFieldName) {
+-    throw new Error("Missing Honeypot's nameFieldName on root loader data");
+-  }
+-  if (!rootLoaderData.validFromFieldName) {
+-    throw new Error(
+-      "Missing Honeypot's validFromFieldName on root loader data"
+-    );
+-  }
+-  if (!rootLoaderData.encryptedValidFrom) {
+-    throw new Error(
+-      "Missing Honeypot's encryptedValidFrom on root loader data"
+-    );
+-  }
+-  return React.createElement(
+-    "div",
+-    {
+-      id: `${rootLoaderData.nameFieldName}_wrap`,
+-      style: { display: "none" },
+-      "aria-hidden": "true",
++  const {nameFieldName, validFromFieldName, encryptedValidFrom} = useContext(HoneyPotContext);
++  return _jsxs("div", {
++    id: `${nameFieldName}_wrap`,
++    style: { display: "none" },
++    "aria-hidden": "true",
++    children: [
++      _jsx("label", {
++        htmlFor: nameFieldName,
++        children: "Please leave this field blank",
++      }),
++      _jsx("input", {
++        id: nameFieldName,
++        name: nameFieldName,
++        type: "text",
++        defaultValue: "",
++        autoComplete: "off",
++        tabIndex: -1,
++      }),
++      _jsx("label", {
++        htmlFor: validFromFieldName,
++        children: "Please leave this field blank",
++      }),
++      _jsx("input", {
++        name: validFromFieldName,
++        type: "text",
++        value: encryptedValidFrom,
++        readOnly: true,
++        autoComplete: "off",
++        tabIndex: -1,
++      }),
++    ],
++  });
++}
++export function HoneypotProvider({children, nameFieldName, validFromFieldName, encryptedValidFrom}) {
++  return _jsx(HoneyPotContext.Provider, {
++    value: {
++      nameFieldName,
++      validFromFieldName,
++      encryptedValidFrom,
+     },
+-    React.createElement("input", {
+-      id: rootLoaderData.nameFieldName,
+-      name: rootLoaderData.nameFieldName,
+-      type: "text",
+-      defaultValue: "",
+-      autoComplete: "off",
+-      tabIndex: -1,
+-    }),
+-    React.createElement("input", {
+-      name: rootLoaderData.validFromFieldName,
+-      type: "text",
+-      value: rootLoaderData.encryptedValidFrom,
+-      autoComplete: "off",
+-      tabIndex: -1,
+-    })
+-  );
++    children: children,
++  });
+ }
+diff --git a/node_modules/remix-utils/build/server/honeypot.d.ts b/node_modules/remix-utils/build/server/honeypot.d.ts
+index d1b2154..eb334b3 100644
+--- a/node_modules/remix-utils/build/server/honeypot.d.ts
++++ b/node_modules/remix-utils/build/server/honeypot.d.ts
+@@ -7,7 +7,6 @@ export interface HonetpotConfig {
+   randomizeNameFieldName?: boolean;
+   nameFieldName?: string;
+   validFromFieldName?: string;
+-  validFromTimestamp?: number;
+   encryptionSeed?: string;
+ }
+ export declare class SpamError extends Error {}
+@@ -15,11 +14,10 @@ export declare class Honeypot {
+   protected config: HonetpotConfig;
+   private generatedEncryptionSeed;
+   constructor(config?: HonetpotConfig);
+-  getInputProps(): HoneypotInputProps;
++  getInputProps(config?: {validFromTimestamp?: Date}): HoneypotInputProps;
+   check(formData: FormData): void;
+   protected get nameFieldName(): string;
+   protected get validFromFieldName(): string;
+-  protected get validFromTimestamp(): number;
+   protected get encryptionSeed(): string;
+   protected getRandomizedNameFieldName(
+     nameFieldName: string,
+diff --git a/node_modules/remix-utils/build/server/honeypot.js b/node_modules/remix-utils/build/server/honeypot.js
+index 1a876c5..a71adeb 100644
+--- a/node_modules/remix-utils/build/server/honeypot.js
++++ b/node_modules/remix-utils/build/server/honeypot.js
+@@ -6,15 +6,15 @@ export class Honeypot {
+   constructor(config = {}) {
+     this.config = config;
+   }
+-  getInputProps() {
++  getInputProps({validFromTimestamp = new Date()} = {}) {
+     return {
+       nameFieldName: this.nameFieldName,
+       validFromFieldName: this.validFromFieldName,
+-      encryptedValidFrom: this.encrypt(this.validFromTimestamp.toString()),
++      encryptedValidFrom: this.encrypt(validFromTimestamp.toString()),
+     };
+   }
+   check(formData) {
+-    let nameFieldName = this.config.nameFieldName ?? "honeypot";
++    let nameFieldName = this.config.nameFieldName ?? "name__confirm";
+     if (this.config.randomizeNameFieldName) {
+       let actualName = this.getRandomizedNameFieldName(nameFieldName, formData);
+       if (actualName) nameFieldName = actualName;
+@@ -25,7 +25,7 @@ export class Honeypot {
+     }
+     let honeypotValue = formData.get(nameFieldName);
+     if (honeypotValue !== "") throw new SpamError("Honeypot input not empty");
+-    if (!this.config.validFromTimestamp) return;
++    if (!this.validFromFieldName) return;
+     let validFrom = formData.get(this.validFromFieldName);
+     if (!validFrom) throw new SpamError("Missing honeypot valid from input");
+     let time = this.decrypt(validFrom);
+@@ -38,15 +38,12 @@ export class Honeypot {
+     }
+   }
+   get nameFieldName() {
+-    let fieldName = this.config.nameFieldName ?? "honeypot";
++    let fieldName = this.config.nameFieldName ?? "name__confirm";
+     if (!this.config.randomizeNameFieldName) return fieldName;
+     return `${fieldName}_${this.randomValue()}`;
+   }
+   get validFromFieldName() {
+-    return this.config.validFromFieldName ?? "honeypot_from";
+-  }
+-  get validFromTimestamp() {
+-    return this.config.validFromTimestamp ?? Date.now();
++    return this.config.validFromFieldName ?? "from__confirm";
+   }
+   get encryptionSeed() {
+     return this.config.encryptionSeed ?? this.generatedEncryptionSeed;

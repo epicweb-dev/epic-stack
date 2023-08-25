@@ -95,7 +95,7 @@
     "remix-auth-form": "^1.3.0",
     "remix-auth-github": "^1.6.0",
     "remix-development-tools": "^2.1.1",
-    "remix-utils": "^7.0.0",
+    "remix-utils": "^7.0.0-pre.1",
     "set-cookie-parser": "^2.6.0",
     "sonner": "^0.6.2",
     "source-map-support": "^0.5.21",
