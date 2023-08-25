@@ -129,10 +129,10 @@ index 60056da..2ebb235 100644
  export declare function HoneypotInputs(): JSX.Element;
 +export declare function HoneypotProvider(props: {children: React.ReactNode, nameFieldName: string, validFromFieldName: string, encryptedValidFrom: string}): JSX.Element;
 diff --git a/node_modules/remix-utils/build/react/honeypot-inputs.js b/node_modules/remix-utils/build/react/honeypot-inputs.js
-index a42c3b8..fa88785 100644
+index a42c3b8..fb47966 100644
 --- a/node_modules/remix-utils/build/react/honeypot-inputs.js
 +++ b/node_modules/remix-utils/build/react/honeypot-inputs.js
-@@ -1,41 +1,39 @@
+@@ -1,41 +1,47 @@
  import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 -import { useRouteLoaderData } from "@remix-run/react";
 +import { createContext, useContext } from "react";
@@ -160,6 +160,10 @@ index a42c3b8..fa88785 100644
      style: { display: "none" },
      "aria-hidden": "true",
      children: [
++      _jsx("label", {
++        htmlFor: nameFieldName,
++        children: "Please leave this field blank",
++      }),
        _jsx("input", {
 -        id: rootLoaderData.nameFieldName,
 -        name: rootLoaderData.nameFieldName,
@@ -170,6 +174,10 @@ index a42c3b8..fa88785 100644
          autoComplete: "off",
          tabIndex: -1,
        }),
++      _jsx("label", {
++        htmlFor: validFromFieldName,
++        children: "Please leave this field blank",
++      }),
        _jsx("input", {
 -        name: rootLoaderData.validFromFieldName,
 +        name: validFromFieldName,
@@ -315,18 +323,18 @@ index 0f26b08..e6e0d8f 100644
    let headers = getHeaders(requestOrHeaders);
    let acceptLanguage = headers.get("Accept-Language");
 diff --git a/node_modules/remix-utils/build/server/honeypot.d.ts b/node_modules/remix-utils/build/server/honeypot.d.ts
-index 0032819..aa8f10e 100644
+index 0032819..3ea0268 100644
 --- a/node_modules/remix-utils/build/server/honeypot.d.ts
 +++ b/node_modules/remix-utils/build/server/honeypot.d.ts
-@@ -7,19 +7,16 @@ export interface HonetpotConfig {
+@@ -7,7 +7,6 @@ export interface HonetpotConfig {
    randomizeNameFieldName?: boolean;
    nameFieldName?: string;
    validFromFieldName?: string;
 -  validFromTimestamp?: number;
    encryptionSeed?: string;
  }
--export declare class SpamError extends Error {}
- export declare class Honeypot {
+ export declare class SpamError extends Error {}
+@@ -15,11 +14,10 @@ export declare class Honeypot {
    protected config: HonetpotConfig;
    private generatedEncryptionSeed;
    constructor(config?: HonetpotConfig);
@@ -340,15 +348,10 @@ index 0032819..aa8f10e 100644
    protected getRandomizedNameFieldName(
      nameFieldName: string,
 diff --git a/node_modules/remix-utils/build/server/honeypot.js b/node_modules/remix-utils/build/server/honeypot.js
-index 65586c9..37bb1c3 100644
+index 65586c9..fb77a74 100644
 --- a/node_modules/remix-utils/build/server/honeypot.js
 +++ b/node_modules/remix-utils/build/server/honeypot.js
-@@ -1,15 +1,15 @@
- import CryptoJS from "crypto-js";
--export class SpamError extends Error {}
-+const getErrorResponse = () => new Response("Error submitting the form", {status: 400});
- export class Honeypot {
-   constructor(config = {}) {
+@@ -5,11 +5,11 @@ export class Honeypot {
      this.config = config;
      this.generatedEncryptionSeed = this.randomValue();
    }
@@ -362,7 +365,7 @@ index 65586c9..37bb1c3 100644
      };
    }
    check(formData) {
-@@ -17,27 +17,27 @@ export class Honeypot {
+@@ -17,7 +17,7 @@ export class Honeypot {
      let nameFieldName =
        (_a = this.config.nameFieldName) !== null && _a !== void 0
          ? _a
@@ -371,32 +374,6 @@ index 65586c9..37bb1c3 100644
      if (this.config.randomizeNameFieldName) {
        let actualName = this.getRandomizedNameFieldName(nameFieldName, formData);
        if (actualName) nameFieldName = actualName;
-     }
-     if (!this.shouldCheckHoneypot(formData, nameFieldName)) return;
-     if (!formData.has(nameFieldName)) {
--      throw new SpamError("Missing honeypot input");
-+      throw getErrorResponse()
-     }
-     let honeypotValue = formData.get(nameFieldName);
--    if (honeypotValue !== "") throw new SpamError("Honeypot input not empty");
-+    if (honeypotValue !== "") throw getErrorResponse()
-     if (!this.config.validFromTimestamp) return;
-     let validFrom = formData.get(this.validFromFieldName);
--    if (!validFrom) throw new SpamError("Missing honeypot valid from input");
-+    if (!validFrom) throw getErrorResponse()
-     let time = this.decrypt(validFrom);
--    if (!time) throw new SpamError("Invalid honeypot valid from input");
-+    if (!time) throw getErrorResponse()
-     if (!this.isValidTimeStamp(Number(time))) {
--      throw new SpamError("Invalid honeypot valid from input");
-+      throw getErrorResponse()
-     }
-     if (this.isFuture(Number(time))) {
--      throw new SpamError("Honeypot valid from is in future");
-+      throw getErrorResponse()
-     }
-   }
-   get nameFieldName() {
 @@ -45,7 +45,7 @@ export class Honeypot {
      let fieldName =
        (_a = this.config.nameFieldName) !== null && _a !== void 0

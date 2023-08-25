@@ -5,9 +5,10 @@ import {
 	ProviderConnectionForm,
 	providerNames,
 } from '#app/utils/connections.tsx'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
-import { honeypot } from '#app/utils/honeypot.server.ts'
+import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
 import { conform, useForm } from '@conform-to/react'
@@ -23,7 +24,6 @@ import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { AuthenticityTokenInput, HoneypotInputs } from 'remix-utils'
 import { z } from 'zod'
 import { prepareVerification } from './verify.tsx'
-import { validateCSRF } from '#app/utils/csrf.server.ts'
 
 const SignupSchema = z.object({
 	email: EmailSchema,
@@ -31,7 +31,7 @@ const SignupSchema = z.object({
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	honeypot.check(formData)
+	checkHoneypot(formData)
 	await validateCSRF(formData, request.headers)
 	const submission = await parse(formData, {
 		schema: SignupSchema.superRefine(async (data, ctx) => {
