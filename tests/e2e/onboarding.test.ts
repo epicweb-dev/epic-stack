@@ -127,6 +127,7 @@ test('onboarding with a short code', async ({ page }) => {
 test('login as existing user', async ({ page }) => {
 	const password = faker.internet.password()
 	const user = await insertNewUser({ password })
+	usernamesToDelete.add(user.username)
 	invariant(user.name, 'User name not found')
 	await page.goto('/login')
 	await page.getByRole('textbox', { name: /username/i }).fill(user.username)
