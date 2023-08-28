@@ -11,7 +11,7 @@ const callback = () =>
 		hydrateRoot(document, <RemixBrowser />)
 	})
 
-if (process.env.NODE_ENV === 'development') {
+if (ENV.MODE === 'development') {
 	import('remix-development-tools').then(({ initClient }) => {
 		// Add all the dev tools props here into the client
 		initClient()
