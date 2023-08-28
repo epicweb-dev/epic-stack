@@ -52,10 +52,14 @@ const ImageFieldsetSchema = z.object({
 
 type ImageFieldset = z.infer<typeof ImageFieldsetSchema>
 
-function imageHasFile(
+function imageHasFileOrId(
 	image: ImageFieldset,
-): image is ImageFieldset & { file: NonNullable<ImageFieldset['file']> } {
-	return Boolean(image.file)
+): image is ImageFieldset &
+	(
+		| { file: NonNullable<ImageFieldset['file']> }
+		| { id: NonNullable<ImageFieldset['id']> }
+	) {
+	return Boolean(image.file || image.id)
 }
 
 const NoteEditorSchema = z.object({
@@ -91,12 +95,12 @@ export async function action({ request }: DataFunctionArgs) {
 			return {
 				...data,
 				images: await Promise.all(
-					images.filter(imageHasFile).map(async image => ({
+					images.filter(imageHasFileOrId).map(async image => ({
 						id: image.id,
 						altText: image.altText,
-						contentType: image.file.type,
+						contentType: image.file?.type,
 						blob:
-							image.file.size > 0
+							image.file?.size && image.file.size > 0
 								? Buffer.from(await image.file.arrayBuffer())
 								: null,
 					})),
@@ -135,12 +139,12 @@ export async function action({ request }: DataFunctionArgs) {
 		})
 
 		for (const image of images) {
-			const { blob } = image
-			if (blob) {
+			const { blob, contentType } = image
+			if (blob && contentType) {
 				await $prisma.noteImage.upsert({
 					select: { id: true },
 					where: { id: image.id ?? '__new_image__' },
-					create: { ...image, blob, noteId: note.id },
+					create: { ...image, blob, contentType, noteId: note.id },
 					update: {
 						...image,
 						blob,
