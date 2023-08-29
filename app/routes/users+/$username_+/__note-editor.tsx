@@ -58,6 +58,12 @@ function imageHasFile(
 	return Boolean(image.file?.size && image.file?.size > 0)
 }
 
+function imageHasId(
+	image: ImageFieldset,
+): image is ImageFieldset & { id: NonNullable<ImageFieldset['id']> } {
+	return image.id != null
+}
+
 const NoteEditorSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(titleMinLength).max(titleMaxLength),
@@ -90,20 +96,34 @@ export async function action({ request }: DataFunctionArgs) {
 		}).transform(async ({ images = [], ...data }) => {
 			return {
 				...data,
-				imageIds: images.map(i => i.id).filter(Boolean),
-				imageUpdates: images
-					.filter(i => i.id && !imageHasFile(i))
-					.map(i => ({
-						id: i.id,
-						altText: i.altText,
-					})),
-				imageUploads: await Promise.all(
-					images.filter(imageHasFile).map(async image => ({
-						id: image.id,
-						altText: image.altText,
-						contentType: image.file.type,
-						blob: Buffer.from(await image.file.arrayBuffer()),
-					})),
+				imageUpdates: await Promise.all(
+					images.filter(imageHasId).map(async i => {
+						if (imageHasFile(i)) {
+							return {
+								id: i.id,
+								altText: i.altText,
+								contentType: i.file.type,
+								blob: Buffer.from(await i.file.arrayBuffer()),
+							}
+						} else {
+							return {
+								id: i.id,
+								altText: i.altText,
+							}
+						}
+					}),
+				),
+				newImages: await Promise.all(
+					images
+						.filter(imageHasFile)
+						.filter(i => !i.id)
+						.map(async image => {
+							return {
+								altText: image.altText,
+								contentType: image.file.type,
+								blob: Buffer.from(await image.file.arrayBuffer()),
+							}
+						}),
 				),
 			}
 		}),
@@ -122,48 +142,30 @@ export async function action({ request }: DataFunctionArgs) {
 		id: noteId,
 		title,
 		content,
-		imageUploads = [],
 		imageUpdates = [],
-		imageIds,
+		newImages = [],
 	} = submission.value
 
-	const updatedNote = await prisma.$transaction(async $prisma => {
-		const note = await $prisma.note.upsert({
-			select: { id: true, owner: { select: { username: true } } },
-			where: { id: noteId ?? '__new_note__' },
-			create: {
-				ownerId: userId,
-				title,
-				content,
+	const updatedNote = await prisma.note.upsert({
+		select: { id: true, owner: { select: { username: true } } },
+		where: { id: noteId ?? '__new_note__' },
+		create: {
+			ownerId: userId,
+			title,
+			content,
+		},
+		update: {
+			title,
+			content,
+			images: {
+				deleteMany: { id: { notIn: imageUpdates.map(i => i.id) } },
+				updateMany: imageUpdates.map(updates => ({
+					where: { id: updates.id },
+					data: { ...updates, id: updates.blob ? cuid() : updates.id },
+				})),
+				create: newImages,
 			},
-			update: {
-				title,
-				content,
-				images: {
-					deleteMany: { id: { notIn: imageIds } },
-					updateMany: imageUpdates.map(updates => ({
-						where: { id: updates.id },
-						data: updates,
-					})),
-				},
-			},
-		})
-
-		for (const image of imageUploads) {
-			await $prisma.noteImage.upsert({
-				select: { id: true },
-				where: { id: image.id ?? '__new_image__' },
-				create: { ...image, noteId: note.id },
-				update: {
-					...image,
-					// update the id since it is used for caching
-					id: cuid(),
-					noteId: note.id,
-				},
-			})
-		}
-
-		return note
+		},
 	})
 
 	return redirect(
