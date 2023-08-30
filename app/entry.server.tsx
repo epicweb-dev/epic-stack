@@ -40,19 +40,13 @@ export default async function handleRequest(...args: DocRequestArgs) {
 	const nonce = String(loadContext.cspNonce) ?? undefined
 	return new Promise(async (resolve, reject) => {
 		let didError = false
-		const context =
-			process.env.NODE_ENV === 'development'
-				? await import('remix-development-tools').then(({ initServer }) =>
-						initServer(remixContext),
-				  )
-				: remixContext
 		// NOTE: this timing will only include things that are rendered in the shell
 		// and will not include suspended components and deferred loaders
 		const timings = makeTimings('render', 'renderToPipeableStream')
 
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
-				<RemixServer context={context} url={request.url} />
+				<RemixServer context={remixContext} url={request.url} />
 			</NonceProvider>,
 			{
 				[callbackName]: () => {
