@@ -153,6 +153,7 @@ export async function action({ request }: DataFunctionArgs) {
 			ownerId: userId,
 			title,
 			content,
+			images: { create: newImages },
 		},
 		update: {
 			title,

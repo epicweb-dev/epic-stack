@@ -81,9 +81,8 @@ export async function handleNewSession(
 			combineResponseInits(
 				{
 					headers: {
-						'set-cookie': await verifySessionStorage.commitSession(
-							verifySession,
-						),
+						'set-cookie':
+							await verifySessionStorage.commitSession(verifySession),
 					},
 				},
 				responseInit,
@@ -261,7 +260,6 @@ export default function LoginPage() {
 				<div>
 					<div className="mx-auto w-full max-w-md px-8">
 						<Form method="POST" {...form.props}>
-							<input type="hidden" name="form" value={form.id} />
 							<Field
 								labelProps={{ children: 'Username' }}
 								inputProps={{
