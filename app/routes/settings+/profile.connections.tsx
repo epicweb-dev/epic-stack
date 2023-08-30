@@ -15,8 +15,8 @@ import {
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
-import { GITHUB_PROVIDER_NAME } from '#app/utils/github-auth.server.ts'
 import { invariantResponse, useIsPending } from '#app/utils/misc.tsx'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 
