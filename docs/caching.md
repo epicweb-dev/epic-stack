@@ -44,7 +44,7 @@ const eventSchema = z.object({
 export async function getScheduledEvents({
 	timings,
 }: {
-	timings: Timings
+	timings?: Timings
 } = {}) {
 	const scheduledEvents = await cachified({
 		key: 'tito:scheduled-events',
