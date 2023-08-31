@@ -24,7 +24,7 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { Suspense, lazy, useRef } from 'react'
+import { useRef } from 'react'
 import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
