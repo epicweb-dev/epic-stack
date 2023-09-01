@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker'
 import { expect, test } from '@playwright/test'
 import { type NoteImage, type Note } from '@prisma/client'
 import { prisma } from '#app/utils/db.server.ts'
-import { insertedUsers, loginPage } from '#tests/playwright-utils.ts'
+import { loginPage } from '#tests/playwright-utils.ts'
 
 test('Users can create note with an image', async ({ page }) => {
 	const user = await loginPage({ page })
@@ -145,10 +145,3 @@ function createNoteWithImage() {
 		images: { create: Pick<NoteImage, 'altText' | 'blob' | 'contentType'> }
 	}
 }
-
-test.afterEach(async () => {
-	await prisma.user.deleteMany({
-		where: { id: { in: Array.from(insertedUsers) } },
-	})
-	insertedUsers.clear()
-})
