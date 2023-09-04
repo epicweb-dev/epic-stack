@@ -1,4 +1,4 @@
-import matchers from '@testing-library/jest-dom/matchers.js'
+import matchers from '@testing-library/jest-dom/matchers'
 import * as setCookieParser from 'set-cookie-parser'
 import { expect } from 'vitest'
 import { sessionKey } from '#app/utils/auth.server.ts'
@@ -11,7 +11,7 @@ import {
 } from '#app/utils/toast.server.ts'
 import { convertSetCookieToCookie } from '#tests/utils.ts'
 
-import '@testing-library/jest-dom/vitest.d.ts'
+import '@testing-library/jest-dom/vitest'
 expect.extend(matchers)
 
 expect.extend({

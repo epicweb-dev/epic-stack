@@ -111,7 +111,7 @@
     "@remix-run/serve": "1.19.3",
     "@remix-run/testing": "^1.19.3",
     "@sly-cli/sly": "^1.4.10",
-    "@testing-library/jest-dom": "^6.0.1",
+    "@testing-library/jest-dom": "^6.1.2",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@total-typescript/ts-reset": "^0.5.1",
