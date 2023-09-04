@@ -18,11 +18,7 @@ export const server = setupServer(
 
 server.listen({
 	onUnhandledRequest(request, print) {
-		if (
-			request.url.includes(process.cwd()) ||
-			request.url.includes('node_modules') ||
-			request.url.startsWith('node:')
-		) {
+		if (!request.url.startsWith('http')) {
 			return
 		}
 		print.warning()
