@@ -5,7 +5,6 @@ import {
 } from '@remix-run/node'
 import { Form, useFetcher, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
-import { z } from 'zod'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
@@ -15,10 +14,11 @@ import {
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
+import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariantResponse, useIsPending } from '#app/utils/misc.tsx'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
+import { resolveConnectionData } from '#app/utils/connections.server.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="link-2">Connections</Icon>,
@@ -38,28 +38,6 @@ async function userCanDeleteConnections(userId: string) {
 	return Boolean(user?._count.connections && user?._count.connections > 1)
 }
 
-const GitHubUserSchema = z.object({ login: z.string() })
-
-async function resolveGitHubConnectionData(connection: {
-	id: string
-	providerName: string
-	providerId: string
-	createdAt: Date
-}) {
-	const response = await fetch(
-		`https://api.github.com/user/${connection.providerId}`,
-		{ headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } },
-	)
-	const rawJson = await response.json()
-	const result = GitHubUserSchema.safeParse(rawJson)
-	return {
-		id: connection.id,
-		displayName: result.success ? result.data.login : 'Unknown',
-		link: result.success ? `https://github.com/${result.data.login}` : null,
-		createdAtFormatted: connection.createdAt.toLocaleString(),
-	}
-}
-
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const rawConnections = await prisma.connection.findMany({
@@ -73,8 +51,18 @@ export async function loader({ request }: DataFunctionArgs) {
 		createdAtFormatted: string
 	}> = []
 	for (const connection of rawConnections) {
-		if (connection.providerName === GITHUB_PROVIDER_NAME) {
-			connections.push(await resolveGitHubConnectionData(connection))
+		const r = ProviderNameSchema.safeParse(connection.providerName)
+		if (!r.success) continue
+		const connectionData = await resolveConnectionData(
+			r.data,
+			connection.providerId,
+		)
+		if (connectionData) {
+			connections.push({
+				...connectionData,
+				id: connection.id,
+				createdAtFormatted: connection.createdAt.toLocaleString(),
+			})
 		} else {
 			connections.push({
 				id: connection.id,

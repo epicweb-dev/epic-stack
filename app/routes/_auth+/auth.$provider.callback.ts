@@ -52,7 +52,6 @@ export async function loader({ request, params }: DataFunctionArgs) {
 		)
 	}
 
-	// return
 	const { data: profile } = authResult
 
 	const existingConnection = await prisma.connection.findUnique({
