@@ -53,7 +53,10 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
   with OpenID Connect Auth (Google) using [web-oidc](https://npm.im/web-oidc)
   and [remix-auth](https://npm.im/remix-auth).
-
+- [Epic Stack + Fathom Analytics](https://github.com/xstevenyung/epic-stack-with-fathom-analytics)
+  by [@xstevenyung](https://github.com/xstevenyung): An example of the Epic Stack
+  with Fanthom Analytics via CDN
+  
 ## How to contribute
 
 [![Kent screencast showing the examples page](https://github.com/epicweb-dev/epic-stack/assets/1500684/7074f1db-c918-42c6-a724-0b082168395f)](https://www.epicweb.dev/tips/contribute-an-epic-stack-example)
