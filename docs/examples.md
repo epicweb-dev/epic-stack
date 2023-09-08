@@ -56,6 +56,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Fathom Analytics](https://github.com/xstevenyung/epic-stack-with-fathom-analytics)
   by [@xstevenyung](https://github.com/xstevenyung): An example of the Epic Stack
   with Fanthom Analytics via CDN
+- [Epic Stack + Tenant Users](https://github.com/offseat/epic-stack-tenant)
+  by [@vinstah](https://github.com/vinstah): An example of the Epic Stack
+  with tenant users and members starter
   
 ## How to contribute
 
