@@ -44,18 +44,14 @@ test('Users can create note with multiple images', async ({ page }) => {
 		"input[name='images[0].file']",
 		'tests/fixtures/images/kody-notes/cute-koala.png',
 	)
-	await page
-		.locator('[id="note-editor-images\\[0\\]\\.altText"]')
-		.fill(altText1)
+	await page.getByLabel('alt text').nth(0).fill(altText1)
 	await page.getByRole('button', { name: 'add image' }).click()
 
 	await page.setInputFiles(
 		"input[name='images[1].file']",
 		'tests/fixtures/images/kody-notes/koala-coder.png',
 	)
-	await page
-		.locator('[id="note-editor-images\\[1\\]\\.altText"]')
-		.fill(altText2)
+	await page.getByLabel('alt text').nth(1).fill(altText2)
 
 	await page.getByRole('button', { name: 'submit' }).click()
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
@@ -83,9 +79,7 @@ test('Users can edit note image', async ({ page }) => {
 		url: 'tests/fixtures/images/kody-notes/koala-coder.png',
 	}
 	await page.setInputFiles("input[name='images[0].file']", updatedImage.url)
-	await page
-		.locator('[id="note-editor-images\\[0\\]\\.altText"]')
-		.fill(updatedImage.altText)
+	await page.getByLabel('alt text').nth(0).fill(updatedImage.altText)
 	await page.getByRole('button', { name: 'submit' }).click()
 
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
