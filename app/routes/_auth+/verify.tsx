@@ -41,7 +41,6 @@ const VerifySchema = z.object({
 	[typeQueryParam]: VerificationTypeSchema,
 	[targetQueryParam]: z.string(),
 	[redirectToQueryParam]: z.string().optional(),
-	[rememberQueryParam]: z.boolean().optional().optional(),
 })
 
 export async function loader({ request }: DataFunctionArgs) {

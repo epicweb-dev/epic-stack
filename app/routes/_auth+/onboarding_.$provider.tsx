@@ -28,7 +28,7 @@ import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant, useIsPending } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { type VerifyFunctionArgs } from './verify.tsx'
@@ -154,7 +154,7 @@ export async function action({ request, params }: DataFunctionArgs) {
 	const headers = new Headers()
 	headers.append(
 		'set-cookie',
-		await sessionStorage.commitSession(cookieSession, {
+		await commitSession(cookieSession, {
 			expires: remember ? session.expirationDate : undefined,
 		}),
 	)
@@ -166,14 +166,9 @@ export async function action({ request, params }: DataFunctionArgs) {
 	return redirectWithConfetti(safeRedirect(redirectTo), { headers })
 }
 
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
+export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(submission.value, 'submission.value should be defined by now')
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession()
 	verifySession.set(onboardingEmailSessionKey, submission.value.target)
 	return redirect('/onboarding', {
 		headers: {

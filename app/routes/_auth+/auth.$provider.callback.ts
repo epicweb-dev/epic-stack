@@ -134,9 +134,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
 	}
 
 	// this is a new user, so let's get them onboarded
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession()
 	verifySession.set(onboardingEmailSessionKey, profile.email)
 	verifySession.set(prefilledProfileKey, {
 		...profile,

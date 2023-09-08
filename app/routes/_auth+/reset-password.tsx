@@ -37,9 +37,7 @@ export async function handleVerification({
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession()
 	verifySession.set(resetPasswordUsernameSessionKey, user.username)
 	return redirect('/reset-password', {
 		headers: {
@@ -92,9 +90,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const { password } = submission.value
 
 	await resetUserPassword({ username: resetPasswordUsername, password })
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession()
 	return redirect('/login', {
 		headers: {
 			'set-cookie': await verifySessionStorage.destroySession(verifySession),

@@ -7,7 +7,7 @@ import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
 import { createUser } from '#tests/db-utils.ts'
 import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
@@ -223,7 +223,7 @@ async function setupRequest({
 	const cookieSession = await sessionStorage.getSession()
 	cookieSession.set('oauth2:state', state)
 	if (sessionId) cookieSession.set(sessionKey, sessionId)
-	const setCookieHeader = await sessionStorage.commitSession(cookieSession)
+	const setCookieHeader = await commitSession(cookieSession)
 	const request = new Request(url.toString(), {
 		method: 'GET',
 		headers: { cookie: convertSetCookieToCookie(setCookieHeader) },

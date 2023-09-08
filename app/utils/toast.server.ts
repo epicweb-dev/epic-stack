@@ -44,7 +44,6 @@ export async function redirectWithToast(
 export async function createToastHeaders(optionalToast: OptionalToast) {
 	const session = await toastSessionStorage.getSession()
 	const toast = ToastSchema.parse(optionalToast)
-	// using session.flash so next time .get is called, it's immediately removed
 	session.flash(toastKey, toast)
 	const cookie = await toastSessionStorage.commitSession(session)
 	return new Headers({ 'set-cookie': cookie })
@@ -60,7 +59,7 @@ export async function getToast(request: Request) {
 		toast,
 		headers: toast
 			? new Headers({
-					'set-cookie': await toastSessionStorage.commitSession(session),
+					'set-cookie': await toastSessionStorage.destroySession(session),
 			  })
 			: null,
 	}

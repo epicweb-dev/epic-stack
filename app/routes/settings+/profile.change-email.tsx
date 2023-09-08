@@ -131,9 +131,7 @@ export async function action({ request }: DataFunctionArgs) {
 	})
 
 	if (response.status === 'success') {
-		const verifySession = await verifySessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
+		const verifySession = await verifySessionStorage.getSession()
 		verifySession.set(newEmailAddressSessionKey, submission.value.email)
 		return redirect(redirectTo.toString(), {
 			headers: {

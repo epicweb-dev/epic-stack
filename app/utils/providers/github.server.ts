@@ -1,7 +1,7 @@
 import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
-import { sessionStorage } from '../session.server.ts'
+import { commitSession, sessionStorage } from '../session.server.ts'
 import { type AuthProvider } from './provider.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })
@@ -61,10 +61,7 @@ export class GitHubProvider implements AuthProvider {
 		cookieSession.set('oauth2:state', state)
 		const reqUrl = new URL(request.url)
 		reqUrl.searchParams.set('state', state)
-		request.headers.set(
-			'cookie',
-			await sessionStorage.commitSession(cookieSession),
-		)
+		request.headers.set('cookie', await commitSession(cookieSession))
 		return new Request(reqUrl.toString(), request)
 	}
 }

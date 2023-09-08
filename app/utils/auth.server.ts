@@ -7,7 +7,7 @@ import { providers } from './connections.server.ts'
 import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
-import { sessionStorage } from './session.server.ts'
+import { commitSession, sessionStorage } from './session.server.ts'
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
 export const getSessionExpirationDate = () =>
@@ -32,11 +32,9 @@ export async function getUserId(request: Request) {
 		where: { id: sessionId, expirationDate: { gt: new Date() } },
 	})
 	if (!session?.user) {
-		// Perhaps user was deleted?
-		cookieSession.unset(sessionKey)
 		throw redirect('/', {
 			headers: {
-				'set-cookie': await sessionStorage.commitSession(cookieSession),
+				'set-cookie': await sessionStorage.destroySession(cookieSession),
 			},
 		})
 	}
@@ -195,12 +193,13 @@ export async function logout(
 		request.headers.get('cookie'),
 	)
 	const sessionId = cookieSession.get(sessionKey)
-	await prisma.session.delete({ where: { id: sessionId } })
-	cookieSession.unset(sessionKey)
+	// if this fails, we still need to delete the session from the user's browser
+	// and it doesn't do any harm staying in the db anyway.
+	void prisma.session.delete({ where: { id: sessionId } })
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,
 		headers: combineHeaders(
-			{ 'set-cookie': await sessionStorage.commitSession(cookieSession) },
+			{ 'set-cookie': await sessionStorage.destroySession(cookieSession) },
 			responseInit?.headers,
 		),
 	})

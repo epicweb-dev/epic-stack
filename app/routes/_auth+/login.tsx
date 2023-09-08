@@ -30,7 +30,7 @@ import {
 	invariant,
 	useIsPending,
 } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -38,6 +38,7 @@ import { getRedirectToUrl, type VerifyFunctionArgs } from './verify.tsx'
 
 const verifiedTimeKey = 'verified-time'
 const unverifiedSessionIdKey = 'unverified-session-id'
+const rememberKey = 'remember'
 
 export async function handleNewSession(
 	{
@@ -62,20 +63,15 @@ export async function handleNewSession(
 	const userHasTwoFactor = Boolean(verification)
 
 	if (userHasTwoFactor) {
-		const verifySession = await verifySessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
+		const verifySession = await verifySessionStorage.getSession()
 		verifySession.set(unverifiedSessionIdKey, session.id)
+		verifySession.set(rememberKey, remember)
 		const redirectUrl = getRedirectToUrl({
 			request,
 			type: twoFAVerificationType,
 			target: session.userId,
 			redirectTo,
 		})
-		if (remember) {
-			redirectUrl.searchParams.set('remember', 'on')
-		}
-		redirectUrl.searchParams.sort()
 		return redirect(
 			`${redirectUrl.pathname}?${redirectUrl.searchParams}`,
 			combineResponseInits(
@@ -99,7 +95,7 @@ export async function handleNewSession(
 			combineResponseInits(
 				{
 					headers: {
-						'set-cookie': await sessionStorage.commitSession(cookieSession, {
+						'set-cookie': await commitSession(cookieSession, {
 							expires: remember ? session.expirationDate : undefined,
 						}),
 					},
@@ -122,29 +118,36 @@ export async function handleVerification({
 		request.headers.get('cookie'),
 	)
 
-	const session = await prisma.session.findUnique({
-		select: { expirationDate: true },
-		where: { id: verifySession.get(unverifiedSessionIdKey) },
-	})
-	if (!session) {
-		throw await redirectWithToast('/login', {
-			type: 'error',
-			title: 'Invalid session',
-			description: 'Could not find session to verify. Please try again.',
-		})
-	}
-
-	cookieSession.set(sessionKey, verifySession.get(unverifiedSessionIdKey))
+	const remember = verifySession.get(rememberKey)
 	const { redirectTo } = submission.value
+	const headers = new Headers()
 	cookieSession.set(verifiedTimeKey, Date.now())
 
-	const headers = new Headers()
-	headers.append(
-		'set-cookie',
-		await sessionStorage.commitSession(cookieSession, {
-			expires: submission.value.remember ? session.expirationDate : undefined,
-		}),
-	)
+	const unverifiedSessionId = verifySession.get(unverifiedSessionIdKey)
+	if (unverifiedSessionId) {
+		const session = await prisma.session.findUnique({
+			select: { expirationDate: true },
+			where: { id: unverifiedSessionId },
+		})
+		if (!session) {
+			throw await redirectWithToast('/login', {
+				type: 'error',
+				title: 'Invalid session',
+				description: 'Could not find session to verify. Please try again.',
+			})
+		}
+		cookieSession.set(sessionKey, unverifiedSessionId)
+
+		headers.append(
+			'set-cookie',
+			await commitSession(cookieSession, {
+				expires: remember ? session.expirationDate : undefined,
+			}),
+		)
+	} else {
+		headers.append('set-cookie', await commitSession(cookieSession))
+	}
+
 	headers.append(
 		'set-cookie',
 		await verifySessionStorage.destroySession(verifySession),
