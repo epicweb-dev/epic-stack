@@ -21,7 +21,7 @@ import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
 import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant, useIsPending } from '#app/utils/misc.tsx'
-import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
+import { sessionStorage } from '#app/utils/session.server.ts'
 import {
 	NameSchema,
 	PasswordSchema,
@@ -112,7 +112,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const headers = new Headers()
 	headers.append(
 		'set-cookie',
-		await commitSession(cookieSession, {
+		await sessionStorage.commitSession(cookieSession, {
 			expires: remember ? session.expirationDate : undefined,
 		}),
 	)

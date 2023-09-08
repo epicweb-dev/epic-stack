@@ -30,7 +30,7 @@ import {
 	invariant,
 	useIsPending,
 } from '#app/utils/misc.tsx'
-import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
+import { sessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -95,7 +95,7 @@ export async function handleNewSession(
 			combineResponseInits(
 				{
 					headers: {
-						'set-cookie': await commitSession(cookieSession, {
+						'set-cookie': await sessionStorage.commitSession(cookieSession, {
 							expires: remember ? session.expirationDate : undefined,
 						}),
 					},
@@ -140,12 +140,15 @@ export async function handleVerification({
 
 		headers.append(
 			'set-cookie',
-			await commitSession(cookieSession, {
+			await sessionStorage.commitSession(cookieSession, {
 				expires: remember ? session.expirationDate : undefined,
 			}),
 		)
 	} else {
-		headers.append('set-cookie', await commitSession(cookieSession))
+		headers.append(
+			'set-cookie',
+			await sessionStorage.commitSession(cookieSession),
+		)
 	}
 
 	headers.append(
@@ -173,7 +176,7 @@ export async function shouldRequestTwoFA(request: Request) {
 	})
 	if (!userHasTwoFA) return false
 	const verifiedTime = cookieSession.get(verifiedTimeKey) ?? new Date(0)
-	const twoHours = 1000 * 60 * 60 * 2
+	const twoHours = 1000 * 60 * 2
 	return Date.now() - verifiedTime > twoHours
 }
 

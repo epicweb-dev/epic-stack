@@ -2,7 +2,7 @@ import { test, type Page } from '@playwright/test'
 import * as setCookieParser from 'set-cookie-parser'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { commitSession, sessionStorage } from '#app/utils/session.server.ts'
+import { sessionStorage } from '#app/utils/session.server.ts'
 import { insertNewUser, insertedUsers } from './db-utils.ts'
 
 export * from './db-utils.ts'
@@ -36,7 +36,7 @@ export async function loginPage({
 	const cookieSession = await sessionStorage.getSession()
 	cookieSession.set(sessionKey, session.id)
 	const cookieConfig = setCookieParser.parseString(
-		await commitSession(cookieSession),
+		await sessionStorage.commitSession(cookieSession),
 	) as any
 	await page.context().addCookies([{ ...cookieConfig, domain: 'localhost' }])
 	return user as typeof user & { name: string }
