@@ -56,7 +56,9 @@ export async function loader({ request, params }: DataFunctionArgs) {
 
 	const existingConnection = await prisma.connection.findUnique({
 		select: { userId: true },
-		where: { providerId: profile.id },
+		where: {
+			providerName_providerId: { providerName, providerId: profile.id },
+		},
 	})
 
 	const userId = await getUserId(request)

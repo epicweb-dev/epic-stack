@@ -14,11 +14,11 @@ import {
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { resolveConnectionData } from '#app/utils/connections.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariantResponse, useIsPending } from '#app/utils/misc.tsx'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
-import { resolveConnectionData } from '#app/utils/connections.server.ts'
 
 export const handle = {
 	breadcrumb: <Icon name="link-2">Connections</Icon>,
