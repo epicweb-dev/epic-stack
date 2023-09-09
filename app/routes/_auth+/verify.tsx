@@ -31,7 +31,6 @@ export const codeQueryParam = 'code'
 export const targetQueryParam = 'target'
 export const typeQueryParam = 'type'
 export const redirectToQueryParam = 'redirectTo'
-export const rememberQueryParam = 'remember'
 const types = ['onboarding', 'reset-password', 'change-email', '2fa'] as const
 const VerificationTypeSchema = z.enum(types)
 export type VerificationTypes = z.infer<typeof VerificationTypeSchema>
@@ -238,7 +237,6 @@ async function validateRequest(
 export default function VerifyRoute() {
 	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
-	const remember = searchParams.get(rememberQueryParam)
 	const isPending = useIsPending()
 	const actionData = useActionData<typeof action>()
 	const type = VerificationTypeSchema.parse(searchParams.get(typeQueryParam))
@@ -312,9 +310,6 @@ export default function VerifyRoute() {
 								type: 'hidden',
 							})}
 						/>
-						{remember === 'on' ? (
-							<input name={rememberQueryParam} value="on" type="hidden" />
-						) : null}
 						<StatusButton
 							className="w-full"
 							status={isPending ? 'pending' : actionData?.status ?? 'idle'}

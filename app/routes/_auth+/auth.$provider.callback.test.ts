@@ -206,9 +206,7 @@ test('if a user is not logged in, but the connection exists and they have enable
 		type: twoFAVerificationType,
 		target: userId,
 		redirectTo: '/',
-		remember: 'on',
 	})
-	searchParams.sort()
 	expect(response).toHaveRedirect(`/verify?${searchParams}`)
 })
 
