@@ -16,7 +16,7 @@ modifications.
 
 ## Signup
 
-You can sign up for Sentry and create a Remix project from visting
+You can sign up for Sentry and create a Remix project from visiting
 [this url](https://sentry.io/signup/?project_platform=javascript-remix) and
 filling out the signup form.
 
@@ -28,7 +28,7 @@ becomes `SENTRY_DSN`). Then click
 to create an internal integration. Give it a name and add the scope for
 `Releases:Admin`. Press Save, find the auth token at the bottom of the page
 under "Tokens", and copy that to secure location (this becomes
-`SENTRY_AUTH_TOKEN`). Then vist the organization settings page and copy that
+`SENTRY_AUTH_TOKEN`). Then visit the organization settings page and copy that
 organization slug (`SENTRY_ORG_SLUG`).
 
 Now, set the secrets in Fly.io:
@@ -38,4 +38,4 @@ fly secrets set SENTRY_DSN=<your_dsn> SENTRY_AUTH_TOKEN=<your_auth_token> SENTRY
 ```
 
 Note that `javascript-remix` is the name of the default Remix project in Sentry
-and if you use a differnet project name you'll need to update that value here.
+and if you use a different project name you'll need to update that value here.
