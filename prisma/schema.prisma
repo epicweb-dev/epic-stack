@@ -154,7 +154,7 @@ model Verification {
 model Connection {
   id           String @id @default(cuid())
   providerName String
-  providerId   String @unique
+  providerId   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -163,5 +163,4 @@ model Connection {
   userId String
 
   @@unique([providerName, providerId])
-  @@unique([providerId, userId])
 }

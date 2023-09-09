@@ -154,13 +154,7 @@ CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 CREATE UNIQUE INDEX "Verification_target_type_key" ON "Verification"("target", "type");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Connection_providerId_key" ON "Connection"("providerId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Connection_providerName_providerId_key" ON "Connection"("providerName", "providerId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Connection_providerId_userId_key" ON "Connection"("providerId", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "_PermissionToRole"("A", "B");
