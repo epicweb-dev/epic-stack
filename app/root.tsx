@@ -182,7 +182,7 @@ export async function action({ request }: DataFunctionArgs) {
 		schema: ThemeFormSchema,
 	})
 	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
+		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
 		return json({ status: 'error', submission } as const, { status: 400 })
