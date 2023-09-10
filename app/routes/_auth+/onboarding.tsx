@@ -36,8 +36,6 @@ const SignupFormSchema = z
 	.object({
 		username: UsernameSchema,
 		name: NameSchema,
-		password: PasswordSchema,
-		confirmPassword: PasswordSchema,
 		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
 			required_error:
 				'You must agree to the terms of service and privacy policy',
@@ -45,15 +43,19 @@ const SignupFormSchema = z
 		remember: z.boolean().optional(),
 		redirectTo: z.string().optional(),
 	})
-	.superRefine(({ confirmPassword, password }, ctx) => {
-		if (confirmPassword !== password) {
-			ctx.addIssue({
-				path: ['confirmPassword'],
-				code: 'custom',
-				message: 'The passwords must match',
-			})
-		}
-	})
+	.and(
+		z
+			.object({ password: PasswordSchema, confirmPassword: PasswordSchema })
+			.superRefine(({ confirmPassword, password }, ctx) => {
+				if (confirmPassword !== password) {
+					ctx.addIssue({
+						path: ['confirmPassword'],
+						code: 'custom',
+						message: 'The passwords must match',
+					})
+				}
+			}),
+	)
 
 async function requireOnboardingEmail(request: Request) {
 	await requireAnonymous(request)
