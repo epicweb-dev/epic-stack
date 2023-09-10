@@ -164,10 +164,6 @@ export function DeleteNote({ id }: { id: string }) {
 	const [form] = useForm({
 		id: 'delete-note',
 		lastSubmission: actionData?.submission,
-		constraint: getFieldsetConstraint(DeleteFormSchema),
-		onValidate({ formData }) {
-			return parse(formData, { schema: DeleteFormSchema })
-		},
 	})
 
 	return (
