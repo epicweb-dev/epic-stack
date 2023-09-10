@@ -34,7 +34,7 @@ const ChangePasswordForm = z
 		if (confirmNewPassword !== newPassword) {
 			ctx.addIssue({
 				path: ['confirmNewPassword'],
-				code: 'custom',
+				code: z.ZodIssueCode.custom,
 				message: 'The passwords must match',
 			})
 		}
@@ -69,7 +69,7 @@ export async function action({ request }: DataFunctionArgs) {
 					if (!user) {
 						ctx.addIssue({
 							path: ['currentPassword'],
-							code: 'custom',
+							code: z.ZodIssueCode.custom,
 							message: 'Incorrect password.',
 						})
 					}

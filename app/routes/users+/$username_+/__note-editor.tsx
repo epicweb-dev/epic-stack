@@ -89,7 +89,7 @@ export async function action({ request }: DataFunctionArgs) {
 			})
 			if (!note) {
 				ctx.addIssue({
-					code: 'custom',
+					code: z.ZodIssueCode.custom,
 					message: 'Note not found',
 				})
 			}

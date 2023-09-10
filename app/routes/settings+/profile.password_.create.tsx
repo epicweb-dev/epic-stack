@@ -28,7 +28,7 @@ const CreatePasswordForm = z
 		if (confirmNewPassword !== newPassword) {
 			ctx.addIssue({
 				path: ['confirmNewPassword'],
-				code: 'custom',
+				code: z.ZodIssueCode.custom,
 				message: 'The passwords must match',
 			})
 		}

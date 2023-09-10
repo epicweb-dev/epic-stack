@@ -106,7 +106,7 @@ export async function action({ request }: DataFunctionArgs) {
 			if (existingUser) {
 				ctx.addIssue({
 					path: ['email'],
-					code: 'custom',
+					code: z.ZodIssueCode.custom,
 					message: 'This email is already in use.',
 				})
 			}
