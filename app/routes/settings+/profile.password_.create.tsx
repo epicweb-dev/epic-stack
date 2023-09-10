@@ -103,12 +103,18 @@ export default function CreatePasswordRoute() {
 	return (
 		<Form method="POST" {...form.props} className="mx-auto max-w-md">
 			<Field
-				labelProps={{ children: 'New Password' }}
+				labelProps={{
+					htmlFor: fields.newPassword.id,
+					children: 'New Password',
+				}}
 				inputProps={conform.input(fields.newPassword, { type: 'password' })}
 				errors={fields.newPassword.errors}
 			/>
 			<Field
-				labelProps={{ children: 'Confirm New Password' }}
+				labelProps={{
+					htmlFor: fields.confirmNewPassword.id,
+					children: 'Confirm New Password',
+				}}
 				inputProps={conform.input(fields.confirmNewPassword, {
 					type: 'password',
 				})}

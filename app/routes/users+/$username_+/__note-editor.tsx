@@ -218,7 +218,7 @@ export function NoteEditor({
 				{note ? <input type="hidden" name="id" value={note.id} /> : null}
 				<div className="flex flex-col gap-1">
 					<Field
-						labelProps={{ children: 'Title' }}
+						labelProps={{ htmlFor: fields.title.id, children: 'Title' }}
 						inputProps={{
 							autoFocus: true,
 							...conform.input(fields.title, { ariaAttributes: true }),
@@ -226,7 +226,7 @@ export function NoteEditor({
 						errors={fields.title.errors}
 					/>
 					<TextareaField
-						labelProps={{ children: 'Content' }}
+						labelProps={{ htmlFor: fields.content.id, children: 'Content' }}
 						textareaProps={{
 							...conform.textarea(fields.content, { ariaAttributes: true }),
 						}}
