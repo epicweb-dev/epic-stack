@@ -42,6 +42,7 @@
   "dependencies": {
     "@conform-to/react": "^0.8.0",
     "@conform-to/zod": "^0.8.0",
+    "@epic-web/remember": "^1.0.0",
     "@epic-web/totp": "^1.0.6",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.1.1",

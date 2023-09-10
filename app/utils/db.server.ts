@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import chalk from 'chalk'
-import { singleton } from './singleton.server.ts'
+import { remember } from '@epic-web/remember'
 
-const prisma = singleton('prisma', () => {
+export const prisma = remember('prisma', () => {
 	// NOTE: if you change anything in this function you'll need to restart
 	// the dev server to see your changes.
 
@@ -34,5 +34,3 @@ const prisma = singleton('prisma', () => {
 	client.$connect()
 	return client
 })
-
-export { prisma }

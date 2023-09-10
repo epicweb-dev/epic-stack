@@ -13,12 +13,12 @@ import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
 import { updatePrimaryCacheValue } from '#app/routes/admin+/cache_.sqlite.tsx'
 import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
-import { singleton } from './singleton.server.ts'
+import { remember } from '@epic-web/remember'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 
-const cacheDb = singleton('cacheDb', createDatabase)
+const cacheDb = remember('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): Database.Database {
 	const db = new Database(CACHE_DATABASE_PATH)
@@ -47,7 +47,7 @@ function createDatabase(tryAgain = true): Database.Database {
 	return db
 }
 
-const lru = singleton(
+const lru = remember(
 	'lru-cache',
 	() => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }),
 )
