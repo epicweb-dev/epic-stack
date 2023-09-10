@@ -177,22 +177,21 @@ async function validateRequest(
 	body: URLSearchParams | FormData,
 ) {
 	const submission = await parse(body, {
-		schema: () =>
-			VerifySchema.superRefine(async (data, ctx) => {
-				const codeIsValid = await isCodeValid({
-					code: data[codeQueryParam],
-					type: data[typeQueryParam],
-					target: data[targetQueryParam],
+		schema: VerifySchema.superRefine(async (data, ctx) => {
+			const codeIsValid = await isCodeValid({
+				code: data[codeQueryParam],
+				type: data[typeQueryParam],
+				target: data[targetQueryParam],
+			})
+			if (!codeIsValid) {
+				ctx.addIssue({
+					path: ['code'],
+					code: z.ZodIssueCode.custom,
+					message: `Invalid code`,
 				})
-				if (!codeIsValid) {
-					ctx.addIssue({
-						path: ['code'],
-						code: z.ZodIssueCode.custom,
-						message: `Invalid code`,
-					})
-					return
-				}
-			}),
+				return
+			}
+		}),
 		async: true,
 	})
 
