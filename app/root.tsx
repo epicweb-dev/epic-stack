@@ -51,7 +51,6 @@ import {
 	combineHeaders,
 	getDomainUrl,
 	getUserImgSrc,
-	invariantResponse,
 } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { useRequestInfo } from './utils/request-info.ts'
