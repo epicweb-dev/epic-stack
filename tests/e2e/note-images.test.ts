@@ -16,10 +16,10 @@ test('Users can create note with an image', async ({ page }) => {
 	// fill in form and submit
 	await page.getByRole('textbox', { name: 'title' }).fill(newNote.title)
 	await page.getByRole('textbox', { name: 'content' }).fill(newNote.content)
-	await page.setInputFiles(
-		"input[name='images[0].file']",
-		'tests/fixtures/images/kody-notes/cute-koala.png',
-	)
+	await page
+		.getByLabel('image')
+		.nth(0)
+		.setInputFiles('tests/fixtures/images/kody-notes/cute-koala.png')
 	await page.getByRole('textbox', { name: 'alt text' }).fill(altText)
 
 	await page.getByRole('button', { name: 'submit' }).click()
@@ -40,17 +40,17 @@ test('Users can create note with multiple images', async ({ page }) => {
 	// fill in form and submit
 	await page.getByRole('textbox', { name: 'title' }).fill(newNote.title)
 	await page.getByRole('textbox', { name: 'content' }).fill(newNote.content)
-	await page.setInputFiles(
-		"input[name='images[0].file']",
-		'tests/fixtures/images/kody-notes/cute-koala.png',
-	)
+	await page
+		.getByLabel('image')
+		.nth(0)
+		.setInputFiles('tests/fixtures/images/kody-notes/cute-koala.png')
 	await page.getByLabel('alt text').nth(0).fill(altText1)
 	await page.getByRole('button', { name: 'add image' }).click()
 
-	await page.setInputFiles(
-		"input[name='images[1].file']",
-		'tests/fixtures/images/kody-notes/koala-coder.png',
-	)
+	await page
+		.getByLabel('image')
+		.nth(1)
+		.setInputFiles('tests/fixtures/images/kody-notes/koala-coder.png')
 	await page.getByLabel('alt text').nth(1).fill(altText2)
 
 	await page.getByRole('button', { name: 'submit' }).click()
@@ -78,7 +78,7 @@ test('Users can edit note image', async ({ page }) => {
 		altText: 'koala coder',
 		url: 'tests/fixtures/images/kody-notes/koala-coder.png',
 	}
-	await page.setInputFiles("input[name='images[0].file']", updatedImage.url)
+	await page.getByLabel('image').nth(0).setInputFiles(updatedImage.url)
 	await page.getByLabel('alt text').nth(0).fill(updatedImage.altText)
 	await page.getByRole('button', { name: 'submit' }).click()
 
