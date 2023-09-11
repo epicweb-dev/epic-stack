@@ -139,7 +139,7 @@ async function seed() {
 		}),
 	})
 
-	const githubUser = await insertGitHubUser('MOCK_CODE')
+	const githubUser = await insertGitHubUser('MOCK_CODE_GITHUB_KODY')
 
 	await prisma.user.create({
 		select: { id: true },

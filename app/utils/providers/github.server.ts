@@ -1,7 +1,10 @@
+import { createId as cuid } from '@paralleldrive/cuid2'
 import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 import { connectionSessionStorage } from '../connections.server.ts'
+import { combineHeaders } from '../misc.tsx'
+import { getRedirectCookieHeader } from '../redirect-cookie.server.ts'
 import { type AuthProvider } from './provider.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })
@@ -43,28 +46,33 @@ export class GitHubProvider implements AuthProvider {
 		} as const
 	}
 
-	async handleMockAction(redirectToCookie: string | null) {
+	async handleMockAction({
+		request,
+		redirectTo,
+	}: {
+		request: Request
+		redirectTo: string
+	}) {
 		if (!shouldMock) return
 
-		throw redirect(`/auth/github/callback?code=MOCK_CODE&state=MOCK_STATE`, {
-			headers: redirectToCookie ? { 'set-cookie': redirectToCookie } : {},
-		})
-	}
-
-	async handleMockCallback(request: Request) {
-		if (!shouldMock) return request
-
-		const cookieSession = await connectionSessionStorage.getSession(
+		const connectionSession = await connectionSessionStorage.getSession(
 			request.headers.get('cookie'),
 		)
-		const state = cookieSession.get('oauth2:state') ?? 'MOCK_STATE'
-		cookieSession.set('oauth2:state', state)
-		const reqUrl = new URL(request.url)
-		reqUrl.searchParams.set('state', state)
-		request.headers.set(
-			'cookie',
-			await connectionSessionStorage.commitSession(cookieSession),
-		)
-		return new Request(reqUrl.toString(), request)
+		const redirectToCookie = getRedirectCookieHeader(redirectTo)
+		const state = cuid()
+		connectionSession.set('oauth2:state', state)
+		const searchParams = new URLSearchParams({
+			code: 'MOCK_CODE_GITHUB_KODY',
+			state,
+		})
+		throw redirect(`/auth/github/callback?${searchParams}`, {
+			headers: combineHeaders(
+				redirectToCookie ? { 'set-cookie': redirectToCookie } : null,
+				{
+					'set-cookie':
+						await connectionSessionStorage.commitSession(connectionSession),
+				},
+			),
+		})
 	}
 }

@@ -21,16 +21,9 @@ export const providers: Record<ProviderName, AuthProvider> = {
 
 export function handleMockAction(
 	providerName: ProviderName,
-	redirectToCookie: string | null,
+	options: { request: Request; redirectTo: string },
 ) {
-	return providers[providerName].handleMockAction(redirectToCookie)
-}
-
-export function handleMockCallback(
-	providerName: ProviderName,
-	request: Request,
-) {
-	return providers[providerName].handleMockCallback(request)
+	return providers[providerName].handleMockAction(options)
 }
 
 export function resolveConnectionData(

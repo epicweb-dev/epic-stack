@@ -20,7 +20,7 @@ export async function action({ request, params }: DataFunctionArgs) {
 
 	const redirectToCookie = getRedirectCookieHeader(redirectTo)
 
-	await handleMockAction(providerName, redirectToCookie)
+	await handleMockAction(providerName, { request, redirectTo })
 	try {
 		return await authenticator.authenticate(providerName, request)
 	} catch (error: unknown) {

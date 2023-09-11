@@ -4,7 +4,6 @@ import {
 	getSessionExpirationDate,
 	getUserId,
 } from '#app/utils/auth.server.ts'
-import { handleMockCallback } from '#app/utils/connections.server.ts'
 import { ProviderNameSchema, providerLabels } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { combineHeaders } from '#app/utils/misc.tsx'
@@ -28,7 +27,6 @@ const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
 export async function loader({ request, params }: DataFunctionArgs) {
 	const providerName = ProviderNameSchema.parse(params.provider)
-	request = await handleMockCallback(providerName, request)
 	const redirectTo = getRedirectCookieValue(request)
 	const label = providerLabels[providerName]
 
