@@ -19,11 +19,8 @@ export const providers: Record<ProviderName, AuthProvider> = {
 	github: new GitHubProvider(),
 }
 
-export function handleMockAction(
-	providerName: ProviderName,
-	options: { request: Request; redirectTo: string },
-) {
-	return providers[providerName].handleMockAction(options)
+export function handleMockAction(providerName: ProviderName, request: Request) {
+	return providers[providerName].handleMockAction(request)
 }
 
 export function resolveConnectionData(

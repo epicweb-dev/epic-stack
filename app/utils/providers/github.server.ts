@@ -3,8 +3,6 @@ import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 import { connectionSessionStorage } from '../connections.server.ts'
-import { combineHeaders } from '../misc.tsx'
-import { getRedirectCookieHeader } from '../redirect-cookie.server.ts'
 import { type AuthProvider } from './provider.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })
@@ -46,33 +44,21 @@ export class GitHubProvider implements AuthProvider {
 		} as const
 	}
 
-	async handleMockAction({
-		request,
-		redirectTo,
-	}: {
-		request: Request
-		redirectTo: string
-	}) {
+	async handleMockAction(request: Request) {
 		if (!shouldMock) return
 
 		const connectionSession = await connectionSessionStorage.getSession(
 			request.headers.get('cookie'),
 		)
-		const redirectToCookie = getRedirectCookieHeader(redirectTo)
 		const state = cuid()
 		connectionSession.set('oauth2:state', state)
-		const searchParams = new URLSearchParams({
-			code: 'MOCK_CODE_GITHUB_KODY',
-			state,
-		})
+		const code = 'MOCK_CODE_GITHUB_KODY'
+		const searchParams = new URLSearchParams({ code, state })
 		throw redirect(`/auth/github/callback?${searchParams}`, {
-			headers: combineHeaders(
-				redirectToCookie ? { 'set-cookie': redirectToCookie } : null,
-				{
-					'set-cookie':
-						await connectionSessionStorage.commitSession(connectionSession),
-				},
-			),
+			headers: {
+				'set-cookie':
+					await connectionSessionStorage.commitSession(connectionSession),
+			},
 		})
 	}
 }

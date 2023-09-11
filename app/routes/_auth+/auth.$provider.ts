@@ -11,21 +11,23 @@ export async function loader() {
 
 export async function action({ request, params }: DataFunctionArgs) {
 	const providerName = ProviderNameSchema.parse(params.provider)
-	const formData = await request.formData()
-	const rawRedirectTo = formData.get('redirectTo')
-	const redirectTo =
-		typeof rawRedirectTo === 'string'
-			? rawRedirectTo
-			: getReferrerRoute(request)
 
-	const redirectToCookie = getRedirectCookieHeader(redirectTo)
+	await handleMockAction(providerName, request)
 
-	await handleMockAction(providerName, { request, redirectTo })
 	try {
 		return await authenticator.authenticate(providerName, request)
 	} catch (error: unknown) {
-		if (error instanceof Response && redirectToCookie) {
-			error.headers.append('set-cookie', redirectToCookie)
+		if (error instanceof Response) {
+			const formData = await request.formData()
+			const rawRedirectTo = formData.get('redirectTo')
+			const redirectTo =
+				typeof rawRedirectTo === 'string'
+					? rawRedirectTo
+					: getReferrerRoute(request)
+			const redirectToCookie = getRedirectCookieHeader(redirectTo)
+			if (redirectToCookie) {
+				error.headers.append('set-cookie', redirectToCookie)
+			}
 		}
 		throw error
 	}
