@@ -76,9 +76,9 @@ test('Users can edit note image', async ({ page }) => {
 	await page.getByRole('link', { name: 'Edit', exact: true }).click()
 	const updatedImage = {
 		altText: 'koala coder',
-		url: 'tests/fixtures/images/kody-notes/koala-coder.png',
+		location: 'tests/fixtures/images/kody-notes/koala-coder.png',
 	}
-	await page.getByLabel('image').nth(0).setInputFiles(updatedImage.url)
+	await page.getByLabel('image').nth(0).setInputFiles(updatedImage.location)
 	await page.getByLabel('alt text').nth(0).fill(updatedImage.altText)
 	await page.getByRole('button', { name: 'submit' }).click()
 
