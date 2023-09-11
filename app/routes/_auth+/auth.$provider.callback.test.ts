@@ -7,13 +7,13 @@ import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
 import { createUser } from '#tests/db-utils.ts'
 import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
 import { consoleError } from '#tests/setup/setup-test-env.ts'
 import { BASE_URL, convertSetCookieToCookie } from '#tests/utils.ts'
 import { loader } from './auth.$provider.callback.ts'
+import { connectionSessionStorage } from '#app/utils/connections.server.ts'
 
 const ROUTE_PATH = '/auth/github/callback'
 const PARAMS = { provider: 'github' }
@@ -218,10 +218,11 @@ async function setupRequest({
 	const state = faker.string.uuid()
 	url.searchParams.set('state', state)
 	url.searchParams.set('code', code)
-	const cookieSession = await sessionStorage.getSession()
-	cookieSession.set('oauth2:state', state)
-	if (sessionId) cookieSession.set(sessionKey, sessionId)
-	const setCookieHeader = await sessionStorage.commitSession(cookieSession)
+	const connectionSession = await connectionSessionStorage.getSession()
+	connectionSession.set('oauth2:state', state)
+	if (sessionId) connectionSession.set(sessionKey, sessionId)
+	const setCookieHeader =
+		await connectionSessionStorage.commitSession(connectionSession)
 	const request = new Request(url.toString(), {
 		method: 'GET',
 		headers: { cookie: convertSetCookieToCookie(setCookieHeader) },

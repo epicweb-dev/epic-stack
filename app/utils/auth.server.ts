@@ -3,7 +3,7 @@ import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils'
-import { providers } from './connections.server.ts'
+import { connectionSessionStorage, providers } from './connections.server.ts'
 import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
@@ -15,7 +15,9 @@ export const getSessionExpirationDate = () =>
 
 export const sessionKey = 'sessionId'
 
-export const authenticator = new Authenticator<ProviderUser>(sessionStorage)
+export const authenticator = new Authenticator<ProviderUser>(
+	connectionSessionStorage,
+)
 
 for (const [providerName, provider] of Object.entries(providers)) {
 	authenticator.use(provider.getAuthStrategy(), providerName)
