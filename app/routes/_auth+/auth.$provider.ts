@@ -12,9 +12,8 @@ export async function loader() {
 export async function action({ request, params }: DataFunctionArgs) {
 	const providerName = ProviderNameSchema.parse(params.provider)
 
-	await handleMockAction(providerName, request)
-
 	try {
+		await handleMockAction(providerName, request)
 		return await authenticator.authenticate(providerName, request)
 	} catch (error: unknown) {
 		if (error instanceof Response) {
