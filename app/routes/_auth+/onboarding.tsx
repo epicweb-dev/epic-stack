@@ -147,7 +147,7 @@ export default function SignupRoute() {
 	const redirectTo = searchParams.get('redirectTo')
 
 	const [form, fields] = useForm({
-		id: 'signup-form',
+		id: 'onboarding-form',
 		constraint: getFieldsetConstraint(SignupFormSchema),
 		defaultValue: { redirectTo },
 		lastSubmission: actionData?.submission,
