@@ -14,6 +14,7 @@ import { server } from '#tests/mocks/index.ts'
 import { consoleError } from '#tests/setup/setup-test-env.ts'
 import { BASE_URL, convertSetCookieToCookie } from '#tests/utils.ts'
 import { loader } from './auth.$provider.callback.ts'
+import { sessionStorage } from '#app/utils/session.server.ts'
 
 const ROUTE_PATH = '/auth/github/callback'
 const PARAMS = { provider: 'github' }
@@ -31,6 +32,7 @@ test('a new user goes to onboarding', async () => {
 })
 
 test('when auth fails, send the user to login with a toast', async () => {
+	consoleError.mockImplementation(() => {})
 	server.use(
 		http.post('https://github.com/login/oauth/access_token', async () => {
 			return new Response('error', { status: 400 })
@@ -49,7 +51,6 @@ test('when auth fails, send the user to login with a toast', async () => {
 		}),
 	)
 	expect(consoleError).toHaveBeenCalledTimes(1)
-	consoleError.mockClear()
 })
 
 test('when a user is logged in, it creates the connection', async () => {
@@ -220,12 +221,20 @@ async function setupRequest({
 	url.searchParams.set('code', code)
 	const connectionSession = await connectionSessionStorage.getSession()
 	connectionSession.set('oauth2:state', state)
-	if (sessionId) connectionSession.set(sessionKey, sessionId)
-	const setCookieHeader =
+	const cookieSession = await sessionStorage.getSession()
+	if (sessionId) cookieSession.set(sessionKey, sessionId)
+	const setSessionCookieHeader =
+		await sessionStorage.commitSession(cookieSession)
+	const setConnectionSessionCookieHeader =
 		await connectionSessionStorage.commitSession(connectionSession)
 	const request = new Request(url.toString(), {
 		method: 'GET',
-		headers: { cookie: convertSetCookieToCookie(setCookieHeader) },
+		headers: {
+			cookie: [
+				convertSetCookieToCookie(setConnectionSessionCookieHeader),
+				convertSetCookieToCookie(setSessionCookieHeader),
+			].join('; '),
+		},
 	})
 	return request
 }
