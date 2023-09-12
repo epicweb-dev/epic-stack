@@ -27,14 +27,17 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
 
       - name: 🖼 Build icons
-        run: npm run build:icons
+        run: bun run build:icons
 
       - name: 🔬 Lint
-        run: npm run lint
+        run: bun run lint
 
   typecheck:
     name: ʦ TypeScript
@@ -48,14 +51,20 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
+
+      - name: 🏗️ Generate Prisma Client
+        run: bunx prisma generate
 
       - name: 🖼 Build icons
-        run: npm run build:icons
+        run: bun run build:icons
 
       - name: 🔎 Type check
-        run: npm run typecheck --if-present
+        run: bun run typecheck
 
   vitest:
     name: ⚡ Vitest
@@ -69,17 +78,20 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: 🖼 Build icons
-        run: npm run build:icons
+        run: bun run build:icons
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: bun run test -- --coverage
 
   playwright:
     name: 🎭 Playwright
@@ -97,14 +109,17 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
 
       - name: 📥 Install Playwright Browsers
-        run: npm run test:e2e:install
+        run: bun run test:e2e:install
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+        run: bunx prisma migrate deploy
 
       - name: 🏦 Cache Database
         id: db-cache
@@ -118,15 +133,15 @@ jobs:
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
-        run: npx prisma db seed
+        run: bunx prisma db seed
         env:
           MINIMAL_SEED: true
 
       - name: 🏗 Build
-        run: npm run build
+        run: bun run build
 
       - name: 🎭 Playwright tests
-        run: npx playwright test
+        run: bunx playwright test
 
       - name: 📊 Upload report
         uses: actions/upload-artifact@v3
