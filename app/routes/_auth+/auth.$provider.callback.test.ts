@@ -193,12 +193,15 @@ test('if a user is not logged in, but the connection exists and they have enable
 			userId,
 		},
 	})
-	const { otp: _otp, ...config } = generateTOTP()
+	const { secret, period, digits, algorithm } = generateTOTP()
 	await prisma.verification.create({
 		data: {
-			type: twoFAVerificationType,
+			algorithm,
+			digits,
+			period,
+			secret,
 			target: userId,
-			...config,
+			type: twoFAVerificationType,
 		},
 	})
 	const request = await setupRequest({ code: githubUser.code })

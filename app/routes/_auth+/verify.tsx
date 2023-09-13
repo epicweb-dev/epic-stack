@@ -115,15 +115,19 @@ export async function prepareVerification({
 	const verifyUrl = getRedirectToUrl({ request, type, target })
 	const redirectTo = new URL(verifyUrl.toString())
 
-	const { otp, ...verificationConfig } = generateTOTP({
-		algorithm: 'SHA256',
+	const algorithm = 'SHA256'
+	const { digits, otp, secret, ...verificationConfig } = generateTOTP({
+		algorithm,
 		period,
 	})
 	const verificationData = {
-		type,
-		target,
-		...verificationConfig,
+		algorithm,
+		digits,
 		expiresAt: new Date(Date.now() + verificationConfig.period * 1000),
+		period,
+		secret,
+		target,
+		type,
 	}
 	await prisma.verification.upsert({
 		where: { target_type: { target, type } },

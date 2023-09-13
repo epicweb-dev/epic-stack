@@ -19,11 +19,14 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const { otp: _otp, ...config } = generateTOTP()
+	const { algorithm, digits, period, secret } = generateTOTP()
 	const verificationData = {
-		...config,
-		type: twoFAVerifyVerificationType,
+		algorithm,
+		digits,
+		period,
+		secret,
 		target: userId,
+		type: twoFAVerifyVerificationType,
 	}
 	await prisma.verification.upsert({
 		where: {

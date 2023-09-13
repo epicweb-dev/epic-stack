@@ -27,8 +27,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
 
       - name: 🖼 Build icons
         run: npm run build:icons
@@ -48,8 +51,14 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
+
+      - name: 🧰 Generate Prisma Client
+        run: npx prisma generate
 
       - name: 🖼 Build icons
         run: npm run build:icons
@@ -69,8 +78,14 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🍞 Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: bun install
+
+      - name: 🧰 Generate Prisma Client
+        run: npx prisma generate
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
