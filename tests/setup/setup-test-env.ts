@@ -1,5 +1,4 @@
 import 'dotenv/config'
-import 'source-map-support/register.js'
 import './db-setup.ts'
 import '#app/utils/env.server.ts'
 // we need these to be imported first 👆
