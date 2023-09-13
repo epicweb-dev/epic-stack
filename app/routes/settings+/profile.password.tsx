@@ -115,7 +115,7 @@ export default function ChangePasswordRoute() {
 	const isPending = useIsPending()
 
 	const [form, fields] = useForm({
-		id: 'signup-form',
+		id: 'password-change-form',
 		constraint: getFieldsetConstraint(ChangePasswordForm),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {

@@ -88,7 +88,7 @@ export default function CreatePasswordRoute() {
 	const isPending = useIsPending()
 
 	const [form, fields] = useForm({
-		id: 'signup-form',
+		id: 'password-create-form',
 		constraint: getFieldsetConstraint(CreatePasswordForm),
 		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
