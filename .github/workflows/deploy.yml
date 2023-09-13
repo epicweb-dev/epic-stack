@@ -34,10 +34,10 @@ jobs:
         run: bun install
 
       - name: 🖼 Build icons
-        run: bun run build:icons
+        run: npm run build:icons
 
       - name: 🔬 Lint
-        run: bun run lint
+        run: npm run lint
 
   typecheck:
     name: ʦ TypeScript
@@ -61,7 +61,7 @@ jobs:
         run: bunx prisma generate
 
       - name: 🖼 Build icons
-        run: bun run build:icons
+        run: npm run build:icons
 
       - name: 🔎 Type check
         run: npm run typecheck --if-present
@@ -78,23 +78,17 @@ jobs:
         with:
           node-version: 18
 
-      - name: 🍞 Install Bun
-        uses: oven-sh/setup-bun@v1
-
       - name: 📥 Download deps
-        run: bun install
-
-      - name: 🧰 Generate Prisma Client
-        run: bunx prisma generate
+        uses: bahmutov/npm-install@v1
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: 🖼 Build icons
-        run: bun run build:icons
+        run: npm run build:icons
 
       - name: ⚡ Run vitest
-        run: bun run test -- --coverage
+        run: npm run test -- --coverage
 
   playwright:
     name: 🎭 Playwright
@@ -122,10 +116,10 @@ jobs:
         run: bunx prisma generate
 
       - name: 📥 Install Playwright Browsers
-        run: bun run test:e2e:install
+        run: npm run test:e2e:install
 
       - name: 🛠 Setup Database
-        run: bunx prisma migrate deploy
+        run: npx prisma migrate deploy
 
       - name: 🏦 Cache Database
         id: db-cache
@@ -139,15 +133,15 @@ jobs:
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
-        run: bunx prisma db seed
+        run: npx prisma db seed
         env:
           MINIMAL_SEED: true
 
       - name: 🏗 Build
-        run: bun run build
+        run: npm run build
 
       - name: 🎭 Playwright tests
-        run: bunx playwright test
+        run: npx playwright test
 
       - name: 📊 Upload report
         uses: actions/upload-artifact@v3
