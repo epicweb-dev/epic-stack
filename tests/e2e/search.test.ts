@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test'
-import { insertNewUser } from '#tests/playwright-utils.ts'
+import { expect, test } from '#tests/playwright-test.ts'
 
-test('Search from home page', async ({ page }) => {
+test('Search from home page', async ({ page, insertNewUser }) => {
 	const newUser = await insertNewUser()
 	await page.goto('/')
 

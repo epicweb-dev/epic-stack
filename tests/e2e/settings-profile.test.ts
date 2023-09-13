@@ -1,18 +1,17 @@
 import { faker } from '@faker-js/faker'
-import { expect, test } from '@playwright/test'
 import { verifyUserPassword } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { readEmail } from '#tests/mocks/utils.ts'
+import { expect, test } from '#tests/playwright-test.ts'
 import {
 	createUser,
-	insertNewUser,
 	loginPage,
 	waitFor,
 } from '#tests/playwright-utils.ts'
 
-test('Users can update their basic info', async ({ page }) => {
-	await loginPage({ page })
+test('Users can update their basic info', async ({ page, insertNewUser }) => {
+	await loginPage({ page, user: await insertNewUser() })
 	await page.goto('/settings/profile')
 
 	const newUserData = createUser()
@@ -25,7 +24,7 @@ test('Users can update their basic info', async ({ page }) => {
 	await page.getByRole('button', { name: /^save/i }).click()
 })
 
-test('Users can update their password', async ({ page }) => {
+test('Users can update their password', async ({ page, insertNewUser }) => {
 	const oldPassword = faker.internet.password()
 	const newPassword = faker.internet.password()
 	const user = await insertNewUser({ password: oldPassword })
@@ -57,8 +56,9 @@ test('Users can update their password', async ({ page }) => {
 	).toEqual({ id: user.id })
 })
 
-test('Users can update their profile photo', async ({ page }) => {
-	const user = await loginPage({ page })
+test('Users can update their profile photo', async ({ page, insertNewUser }) => {
+	const user = await insertNewUser()
+	await loginPage({ page, user })
 	await page.goto('/settings/profile')
 
 	const beforeSrc = await page
@@ -87,8 +87,9 @@ test('Users can update their profile photo', async ({ page }) => {
 	expect(beforeSrc).not.toEqual(afterSrc)
 })
 
-test('Users can change their email address', async ({ page }) => {
-	const preUpdateUser = await loginPage({ page })
+test('Users can change their email address', async ({ page, insertNewUser }) => {
+	const preUpdateUser = await insertNewUser()
+	await loginPage({ page, user: preUpdateUser })
 	const newEmailAddress = faker.internet.email().toLowerCase()
 	expect(preUpdateUser.email).not.toEqual(newEmailAddress)
 	await page.goto('/settings/profile')

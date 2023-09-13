@@ -5,6 +5,13 @@ import { UniqueEnforcer } from 'enforce-unique'
 import { getPasswordHash } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 
+export type User = {
+	id: string
+	username: string
+	name: string
+	email: string
+}
+
 const uniqueUsernameEnforcer = new UniqueEnforcer()
 
 export function createUser() {
@@ -38,8 +45,6 @@ export function createPassword(password: string = faker.internet.password()) {
 	}
 }
 
-export const insertedUsers = new Set<string>()
-
 export async function insertNewUser({
 	username,
 	password,
@@ -59,8 +64,13 @@ export async function insertNewUser({
 			password: { create: { hash: await getPasswordHash(password) } },
 		},
 	})
-	insertedUsers.add(user.id)
-	return user as typeof user & { name: string }
+	return user as User
+}
+
+export async function deleteUsers(users: User[]) {
+	await prisma.user.deleteMany({
+		where: { id: { in: users.map(u => u.id) } },
+	})
 }
 
 let noteImages: Array<Awaited<ReturnType<typeof img>>> | undefined

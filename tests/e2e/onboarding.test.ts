@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
-import { expect, test } from '@playwright/test'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { readEmail } from '#tests/mocks/utils.ts'
-import { createUser, insertNewUser } from '#tests/playwright-utils.ts'
+import { expect, test } from '#tests/playwright-test.ts'
+import { createUser } from '#tests/playwright-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
@@ -124,7 +124,7 @@ test('onboarding with a short code', async ({ page }) => {
 	await expect(page).toHaveURL(`/onboarding`)
 })
 
-test('login as existing user', async ({ page }) => {
+test('login as existing user', async ({ page, insertNewUser }) => {
 	const password = faker.internet.password()
 	const user = await insertNewUser({ password })
 	invariant(user.name, 'User name not found')
@@ -137,7 +137,7 @@ test('login as existing user', async ({ page }) => {
 	await expect(page.getByRole('link', { name: user.name })).toBeVisible()
 })
 
-test('reset password with a link', async ({ page }) => {
+test('reset password with a link', async ({ page, insertNewUser }) => {
 	const originalPassword = faker.internet.password()
 	const user = await insertNewUser({ password: originalPassword })
 	invariant(user.name, 'User name not found')
@@ -190,7 +190,7 @@ test('reset password with a link', async ({ page }) => {
 	await expect(page.getByRole('link', { name: user.name })).toBeVisible()
 })
 
-test('reset password with a short code', async ({ page }) => {
+test('reset password with a short code', async ({ page, insertNewUser }) => {
 	const user = await insertNewUser()
 	await page.goto('/login')
 

@@ -1,30 +1,19 @@
-import { test, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 import * as setCookieParser from 'set-cookie-parser'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { sessionStorage } from '#app/utils/session.server.ts'
-import { insertNewUser, insertedUsers } from './db-utils.ts'
+import { type User } from './db-utils.ts'
 
 export * from './db-utils.ts'
 
 export async function loginPage({
 	page,
-	user: givenUser,
+	user,
 }: {
 	page: Page
-	user?: { id: string }
+	user: User
 }) {
-	const user = givenUser
-		? await prisma.user.findUniqueOrThrow({
-				where: { id: givenUser.id },
-				select: {
-					id: true,
-					email: true,
-					username: true,
-					name: true,
-				},
-		  })
-		: await insertNewUser()
 	const session = await prisma.session.create({
 		data: {
 			expirationDate: getSessionExpirationDate(),
@@ -39,7 +28,6 @@ export async function loginPage({
 		await sessionStorage.commitSession(cookieSession),
 	) as any
 	await page.context().addCookies([{ ...cookieConfig, domain: 'localhost' }])
-	return user as typeof user & { name: string }
 }
 
 /**
@@ -69,10 +57,3 @@ export async function waitFor<ReturnValue>(
 	}
 	throw lastError
 }
-
-test.afterEach(async () => {
-	await prisma.user.deleteMany({
-		where: { id: { in: Array.from(insertedUsers) } },
-	})
-	insertedUsers.clear()
-})
