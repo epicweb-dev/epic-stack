@@ -1,9 +1,8 @@
 import { faker } from '@faker-js/faker'
-import { expect, test } from '@playwright/test'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { readEmail } from '#tests/mocks/utils.ts'
-import { createUser, insertNewUser } from '#tests/playwright-utils.ts'
+import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
 const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
 function extractUrl(text: string) {
@@ -11,25 +10,30 @@ function extractUrl(text: string) {
 	return match?.groups?.url
 }
 
-function getOnboardingData() {
-	const userData = createUser()
-	const onboardingData = {
-		...userData,
-		password: faker.internet.password(),
+const test = base.extend<{
+	getOnboardingData(): {
+		username: string
+		name: string
+		email: string
+		password: string
 	}
-	return onboardingData
-}
-
-const usernamesToDelete = new Set<string>()
-
-test.afterEach(async () => {
-	for (const username of usernamesToDelete) {
-		await prisma.user.delete({ where: { username } })
-	}
-	usernamesToDelete.clear()
+}>({
+	getOnboardingData: async ({}, use) => {
+		const userData = createUser()
+		await use(() => {
+			const onboardingData = {
+				...userData,
+				password: faker.internet.password(),
+			}
+			return onboardingData
+		})
+		await prisma.user
+			.delete({ where: { username: userData.username } })
+			.catch(() => {})
+	},
 })
 
-test('onboarding with link', async ({ page }) => {
+test('onboarding with link', async ({ page, getOnboardingData }) => {
 	const onboardingData = getOnboardingData()
 
 	await page.goto('/')
@@ -78,7 +82,6 @@ test('onboarding with link', async ({ page }) => {
 
 	await page.getByLabel(/remember me/i).check()
 
-	usernamesToDelete.add(onboardingData.username)
 	await page.getByRole('button', { name: /Create an account/i }).click()
 
 	await expect(page).toHaveURL(`/`)
@@ -93,7 +96,7 @@ test('onboarding with link', async ({ page }) => {
 	await expect(page).toHaveURL(`/`)
 })
 
-test('onboarding with a short code', async ({ page }) => {
+test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	const onboardingData = getOnboardingData()
 
 	await page.goto('/signup')
@@ -124,7 +127,7 @@ test('onboarding with a short code', async ({ page }) => {
 	await expect(page).toHaveURL(`/onboarding`)
 })
 
-test('login as existing user', async ({ page }) => {
+test('login as existing user', async ({ page, insertNewUser }) => {
 	const password = faker.internet.password()
 	const user = await insertNewUser({ password })
 	invariant(user.name, 'User name not found')
@@ -137,7 +140,7 @@ test('login as existing user', async ({ page }) => {
 	await expect(page.getByRole('link', { name: user.name })).toBeVisible()
 })
 
-test('reset password with a link', async ({ page }) => {
+test('reset password with a link', async ({ page, insertNewUser }) => {
 	const originalPassword = faker.internet.password()
 	const user = await insertNewUser({ password: originalPassword })
 	invariant(user.name, 'User name not found')
@@ -190,7 +193,7 @@ test('reset password with a link', async ({ page }) => {
 	await expect(page.getByRole('link', { name: user.name })).toBeVisible()
 })
 
-test('reset password with a short code', async ({ page }) => {
+test('reset password with a short code', async ({ page, insertNewUser }) => {
 	const user = await insertNewUser()
 	await page.goto('/login')
 

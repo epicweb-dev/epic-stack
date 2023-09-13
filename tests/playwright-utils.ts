@@ -1,46 +1,101 @@
-import { test, type Page } from '@playwright/test'
+import { test as base } from '@playwright/test'
+import { type User as UserModel } from '@prisma/client'
 import * as setCookieParser from 'set-cookie-parser'
-import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
+import {
+	getPasswordHash,
+	getSessionExpirationDate,
+	sessionKey,
+} from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { sessionStorage } from '#app/utils/session.server.ts'
-import { insertNewUser, insertedUsers } from './db-utils.ts'
+import { createUser } from './db-utils.ts'
 
 export * from './db-utils.ts'
 
-export async function loginPage({
-	page,
-	user: givenUser,
-}: {
-	page: Page
-	user?: { id: string }
-}) {
-	const user = givenUser
-		? await prisma.user.findUniqueOrThrow({
-				where: { id: givenUser.id },
-				select: {
-					id: true,
-					email: true,
-					username: true,
-					name: true,
-				},
-		  })
-		: await insertNewUser()
-	const session = await prisma.session.create({
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			userId: user.id,
-		},
-		select: { id: true },
-	})
-
-	const cookieSession = await sessionStorage.getSession()
-	cookieSession.set(sessionKey, session.id)
-	const cookieConfig = setCookieParser.parseString(
-		await sessionStorage.commitSession(cookieSession),
-	) as any
-	await page.context().addCookies([{ ...cookieConfig, domain: 'localhost' }])
-	return user as typeof user & { name: string }
+type GetOrInsertUserOptions = {
+	id?: string
+	username?: UserModel['username']
+	password?: string
+	email?: UserModel['email']
 }
+
+type User = {
+	id: string
+	email: string
+	username: string
+	name: string | null
+}
+
+async function getOrInsertUser({
+	id,
+	username,
+	password,
+	email,
+}: GetOrInsertUserOptions = {}): Promise<User> {
+	const select = { id: true, email: true, username: true, name: true }
+	if (id) {
+		return await prisma.user.findUniqueOrThrow({
+			select,
+			where: { id: id },
+		})
+	} else {
+		const userData = createUser()
+		username ??= userData.username
+		password ??= userData.username
+		email ??= userData.email
+		return await prisma.user.create({
+			select,
+			data: {
+				...userData,
+				email,
+				username,
+				roles: { connect: { name: 'user' } },
+				password: { create: { hash: await getPasswordHash(password) } },
+			},
+		})
+	}
+}
+
+export const test = base.extend<{
+	insertNewUser(options?: GetOrInsertUserOptions): Promise<User>
+	login(options?: GetOrInsertUserOptions): Promise<User>
+}>({
+	insertNewUser: async ({}, use) => {
+		let userId: string | undefined = undefined
+		await use(async options => {
+			const user = await getOrInsertUser(options)
+			userId = user.id
+			return user
+		})
+		await prisma.user.delete({ where: { id: userId } }).catch(() => {})
+	},
+	login: async ({ page }, use) => {
+		let userId: string | undefined = undefined
+		await use(async options => {
+			const user = await getOrInsertUser(options)
+			userId = user.id
+			const session = await prisma.session.create({
+				data: {
+					expirationDate: getSessionExpirationDate(),
+					userId: user.id,
+				},
+				select: { id: true },
+			})
+
+			const cookieSession = await sessionStorage.getSession()
+			cookieSession.set(sessionKey, session.id)
+			const cookieConfig = setCookieParser.parseString(
+				await sessionStorage.commitSession(cookieSession),
+			) as any
+			await page
+				.context()
+				.addCookies([{ ...cookieConfig, domain: 'localhost' }])
+			return user
+		})
+		await prisma.user.delete({ where: { id: userId } }).catch(() => {})
+	},
+})
+export const { expect } = test
 
 /**
  * This allows you to wait for something (like an email to be available).
@@ -69,10 +124,3 @@ export async function waitFor<ReturnValue>(
 	}
 	throw lastError
 }
-
-test.afterEach(async () => {
-	await prisma.user.deleteMany({
-		where: { id: { in: Array.from(insertedUsers) } },
-	})
-	insertedUsers.clear()
-})
