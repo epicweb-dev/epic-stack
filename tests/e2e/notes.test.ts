@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
-import { expect, test } from '@playwright/test'
 import { prisma } from '#app/utils/db.server.ts'
 import { loginPage } from '#tests/playwright-utils.ts'
+import { expect, test } from './baseTest.ts'
 
-test('Users can create notes', async ({ page }) => {
-	const user = await loginPage({ page })
+test('Users can create notes', async ({ page, insertUser }) => {
+	const user = await loginPage({ page, insertUser })
 	await page.goto(`/users/${user.username}/notes`)
 
 	const newNote = createNote()
@@ -18,8 +18,8 @@ test('Users can create notes', async ({ page }) => {
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 })
 
-test('Users can edit notes', async ({ page }) => {
-	const user = await loginPage({ page })
+test('Users can edit notes', async ({ page, insertUser }) => {
+	const user = await loginPage({ page, insertUser })
 
 	const note = await prisma.note.create({
 		select: { id: true },
@@ -42,8 +42,8 @@ test('Users can edit notes', async ({ page }) => {
 	).toBeVisible()
 })
 
-test('Users can delete notes', async ({ page }) => {
-	const user = await loginPage({ page })
+test('Users can delete notes', async ({ page, insertUser }) => {
+	const user = await loginPage({ page, insertUser })
 
 	const note = await prisma.note.create({
 		select: { id: true },

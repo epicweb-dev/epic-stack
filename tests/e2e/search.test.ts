@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test'
-import { insertNewUser } from '#tests/playwright-utils.ts'
+import { expect, test } from './baseTest.ts'
 
-test('Search from home page', async ({ page }) => {
-	const newUser = await insertNewUser()
+test('Search from home page', async ({ page, insertUser }) => {
+	const newUser = await insertUser()
 	await page.goto('/')
 
 	await page.getByRole('searchbox', { name: /search/i }).fill(newUser.username)
