@@ -1,10 +1,10 @@
 import { Index as ConfettiShower } from 'confetti-react'
 import { ClientOnly } from 'remix-utils'
-import { useWindowSize } from '~/utils/useWindowSize.ts'
+import { useWindowSize } from '#app/utils/useWindowSize.ts'
 
 export function Confetti({ id }: { id?: string | null }) {
-	if (!id) return null
 	const { width, height } = useWindowSize()
+	if (!id) return null
 
 	return (
 		<ClientOnly>
