@@ -30,12 +30,19 @@ export const handle = {
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
-const PhotoFormSchema = z.object({
+const DeleteImageSchema = z.object({
+	intent: z.literal('delete'),
+})
+
+const SubmitFormSchema = z.object({
+	intent: z.literal('submit'),
 	photoFile: z
 		.instanceof(File)
 		.refine(file => file.size > 0, 'Image is required')
 		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 3MB'),
 })
+
+const PhotoFormSchema = z.union([DeleteImageSchema, SubmitFormSchema])
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
@@ -58,16 +65,13 @@ export async function action({ request }: DataFunctionArgs) {
 		request,
 		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	const intent = formData.get('intent')
-	if (intent === 'delete') {
-		await prisma.userImage.deleteMany({ where: { userId } })
-		return redirect('/settings/profile')
-	}
 
 	const submission = await parse(formData, {
 		schema: PhotoFormSchema.transform(async data => {
+			if (data.intent === 'delete') return { intent: 'delete' }
 			if (data.photoFile.size <= 0) return z.NEVER
 			return {
+				intent: data.intent,
 				image: {
 					contentType: data.photoFile.type,
 					blob: Buffer.from(await data.photoFile.arrayBuffer()),
@@ -84,7 +88,12 @@ export async function action({ request }: DataFunctionArgs) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	const { image } = submission.value
+	const { image, intent } = submission.value
+
+	if (intent === 'delete') {
+		await prisma.userImage.deleteMany({ where: { userId } })
+		return redirect('/settings/profile')
+	}
 
 	await prisma.$transaction(async $prisma => {
 		await $prisma.userImage.deleteMany({ where: { userId } })
@@ -155,6 +164,8 @@ export default function PhotoRoute() {
 					<div className="flex gap-4">
 						<StatusButton
 							type="submit"
+							name="intent"
+							value="submit"
 							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
 							disabled={isPending}
 						>
@@ -177,7 +188,12 @@ export default function PhotoRoute() {
 						selected photo. */}
 						<ServerOnly>
 							{() => (
-								<Button type="submit" className="server-only">
+								<Button
+									name="intent"
+									value="submit"
+									type="submit"
+									className="server-only"
+								>
 									Save Photo
 								</Button>
 							)}
