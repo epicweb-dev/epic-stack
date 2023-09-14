@@ -1,21 +1,30 @@
-import './setup-env-vars.ts'
-import { afterAll, afterEach, expect } from 'vitest'
-import { installGlobals } from '@remix-run/node'
-import { matchers } from './matchers.cjs'
 import 'dotenv/config'
-import fs from 'fs'
-import { BASE_DATABASE_PATH, DATABASE_PATH } from './paths.ts'
-import { deleteAllData } from './utils.ts'
-import { prisma } from '~/utils/db.server.ts'
+import './db-setup.ts'
+import '#app/utils/env.server.ts'
+// we need these to be imported first 👆
 
-expect.extend(matchers)
+import { installGlobals } from '@remix-run/node'
+import { cleanup } from '@testing-library/react'
+import { afterEach, beforeEach, vi, type SpyInstance } from 'vitest'
+import { server } from '#tests/mocks/index.ts'
+import './custom-matchers.ts'
 
 installGlobals()
-fs.copyFileSync(BASE_DATABASE_PATH, DATABASE_PATH)
 
-afterEach(() => deleteAllData())
+afterEach(() => server.resetHandlers())
+afterEach(() => cleanup())
 
-afterAll(async () => {
-	await prisma.$disconnect()
-	await fs.promises.rm(DATABASE_PATH)
+export let consoleError: SpyInstance<Parameters<(typeof console)['error']>>
+
+beforeEach(() => {
+	const originalConsoleError = console.error
+	consoleError = vi.spyOn(console, 'error')
+	consoleError.mockImplementation(
+		(...args: Parameters<typeof console.error>) => {
+			originalConsoleError(...args)
+			throw new Error(
+				'Console error was called. Call consoleError.mockImplementation(() => {}) if this is expected.',
+			)
+		},
+	)
 })

@@ -1,8 +1,7 @@
-import type { DataFunctionArgs } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { z } from 'zod'
+import { type DataFunctionArgs, json, redirect } from '@remix-run/node'
 import { getInstanceInfo, getInternalInstanceDomain } from 'litefs-js'
-import { cache } from '~/utils/cache.server.ts'
+import { z } from 'zod'
+import { cache } from '#app/utils/cache.server.ts'
 
 export async function action({ request }: DataFunctionArgs) {
 	const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
@@ -15,7 +14,7 @@ export async function action({ request }: DataFunctionArgs) {
 	const isAuthorized =
 		request.headers.get('Authorization') === `Bearer ${token}`
 	if (!isAuthorized) {
-		// rick roll them
+		// nah, you can't be here...
 		return redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 	}
 	const { key, cacheValue } = z

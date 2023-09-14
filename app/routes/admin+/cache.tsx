@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -8,22 +7,29 @@ import {
 	useSearchParams,
 	useSubmit,
 } from '@remix-run/react'
-import { getAllInstances, getInstanceInfo } from 'litefs-js'
-import { ensureInstance } from 'litefs-js/remix.js'
-import invariant from 'tiny-invariant'
-import { Spacer } from '~/components/spacer.tsx'
-import { Button } from '~/components/ui/button.tsx'
+import { Field } from '#app/components/forms.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { Button } from '#app/components/ui/button.tsx'
 import {
 	cache,
 	getAllCacheKeys,
 	lruCache,
 	searchCacheKeys,
-} from '~/utils/cache.server.ts'
-import { Field } from '~/components/forms.tsx'
-import { requireAdmin } from '~/utils/permissions.server.ts'
+} from '#app/utils/cache.server.ts'
+import {
+	ensureInstance,
+	getAllInstances,
+	getInstanceInfo,
+} from '#app/utils/litefs.server.ts'
+import {
+	invariantResponse,
+	useDebounce,
+	useDoubleCheck,
+} from '#app/utils/misc.tsx'
+import { requireUserWithRole } from '#app/utils/permissions.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
-	await requireAdmin(request)
+	await requireUserWithRole(request, 'admin')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
 	if (query === '') {
@@ -48,16 +54,16 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 export async function action({ request }: DataFunctionArgs) {
-	await requireAdmin(request)
+	await requireUserWithRole(request, 'admin')
 	const formData = await request.formData()
 	const key = formData.get('cacheKey')
 	const { currentInstance } = await getInstanceInfo()
 	const instance = formData.get('instance') ?? currentInstance
 	const type = formData.get('type')
 
-	invariant(typeof key === 'string', 'cacheKey must be a string')
-	invariant(typeof type === 'string', 'type must be a string')
-	invariant(typeof instance === 'string', 'instance must be a string')
+	invariantResponse(typeof key === 'string', 'cacheKey must be a string')
+	invariantResponse(typeof type === 'string', 'type must be a string')
+	invariantResponse(typeof instance === 'string', 'instance must be a string')
 	await ensureInstance(instance)
 
 	switch (type) {
@@ -89,7 +95,7 @@ export default function CacheAdminRoute() {
 	}, 400)
 
 	return (
-		<div className="container mx-auto">
+		<div className="container">
 			<h1 className="text-h1">Cache Admin</h1>
 			<Spacer size="2xs" />
 			<Form
@@ -219,69 +225,6 @@ function CacheKeyRow({
 				{cacheKey}
 			</Link>
 		</div>
-	)
-}
-
-function callAll<Args extends Array<unknown>>(
-	...fns: Array<((...args: Args) => unknown) | undefined>
-) {
-	return (...args: Args) => fns.forEach(fn => fn?.(...args))
-}
-
-export function useDoubleCheck() {
-	const [doubleCheck, setDoubleCheck] = React.useState(false)
-
-	function getButtonProps(
-		props?: React.ButtonHTMLAttributes<HTMLButtonElement>,
-	) {
-		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] =
-			() => setDoubleCheck(false)
-
-		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] =
-			doubleCheck
-				? undefined
-				: e => {
-						e.preventDefault()
-						setDoubleCheck(true)
-				  }
-
-		return {
-			...props,
-			onBlur: callAll(onBlur, props?.onBlur),
-			onClick: callAll(onClick, props?.onClick),
-		}
-	}
-
-	return { doubleCheck, getButtonProps }
-}
-
-function debounce<Callback extends (...args: Parameters<Callback>) => void>(
-	fn: Callback,
-	delay: number,
-) {
-	let timer: ReturnType<typeof setTimeout> | null = null
-	return (...args: Parameters<Callback>) => {
-		if (timer) clearTimeout(timer)
-		timer = setTimeout(() => {
-			fn(...args)
-		}, delay)
-	}
-}
-
-export function useDebounce<
-	Callback extends (...args: Parameters<Callback>) => ReturnType<Callback>,
->(callback: Callback, delay: number) {
-	const callbackRef = React.useRef(callback)
-	React.useEffect(() => {
-		callbackRef.current = callback
-	})
-	return React.useMemo(
-		() =>
-			debounce(
-				(...args: Parameters<Callback>) => callbackRef.current(...args),
-				delay,
-			),
-		[delay],
 	)
 }
 

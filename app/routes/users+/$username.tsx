@@ -1,36 +1,38 @@
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
-	json,
-	type DataFunctionArgs,
+	Form,
+	Link,
+	useLoaderData,
 	type V2_MetaFunction,
-} from '@remix-run/node'
-import { Form, Link, useLoaderData } from '@remix-run/react'
-import invariant from 'tiny-invariant'
-import { GeneralErrorBoundary } from '~/components/error-boundary.tsx'
-import { Spacer } from '~/components/spacer.tsx'
-import { Button } from '~/components/ui/button.tsx'
-import { prisma } from '~/utils/db.server.ts'
-import { getUserImgSrc } from '~/utils/misc.ts'
-import { useOptionalUser } from '~/utils/user.ts'
+} from '@remix-run/react'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import { Spacer } from '#app/components/spacer.tsx'
+import { Button } from '#app/components/ui/button.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { prisma } from '#app/utils/db.server.ts'
+import { getUserImgSrc, invariantResponse } from '#app/utils/misc.tsx'
+import { useOptionalUser } from '#app/utils/user.ts'
 
 export async function loader({ params }: DataFunctionArgs) {
-	invariant(params.username, 'Missing username')
-	const user = await prisma.user.findUnique({
-		where: { username: params.username },
+	const user = await prisma.user.findFirst({
 		select: {
 			id: true,
-			username: true,
 			name: true,
-			imageId: true,
+			username: true,
 			createdAt: true,
+			image: { select: { id: true } },
+		},
+		where: {
+			username: params.username,
 		},
 	})
-	if (!user) {
-		throw new Response('not found', { status: 404 })
-	}
+
+	invariantResponse(user, 'User not found', { status: 404 })
+
 	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
 }
 
-export default function UsernameIndex() {
+export default function ProfileRoute() {
 	const data = useLoaderData<typeof loader>()
 	const user = data.user
 	const userDisplayName = user.name ?? user.username
@@ -38,15 +40,15 @@ export default function UsernameIndex() {
 	const isLoggedInUser = data.user.id === loggedInUser?.id
 
 	return (
-		<div className="container mx-auto mb-48 mt-36 flex flex-col items-center justify-center">
+		<div className="container mb-48 mt-36 flex flex-col items-center justify-center">
 			<Spacer size="4xs" />
 
-			<div className="container mx-auto flex flex-col items-center rounded-3xl bg-muted p-12">
+			<div className="container flex flex-col items-center rounded-3xl bg-muted p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
 							<img
-								src={getUserImgSrc(data.user.imageId)}
+								src={getUserImgSrc(data.user.image?.id)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
 							/>
@@ -65,8 +67,10 @@ export default function UsernameIndex() {
 					</p>
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">
-							<Button type="submit" variant="secondary" size="pill">
-								Logout
+							<Button type="submit" variant="link" size="pill">
+								<Icon name="exit" className="scale-125 max-md:scale-150">
+									Logout
+								</Icon>
 							</Button>
 						</Form>
 					) : null}
@@ -98,6 +102,17 @@ export default function UsernameIndex() {
 	)
 }
 
+export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
+	const displayName = data?.user.name ?? params.username
+	return [
+		{ title: `${displayName} | Epic Notes` },
+		{
+			name: 'description',
+			content: `Profile of ${displayName} on Epic Notes`,
+		},
+	]
+}
+
 export function ErrorBoundary() {
 	return (
 		<GeneralErrorBoundary
@@ -108,15 +123,4 @@ export function ErrorBoundary() {
 			}}
 		/>
 	)
-}
-
-export const meta: V2_MetaFunction<typeof loader> = ({ data, params }) => {
-	const displayName = data?.user.name ?? params.username
-	return [
-		{ title: `${displayName} | Epic Notes` },
-		{
-			name: 'description',
-			content: `Profile of ${displayName} on Epic Notes`,
-		},
-	]
 }

@@ -1,6 +1,6 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import fsExtra from 'fs-extra'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import { z } from 'zod'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -20,7 +20,7 @@ export async function createFixture(
 	return fsExtra.writeJSON(path.join(dir, `./${name}.json`), data)
 }
 
-export const emailSchema = z.object({
+export const EmailSchema = z.object({
 	to: z.string(),
 	from: z.string(),
 	subject: z.string(),
@@ -29,22 +29,29 @@ export const emailSchema = z.object({
 })
 
 export async function writeEmail(rawEmail: unknown) {
-	const email = emailSchema.parse(rawEmail)
+	const email = EmailSchema.parse(rawEmail)
 	await createFixture('email', email.to, email)
+	return email
+}
+
+export async function requireEmail(recipient: string) {
+	const email = await readEmail(recipient)
+	if (!email) throw new Error(`Email to ${recipient} not found`)
+	return email
 }
 
 export async function readEmail(recipient: string) {
 	try {
 		const email = await readFixture('email', recipient)
-		return emailSchema.parse(email)
+		return EmailSchema.parse(email)
 	} catch (error) {
 		console.error(`Error reading email`, error)
 		return null
 	}
 }
 
-export function requiredHeader(headers: Headers, header: string) {
-	if (!headers.get(header)) {
+export function requireHeader(headers: Headers, header: string) {
+	if (!headers.has(header)) {
 		const headersString = JSON.stringify(
 			Object.fromEntries(headers.entries()),
 			null,
@@ -54,4 +61,5 @@ export function requiredHeader(headers: Headers, header: string) {
 			`Header "${header}" required, but not found in ${headersString}`,
 		)
 	}
+	return headers.get(header)
 }

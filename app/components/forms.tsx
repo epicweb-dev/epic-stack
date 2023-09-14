@@ -1,9 +1,9 @@
 import { useInputEvent } from '@conform-to/react'
 import React, { useId, useRef } from 'react'
-import { Input } from '~/components/ui/input.tsx'
-import { Label } from '~/components/ui/label.tsx'
-import { Checkbox, type CheckboxProps } from '~/components/ui/checkbox.tsx'
-import { Textarea } from '~/components/ui/textarea.tsx'
+import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Input } from './ui/input.tsx'
+import { Label } from './ui/label.tsx'
+import { Textarea } from './ui/textarea.tsx'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -17,7 +17,7 @@ export function ErrorList({
 	const errorsToRender = errors?.filter(Boolean)
 	if (!errorsToRender?.length) return null
 	return (
-		<ul id={id} className="space-y-1">
+		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map(e => (
 				<li key={e} className="text-[10px] text-foreground-danger">
 					{e}
@@ -33,8 +33,8 @@ export function Field({
 	errors,
 	className,
 }: {
-	labelProps: Omit<React.LabelHTMLAttributes<HTMLLabelElement>, 'className'>
-	inputProps: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>
+	labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
+	inputProps: React.InputHTMLAttributes<HTMLInputElement>
 	errors?: ListOfErrors
 	className?: string
 }) {
@@ -80,7 +80,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				{...textareaProps}
 			/>
-			<div className="px-4 pb-3 pt-1">
+			<div className="min-h-[32px] px-4 pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>

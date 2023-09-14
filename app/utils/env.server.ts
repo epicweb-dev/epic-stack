@@ -1,28 +1,38 @@
-import invariant from 'tiny-invariant'
+import { z } from 'zod'
 
-const requiredServerEnvs = [
-	'NODE_ENV',
-	'DATABASE_PATH',
-	'DATABASE_URL',
-	'SESSION_SECRET',
-	'INTERNAL_COMMAND_TOKEN',
-	'CACHE_DATABASE_PATH',
-	// If you plan to use Resend, uncomment this line
-	// 'RESEND_API_KEY',
+const schema = z.object({
+	NODE_ENV: z.enum(['production', 'development', 'test'] as const),
+	DATABASE_PATH: z.string(),
+	DATABASE_URL: z.string(),
+	SESSION_SECRET: z.string(),
+	INTERNAL_COMMAND_TOKEN: z.string(),
+	CACHE_DATABASE_PATH: z.string(),
 	// If you plan on using Sentry, uncomment this line
-	// 'SENTRY_DSN',
-] as const
+	// SENTRY_DSN: z.string(),
+	// If you plan to use Resend, uncomment this line
+	// RESEND_API_KEY: z.string(),
+	// If you plan to use GitHub auth, remove the default:
+	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
+	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
+	GITHUB_TOKEN: z.string().default('MOCK_GITHUB_TOKEN'),
+})
 
 declare global {
 	namespace NodeJS {
-		interface ProcessEnv
-			extends Record<(typeof requiredServerEnvs)[number], string> {}
+		interface ProcessEnv extends z.infer<typeof schema> {}
 	}
 }
 
 export function init() {
-	for (const env of requiredServerEnvs) {
-		invariant(process.env[env], `${env} is required`)
+	const parsed = schema.safeParse(process.env)
+
+	if (parsed.success === false) {
+		console.error(
+			'❌ Invalid environment variables:',
+			parsed.error.flatten().fieldErrors,
+		)
+
+		throw new Error('Invalid envirmonment variables')
 	}
 }
 
@@ -36,8 +46,6 @@ export function init() {
  * @returns all public ENV variables
  */
 export function getEnv() {
-	invariant(process.env.NODE_ENV, 'NODE_ENV should be defined')
-
 	return {
 		MODE: process.env.NODE_ENV,
 		SENTRY_DSN: process.env.SENTRY_DSN,

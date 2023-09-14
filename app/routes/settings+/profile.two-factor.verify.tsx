@@ -1,33 +1,41 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { getTOTPAuthUri } from '@epic-web/totp'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import {
+	Form,
+	useActionData,
+	useLoaderData,
+	useNavigation,
+} from '@remix-run/react'
 import * as QRCode from 'qrcode'
-import invariant from 'tiny-invariant'
 import { z } from 'zod'
-import { StatusButton } from '~/components/ui/status-button.tsx'
-import { requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { Field } from '~/components/forms.tsx'
-import { getDomainUrl } from '~/utils/misc.ts'
-import { getTOTPAuthUri, verifyTOTP } from '~/utils/totp.server.ts'
+import { Field } from '#app/components/forms.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { isCodeValid } from '#app/routes/_auth+/verify.tsx'
+import { requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
+import { twoFAVerificationType } from './profile.two-factor.tsx'
 
-export const verificationType = '2fa-verify'
+export const handle = {
+	breadcrumb: <Icon name="check">Verify</Icon>,
+}
 
-const verifySchema = z.union([
-	z.object({
-		intent: z.literal('confirm'),
-		otp: z.string().min(6).max(6),
-	}),
-	z.object({
-		intent: z.literal('cancel'),
-	}),
-])
+const VerifySchema = z.object({
+	code: z.string().min(6).max(6),
+})
+
+export const twoFAVerifyVerificationType = '2fa-verify'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
-	const verification = await prisma.verification.findFirst({
-		where: { type: verificationType, target: userId },
+	const verification = await prisma.verification.findUnique({
+		where: {
+			target_type: { type: twoFAVerifyVerificationType, target: userId },
+		},
 		select: {
 			id: true,
 			algorithm: true,
@@ -39,10 +47,14 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!verification) {
 		return redirect('/settings/profile/two-factor')
 	}
+	const user = await prisma.user.findUniqueOrThrow({
+		where: { id: userId },
+		select: { email: true },
+	})
 	const issuer = new URL(getDomainUrl(request)).host
 	const otpUri = getTOTPAuthUri({
 		...verification,
-		accountName: userId,
+		accountName: user.email,
 		issuer,
 	})
 	const qrCode = await QRCode.toDataURL(otpUri)
@@ -52,106 +64,74 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	const verification = await prisma.verification.findFirst({
-		where: {
-			type: verificationType,
-			target: userId,
-		},
-		select: {
-			id: true,
-			algorithm: true,
-			secret: true,
-			period: true,
-		},
-	})
-	const submission = await parse(formData, {
-		schema: () => {
-			return verifySchema.superRefine(async (data, ctx) => {
-				if (data.intent === 'cancel') return
 
-				if (!verification) {
+	if (formData.get('intent') === 'cancel') {
+		await prisma.verification.deleteMany({
+			where: { type: twoFAVerifyVerificationType, target: userId },
+		})
+		return redirect('/settings/profile/two-factor')
+	}
+	const submission = await parse(formData, {
+		schema: () =>
+			VerifySchema.superRefine(async (data, ctx) => {
+				const codeIsValid = await isCodeValid({
+					code: data.code,
+					type: twoFAVerifyVerificationType,
+					target: userId,
+				})
+				if (!codeIsValid) {
 					ctx.addIssue({
-						path: ['otp'],
+						path: ['code'],
 						code: z.ZodIssueCode.custom,
 						message: `Invalid code`,
 					})
 					return
 				}
-				const result = verifyTOTP({
-					otp: data.otp,
-					secret: verification.secret,
-					algorithm: verification.algorithm,
-					period: verification.period,
-					window: 1,
-				})
-				if (!result) {
-					ctx.addIssue({
-						path: ['otp'],
-						code: z.ZodIssueCode.custom,
-						message: `Invalid code`,
-					})
-				}
-			})
-		},
-		acceptMultipleErrors: () => true,
+			}),
 		async: true,
 	})
+
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	switch (submission.value.intent) {
-		case 'confirm': {
-			invariant(verification, 'Verification should exist by this point')
-			// upgrade to regular 2fa
-			await prisma.verification.update({
-				where: { id: verification.id },
-				data: { type: '2fa' },
-			})
-			break
-		}
-		case 'cancel': {
-			await prisma.verification.deleteMany({
-				where: { type: verificationType, target: userId },
-			})
-			break
-		}
-		default: {
-			submission.error = { '': 'Invalid intent' }
-			return json({ status: 'error', submission } as const)
-		}
-	}
-	return redirect('/settings/profile/two-factor')
+	await prisma.verification.update({
+		where: {
+			target_type: { type: twoFAVerifyVerificationType, target: userId },
+		},
+		data: { type: twoFAVerificationType },
+	})
+	return redirectWithToast('/settings/profile/two-factor', {
+		type: 'success',
+		title: 'Enabled',
+		description: 'Two-factor authentication has been enabled.',
+	})
 }
 
 export default function TwoFactorRoute() {
 	const data = useLoaderData<typeof loader>()
-	const toggle2FAFetcher = useFetcher<typeof action>()
+	const actionData = useActionData<typeof action>()
+	const navigation = useNavigation()
+
+	const isPending = useIsPending()
+	const pendingIntent = isPending ? navigation.formData?.get('intent') : null
 
 	const [form, fields] = useForm({
-		id: 'signup-form',
-		constraint: getFieldsetConstraint(verifySchema),
-		lastSubmission: toggle2FAFetcher.data?.submission,
+		id: 'verify-form',
+		constraint: getFieldsetConstraint(VerifySchema),
+		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
-			const result = parse(formData, { schema: verifySchema })
-			return result
+			return parse(formData, { schema: VerifySchema })
 		},
-		shouldRevalidate: 'onBlur',
 	})
 
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data.qrCode} className="w-56" />
+				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -172,50 +152,45 @@ export default function TwoFactorRoute() {
 					actions. Do not lose access to your authenticator app, or you will
 					lose access to your account.
 				</p>
-				<toggle2FAFetcher.Form
-					method="POST"
-					preventScrollReset
-					className="w-full"
-					{...form.props}
-				>
-					<Field
-						labelProps={{
-							children: 'Code',
-						}}
-						inputProps={conform.input(fields.otp)}
-						errors={fields.otp.errors}
-						className="mx-auto w-28"
-					/>
-					<div className="flex flex-row-reverse justify-between">
-						<StatusButton
-							type="submit"
-							name="intent"
-							value="confirm"
-							status={
-								toggle2FAFetcher.state === 'loading' &&
-								toggle2FAFetcher.formData?.get('intent') === 'confirm'
-									? 'pending'
-									: 'idle'
-							}
-						>
-							Confirm
-						</StatusButton>
-						<StatusButton
-							variant="secondary"
-							type="submit"
-							name="intent"
-							value="cancel"
-							status={
-								toggle2FAFetcher.state === 'loading' &&
-								toggle2FAFetcher.formData?.get('intent') === 'cancel'
-									? 'pending'
-									: 'idle'
-							}
-						>
-							Cancel
-						</StatusButton>
-					</div>
-				</toggle2FAFetcher.Form>
+				<div className="flex w-full max-w-xs flex-col justify-center gap-4">
+					<Form method="POST" {...form.props} className="flex-1">
+						<Field
+							labelProps={{
+								htmlFor: fields.code.id,
+								children: 'Code',
+							}}
+							inputProps={{ ...conform.input(fields.code), autoFocus: true }}
+							errors={fields.code.errors}
+						/>
+						<div className="flex justify-between gap-4">
+							<StatusButton
+								className="w-full"
+								status={
+									pendingIntent === 'verify'
+										? 'pending'
+										: actionData?.status ?? 'idle'
+								}
+								type="submit"
+								name="intent"
+								value="verify"
+								disabled={isPending}
+							>
+								Submit
+							</StatusButton>
+							<StatusButton
+								className="w-full"
+								variant="secondary"
+								status={pendingIntent === 'cancel' ? 'pending' : 'idle'}
+								type="submit"
+								name="intent"
+								value="cancel"
+								disabled={isPending}
+							>
+								Cancel
+							</StatusButton>
+						</div>
+					</Form>
+				</div>
 			</div>
 		</div>
 	)

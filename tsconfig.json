@@ -13,10 +13,12 @@
     "noImplicitAny": true,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
-      "tests/*": ["./tests/*"]
+      "#*": ["./*"],
+      "@/icon-name": [
+        "./app/components/ui/icons/name.d.ts",
+        "./types/icon-name.d.ts"
+      ]
     },
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,

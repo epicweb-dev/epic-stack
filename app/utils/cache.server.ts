@@ -1,4 +1,5 @@
-import type BetterSqlite3 from 'better-sqlite3'
+import fs from 'fs'
+import { remember } from '@epic-web/remember'
 import Database from 'better-sqlite3'
 import {
 	cachified as baseCachified,
@@ -9,19 +10,17 @@ import {
 	type Cache as CachifiedCache,
 	type CachifiedOptions,
 } from 'cachified'
-import fs from 'fs'
-import { getInstanceInfo, getInstanceInfoSync } from 'litefs-js'
 import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
-import { updatePrimaryCacheValue } from '~/routes/admin+/cache_.sqlite.tsx'
+import { updatePrimaryCacheValue } from '#app/routes/admin+/cache_.sqlite.tsx'
+import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
-import { singleton } from './singleton.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 
-const cacheDb = singleton('cacheDb', createDatabase)
+const cacheDb = remember('cacheDb', createDatabase)
 
-function createDatabase(tryAgain = true): BetterSqlite3.Database {
+function createDatabase(tryAgain = true): Database.Database {
 	const db = new Database(CACHE_DATABASE_PATH)
 	const { currentIsPrimary } = getInstanceInfoSync()
 	if (!currentIsPrimary) return db
@@ -48,7 +47,7 @@ function createDatabase(tryAgain = true): BetterSqlite3.Database {
 	return db
 }
 
-const lru = singleton(
+const lru = remember(
 	'lru-cache',
 	() => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }),
 )

@@ -1,25 +1,33 @@
+import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import express from 'express'
-import chokidar from 'chokidar'
-import compression from 'compression'
-import morgan from 'morgan'
-import address from 'address'
-import closeWithGrace from 'close-with-grace'
-import helmet from 'helmet'
-import crypto from 'crypto'
 import {
-	type RequestHandler,
 	createRequestHandler as _createRequestHandler,
+	type RequestHandler,
 } from '@remix-run/express'
+import {
+	broadcastDevReady,
+	installGlobals,
+	type ServerBuild,
+} from '@remix-run/node'
 import { wrapExpressCreateRequestHandler } from '@sentry/remix'
-import { type ServerBuild, broadcastDevReady } from '@remix-run/node'
-import getPort, { portNumbers } from 'get-port'
+import address from 'address'
 import chalk from 'chalk'
+import chokidar from 'chokidar'
+import closeWithGrace from 'close-with-grace'
+import compression from 'compression'
+import express from 'express'
+import rateLimit from 'express-rate-limit'
+import getPort, { portNumbers } from 'get-port'
+import helmet from 'helmet'
+import morgan from 'morgan'
 
 // @ts-ignore - this file may not exist if you haven't built yet, but it will
 // definitely exist by the time the dev or prod server actually runs.
-import * as remixBuild from '../build/index.js'
+import * as remixBuild from '#build/index.js'
+
+installGlobals()
+
 const MODE = process.env.NODE_ENV
 
 const createRequestHandler = wrapExpressCreateRequestHandler(
@@ -82,7 +90,15 @@ app.use(
 app.use(express.static('public', { maxAge: '1h' }))
 
 morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
-app.use(morgan('tiny'))
+app.use(
+	morgan('tiny', {
+		skip: (req, res) =>
+			res.statusCode === 200 &&
+			(req.url?.startsWith('/resources/note-images') ||
+				req.url?.startsWith('/resources/user-images') ||
+				req.url?.startsWith('/resources/healthcheck')),
+	}),
+)
 
 app.use((_, res, next) => {
 	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
@@ -91,8 +107,11 @@ app.use((_, res, next) => {
 
 app.use(
 	helmet({
+		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
+			// NOTE: Remove reportOnly when you're ready to enforce this CSP
+			reportOnly: true,
 			directives: {
 				'connect-src': [
 					MODE === 'development' ? 'ws:' : null,
@@ -118,6 +137,59 @@ app.use(
 	}),
 )
 
+// When running tests or running in development, we want to effectively disable
+// rate limiting because playwright tests are very fast and we don't want to
+// have to wait for the rate limit to reset between tests.
+const maxMultiple =
+	MODE !== 'production' || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
+const rateLimitDefault = {
+	windowMs: 60 * 1000,
+	max: 1000 * maxMultiple,
+	standardHeaders: true,
+	legacyHeaders: false,
+}
+
+const strongestRateLimit = rateLimit({
+	...rateLimitDefault,
+	windowMs: 60 * 1000,
+	max: 10 * maxMultiple,
+})
+
+const strongRateLimit = rateLimit({
+	...rateLimitDefault,
+	windowMs: 60 * 1000,
+	max: 100 * maxMultiple,
+})
+
+const generalRateLimit = rateLimit(rateLimitDefault)
+app.use((req, res, next) => {
+	const strongPaths = [
+		'/login',
+		'/signup',
+		'/verify',
+		'/admin',
+		'/onboarding',
+		'/reset-password',
+		'/settings/profile',
+		'/resources/login',
+		'/resources/verify',
+	]
+	if (req.method !== 'GET' && req.method !== 'HEAD') {
+		if (strongPaths.some(p => req.path.includes(p))) {
+			return strongestRateLimit(req, res, next)
+		}
+		return strongRateLimit(req, res, next)
+	}
+
+	// the verify route is a special case because it's a GET route that
+	// can have a token in the query string
+	if (req.path.includes('/verify')) {
+		return strongestRateLimit(req, res, next)
+	}
+
+	return generalRateLimit(req, res, next)
+})
+
 function getRequestHandler(build: ServerBuild): RequestHandler {
 	function getLoadContext(_: any, res: any) {
 		return { cspNonce: res.locals.cspNonce }
@@ -127,7 +199,7 @@ function getRequestHandler(build: ServerBuild): RequestHandler {
 
 app.all(
 	'*',
-	process.env.NODE_ENV === 'development'
+	MODE === 'development'
 		? (...args) => getRequestHandler(devBuild)(...args)
 		: getRequestHandler(build),
 )
@@ -172,7 +244,7 @@ ${chalk.bold('Press Ctrl+C to stop')}
 		`.trim(),
 	)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (MODE === 'development') {
 		broadcastDevReady(build)
 	}
 })
@@ -184,7 +256,7 @@ closeWithGrace(async () => {
 })
 
 // during dev, we'll keep the build module up to date with the changes
-if (process.env.NODE_ENV === 'development') {
+if (MODE === 'development') {
 	async function reloadBuild() {
 		devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
 		broadcastDevReady(devBuild)

@@ -24,7 +24,7 @@ script_checks = [ ]
   [services.concurrency]
   hard_limit = 100
   soft_limit = 80
-  type = "connections"
+  type = "requests"
 
   [[services.ports]]
   handlers = [ "http" ]
@@ -50,3 +50,10 @@ script_checks = [ ]
   timeout = "2s"
   tls_skip_verify = false
   headers = { }
+
+  [[services.http_checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/litefs/health"

@@ -1,64 +1,54 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import {
-	type DataFunctionArgs,
 	json,
 	redirect,
 	unstable_createMemoryUploadHandler,
 	unstable_parseMultipartFormData,
+	type DataFunctionArgs,
 } from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useActionData,
-	useFetcher,
-	useLoaderData,
-	useNavigate,
-} from '@remix-run/react'
+import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
+import { ServerOnly } from 'remix-utils'
 import { z } from 'zod'
-import { Button } from '~/components/ui/button.tsx'
+import { ErrorList } from '#app/components/forms.tsx'
+import { Button } from '#app/components/ui/button.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
 import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogTitle,
-} from '~/components/ui/dialog.tsx'
-import * as deleteImageRoute from '~/routes/resources+/delete-image.tsx'
-import { authenticator, requireUserId } from '~/utils/auth.server.ts'
-import { prisma } from '~/utils/db.server.ts'
-import { ErrorList } from '~/components/forms.tsx'
-import { getUserImgSrc } from '~/utils/misc.ts'
-import { Icon } from '~/components/ui/icon.tsx'
+	getUserImgSrc,
+	invariantResponse,
+	useDoubleCheck,
+	useIsPending,
+} from '#app/utils/misc.tsx'
+
+export const handle = {
+	breadcrumb: <Icon name="avatar">Photo</Icon>,
+}
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB
 
-/*
-The preprocess call is needed because a current bug in @remix-run/web-fetch
-for more info see the bug (https://github.com/remix-run/web-std-io/pull/28)
-and the explanation here: https://conform.guide/file-upload
-*/
 const PhotoFormSchema = z.object({
-	photoFile: z.preprocess(
-		value => (value === '' ? new File([], '') : value),
-		z
-			.instanceof(File)
-			.refine(file => file.name !== '' && file.size !== 0, 'Image is required')
-			.refine(file => {
-				return file.size <= MAX_SIZE
-			}, 'Image size must be less than 3MB'),
-	),
+	photoFile: z
+		.instanceof(File)
+		.refine(file => file.size > 0, 'Image is required')
+		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 3MB'),
 })
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
-		select: { imageId: true, name: true, username: true },
+		select: {
+			id: true,
+			name: true,
+			username: true,
+			image: { select: { id: true } },
+		},
 	})
-	if (!user) {
-		throw await authenticator.logout(request, { redirectTo: '/' })
-	}
+	invariantResponse(user, 'User not found', { status: 404 })
 	return json({ user })
 }
 
@@ -68,69 +58,53 @@ export async function action({ request }: DataFunctionArgs) {
 		request,
 		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
 	)
+	const intent = formData.get('intent')
+	if (intent === 'delete') {
+		await prisma.userImage.deleteMany({ where: { userId } })
+		return redirect('/settings/profile')
+	}
 
-	const submission = parse(formData, { schema: PhotoFormSchema })
+	const submission = await parse(formData, {
+		schema: PhotoFormSchema.transform(async data => {
+			if (data.photoFile.size <= 0) return z.NEVER
+			return {
+				image: {
+					contentType: data.photoFile.type,
+					blob: Buffer.from(await data.photoFile.arrayBuffer()),
+				},
+			}
+		}),
+		async: true,
+	})
 
 	if (submission.intent !== 'submit') {
 		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
-		return json(
-			{
-				status: 'error',
-				submission,
-			} as const,
-			{ status: 400 },
-		)
+		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	const { photoFile } = submission.value
+	const { image } = submission.value
 
-	const newPrismaPhoto = {
-		contentType: photoFile.type,
-		file: {
-			create: {
-				blob: Buffer.from(await photoFile.arrayBuffer()),
-			},
-		},
-	}
-
-	const previousUserPhoto = await prisma.user.findUnique({
-		where: { id: userId },
-		select: { imageId: true },
+	await prisma.$transaction(async $prisma => {
+		await $prisma.userImage.deleteMany({ where: { userId } })
+		await $prisma.user.update({
+			where: { id: userId },
+			data: { image: { create: image } },
+		})
 	})
-
-	await prisma.user.update({
-		select: { id: true },
-		where: { id: userId },
-		data: {
-			image: {
-				upsert: {
-					update: newPrismaPhoto,
-					create: newPrismaPhoto,
-				},
-			},
-		},
-	})
-
-	if (previousUserPhoto?.imageId) {
-		void prisma.image
-			.delete({
-				where: { fileId: previousUserPhoto.imageId },
-			})
-			.catch(() => {}) // ignore the error, maybe it never existed?
-	}
 
 	return redirect('/settings/profile')
 }
 
-export default function PhotoChooserModal() {
+export default function PhotoRoute() {
 	const data = useLoaderData<typeof loader>()
-	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
-	const navigate = useNavigate()
-	const deleteImageFetcher = useFetcher<typeof deleteImageRoute.action>()
+
+	const doubleCheckDeleteImage = useDoubleCheck()
+
 	const actionData = useActionData<typeof action>()
-	const [form, { photoFile }] = useForm({
+
+	const [form, fields] = useForm({
 		id: 'profile-photo',
 		constraint: getFieldsetConstraint(PhotoFormSchema),
 		lastSubmission: actionData?.submission,
@@ -140,95 +114,94 @@ export default function PhotoChooserModal() {
 		shouldRevalidate: 'onBlur',
 	})
 
-	const deleteProfilePhotoFormId = 'delete-profile-photo'
-	const dismissModal = () => navigate('..', { preventScrollReset: true })
+	const isPending = useIsPending()
+
+	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
+
 	return (
-		<Dialog open={true}>
-			<DialogContent
-				onEscapeKeyDown={dismissModal}
-				onPointerDownOutside={dismissModal}
-				className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 transform rounded-lg border-2 bg-background p-12 shadow-lg"
-			>
-				<DialogTitle asChild className="text-center">
-					<h2 className="text-h2">Profile photo</h2>
-				</DialogTitle>
-				<Form
-					method="POST"
-					encType="multipart/form-data"
-					className="mt-8 flex flex-col items-center justify-center gap-10"
-					onReset={() => setNewImageSrc(null)}
-					{...form.props}
-				>
-					<img
-						src={newImageSrc ?? getUserImgSrc(data.user.imageId)}
-						className="h-64 w-64 rounded-full"
-						alt={data.user.name ?? data.user.username}
-					/>
-					<ErrorList errors={photoFile.errors} id={photoFile.id} />
-					<input
-						{...conform.input(photoFile, { type: 'file' })}
-						type="file"
-						accept="image/*"
-						className="sr-only"
-						tabIndex={newImageSrc ? -1 : 0}
-						onChange={e => {
-							const file = e.currentTarget.files?.[0]
-							if (file) {
-								const reader = new FileReader()
-								reader.onload = event => {
-									setNewImageSrc(event.target?.result?.toString() ?? null)
-								}
-								reader.readAsDataURL(file)
-							}
-						}}
-					/>
-					{newImageSrc ? (
-						<div className="flex gap-4">
-							<Button type="submit">Save Photo</Button>
-							<Button type="reset" variant="secondary">
-								Reset
-							</Button>
-						</div>
-					) : (
-						<div className="flex gap-4">
-							<Button asChild className="cursor-pointer">
-								<label htmlFor={photoFile.id} className="flex gap-1">
-									<Icon name="pencil-1" /> Change
-								</label>
-							</Button>
-							{data.user.imageId ? (
-								<Button
-									variant="destructive"
-									type="submit"
-									form={deleteProfilePhotoFormId}
-									className="flex gap-1"
-								>
-									<Icon name="trash" /> Delete
-								</Button>
-							) : null}
-						</div>
-					)}
-					<ErrorList errors={form.errors} />
-				</Form>
-				<DialogClose asChild>
-					<Link
-						to=".."
-						preventScrollReset
-						aria-label="Close"
-						className="absolute right-10 top-10"
-					>
-						<Icon name="cross-1" />
-					</Link>
-				</DialogClose>
-			</DialogContent>
-			<deleteImageFetcher.Form
+		<div>
+			<Form
 				method="POST"
-				id={deleteProfilePhotoFormId}
-				action={deleteImageRoute.ROUTE_PATH}
+				encType="multipart/form-data"
+				className="flex flex-col items-center justify-center gap-10"
+				onReset={() => setNewImageSrc(null)}
+				{...form.props}
 			>
-				<input name="intent" type="hidden" value="submit" />
-				<input name="imageId" type="hidden" value={data.user.imageId ?? ''} />
-			</deleteImageFetcher.Form>
-		</Dialog>
+				<img
+					src={
+						newImageSrc ?? (data.user ? getUserImgSrc(data.user.image?.id) : '')
+					}
+					className="h-52 w-52 rounded-full object-cover"
+					alt={data.user?.name ?? data.user?.username}
+				/>
+				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />
+				<input
+					{...conform.input(fields.photoFile, { type: 'file' })}
+					accept="image/*"
+					className="peer sr-only"
+					tabIndex={newImageSrc ? -1 : 0}
+					onChange={e => {
+						const file = e.currentTarget.files?.[0]
+						if (file) {
+							const reader = new FileReader()
+							reader.onload = event => {
+								setNewImageSrc(event.target?.result?.toString() ?? null)
+							}
+							reader.readAsDataURL(file)
+						}
+					}}
+				/>
+				{newImageSrc ? (
+					<div className="flex gap-4">
+						<StatusButton
+							type="submit"
+							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+							disabled={isPending}
+						>
+							Save Photo
+						</StatusButton>
+						<Button type="reset" variant="secondary">
+							Reset
+						</Button>
+					</div>
+				) : (
+					<div className="flex gap-4 peer-invalid:[&>.server-only[type='submit']]:hidden">
+						<Button asChild className="cursor-pointer">
+							<label htmlFor={fields.photoFile.id}>
+								<Icon name="pencil-1">Change</Icon>
+							</label>
+						</Button>
+
+						{/* This is here for progressive enhancement. If the client doesn't
+						hydrate (or hasn't yet) this button will be available to submit the
+						selected photo. */}
+						<ServerOnly>
+							{() => (
+								<Button type="submit" className="server-only">
+									Save Photo
+								</Button>
+							)}
+						</ServerOnly>
+						{data.user.image?.id ? (
+							<Button
+								variant="destructive"
+								{...doubleCheckDeleteImage.getButtonProps({
+									type: 'submit',
+									name: 'intent',
+									value: 'delete',
+								})}
+							>
+								<Icon name="trash">
+									{doubleCheckDeleteImage.doubleCheck
+										? 'Are you sure?'
+										: 'Delete'}
+								</Icon>
+							</Button>
+						) : null}
+					</div>
+				)}
+				<ErrorList errors={form.errors} />
+			</Form>
+		</div>
 	)
 }

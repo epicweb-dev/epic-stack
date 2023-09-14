@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker'
-import { expect, insertNewUser, test } from '../playwright-utils.ts'
-import { createUser } from '../../tests/db-utils.ts'
-import { verifyLogin } from '~/utils/auth.server.ts'
+import { verifyUserPassword } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+import { invariant } from '#app/utils/misc.tsx'
+import { readEmail } from '#tests/mocks/utils.ts'
+import { expect, test , createUser, waitFor } from '#tests/playwright-utils.ts'
 
-test('Users can update their basic info', async ({ login, page }) => {
+test('Users can update their basic info', async ({ page, login }) => {
 	await login()
 	await page.goto('/settings/profile')
 
@@ -13,50 +15,47 @@ test('Users can update their basic info', async ({ login, page }) => {
 	await page
 		.getByRole('textbox', { name: /^username/i })
 		.fill(newUserData.username)
-	// TODO: support changing the email... probably test this in another test though
-	// await page.getByRole('textbox', {name: /^email/i}).fill(newUserData.email)
 
 	await page.getByRole('button', { name: /^save/i }).click()
-
-	await expect(page).toHaveURL(`/users/${newUserData.username}`)
 })
 
-test('Users can update their password', async ({ login, page }) => {
+test('Users can update their password', async ({ page, login }) => {
 	const oldPassword = faker.internet.password()
 	const newPassword = faker.internet.password()
-	const user = await insertNewUser({ password: oldPassword })
-	await login(user)
+	const user = await login({ password: oldPassword })
 	await page.goto('/settings/profile')
 
-	const fieldset = page.getByRole('group', { name: /change password/i })
+	await page.getByRole('link', { name: /change password/i }).click()
 
-	await fieldset
+	await page
 		.getByRole('textbox', { name: /^current password/i })
 		.fill(oldPassword)
-	await fieldset
-		.getByRole('textbox', { name: /^new password/i })
+	await page.getByRole('textbox', { name: /^new password/i }).fill(newPassword)
+	await page
+		.getByRole('textbox', { name: /^confirm new password/i })
 		.fill(newPassword)
 
-	await page.getByRole('button', { name: /^save/i }).click()
+	await page.getByRole('button', { name: /^change password/i }).click()
 
-	await expect(page).toHaveURL(`/users/${user.username}`)
+	await expect(page).toHaveURL(`/settings/profile`)
 
+	const { username } = user
 	expect(
-		await verifyLogin(user.username, oldPassword),
+		await verifyUserPassword({ username }, oldPassword),
 		'Old password still works',
 	).toEqual(null)
 	expect(
-		await verifyLogin(user.username, newPassword),
+		await verifyUserPassword({ username }, newPassword),
 		'New password does not work',
 	).toEqual({ id: user.id })
 })
 
-test('Users can update their profile photo', async ({ login, page }) => {
+test('Users can update their profile photo', async ({ page, login }) => {
 	const user = await login()
 	await page.goto('/settings/profile')
 
 	const beforeSrc = await page
-		.getByAltText(user.name ?? user.username)
+		.getByRole('img', { name: user.name ?? user.username })
 		.getAttribute('src')
 
 	await page.getByRole('link', { name: /change profile photo/i }).click()
@@ -64,14 +63,10 @@ test('Users can update their profile photo', async ({ login, page }) => {
 	await expect(page).toHaveURL(`/settings/profile/photo`)
 
 	await page
-		.getByRole('dialog', { name: /profile photo/i })
-		.getByLabel(/change/i)
-		.setInputFiles('./tests/fixtures/test-profile.jpg')
+		.getByRole('textbox', { name: /change/i })
+		.setInputFiles('./tests/fixtures/images/user/kody.png')
 
-	await page
-		.getByRole('dialog', { name: /profile photo/i })
-		.getByRole('button', { name: /save/i })
-		.click()
+	await page.getByRole('button', { name: /save/i }).click()
 
 	await expect(
 		page,
@@ -79,8 +74,42 @@ test('Users can update their profile photo', async ({ login, page }) => {
 	).toHaveURL(`/settings/profile`)
 
 	const afterSrc = await page
-		.getByAltText(user.name ?? user.username)
+		.getByRole('img', { name: user.name ?? user.username })
 		.getAttribute('src')
 
 	expect(beforeSrc).not.toEqual(afterSrc)
+})
+
+test('Users can change their email address', async ({ page, login }) => {
+	const preUpdateUser = await login()
+	const newEmailAddress = faker.internet.email().toLowerCase()
+	expect(preUpdateUser.email).not.toEqual(newEmailAddress)
+	await page.goto('/settings/profile')
+	await page.getByRole('link', { name: /change email/i }).click()
+	await page.getByRole('textbox', { name: /new email/i }).fill(newEmailAddress)
+	await page.getByRole('button', { name: /send confirmation/i }).click()
+	await expect(page.getByText(/check your email/i)).toBeVisible()
+	const email = await waitFor(() => readEmail(newEmailAddress), {
+		errorMessage: 'Confirmation email was not sent',
+	})
+	invariant(email, 'Email was not sent')
+	const codeMatch = email.text.match(
+		/Here's your verification code: (?<code>\d+)/,
+	)
+	const code = codeMatch?.groups?.code
+	invariant(code, 'Onboarding code not found')
+	await page.getByRole('textbox', { name: /code/i }).fill(code)
+	await page.getByRole('button', { name: /submit/i }).click()
+	await expect(page.getByText(/email changed/i)).toBeVisible()
+
+	const updatedUser = await prisma.user.findUnique({
+		where: { id: preUpdateUser.id },
+		select: { email: true },
+	})
+	invariant(updatedUser, 'Updated user not found')
+	expect(updatedUser.email).toBe(newEmailAddress)
+	const noticeEmail = await waitFor(() => readEmail(preUpdateUser.email), {
+		errorMessage: 'Notice email was not sent',
+	})
+	expect(noticeEmail.subject).toContain('changed')
 })

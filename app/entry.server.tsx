@@ -1,9 +1,9 @@
+import { PassThrough } from 'stream'
 import { Response, type HandleDocumentRequestFunction } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import isbot from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
 import { renderToPipeableStream } from 'react-dom/server'
-import { PassThrough } from 'stream'
 import { getEnv, init } from './utils/env.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
@@ -14,7 +14,7 @@ init()
 global.ENV = getEnv()
 
 if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
-	import('~/utils/monitoring.server.ts').then(({ init }) => init())
+	import('./utils/monitoring.server.ts').then(({ init }) => init())
 }
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
@@ -38,9 +38,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		: 'onShellReady'
 
 	const nonce = String(loadContext.cspNonce) ?? undefined
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		let didError = false
-
 		// NOTE: this timing will only include things that are rendered in the shell
 		// and will not include suspended components and deferred loaders
 		const timings = makeTimings('render', 'renderToPipeableStream')

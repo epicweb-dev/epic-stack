@@ -26,6 +26,39 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@L-Steinmacher](https://github.com/L-Steinmacher/epic-stack-with-prisma-client-extensions):
   An example of the Epic Stack with Prisma Client extensions activated for enum
   like behavior in SQLite.
+- [Epic Stack + Storybook](https://github.com/moishinetzer/epic-stack-with-storybook):
+  by [@moishinetzer](https://github.com/moishinetzer): An example of the Epic
+  Stack with Storybook. It also showcases creating a Remix stub, which is very
+  helpful for isolating Remix-specific components inside of Storybook.
+- [Socket.IO](https://github.com/L-Steinmacher/epic-stack-with-socket.io): by
+  [@L-Steinmacher](https://github.com/L-Steinmacher): An example of setting up
+  using websockets in the Epic Stack using the `Socket.IO` library.
+- [User Impersonation](https://github.com/alan2207/epic-stack-with-user-impersonation)
+  by [@alan2207](https://github.com/alan2207): An example Remix application
+  showcasing how to implement user impersonation in the Epic Stack.
+- [Epic Stack + Tailwind CSS Plugin](https://github.com/hakimLyon/epic-stack-with-tailwind-css-plugin)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
+  with Tailwind CSS Plugin.
+- [Epic Stack + GitHub Auth](https://github.com/kentcdodds/epic-github-auth) by
+  [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
+  with GitHub Auth.
+- [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
+  with Prisma using MongoDB as the database.
+- [Epic Stack Custom Themes](https://github.com/kiliman/epic-stack-theme) by
+  [@kiliman](https://github.com/kiliman): An example showing how to create a
+  custom theme using the
+  [`shadcn-custom-theme`](https://github.com/kiliman/shadcn-custom-theme) tool.
+- [Epic Stack + OpenID Connect Auth (Google)](https://github.com/kentcdodds/epic-oidc)
+  by [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
+  with OpenID Connect Auth (Google) using [web-oidc](https://npm.im/web-oidc)
+  and [remix-auth](https://npm.im/remix-auth).
+- [Epic Stack + Fathom Analytics](https://github.com/xstevenyung/epic-stack-with-fathom-analytics)
+  by [@xstevenyung](https://github.com/xstevenyung): An example of the Epic
+  Stack with Fanthom Analytics via CDN
+- [Epic Stack + Tenant Users](https://github.com/offseat/epic-stack-tenant) by
+  [@vinstah](https://github.com/vinstah): An example of the Epic Stack with
+  tenant users and members starter
 
 ## How to contribute
 

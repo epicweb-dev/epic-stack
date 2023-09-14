@@ -1,11 +1,12 @@
 import { execSync } from 'child_process'
-import parseGitHubURL from 'parse-github-url'
 import crypto from 'crypto'
-import { $, execa } from 'execa'
 import fs from 'fs/promises'
-import inquirer from 'inquirer'
 import path from 'path'
 import toml from '@iarna/toml'
+import { $, execa } from 'execa'
+import inquirer from 'inquirer'
+import open from 'open'
+import parseGitHubURL from 'parse-github-url'
 
 const escapeRegExp = string =>
 	// $& means the whole matched string
@@ -70,6 +71,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 		fs.rm(path.join(rootDirectory, 'CONTRIBUTING.md')),
 		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/notes.test.ts')),
+		fs.rm(path.join(rootDirectory, 'tests/e2e/search.test.ts')),
 
 		// .git could exist if pointing to a local version of the template rather
 		// than the github version, and there's not any situation we'd want that.
@@ -80,7 +82,7 @@ export default async function main({ isTypeScript, rootDirectory }) {
 
 	execSync('npm run setup', { cwd: rootDirectory, stdio: 'inherit' })
 
-	execSync('npm run format -- --loglevel warn', {
+	execSync('npm run format -- --log-level warn', {
 		cwd: rootDirectory,
 		stdio: 'inherit',
 	})
@@ -179,21 +181,38 @@ async function setupDeployment({ rootDirectory }) {
 			name: 'shouldDeploy',
 			type: 'confirm',
 			default: true,
-			message: 'Would you like to deploy right now?',
+			message:
+				'Would you like to deploy right now? (This will take a while, and you can always wait until you push to GitHub instead).',
 		},
 	])
 	if (shouldDeploy) {
 		console.log(`🚀 Deploying apps...`)
+		console.log('  Moving Dockerfile and .dockerignore to root (temporarily)')
+		await fs.rename(
+			path.join(rootDirectory, 'other', 'Dockerfile'),
+			path.join(rootDirectory, 'Dockerfile'),
+		)
+		await fs.rename(
+			path.join(rootDirectory, 'other', '.dockerignore'),
+			path.join(rootDirectory, '.dockerignore'),
+		)
 		console.log(`  Starting with staging`)
 		await $I`fly deploy --app ${APP_NAME}-staging`
-		// "fly open" was having trouble with opening the staging app
-		// so we'll just use "open" instead.
-		await $I`open https://${APP_NAME}-staging.fly.dev/`
+		await open(`https://${APP_NAME}-staging.fly.dev/`)
 
 		console.log(`  Staging deployed... Deploying production...`)
 		await $I`fly deploy --app ${APP_NAME}`
-		await $I`open https://${APP_NAME}.fly.dev/`
+		await open(`https://${APP_NAME}.fly.dev/`)
 		console.log(`  Production deployed...`)
+		console.log('  Moving Dockerfile and .dockerignore back to other/')
+		await fs.rename(
+			path.join(rootDirectory, 'Dockerfile'),
+			path.join(rootDirectory, 'other', 'Dockerfile'),
+		)
+		await fs.rename(
+			path.join(rootDirectory, '.dockerignore'),
+			path.join(rootDirectory, 'other', '.dockerignore'),
+		)
 	}
 
 	const { shouldSetupGitHub } = await inquirer.prompt([
@@ -211,7 +230,7 @@ async function setupDeployment({ rootDirectory }) {
 		console.log(
 			`Opening repo.new. Please create a new repo and paste the URL below.`,
 		)
-		await $I`open https://repo.new`
+		await open(`https://repo.new`)
 
 		const { repoURL } = await inquirer.prompt([
 			{
@@ -227,39 +246,15 @@ async function setupDeployment({ rootDirectory }) {
 			throw new Error(`Invalid GitHub URL: ${repoURL}`)
 		}
 
-		console.log(`🔗 Adding remote...`)
-		await $I`git remote add origin git@github.com:${githubParts.repo}.git`
-
 		console.log(
 			`Opening Fly Tokens Dashboard and GitHub Action Secrets pages. Please create a new token on Fly and set it as the value for a new secret called FLY_API_TOKEN on GitHub.`,
 		)
-		await $I`open https://web.fly.io/user/personal_access_tokens/new`
-		await $I`open ${repoURL}/settings/secrets/actions/new`
+		await open(`https://web.fly.io/user/personal_access_tokens/new`)
+		await open(`${repoURL}/settings/secrets/actions/new`)
 
-		const { commitAndPush } = await inquirer.prompt([
-			{
-				name: 'commitAndPush',
-				type: 'confirm',
-				default: true,
-				message: 'Would you like to commit and push your changes?',
-			},
-		])
-		if (commitAndPush) {
-			// have to delete the remix.init directory before committing
-			await fs.rm(path.join(rootDirectory, 'remix.init'), {
-				recursive: true,
-				force: true,
-			})
-
-			console.log(`📦 Committing and pushing...`)
-			await $I`git add -A`
-			// $I doesn't like the quotes
-			await execa('git', ['commit', '-m', 'Initial commit'], {
-				stdio: 'inherit',
-				cwd: rootDirectory,
-			})
-			await $I`git push -u origin main`
-		}
+		console.log(
+			`Once you're finished with setting the token, you should be good to add the remote, commit, and push!`,
+		)
 	}
 	console.log('All done 🎉 Happy building')
 }
