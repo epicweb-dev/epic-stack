@@ -4,9 +4,10 @@ import { invariant } from '#app/utils/misc.tsx'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
-const urlRegex = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
+const URL_REGEX = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
+const CODE_REGEX = /Here's your verification code: (?<code>[\d\w]+)/
 function extractUrl(text: string) {
-	const match = text.match(urlRegex)
+	const match = text.match(URL_REGEX)
 	return match?.groups?.url
 }
 
@@ -116,9 +117,7 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	expect(email.to).toBe(onboardingData.email.toLowerCase())
 	expect(email.from).toBe('hello@epicstack.dev')
 	expect(email.subject).toMatch(/welcome/i)
-	const codeMatch = email.text.match(
-		/Here's your verification code: (?<code>\d+)/,
-	)
+	const codeMatch = email.text.match(CODE_REGEX)
 	const code = codeMatch?.groups?.code
 	invariant(code, 'Onboarding code not found')
 	await page.getByRole('textbox', { name: /code/i }).fill(code)
@@ -215,9 +214,7 @@ test('reset password with a short code', async ({ page, insertNewUser }) => {
 	expect(email.subject).toMatch(/password reset/i)
 	expect(email.to).toBe(user.email)
 	expect(email.from).toBe('hello@epicstack.dev')
-	const codeMatch = email.text.match(
-		/Here's your verification code: (?<code>\d+)/,
-	)
+	const codeMatch = email.text.match(CODE_REGEX)
 	const code = codeMatch?.groups?.code
 	invariant(code, 'Reset Password code not found')
 	await page.getByRole('textbox', { name: /code/i }).fill(code)

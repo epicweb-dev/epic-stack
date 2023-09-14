@@ -90,6 +90,7 @@ CREATE TABLE "Verification" (
     "algorithm" TEXT NOT NULL,
     "digits" INTEGER NOT NULL,
     "period" INTEGER NOT NULL,
+    "charSet" TEXT NOT NULL,
     "expiresAt" DATETIME
 );
 

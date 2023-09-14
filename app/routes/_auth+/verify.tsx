@@ -117,6 +117,8 @@ export async function prepareVerification({
 
 	const { otp, ...verificationConfig } = generateTOTP({
 		algorithm: 'SHA256',
+		// Leaving off 0 and O on purpose to avoid confusing users.
+		charSet: 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789',
 		period,
 	})
 	const verificationData = {
@@ -157,14 +159,12 @@ export async function isCodeValid({
 			target_type: { target, type },
 			OR: [{ expiresAt: { gt: new Date() } }, { expiresAt: null }],
 		},
-		select: { algorithm: true, secret: true, period: true },
+		select: { algorithm: true, secret: true, period: true, charSet: true },
 	})
 	if (!verification) return false
 	const result = verifyTOTP({
 		otp: code,
-		secret: verification.secret,
-		algorithm: verification.algorithm,
-		period: verification.period,
+		...verification,
 	})
 	if (!result) return false
 

@@ -3,7 +3,9 @@ import { verifyUserPassword } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { readEmail } from '#tests/mocks/utils.ts'
-import { expect, test , createUser, waitFor } from '#tests/playwright-utils.ts'
+import { expect, test, createUser, waitFor } from '#tests/playwright-utils.ts'
+
+const CODE_REGEX = /Here's your verification code: (?<code>[\d\w]+)/
 
 test('Users can update their basic info', async ({ page, login }) => {
 	await login()
@@ -93,9 +95,7 @@ test('Users can change their email address', async ({ page, login }) => {
 		errorMessage: 'Confirmation email was not sent',
 	})
 	invariant(email, 'Email was not sent')
-	const codeMatch = email.text.match(
-		/Here's your verification code: (?<code>\d+)/,
-	)
+	const codeMatch = email.text.match(CODE_REGEX)
 	const code = codeMatch?.groups?.code
 	invariant(code, 'Onboarding code not found')
 	await page.getByRole('textbox', { name: /code/i }).fill(code)
