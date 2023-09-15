@@ -51,8 +51,8 @@ export async function loader({ request }: DataFunctionArgs) {
 			status: 'idle',
 			submission: {
 				intent: '',
-				payload: Object.fromEntries(params),
-				error: {},
+				payload: Object.fromEntries(params) as Record<string, unknown>,
+				error: {} as Record<string, Array<string>>,
 			},
 		} as const)
 	}

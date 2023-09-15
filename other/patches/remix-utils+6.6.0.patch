@@ -1,0 +1,19 @@
+diff --git a/node_modules/remix-utils/browser/react/use-global-pending-state.js b/node_modules/remix-utils/browser/react/use-global-pending-state.js
+index 4db18dd..26e2185 100644
+--- a/node_modules/remix-utils/browser/react/use-global-pending-state.js
++++ b/node_modules/remix-utils/browser/react/use-global-pending-state.js
+@@ -1,4 +1,4 @@
+-import { useTransition, useFetchers } from "@remix-run/react";
++import { useNavigation, useFetchers } from "@remix-run/react";
+ import { useMemo } from "react";
+ /**
+  * This is a helper hook that returns the state of every fetcher active on
+@@ -14,7 +14,7 @@ import { useMemo } from "react";
+  * // The app is idle
+  */
+ export function useGlobalTransitionStates() {
+-    let transition = useTransition();
++    let transition = useNavigation();
+     let fetchers = useFetchers();
+     /**
+      * This gets the state of every fetcher active on the app and combine it with

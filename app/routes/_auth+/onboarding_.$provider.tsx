@@ -4,7 +4,7 @@ import {
 	json,
 	redirect,
 	type DataFunctionArgs,
-	type V2_MetaFunction,
+	type MetaFunction,
 } from '@remix-run/node'
 import {
 	Form,
@@ -90,11 +90,10 @@ export async function loader({ request, params }: DataFunctionArgs) {
 
 	return json({
 		email,
-		formError: typeof formError === 'string' ? formError : null,
 		status: 'idle',
 		submission: {
 			intent: '',
-			payload: (prefilledProfile ?? {}) as {},
+			payload: (prefilledProfile ?? {}) as Record<string, unknown>,
 			error: {
 				'': typeof formError === 'string' ? [formError] : [],
 			},
@@ -177,7 +176,7 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	})
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
 	return [{ title: 'Setup Epic Notes Account' }]
 }
 

@@ -15,11 +15,7 @@ const escapeRegExp = string =>
 const getRandomString = length => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
 
-export default async function main({ isTypeScript, rootDirectory }) {
-	if (!isTypeScript) {
-		// not throwing an error because the stack trace doesn't do anything to help the user
-		throw `Sorry, this template only supports TypeScript. Please run the command again and select "TypeScript". Learn more about why in https://github.com/epicweb-dev/epic-stack/blob/main/docs/decisions/001-typescript-only.md`
-	}
+export default async function main({ rootDirectory }) {
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
 	const EXAMPLE_ENV_PATH = path.join(rootDirectory, '.env.example')
 	const ENV_PATH = path.join(rootDirectory, '.env')
@@ -225,7 +221,9 @@ async function setupDeployment({ rootDirectory }) {
 	])
 	if (shouldSetupGitHub) {
 		console.log(`⛓ Initializing git repo...`)
-		await $I`git init`
+		// it's possible there's already a git repo initialized so we'll just ignore
+		// any errors and hope things work out.
+		await $I`git init`.catch(() => {})
 
 		console.log(
 			`Opening repo.new. Please create a new repo and paste the URL below.`,

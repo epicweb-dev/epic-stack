@@ -6,7 +6,7 @@ import {
 	Link,
 	useActionData,
 	useLoaderData,
-	type V2_MetaFunction,
+	type MetaFunction,
 } from '@remix-run/react'
 import { formatDistanceToNow } from 'date-fns'
 import { z } from 'zod'
@@ -191,7 +191,7 @@ export function DeleteNote({ id }: { id: string }) {
 	)
 }
 
-export const meta: V2_MetaFunction<
+export const meta: MetaFunction<
 	typeof loader,
 	{ 'routes/users+/$username_+/notes': typeof notesLoader }
 > = ({ data, params, matches }) => {

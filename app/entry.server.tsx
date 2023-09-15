@@ -1,5 +1,8 @@
 import { PassThrough } from 'stream'
-import { Response, type HandleDocumentRequestFunction } from '@remix-run/node'
+import {
+	createReadableStreamFromReadable,
+	type HandleDocumentRequestFunction,
+} from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import isbot from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
@@ -54,7 +57,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 					responseHeaders.set('Content-Type', 'text/html')
 					responseHeaders.append('Server-Timing', timings.toString())
 					resolve(
-						new Response(body, {
+						new Response(createReadableStreamFromReadable(body), {
 							headers: responseHeaders,
 							status: didError ? 500 : responseStatusCode,
 						}),
