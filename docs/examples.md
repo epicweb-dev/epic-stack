@@ -59,6 +59,10 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Tenant Users](https://github.com/offseat/epic-stack-tenant) by
   [@vinstah](https://github.com/vinstah): An example of the Epic Stack with
   tenant users and members starter
+- [Epic Stack + i18n](https://github.com/rperon/epic-stack-with-i18n/) by
+  [@rperon](https://github.com/rperon): An example of the Epic Stack with i18n
+  using [i18next](https://www.i18next.com/) and
+  [remix-18next](https://github.com/sergiodxa/remix-i18next)
 
 ## How to contribute
 
