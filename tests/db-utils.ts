@@ -67,7 +67,7 @@ export async function getNoteImages() {
 		}),
 		img({
 			altText:
-				'an office full of laptops and other office equipment that look like it was abandond in a rush out of the building in an emergency years ago.',
+				'an office full of laptops and other office equipment that look like it was abandoned in a rush out of the building in an emergency years ago.',
 			filepath: './tests/fixtures/images/notes/6.png',
 		}),
 		img({
