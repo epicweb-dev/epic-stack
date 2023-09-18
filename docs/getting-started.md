@@ -5,7 +5,7 @@ Stack, run the following [`npx`](https://docs.npmjs.com/cli/v9/commands/npx)
 command:
 
 ```sh
-npx create-remix@latest --typescript --install --template epicweb-dev/epic-stack
+npx create-remix@latest --install --template epicweb-dev/epic-stack
 ```
 
 This will prompt you for a project name (the name of the directory to put your
