@@ -17,7 +17,9 @@ import { requireUserId } from '#app/utils/auth.server.ts'
 import { resolveConnectionData } from '#app/utils/connections.server.ts'
 import {
 	ProviderConnectionForm,
+	ProviderName,
 	ProviderNameSchema,
+	providerIcons,
 	providerNames,
 } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
@@ -49,6 +51,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		where: { userId },
 	})
 	const connections: Array<{
+		providerName: ProviderName
 		id: string
 		displayName: string
 		link?: string | null
@@ -57,23 +60,17 @@ export async function loader({ request }: DataFunctionArgs) {
 	for (const connection of rawConnections) {
 		const r = ProviderNameSchema.safeParse(connection.providerName)
 		if (!r.success) continue
+		const providerName = r.data
 		const connectionData = await resolveConnectionData(
-			r.data,
+			providerName,
 			connection.providerId,
 		)
-		if (connectionData) {
-			connections.push({
-				...connectionData,
-				id: connection.id,
-				createdAtFormatted: connection.createdAt.toLocaleString(),
-			})
-		} else {
-			connections.push({
-				id: connection.id,
-				displayName: 'Unknown',
-				createdAtFormatted: connection.createdAt.toLocaleString(),
-			})
-		}
+		connections.push({
+			...connectionData,
+			providerName,
+			id: connection.id,
+			createdAtFormatted: connection.createdAt.toLocaleString(),
+		})
 	}
 
 	return json({
@@ -152,18 +149,22 @@ function Connection({
 }) {
 	const deleteFetcher = useFetcher<typeof action>()
 	const [infoOpen, setInfoOpen] = useState(false)
+	const icon = providerIcons[connection.providerName]
 	return (
 		<div className="flex justify-between gap-2">
-			<Icon name="github-logo">
-				{connection.link ? (
-					<a href={connection.link} className="underline">
-						{connection.displayName}
-					</a>
-				) : (
-					connection.displayName
-				)}{' '}
-				({connection.createdAtFormatted})
-			</Icon>
+			<span className={`inline-flex items-center gap-1.5`}>
+				{icon}
+				<span>
+					{connection.link ? (
+						<a href={connection.link} className="underline">
+							{connection.displayName}
+						</a>
+					) : (
+						connection.displayName
+					)}{' '}
+					({connection.createdAtFormatted})
+				</span>
+			</span>
 			{canDelete ? (
 				<deleteFetcher.Form method="POST">
 					<input name="connectionId" value={connection.id} type="hidden" />
