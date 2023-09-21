@@ -3,7 +3,7 @@ import {
 	type DataFunctionArgs,
 	type SerializeFrom,
 } from '@remix-run/node'
-import { Form, useFetcher, useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -15,9 +15,13 @@ import {
 } from '#app/components/ui/tooltip.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { resolveConnectionData } from '#app/utils/connections.server.ts'
-import { ProviderNameSchema } from '#app/utils/connections.tsx'
+import {
+	ProviderConnectionForm,
+	ProviderNameSchema,
+	providerNames,
+} from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
-import { invariantResponse, useIsPending } from '#app/utils/misc.tsx'
+import { invariantResponse } from '#app/utils/misc.tsx'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 
 export const handle = {
@@ -106,7 +110,6 @@ export async function action({ request }: DataFunctionArgs) {
 
 export default function Connections() {
 	const data = useLoaderData<typeof loader>()
-	const isGitHubSubmitting = useIsPending({ formAction: '/auth/github' })
 
 	return (
 		<div className="mx-auto max-w-md">
@@ -127,19 +130,15 @@ export default function Connections() {
 			) : (
 				<p>You don't have any connections yet.</p>
 			)}
-			<Form
-				className="mt-5 flex items-center justify-center gap-2 border-t-2 border-border pt-3"
-				action="/auth/github"
-				method="POST"
-			>
-				<StatusButton
-					type="submit"
-					className="w-full"
-					status={isGitHubSubmitting ? 'pending' : 'idle'}
-				>
-					<Icon name="github-logo">Connect with GitHub</Icon>
-				</StatusButton>
-			</Form>
+			<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+				{providerNames.map(providerName => (
+					<ProviderConnectionForm
+						key={providerName}
+						type="Login"
+						providerName={providerName}
+					/>
+				))}
+			</div>
 		</div>
 	)
 }
