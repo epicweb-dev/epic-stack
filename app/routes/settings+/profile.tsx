@@ -1,3 +1,4 @@
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useMatches } from '@remix-run/react'
 import { z } from 'zod'
@@ -8,8 +9,12 @@ import { prisma } from '#app/utils/db.server.ts'
 import { cn, invariantResponse } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 
-export const handle = {
+export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
+export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>
+
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="file-text">Edit Profile</Icon>,
+	getSitemapEntries: () => null,
 }
 
 export async function loader({ request }: DataFunctionArgs) {
@@ -23,7 +28,7 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 const BreadcrumbHandleMatch = z.object({
-	handle: z.object({ breadcrumb: z.any() }),
+	handle: BreadcrumbHandle,
 })
 
 export default function EditUserProfile() {

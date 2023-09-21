@@ -1,3 +1,4 @@
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
 	type DataFunctionArgs,
@@ -17,7 +18,7 @@ import { requireUserId } from '#app/utils/auth.server.ts'
 import { resolveConnectionData } from '#app/utils/connections.server.ts'
 import {
 	ProviderConnectionForm,
-	ProviderName,
+	type ProviderName,
 	ProviderNameSchema,
 	providerIcons,
 	providerNames,
@@ -25,9 +26,11 @@ import {
 import { prisma } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
+import { type BreadcrumbHandle } from './profile.tsx'
 
-export const handle = {
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="link-2">Connections</Icon>,
+	getSitemapEntries: () => null,
 }
 
 async function userCanDeleteConnections(userId: string) {

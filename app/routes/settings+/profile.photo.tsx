@@ -1,5 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
 	redirect,
@@ -23,9 +24,11 @@ import {
 	useDoubleCheck,
 	useIsPending,
 } from '#app/utils/misc.tsx'
+import { type BreadcrumbHandle } from './profile.tsx'
 
-export const handle = {
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,
+	getSitemapEntries: () => null,
 }
 
 const MAX_SIZE = 1024 * 1024 * 3 // 3MB

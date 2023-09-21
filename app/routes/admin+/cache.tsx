@@ -1,3 +1,4 @@
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -27,6 +28,10 @@ import {
 	useDoubleCheck,
 } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.ts'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader({ request }: DataFunctionArgs) {
 	await requireUserWithRole(request, 'admin')

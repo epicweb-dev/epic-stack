@@ -1,5 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useActionData } from '@remix-run/react'
 import { z } from 'zod'
@@ -11,9 +12,11 @@ import { getPasswordHash, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordSchema } from '#app/utils/user-validation.ts'
+import { type BreadcrumbHandle } from './profile.tsx'
 
-export const handle = {
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="dots-horizontal">Password</Icon>,
+	getSitemapEntries: () => null,
 }
 
 const CreatePasswordForm = z
