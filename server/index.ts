@@ -150,6 +150,9 @@ const rateLimitDefault = {
 	max: 1000 * maxMultiple,
 	standardHeaders: true,
 	legacyHeaders: false,
+	// Fly.io prevents spoofing of X-Forwarded-For
+	// so no need to validate the trustProxy config
+	validate: { trustProxy: false },
 }
 
 const strongestRateLimit = rateLimit({
