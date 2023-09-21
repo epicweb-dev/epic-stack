@@ -44,6 +44,9 @@ const app = express()
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
 
+// fly is our proxy
+app.set('trust proxy', true)
+
 // ensure HTTPS only (X-Forwarded-Proto comes from Fly)
 app.use((req, res, next) => {
 	const proto = req.get('X-Forwarded-Proto')
