@@ -153,7 +153,7 @@ export default function SignupRoute() {
 					{providerNames.map(providerName => (
 						<li key={providerName}>
 							<ProviderConnectionForm
-								type="Login"
+								type="Signup"
 								providerName={providerName}
 								redirectTo={redirectTo}
 							/>

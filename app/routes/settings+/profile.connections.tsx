@@ -134,7 +134,7 @@ export default function Connections() {
 				{providerNames.map(providerName => (
 					<ProviderConnectionForm
 						key={providerName}
-						type="Login"
+						type="Connect"
 						providerName={providerName}
 					/>
 				))}
