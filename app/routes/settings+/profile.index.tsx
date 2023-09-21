@@ -1,5 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
@@ -17,6 +18,10 @@ import {
 import { sessionStorage } from '#app/utils/session.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 const ProfileFormSchema = z.object({
 	name: NameSchema.optional(),

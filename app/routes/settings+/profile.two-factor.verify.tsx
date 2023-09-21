@@ -1,6 +1,7 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { getTOTPAuthUri } from '@epic-web/totp'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -18,10 +19,12 @@ import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
+import { type BreadcrumbHandle } from './profile.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
-export const handle = {
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="check">Verify</Icon>,
+	getSitemapEntries: () => null,
 }
 
 const VerifySchema = z.object({

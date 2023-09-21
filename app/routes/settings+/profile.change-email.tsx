@@ -1,5 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as E from '@react-email/components'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
@@ -19,9 +20,11 @@ import { invariant, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { EmailSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { type BreadcrumbHandle } from './profile.tsx'
 
-export const handle = {
+export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="envelope-closed">Change Email</Icon>,
+	getSitemapEntries: () => null,
 }
 
 const newEmailAddressSessionKey = 'new-email-address'
