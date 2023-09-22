@@ -18,6 +18,25 @@ Check the project README.md for instructions on getting the app deployed. You'll
 want to get this done early in the process to make sure you're all set up
 properly.
 
+If you'd like to skip some of the setup steps, you can set the following
+environment variables when you run the script:
+
+- `SKIP_SETUP` - skips running `npm run setup`
+- `SKIP_FORMAT` - skips running `npm run format`
+- `SKIP_DEPLOYMENT` - skips deployment setup
+
+So, if you enabled all of these it would be:
+
+```sh
+SKIP_SETUP=true SKIP_FORMAT=true SKIP_DEPLOYMENT npx create-remix@latest --install --init-script --git-init --template epicweb-dev/epic-stack
+```
+
+Or, on windows:
+
+```
+set SKIP_SETUP=true && set SKIP_FORMAT=true && set SKIP_DEPLOYMENT=true && npx create-remix@latest --install --init-script --git-init --template epicweb-dev/epic-stack
+```
+
 ## Development
 
 - Initial setup:
