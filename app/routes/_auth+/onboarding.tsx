@@ -49,7 +49,7 @@ const SignupFormSchema = z
 		if (confirmPassword !== password) {
 			ctx.addIssue({
 				path: ['confirmPassword'],
-				code: 'custom',
+				code: z.ZodIssueCode.custom,
 				message: 'The passwords must match',
 			})
 		}

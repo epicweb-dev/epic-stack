@@ -203,7 +203,7 @@ export async function action({ request }: DataFunctionArgs) {
 				const session = await login(data)
 				if (!session) {
 					ctx.addIssue({
-						code: 'custom',
+						code: z.ZodIssueCode.custom,
 						message: 'Invalid username or password',
 					})
 					return z.NEVER

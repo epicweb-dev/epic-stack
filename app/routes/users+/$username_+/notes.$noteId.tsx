@@ -1,5 +1,5 @@
 import { useForm } from '@conform-to/react'
-import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { parse } from '@conform-to/zod'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
@@ -164,10 +164,6 @@ export function DeleteNote({ id }: { id: string }) {
 	const [form] = useForm({
 		id: 'delete-note',
 		lastSubmission: actionData?.submission,
-		constraint: getFieldsetConstraint(DeleteFormSchema),
-		onValidate({ formData }) {
-			return parse(formData, { schema: DeleteFormSchema })
-		},
 	})
 
 	return (

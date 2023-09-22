@@ -51,7 +51,6 @@ import {
 	combineHeaders,
 	getDomainUrl,
 	getUserImgSrc,
-	invariantResponse,
 } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { useRequestInfo } from './utils/request-info.ts'
@@ -173,16 +172,11 @@ const ThemeFormSchema = z.object({
 
 export async function action({ request }: DataFunctionArgs) {
 	const formData = await request.formData()
-	invariantResponse(
-		formData.get('intent') === 'update-theme',
-		'Invalid intent',
-		{ status: 400 },
-	)
 	const submission = parse(formData, {
 		schema: ThemeFormSchema,
 	})
 	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const)
+		return json({ status: 'idle', submission } as const)
 	}
 	if (!submission.value) {
 		return json({ status: 'error', submission } as const, { status: 400 })
@@ -365,10 +359,7 @@ export function useTheme() {
  */
 export function useOptimisticThemeMode() {
 	const fetchers = useFetchers()
-
-	const themeFetcher = fetchers.find(
-		f => f.formData?.get('intent') === 'update-theme',
-	)
+	const themeFetcher = fetchers.find(f => f.formAction === '/')
 
 	if (themeFetcher && themeFetcher.formData) {
 		const submission = parse(themeFetcher.formData, {
@@ -384,9 +375,6 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 	const [form] = useForm({
 		id: 'theme-switch',
 		lastSubmission: fetcher.data?.submission,
-		onValidate({ formData }) {
-			return parse(formData, { schema: ThemeFormSchema })
-		},
 	})
 
 	const optimisticMode = useOptimisticThemeMode()
@@ -416,8 +404,6 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
 				<button
-					name="intent"
-					value="update-theme"
 					type="submit"
 					className="flex h-8 w-8 cursor-pointer items-center justify-center"
 				>

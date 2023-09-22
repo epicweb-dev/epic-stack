@@ -185,7 +185,7 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 			if (existingUsername && existingUsername.id !== userId) {
 				ctx.addIssue({
 					path: ['username'],
-					code: 'custom',
+					code: z.ZodIssueCode.custom,
 					message: 'A user already exists with this username',
 				})
 			}
