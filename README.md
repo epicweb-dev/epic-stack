@@ -12,7 +12,7 @@
 </div>
 
 ```sh
-npx create-remix@latest --install --init --git-init --template epicweb-dev/epic-stack
+npx create-remix@latest --install --init-script --git-init --template epicweb-dev/epic-stack
 ```
 
 [![The Epic Stack](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/246885449-1b00286c-aa3d-44b2-9ef2-04f694eb3592.png)](https://www.epicweb.dev/epic-stack)
