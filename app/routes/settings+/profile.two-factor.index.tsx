@@ -1,5 +1,5 @@
 import { generateTOTP } from '@epic-web/totp'
-import { SEOHandle } from '@nasa-gcn/remix-seo'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import { Icon } from '#app/components/ui/icon.tsx'
