@@ -226,7 +226,7 @@ export default function ChangeEmailIndex() {
 			<div className="mx-auto mt-5 max-w-sm">
 				<Form method="POST" {...form.props}>
 					<Field
-						labelProps={{ htmlFor: fields.email.id, children: 'New Email' }}
+						labelProps={{ children: 'New Email' }}
 						inputProps={conform.input(fields.email)}
 						errors={fields.email.errors}
 					/>

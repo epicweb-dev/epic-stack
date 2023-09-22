@@ -267,10 +267,7 @@ export default function LoginPage() {
 					<div className="mx-auto w-full max-w-md px-8">
 						<Form method="POST" {...form.props}>
 							<Field
-								labelProps={{
-									htmlFor: fields.username.id,
-									children: 'Username',
-								}}
+								labelProps={{ children: 'Username' }}
 								inputProps={{
 									...conform.input(fields.username),
 									autoFocus: true,
@@ -280,10 +277,7 @@ export default function LoginPage() {
 							/>
 
 							<Field
-								labelProps={{
-									htmlFor: fields.password.id,
-									children: 'Password',
-								}}
+								labelProps={{ children: 'Password' }}
 								inputProps={conform.input(fields.password, {
 									type: 'password',
 								})}
