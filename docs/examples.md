@@ -62,6 +62,8 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Argos](https://github.com/jsfez/epic-stack-with-argos) by
   [@jsfez](https://github.com/jsfez): An example of the Epic Stack
   with [Argos](https://www.argos-ci.com/) for visual testing
+- [Epic Stack monorepo with pnpm + turbo](https://github.com/PhilDL/epic-stack-monorepo):
+  An example of the Epic Stack in a monorepo setup, configs packages, UI package, and "client-hints" example package.
 
 ## How to contribute
 
