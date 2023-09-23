@@ -1,3 +1,5 @@
+import 'nprogress/nprogress.css'
+
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { cssBundleHref } from '@remix-run/css-bundle'
@@ -21,10 +23,12 @@ import {
 	useFetchers,
 	useLoaderData,
 	useMatches,
+	useNavigation,
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { useRef } from 'react'
+import NProgress from 'nprogress'
+import { useEffect, useRef } from 'react'
 import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
@@ -47,11 +51,7 @@ import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
 import { getConfetti } from './utils/confetti.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import {
-	combineHeaders,
-	getDomainUrl,
-	getUserImgSrc,
-} from './utils/misc.tsx'
+import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { useRequestInfo } from './utils/request-info.ts'
 import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
@@ -231,7 +231,13 @@ function App() {
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
+	const transition = useNavigation()
 	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
+
+	useEffect(() => {
+		if (transition.state === 'idle') NProgress.done()
+		else NProgress.start()
+	}, [transition.state])
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
