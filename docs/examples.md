@@ -59,6 +59,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@rperon](https://github.com/rperon): An example of the Epic Stack with i18n
   using [i18next](https://www.i18next.com/) and
   [remix-18next](https://github.com/sergiodxa/remix-i18next)
+- [Epic Stack + Argos](https://github.com/jsfez/epic-stack-with-argos) by
+  [@jsfez](https://github.com/jsfez): An example of the Epic Stack
+  with [Argos](https://www.argos-ci.com/) for visual testing
 
 ## How to contribute
 
