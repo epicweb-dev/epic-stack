@@ -1,5 +1,3 @@
-import 'nprogress/nprogress.css'
-
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { cssBundleHref } from '@remix-run/css-bundle'
@@ -23,12 +21,10 @@ import {
 	useFetchers,
 	useLoaderData,
 	useMatches,
-	useNavigation,
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import NProgress from 'nprogress'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
@@ -231,13 +227,7 @@ function App() {
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
-	const transition = useNavigation()
 	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
-
-	useEffect(() => {
-		if (transition.state === 'idle') NProgress.done()
-		else NProgress.start()
-	}, [transition.state])
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
