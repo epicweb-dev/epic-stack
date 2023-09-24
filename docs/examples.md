@@ -59,6 +59,8 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@rperon](https://github.com/rperon): An example of the Epic Stack with i18n
   using [i18next](https://www.i18next.com/) and
   [remix-18next](https://github.com/sergiodxa/remix-i18next)
+- [Epic Stack + Progress Bar](https://github.com/hakimLyon/epic-stack-progress-bar)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Progress Bar
 
 ## How to contribute
 
