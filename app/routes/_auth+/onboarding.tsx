@@ -75,23 +75,26 @@ export async function action({ request }: DataFunctionArgs) {
 	const email = await requireOnboardingEmail(request)
 	const formData = await request.formData()
 	const submission = await parse(formData, {
-		schema: SignupFormSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { username: data.username },
-				select: { id: true },
-			})
-			if (existingUser) {
-				ctx.addIssue({
-					path: ['username'],
-					code: z.ZodIssueCode.custom,
-					message: 'A user already exists with this username',
+		schema: intent =>
+			SignupFormSchema.superRefine(async (data, ctx) => {
+				const existingUser = await prisma.user.findUnique({
+					where: { username: data.username },
+					select: { id: true },
 				})
-				return
-			}
-		}).transform(async data => {
-			const session = await signup({ ...data, email })
-			return { ...data, session }
-		}),
+				if (existingUser) {
+					ctx.addIssue({
+						path: ['username'],
+						code: z.ZodIssueCode.custom,
+						message: 'A user already exists with this username',
+					})
+					return
+				}
+			}).transform(async data => {
+				if (intent !== 'submit') return { ...data, session: null }
+
+				const session = await signup({ ...data, email })
+				return { ...data, session }
+			}),
 		async: true,
 	})
 
