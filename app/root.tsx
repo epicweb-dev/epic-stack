@@ -29,6 +29,7 @@ import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { ErrorList } from './components/forms.tsx'
+import { EpicProgress } from './components/progess-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
 import { EpicToaster } from './components/toaster.tsx'
 import { Button } from './components/ui/button.tsx'
@@ -269,6 +270,7 @@ function App() {
 			</div>
 			<Confetti id={data.confettiId} />
 			<EpicToaster toast={data.toast} />
+			<EpicProgress/>
 		</Document>
 	)
 }

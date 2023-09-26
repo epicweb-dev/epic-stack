@@ -1,4 +1,12 @@
-export function Spinner({ showSpinner }: { showSpinner: boolean }) {
+import { cn } from '#app/utils/misc.tsx'
+
+export function Spinner({
+	showSpinner,
+	className = '',
+}: {
+	showSpinner: boolean
+	className?: string
+}) {
 	return (
 		<div
 			className={`absolute right-0 top-[6px] transition-opacity ${
@@ -6,7 +14,7 @@ export function Spinner({ showSpinner }: { showSpinner: boolean }) {
 			}`}
 		>
 			<svg
-				className="-ml-1 mr-3 h-5 w-5 animate-spin"
+				className={cn('-ml-1 mr-3 h-5 w-5 animate-spin', className)}
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
 				viewBox="0 0 24 24"
