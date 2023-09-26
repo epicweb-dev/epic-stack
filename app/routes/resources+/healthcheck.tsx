@@ -1,7 +1,6 @@
 // learn more: https://fly.io/docs/reference/configuration/#services-http_checks
+import { type DataFunctionArgs } from '@remix-run/node'
 import { prisma } from '#app/utils/db.server.ts'
-import { getDomainUrl } from '#app/utils/misc.tsx'
-import type { DataFunctionArgs } from '@remix-run/node'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const host =
