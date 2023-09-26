@@ -64,8 +64,6 @@ This page links to examples of how to implement some things with the Epic Stack.
   with [Argos](https://www.argos-ci.com/) for visual testing
 - [Epic Stack monorepo with pnpm + turbo](https://github.com/PhilDL/epic-stack-monorepo):
   An example of the Epic Stack in a monorepo setup, configs packages, UI package, and "client-hints" example package.
-- [Epic Stack + Progress Bar](https://github.com/hakimLyon/epic-stack-progress-bar)
-  by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack with Progress Bar
 
 ## How to contribute
 
