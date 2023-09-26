@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker'
 import { promiseHash } from 'remix-utils'
 import { prisma } from '#app/utils/db.server.ts'
 import {
+	cleanupDb,
 	createPassword,
 	createUser,
 	getNoteImages,
@@ -15,10 +16,7 @@ async function seed() {
 	console.time(`🌱 Database has been seeded`)
 
 	console.time('🧹 Cleaned up the database...')
-	await prisma.user.deleteMany()
-	await prisma.verification.deleteMany()
-	await prisma.role.deleteMany()
-	await prisma.permission.deleteMany()
+	await cleanupDb(prisma)
 	console.timeEnd('🧹 Cleaned up the database...')
 
 	console.time('🔑 Created permissions...')
