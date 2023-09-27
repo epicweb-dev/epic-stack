@@ -25,3 +25,15 @@ export const EmailSchema = z
 	.max(100, { message: 'Email is too long' })
 	// users can type the email in any case, but we store it in lowercase
 	.transform(value => value.toLowerCase())
+
+export const PasswordAndConfirmPasswordSchema = z
+	.object({ password: PasswordSchema, confirmPassword: PasswordSchema })
+	.superRefine(({ confirmPassword, password }, ctx) => {
+		if (confirmPassword !== password) {
+			ctx.addIssue({
+				path: ['confirmPassword'],
+				code: 'custom',
+				message: 'The passwords must match',
+			})
+		}
+	})

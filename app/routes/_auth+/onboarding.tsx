@@ -24,7 +24,7 @@ import { invariant, useIsPending } from '#app/utils/misc.tsx'
 import { sessionStorage } from '#app/utils/session.server.ts'
 import {
 	NameSchema,
-	PasswordSchema,
+	PasswordAndConfirmPasswordSchema,
 	UsernameSchema,
 } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -36,8 +36,6 @@ const SignupFormSchema = z
 	.object({
 		username: UsernameSchema,
 		name: NameSchema,
-		password: PasswordSchema,
-		confirmPassword: PasswordSchema,
 		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
 			required_error:
 				'You must agree to the terms of service and privacy policy',
@@ -45,15 +43,7 @@ const SignupFormSchema = z
 		remember: z.boolean().optional(),
 		redirectTo: z.string().optional(),
 	})
-	.superRefine(({ confirmPassword, password }, ctx) => {
-		if (confirmPassword !== password) {
-			ctx.addIssue({
-				path: ['confirmPassword'],
-				code: z.ZodIssueCode.custom,
-				message: 'The passwords must match',
-			})
-		}
-	})
+	.and(PasswordAndConfirmPasswordSchema)
 
 async function requireOnboardingEmail(request: Request) {
 	await requireAnonymous(request)
