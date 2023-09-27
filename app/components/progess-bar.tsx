@@ -8,8 +8,8 @@ function EpicProgress() {
 	const transition = useNavigation()
 	const busy = transition.state !== 'idle'
 	const delayedPending = useSpinDelay(busy, {
-		delay: 400,
-		minDuration: 300,
+		delay: 600,
+		minDuration: 400,
 	})
 	const ref = useRef<HTMLDivElement>(null)
 	const [animationComplete, setAnimationComplete] = useState(true)
@@ -30,20 +30,20 @@ function EpicProgress() {
 	return (
 		<div
 			role="progressbar"
-			aria-hidden={!delayedPending}
+			aria-hidden={delayedPending ? undefined : true}
 			aria-valuetext={delayedPending ? 'Loading' : undefined}
 			className="fixed inset-x-0 left-0 top-0 z-50 h-[0.20rem] animate-pulse"
 		>
 			<div
 				ref={ref}
 				className={cn(
-					'h-full bg-blue-600 transition-all duration-300 ease-in-out',
+					'h-full w-0 bg-blue-600 duration-300 ease-in-out',
 					transition.state === 'idle' &&
-						animationComplete &&
-						'w-0 opacity-0 transition-none',
-					transition.state === 'submitting' && 'w-1/12',
-					transition.state === 'loading' && 'w-2/12',
-					transition.state === 'idle' && !animationComplete && 'w-full',
+						(animationComplete
+							? 'transition-none'
+							: 'w-full opacity-0 transition-all'),
+					delayedPending && transition.state === 'submitting' && 'w-5/12',
+					delayedPending && transition.state === 'loading' && 'w-8/12',
 				)}
 			/>
 			{delayedPending && (
