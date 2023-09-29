@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from '@remix-run/node'
 
-export const sessionStorage = createCookieSessionStorage({
+export const authSessionStorage = createCookieSessionStorage({
 	cookie: {
 		name: 'en_session',
 		sameSite: 'lax',
@@ -13,9 +13,9 @@ export const sessionStorage = createCookieSessionStorage({
 
 // we have to do this because every time you commit the session you overwrite it
 // so we store the expiration time in the cookie and reset it every time we commit
-const originalCommitSession = sessionStorage.commitSession
+const originalCommitSession = authSessionStorage.commitSession
 
-Object.defineProperty(sessionStorage, 'commitSession', {
+Object.defineProperty(authSessionStorage, 'commitSession', {
 	value: async function commitSession(
 		...args: Parameters<typeof originalCommitSession>
 	) {

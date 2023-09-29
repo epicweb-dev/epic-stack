@@ -2,7 +2,7 @@ import * as setCookieParser from 'set-cookie-parser'
 import { expect } from 'vitest'
 import { sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 import {
 	type OptionalToast,
 	toastSessionStorage,
@@ -89,10 +89,10 @@ expect.extend({
 			}
 		}
 
-		const cookieSession = await sessionStorage.getSession(
+		const authSession = await authSessionStorage.getSession(
 			convertSetCookieToCookie(sessionSetCookie),
 		)
-		const sessionValue = cookieSession.get(sessionKey)
+		const sessionValue = authSession.get(sessionKey)
 
 		if (!sessionValue) {
 			return {

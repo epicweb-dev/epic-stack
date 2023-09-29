@@ -15,7 +15,7 @@ import {
 	invariantResponse,
 	useDoubleCheck,
 } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
@@ -273,10 +273,10 @@ function UpdateProfile() {
 }
 
 async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
-	const cookieSession = await sessionStorage.getSession(
+	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
-	const sessionId = cookieSession.get(sessionKey)
+	const sessionId = authSession.get(sessionKey)
 	invariantResponse(
 		sessionId,
 		'You must be authenticated to sign out of other sessions',

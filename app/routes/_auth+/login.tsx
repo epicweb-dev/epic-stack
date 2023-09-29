@@ -30,7 +30,7 @@ import {
 	invariant,
 	useIsPending,
 } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -85,17 +85,17 @@ export async function handleNewSession(
 			),
 		)
 	} else {
-		const cookieSession = await sessionStorage.getSession(
+		const authSession = await authSessionStorage.getSession(
 			request.headers.get('cookie'),
 		)
-		cookieSession.set(sessionKey, session.id)
+		authSession.set(sessionKey, session.id)
 
 		return redirect(
 			safeRedirect(redirectTo),
 			combineResponseInits(
 				{
 					headers: {
-						'set-cookie': await sessionStorage.commitSession(cookieSession, {
+						'set-cookie': await authSessionStorage.commitSession(authSession, {
 							expires: remember ? session.expirationDate : undefined,
 						}),
 					},
@@ -111,7 +111,7 @@ export async function handleVerification({
 	submission,
 }: VerifyFunctionArgs) {
 	invariant(submission.value, 'Submission should have a value by this point')
-	const cookieSession = await sessionStorage.getSession(
+	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const verifySession = await verifySessionStorage.getSession(
@@ -121,7 +121,7 @@ export async function handleVerification({
 	const remember = verifySession.get(rememberKey)
 	const { redirectTo } = submission.value
 	const headers = new Headers()
-	cookieSession.set(verifiedTimeKey, Date.now())
+	authSession.set(verifiedTimeKey, Date.now())
 
 	const unverifiedSessionId = verifySession.get(unverifiedSessionIdKey)
 	if (unverifiedSessionId) {
@@ -136,18 +136,18 @@ export async function handleVerification({
 				description: 'Could not find session to verify. Please try again.',
 			})
 		}
-		cookieSession.set(sessionKey, unverifiedSessionId)
+		authSession.set(sessionKey, unverifiedSessionId)
 
 		headers.append(
 			'set-cookie',
-			await sessionStorage.commitSession(cookieSession, {
+			await authSessionStorage.commitSession(authSession, {
 				expires: remember ? session.expirationDate : undefined,
 			}),
 		)
 	} else {
 		headers.append(
 			'set-cookie',
-			await sessionStorage.commitSession(cookieSession),
+			await authSessionStorage.commitSession(authSession),
 		)
 	}
 
@@ -160,7 +160,7 @@ export async function handleVerification({
 }
 
 export async function shouldRequestTwoFA(request: Request) {
-	const cookieSession = await sessionStorage.getSession(
+	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const verifySession = await verifySessionStorage.getSession(
@@ -175,7 +175,7 @@ export async function shouldRequestTwoFA(request: Request) {
 		where: { target_type: { target: userId, type: twoFAVerificationType } },
 	})
 	if (!userHasTwoFA) return false
-	const verifiedTime = cookieSession.get(verifiedTimeKey) ?? new Date(0)
+	const verifiedTime = authSession.get(verifiedTimeKey) ?? new Date(0)
 	const twoHours = 1000 * 60 * 2
 	return Date.now() - verifiedTime > twoHours
 }

@@ -1,6 +1,6 @@
 import * as setCookieParser from 'set-cookie-parser'
 import { sessionKey } from '#app/utils/auth.server.ts'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 
 export const BASE_URL = 'https://www.epicstack.dev'
 
@@ -15,9 +15,9 @@ export async function getSessionSetCookieHeader(
 	session: { id: string },
 	existingCookie?: string,
 ) {
-	const cookieSession = await sessionStorage.getSession(existingCookie)
-	cookieSession.set(sessionKey, session.id)
-	const setCookieHeader = await sessionStorage.commitSession(cookieSession)
+	const authSession = await authSessionStorage.getSession(existingCookie)
+	authSession.set(sessionKey, session.id)
+	const setCookieHeader = await authSessionStorage.commitSession(authSession)
 	return setCookieHeader
 }
 

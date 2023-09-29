@@ -8,7 +8,7 @@ import { connectionSessionStorage } from '#app/utils/connections.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 import { createUser } from '#tests/db-utils.ts'
 import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
@@ -221,10 +221,10 @@ async function setupRequest({
 	url.searchParams.set('code', code)
 	const connectionSession = await connectionSessionStorage.getSession()
 	connectionSession.set('oauth2:state', state)
-	const cookieSession = await sessionStorage.getSession()
-	if (sessionId) cookieSession.set(sessionKey, sessionId)
+	const authSession = await authSessionStorage.getSession()
+	if (sessionId) authSession.set(sessionKey, sessionId)
 	const setSessionCookieHeader =
-		await sessionStorage.commitSession(cookieSession)
+		await authSessionStorage.commitSession(authSession)
 	const setConnectionSessionCookieHeader =
 		await connectionSessionStorage.commitSession(connectionSession)
 	const request = new Request(url.toString(), {

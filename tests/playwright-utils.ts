@@ -7,7 +7,7 @@ import {
 	sessionKey,
 } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { sessionStorage } from '#app/utils/session.server.ts'
+import { authSessionStorage } from '#app/utils/session.server.ts'
 import { createUser } from './db-utils.ts'
 
 export * from './db-utils.ts'
@@ -82,10 +82,10 @@ export const test = base.extend<{
 				select: { id: true },
 			})
 
-			const cookieSession = await sessionStorage.getSession()
-			cookieSession.set(sessionKey, session.id)
+			const authSession = await authSessionStorage.getSession()
+			authSession.set(sessionKey, session.id)
 			const cookieConfig = setCookieParser.parseString(
-				await sessionStorage.commitSession(cookieSession),
+				await authSessionStorage.commitSession(authSession),
 			) as any
 			await page
 				.context()
