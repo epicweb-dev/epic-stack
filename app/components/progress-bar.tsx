@@ -2,7 +2,7 @@ import { useNavigation } from '@remix-run/react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '#app/utils/misc.tsx'
-import { Spinner } from './spinner.tsx'
+import { Icon } from './ui/icon.tsx'
 
 function EpicProgress() {
 	const transition = useNavigation()
@@ -37,7 +37,7 @@ function EpicProgress() {
 			<div
 				ref={ref}
 				className={cn(
-					'h-full w-0 bg-blue-600 duration-300 ease-in-out',
+					'h-full w-0 bg-foreground duration-500 ease-in-out',
 					transition.state === 'idle' &&
 						(animationComplete
 							? 'transition-none'
@@ -47,8 +47,13 @@ function EpicProgress() {
 				)}
 			/>
 			{delayedPending && (
-				<div className="absolute inset-0 flex items-center justify-center">
-					<Spinner showSpinner={true} className="text-blue-600" />
+				<div className="absolute flex items-center justify-center">
+					<Icon
+						name="update"
+						size="md"
+						className="m-1 animate-spin text-foreground"
+						aria-hidden
+					/>
 				</div>
 			)}
 		</div>
