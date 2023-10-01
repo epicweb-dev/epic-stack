@@ -8,7 +8,7 @@
 		/* --font-mono: here if you got it... */
 
 		/* prefixed with foreground because it should look good on the background */
-		--foreground-danger: 345 82.7% 40.8%;
+		--foreground-destructive: 345 82.7% 40.8%;
 
 		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;
@@ -48,7 +48,7 @@
 		--foreground: 210 40% 98%;
 
 		/* prefixed with foreground because it should look good on the background */
-		--foreground-danger: -4 84% 60%;
+		--foreground-destructive: -4 84% 60%;
 
 		--muted: 217.2 32.6% 12%;
 		--muted-foreground: 215 20.2% 65.1%;
@@ -72,7 +72,7 @@
 		--accent: 217.2 32.6% 10%;
 		--accent-foreground: 210 40% 98%;
 
-		--destructive: 0 62.8% 30.6%;
+		--destructive: 0 60% 40%;
 		--destructive-foreground: 0 85.7% 97.3%;
 
 		--ring: 217.2 32.6% 60%;

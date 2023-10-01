@@ -9,12 +9,12 @@ export const extendedTheme = {
 		},
 		ring: {
 			DEFAULT: 'hsl(var(--ring))',
-			invalid: 'hsl(var(--foreground-danger))',
+			invalid: 'hsl(var(--foreground-destructive))',
 		},
 		background: 'hsl(var(--background))',
 		foreground: {
 			DEFAULT: 'hsl(var(--foreground))',
-			danger: 'hsl(var(--foreground-danger))',
+			destructive: 'hsl(var(--foreground-destructive))',
 		},
 		primary: {
 			DEFAULT: 'hsl(var(--primary))',

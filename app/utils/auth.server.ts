@@ -197,7 +197,7 @@ export async function logout(
 	const sessionId = authSession.get(sessionKey)
 	// if this fails, we still need to delete the session from the user's browser
 	// and it doesn't do any harm staying in the db anyway.
-	void prisma.session.deleteMany({ where: { id: sessionId } })
+	if (sessionId) void prisma.session.deleteMany({ where: { id: sessionId } })
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,
 		headers: combineHeaders(

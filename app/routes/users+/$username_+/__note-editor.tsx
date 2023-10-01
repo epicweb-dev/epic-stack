@@ -241,7 +241,7 @@ export function NoteEditor({
 									className="relative border-b-2 border-muted-foreground"
 								>
 									<button
-										className="absolute right-0 top-0 text-destructive"
+										className="text-foreground-destructive absolute right-0 top-0"
 										{...list.remove(fields.images.name, { index })}
 									>
 										<span aria-hidden>
