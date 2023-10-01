@@ -1,7 +1,7 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -16,6 +16,7 @@ import {
 	useDoubleCheck,
 } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
@@ -329,7 +330,11 @@ function SignOutOfSessions() {
 
 async function deleteDataAction({ userId }: ProfileActionArgs) {
 	await prisma.user.delete({ where: { id: userId } })
-	return redirect('/')
+	return redirectWithToast('/', {
+		type: 'success',
+		title: 'Data Deleted',
+		description: 'All of your data has been deleted',
+	})
 }
 
 function DeleteData() {

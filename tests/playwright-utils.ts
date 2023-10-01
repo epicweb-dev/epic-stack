@@ -92,7 +92,7 @@ export const test = base.extend<{
 				.addCookies([{ ...cookieConfig, domain: 'localhost' }])
 			return user
 		})
-		await prisma.user.delete({ where: { id: userId } }).catch(() => {})
+		await prisma.user.deleteMany({ where: { id: userId } })
 	},
 })
 export const { expect } = test
