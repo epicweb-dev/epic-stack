@@ -2,12 +2,7 @@ import { conform, useForm, type Submission } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { generateTOTP, verifyTOTP } from '@epic-web/totp'
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useSearchParams,
-} from '@remix-run/react'
+import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -42,23 +37,6 @@ const VerifySchema = z.object({
 	[targetQueryParam]: z.string(),
 	[redirectToQueryParam]: z.string().optional(),
 })
-
-export async function loader({ request }: DataFunctionArgs) {
-	const params = new URL(request.url).searchParams
-	if (!params.has(codeQueryParam)) {
-		// we don't want to show an error message on page load if the otp hasn't be
-		// prefilled in yet, so we'll send a response with an empty submission.
-		return json({
-			status: 'idle',
-			submission: {
-				intent: '',
-				payload: Object.fromEntries(params) as Record<string, unknown>,
-				error: {} as Record<string, Array<string>>,
-			},
-		} as const)
-	}
-	return validateRequest(request, params)
-}
 
 export async function action({ request }: DataFunctionArgs) {
 	return validateRequest(request, await request.formData())
@@ -239,11 +217,13 @@ async function validateRequest(
 }
 
 export default function VerifyRoute() {
-	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
 	const isPending = useIsPending()
 	const actionData = useActionData<typeof action>()
-	const type = VerificationTypeSchema.parse(searchParams.get(typeQueryParam))
+	const parsedType = VerificationTypeSchema.safeParse(
+		searchParams.get(typeQueryParam),
+	)
+	const type = parsedType.success ? parsedType.data : null
 
 	const checkEmail = (
 		<>
@@ -271,7 +251,7 @@ export default function VerifyRoute() {
 	const [form, fields] = useForm({
 		id: 'verify-form',
 		constraint: getFieldsetConstraint(VerifySchema),
-		lastSubmission: actionData?.submission ?? data.submission,
+		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
 			return parse(formData, { schema: VerifySchema })
 		},
@@ -284,8 +264,10 @@ export default function VerifyRoute() {
 	})
 
 	return (
-		<div className="container flex flex-col justify-center pb-32 pt-20">
-			<div className="text-center">{headings[type]}</div>
+		<main className="container flex flex-col justify-center pb-32 pt-20">
+			<div className="text-center">
+				{type ? headings[type] : 'Invalid Verification Type'}
+			</div>
 
 			<Spacer size="xs" />
 
@@ -325,7 +307,7 @@ export default function VerifyRoute() {
 					</Form>
 				</div>
 			</div>
-		</div>
+		</main>
 	)
 }
 

@@ -66,6 +66,13 @@ test('onboarding with link', async ({ page, getOnboardingData }) => {
 	invariant(onboardingUrl, 'Onboarding URL not found')
 	await page.goto(onboardingUrl)
 
+	await expect(page).toHaveURL(/\/verify/)
+
+	await page
+		.getByRole('main')
+		.getByRole('button', { name: /submit/i })
+		.click()
+
 	await expect(page).toHaveURL(`/onboarding`)
 	await page
 		.getByRole('textbox', { name: /^username/i })
@@ -164,6 +171,13 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 	const resetPasswordUrl = extractUrl(email.text)
 	invariant(resetPasswordUrl, 'Reset password URL not found')
 	await page.goto(resetPasswordUrl)
+
+	await expect(page).toHaveURL(/\/verify/)
+
+	await page
+		.getByRole('main')
+		.getByRole('button', { name: /submit/i })
+		.click()
 
 	await expect(page).toHaveURL(`/reset-password`)
 	const newPassword = faker.internet.password()
