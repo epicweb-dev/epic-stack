@@ -29,7 +29,7 @@
 		--primary: 222.2 47.4% 11.2%;
 		--primary-foreground: 210 40% 98%;
 
-		--secondary: 210 40% 96.1%;
+		--secondary: 210 20% 83%;
 		--secondary-foreground: 222.2 47.4% 11.2%;
 
 		--accent: 210 40% 90%;
@@ -50,7 +50,7 @@
 		/* prefixed with foreground because it should look good on the background */
 		--foreground-danger: -4 84% 60%;
 
-		--muted: 217.2 32.6% 17.5%;
+		--muted: 217.2 32.6% 12%;
 		--muted-foreground: 215 20.2% 65.1%;
 
 		--popover: 222.2 84% 4.9%;
@@ -66,7 +66,7 @@
 		--primary: 210 40% 98%;
 		--primary-foreground: 222.2 47.4% 11.2%;
 
-		--secondary: 217.2 32.6% 17.5%;
+		--secondary: 217.2 20% 24%;
 		--secondary-foreground: 210 40% 98%;
 
 		--accent: 217.2 32.6% 10%;
