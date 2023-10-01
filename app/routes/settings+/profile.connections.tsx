@@ -3,6 +3,7 @@ import {
 	json,
 	type DataFunctionArgs,
 	type SerializeFrom,
+	type HeadersFunction,
 } from '@remix-run/node'
 import { useFetcher, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
@@ -25,6 +26,7 @@ import {
 } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
+import { makeTimings } from '#app/utils/timing.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
@@ -49,6 +51,7 @@ async function userCanDeleteConnections(userId: string) {
 
 export async function loader({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
+	const timings = makeTimings('profile connections loader')
 	const rawConnections = await prisma.connection.findMany({
 		select: { id: true, providerName: true, providerId: true, createdAt: true },
 		where: { userId },
@@ -67,6 +70,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		const connectionData = await resolveConnectionData(
 			providerName,
 			connection.providerId,
+			{ timings },
 		)
 		connections.push({
 			...connectionData,
@@ -76,10 +80,20 @@ export async function loader({ request }: DataFunctionArgs) {
 		})
 	}
 
-	return json({
-		connections,
-		canDeleteConnections: await userCanDeleteConnections(userId),
-	})
+	return json(
+		{
+			connections,
+			canDeleteConnections: await userCanDeleteConnections(userId),
+		},
+		{ headers: { 'Server-Timing': timings.toString() } },
+	)
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+	const headers = {
+		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
+	}
+	return headers
 }
 
 export async function action({ request }: DataFunctionArgs) {
