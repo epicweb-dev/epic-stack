@@ -147,22 +147,6 @@ export default function PhotoRoute() {
 					alt={data.user?.name ?? data.user?.username}
 				/>
 				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />
-				<input
-					{...conform.input(fields.photoFile, { type: 'file' })}
-					accept="image/*"
-					className="peer sr-only"
-					tabIndex={newImageSrc ? -1 : 0}
-					onChange={e => {
-						const file = e.currentTarget.files?.[0]
-						if (file) {
-							const reader = new FileReader()
-							reader.onload = event => {
-								setNewImageSrc(event.target?.result?.toString() ?? null)
-							}
-							reader.readAsDataURL(file)
-						}
-					}}
-				/>
 				{newImageSrc ? (
 					<div className="flex gap-4">
 						<StatusButton
@@ -183,6 +167,22 @@ export default function PhotoRoute() {
 						<Button asChild className="cursor-pointer">
 							<label htmlFor={fields.photoFile.id}>
 								<Icon name="pencil-1">Change</Icon>
+								<input
+									{...conform.input(fields.photoFile, { type: 'file' })}
+									accept="image/*"
+									className="peer sr-only"
+									tabIndex={newImageSrc ? -1 : 0}
+									onChange={e => {
+										const file = e.currentTarget.files?.[0]
+										if (file) {
+											const reader = new FileReader()
+											reader.onload = event => {
+												setNewImageSrc(event.target?.result?.toString() ?? null)
+											}
+											reader.readAsDataURL(file)
+										}
+									}}
+								/>
 							</label>
 						</Button>
 

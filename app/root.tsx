@@ -229,29 +229,31 @@ function App() {
 	const theme = useTheme()
 	const matches = useMatches()
 	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
+	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
 			<div className="flex h-screen flex-col justify-between">
 				<header className="container py-6">
-					<nav className="flex items-center justify-between">
-						<Link to="/">
-							<div className="font-light">epic</div>
-							<div className="font-bold">notes</div>
-						</Link>
-						{isOnSearchPage ? null : (
-							<div className="ml-auto max-w-sm flex-1 pr-10">
-								<SearchBar status="idle" />
+					<nav>
+						<div className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
+							<Link to="/">
+								<div className="font-light">epic</div>
+								<div className="font-bold">notes</div>
+							</Link>
+							<div className="ml-auto hidden max-w-sm flex-1 sm:block">
+								{searchBar}
 							</div>
-						)}
-						<div className="flex items-center gap-10">
-							{user ? (
-								<UserDropdown />
-							) : (
-								<Button asChild variant="default" size="sm">
-									<Link to="/login">Log In</Link>
-								</Button>
-							)}
+							<div className="flex items-center gap-10">
+								{user ? (
+									<UserDropdown />
+								) : (
+									<Button asChild variant="default" size="sm">
+										<Link to="/login">Log In</Link>
+									</Button>
+								)}
+							</div>
+							<div className="block w-full sm:hidden">{searchBar}</div>
 						</div>
 					</nav>
 				</header>
@@ -270,7 +272,7 @@ function App() {
 			</div>
 			<Confetti id={data.confettiId} />
 			<EpicToaster toast={data.toast} />
-			<EpicProgress/>
+			<EpicProgress />
 		</Document>
 	)
 }
