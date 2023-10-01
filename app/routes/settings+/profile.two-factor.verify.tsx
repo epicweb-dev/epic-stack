@@ -28,9 +28,10 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 }
 
 const CancelSchema = z.object({ intent: z.literal('cancel') })
-const VerifySchema = z
-	.object({ intent: z.literal('verify') })
-	.and(z.object({ code: z.string().min(6).max(6) }))
+const VerifySchema = z.object({
+	intent: z.literal('verify'),
+	code: z.string().min(6).max(6),
+})
 
 const ActionSchema = z.union([CancelSchema, VerifySchema])
 
@@ -129,6 +130,7 @@ export default function TwoFactorRoute() {
 
 	const isPending = useIsPending()
 	const pendingIntent = isPending ? navigation.formData?.get('intent') : null
+	const lastSubmissionIntent = actionData?.submission.value?.intent
 
 	const [form, fields] = useForm({
 		id: 'verify-form',
@@ -189,19 +191,26 @@ export default function TwoFactorRoute() {
 								status={
 									pendingIntent === 'verify'
 										? 'pending'
-										: actionData?.status ?? 'idle'
+										: lastSubmissionIntent === 'verify'
+										? actionData?.status ?? 'idle'
+										: 'idle'
 								}
 								type="submit"
 								name="intent"
 								value="verify"
-								disabled={isPending}
 							>
 								Submit
 							</StatusButton>
 							<StatusButton
 								className="w-full"
 								variant="secondary"
-								status={pendingIntent === 'cancel' ? 'pending' : 'idle'}
+								status={
+									pendingIntent === 'cancel'
+										? 'pending'
+										: lastSubmissionIntent === 'cancel'
+										? actionData?.status ?? 'idle'
+										: 'idle'
+								}
 								type="submit"
 								name="intent"
 								value="cancel"
