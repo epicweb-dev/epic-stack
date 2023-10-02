@@ -58,7 +58,7 @@ export async function handleVerification({
 
 	void sendEmail({
 		to: preUpdateUser.email,
-		subject: 'Epic Stack email changed',
+		subject: `${ENV.APP_DISPLAY_NAME} email changed`,
 		react: <EmailChangeNoticeEmail userId={user.id} />,
 	})
 
@@ -129,7 +129,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const response = await sendEmail({
 		to: submission.value.email,
-		subject: `Epic Notes Email Change Verification`,
+		subject: `${ENV.APP_DISPLAY_NAME} Email Change Verification`,
 		react: <EmailChangeEmail verifyUrl={verifyUrl.toString()} otp={otp} />,
 	})
 
@@ -158,7 +158,7 @@ export function EmailChangeEmail({
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
 				<h1>
-					<E.Text>Epic Notes Email Change</E.Text>
+					<E.Text>{ENV.APP_DISPLAY_NAME} Email Change</E.Text>
 				</h1>
 				<p>
 					<E.Text>
@@ -179,12 +179,12 @@ export function EmailChangeNoticeEmail({ userId }: { userId: string }) {
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
 				<h1>
-					<E.Text>Your Epic Notes email has been changed</E.Text>
+					<E.Text>Your {ENV.APP_DISPLAY_NAME} email has been changed</E.Text>
 				</h1>
 				<p>
 					<E.Text>
-						We're writing to let you know that your Epic Notes email has been
-						changed.
+						We're writing to let you know that your {ENV.APP_DISPLAY_NAME} email
+						has been changed.
 					</E.Text>
 				</p>
 				<p>

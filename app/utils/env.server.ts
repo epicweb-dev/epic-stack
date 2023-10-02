@@ -47,6 +47,7 @@ export function init() {
  */
 export function getEnv() {
 	return {
+		APP_DISPLAY_NAME: process.env.APP_DISPLAY_NAME,
 		MODE: process.env.NODE_ENV,
 		SENTRY_DSN: process.env.SENTRY_DSN,
 	}
