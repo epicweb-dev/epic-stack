@@ -118,7 +118,7 @@ If your app has already applied all migrations, then the changes to the
 you can SSH into your app and run the following command to apply the migration:
 
 ```sh nonumber
-npx prisma migrate reset
+npx prisma migrate reset --skip-seed
 ```
 
 > **WARNING**: This will reset your database and apply all migrations. Continue
