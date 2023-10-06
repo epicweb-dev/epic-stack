@@ -1,5 +1,5 @@
 import { useNavigation } from '@remix-run/react'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '#app/utils/misc.tsx'
 import { Icon } from './ui/icon.tsx'

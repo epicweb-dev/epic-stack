@@ -114,14 +114,20 @@ Find instructions for this optional step in
 
 ### Optional: Connecting to your production database
 
-The sqlite database lives at `/data/sqlite.db` in the deployed application.
-Because it is SQLite, you cannot connect to it unless you're running a
-command-line session on the machine. You can do this using `fly ssh console`.
-The Dockerfile simplifies this further by adding a `database-cli` command. You
-can connect to the live database by running `fly ssh console -C database-cli`.
+The location of the sqlite database is kinda funny. The real location is in
+`/data/litefs/dbs/sqlite.db`. However, during development you connect to it via
+the fake filesystem managed by LiteFS so it can propagate any changes to your
+database to all replicas.
+
+So to connect to your database, you'll want to connect to it at
+`/litefs/sqlite.db` in the deployed application. Because it is SQLite, you
+cannot connect to it unless you're running a command-line session on the
+machine. You can do this using `fly ssh console`. The Dockerfile simplifies this
+further by adding a `database-cli` command. You can connect to the live database
+by running `fly ssh console -C database-cli`.
 
 To connect to the deployed database from your local machine using Prisma Studio,
-you can utilize Fly's ﻿`ssh` and ﻿`proxy` commands.
+you can utilize Fly's `ssh` and `proxy` commands.
 
 - Run in one terminal the command to start Prisma Studio on your desired Fly app
   ```sh
@@ -135,6 +141,14 @@ you can utilize Fly's ﻿`ssh` and ﻿`proxy` commands.
 
 To work with Prisma Studio and your deployed app's database, simply open
 `http://localhost:5556` in your browser.
+
+> **Note**: You may want to add `--select` to the `fly ssh console` command to
+> select the instance you want to connect to if you have multiple instances
+> running. Otherwise you could connect to a non-primary instance. The easiest
+> way to determine the primary instance (because it can change) is to open your
+> deployed application and check the request headers. One of them will be
+> `Fly-Primary-Instance` which will tell you the instance ID of the primary
+> instance.
 
 ## Seeding Production
 
