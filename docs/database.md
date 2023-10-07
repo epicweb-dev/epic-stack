@@ -8,7 +8,7 @@ the fake filesystem managed by LiteFS so it can propagate any changes to your
 database to all replicas.
 
 So to connect to your database, you'll want to connect to it at
-`/litefs/sqlite.db` in the deployed application. Because it is SQLite, you
+`/litefs/data/sqlite.db` in the deployed application. Because it is SQLite, you
 cannot connect to it unless you're running a command-line session on the
 machine. You can do this using `fly ssh console`. The Dockerfile simplifies this
 further by adding a `database-cli` command. You can connect to the live database
@@ -115,10 +115,10 @@ if what you need to seed is a lot of data), so here's an easy way to help out:
 
 If your app has already applied all migrations, then the changes to the
 `migration.sql` won't be applied (because prisma's already applied it). So then
-you can SSH into your app and run the following command to apply the migration:
+you can run the following command to apply the migration:
 
 ```sh nonumber
-npx prisma migrate reset --skip-seed
+fly ssh console -C "npx prisma migrate reset --skip-seed --force" --app [YOUR_APP_NAME]
 ```
 
 > **WARNING**: This will reset your database and apply all migrations. Continue
