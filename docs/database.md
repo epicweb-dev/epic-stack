@@ -141,3 +141,94 @@ with more data without performing a migration, then it's a bit more involved.
    ```
 1. Verify that your production database has been seeded correctly. If it hasn't,
    then restore your backup (asap).
+
+## Backups
+
+### Manual DB Backups
+
+Manual DB backups can be taken/restored using `litefs` commands:
+
+- `litefs export`: https://fly.io/docs/litefs/export/
+- `litefs import`: https://fly.io/docs/litefs/import/
+
+**Make sure to keep the backup in a secure location. Your DB backup will contain
+user information and password hashes!**
+
+You can manually create a backup for your database using the following steps:
+
+1. SSH into your fly instance:
+   ```sh
+   fly ssh console --app [YOUR_APP_NAME]
+   ```
+1. Create a `backups` folder:
+   ```sh
+   mkdir /backups
+   ```
+1. Create a backup file using `litefs export`, and exit the console (it is
+   recommended to name the exported file with the current date):
+   ```sh
+   lifefs export -name sqlite.db /backups/backup-2023-10-10.db
+   exit
+   ```
+1. Use sftp to download the backup file:
+   ```sh
+   fly ssh sftp get /backups/backup-2023-10-10.db --app [YOUR_APP_NAME]
+   ```
+
+You can now store this backup file wherever you like, such as an S3 bucket
+(again, make sure it's a secure location!).
+
+See the fly docs for more info: https://fly.io/docs/litefs/backup/
+
+### Manual DB restoration
+
+**WARNING - THIS OVERWRITES YOUR DATABASE, YOU CAN LOSE DATA!! TAKE ANOTHER
+BACKUP OF THE CURRENT DATABASE BEFORE DOING THIS!!**
+
+1. Establish an sftp session with the fly instance and upload the backup file to
+   the server using `put`:
+   ```sh
+   fly ssh sftp shell --app [YOUR_APP_NAME]
+   put backup-2023-10-10.db
+   ```
+1. Quit the sftp session with CTRL+C
+1. SSH into the fly instance:
+   ```sh
+   fly ssh console --app [YOUR_APP_NAME]
+   ```
+1. Restore the database from the backup file using `litefs import`
+   ```sh
+   litefs import -name sqlite.db /backup-2023-10-10.db
+   ```
+1. Exit the ssh session
+   ```sh
+   exit
+   ```
+
+### LiteFS Cloud Backups
+
+LifeFS Cloud is a service offered by Fly.io for managing backup and restore
+functionality.
+
+This is the simplest method for backing up your database.
+
+It offers the ability to restore your database to any point in time in the last
+30 days, with 5 minute granularity.
+
+Fly.io has some great documentation on how to set this up:
+
+- [Pricing](https://fly.io/docs/about/pricing/#litefs-cloud)
+- [LiteFS Cloud Setup](https://fly.io/docs/litefs/cloud-backups/)
+- [Restoring DB with LiteFS Cloud](https://fly.io/docs/litefs/cloud-restore/)
+- [Disaster Recovery with LiteFS Cloud](https://fly.io/docs/litefs/disaster-recovery/)
+
+The following is a summary of the steps to set up LiteFS Cloud:
+
+1. Create a LiteFS Cloud cluster in your Fly.io dashboard:
+   https://fly.io/dashboard/personal/litefs
+   - Take note of the auth token, you'll need it in the next step
+1. Set the `LITEFS_CLOUD_TOKEN` to the token from your dashboard:
+   ```sh
+   fly secrets set SESSION_SECRET="AUTH_TOKEN_HERE" --app [YOUR_APP_NAME]
+   ```
+1. You should now be able to restore backups from the LiteFS dashboard.
