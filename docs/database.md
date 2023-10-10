@@ -229,6 +229,6 @@ The following is a summary of the steps to set up LiteFS Cloud:
    - Take note of the auth token, you'll need it in the next step
 1. Set the `LITEFS_CLOUD_TOKEN` to the token from your dashboard:
    ```sh
-   fly secrets set SESSION_SECRET="AUTH_TOKEN_HERE" --app [YOUR_APP_NAME]
+   fly secrets set LITEFS_CLOUD_TOKEN="LITEFS_CLOUD_TOKEN_HERE" --app [YOUR_APP_NAME]
    ```
 1. You should now be able to restore backups from the LiteFS dashboard.
