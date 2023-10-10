@@ -144,6 +144,34 @@ with more data without performing a migration, then it's a bit more involved.
 
 ## Backups
 
+### LiteFS Cloud Backups
+
+LifeFS Cloud is a service offered by Fly.io for managing backup and restore
+functionality.
+
+This is the simplest method for backing up your database.
+
+It offers the ability to restore your database to any point in time in the last
+30 days, with 5 minute granularity.
+
+Fly.io has some great documentation on how to set this up:
+
+- [Pricing](https://fly.io/docs/about/pricing/#litefs-cloud)
+- [LiteFS Cloud Setup](https://fly.io/docs/litefs/cloud-backups/)
+- [Restoring DB with LiteFS Cloud](https://fly.io/docs/litefs/cloud-restore/)
+- [Disaster Recovery with LiteFS Cloud](https://fly.io/docs/litefs/disaster-recovery/)
+
+The following is a summary of the steps to set up LiteFS Cloud:
+
+1. Create a LiteFS Cloud cluster in your Fly.io dashboard:
+   https://fly.io/dashboard/personal/litefs
+   - Take note of the auth token, you'll need it in the next step
+1. Set the `LITEFS_CLOUD_TOKEN` to the token from your dashboard:
+   ```sh
+   fly secrets set LITEFS_CLOUD_TOKEN="LITEFS_CLOUD_TOKEN_HERE" --app [YOUR_APP_NAME]
+   ```
+1. You should now be able to restore backups from the LiteFS dashboard.
+
 ### Manual DB Backups
 
 Manual DB backups can be taken/restored using `litefs` commands:
@@ -204,31 +232,3 @@ BACKUP OF THE CURRENT DATABASE BEFORE DOING THIS!!**
    ```sh
    exit
    ```
-
-### LiteFS Cloud Backups
-
-LifeFS Cloud is a service offered by Fly.io for managing backup and restore
-functionality.
-
-This is the simplest method for backing up your database.
-
-It offers the ability to restore your database to any point in time in the last
-30 days, with 5 minute granularity.
-
-Fly.io has some great documentation on how to set this up:
-
-- [Pricing](https://fly.io/docs/about/pricing/#litefs-cloud)
-- [LiteFS Cloud Setup](https://fly.io/docs/litefs/cloud-backups/)
-- [Restoring DB with LiteFS Cloud](https://fly.io/docs/litefs/cloud-restore/)
-- [Disaster Recovery with LiteFS Cloud](https://fly.io/docs/litefs/disaster-recovery/)
-
-The following is a summary of the steps to set up LiteFS Cloud:
-
-1. Create a LiteFS Cloud cluster in your Fly.io dashboard:
-   https://fly.io/dashboard/personal/litefs
-   - Take note of the auth token, you'll need it in the next step
-1. Set the `LITEFS_CLOUD_TOKEN` to the token from your dashboard:
-   ```sh
-   fly secrets set LITEFS_CLOUD_TOKEN="LITEFS_CLOUD_TOKEN_HERE" --app [YOUR_APP_NAME]
-   ```
-1. You should now be able to restore backups from the LiteFS dashboard.
