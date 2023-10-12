@@ -10,12 +10,14 @@ import {
 	useNavigation,
 } from '@remix-run/react'
 import * as QRCode from 'qrcode'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { isCodeValid } from '#app/routes/_auth+/verify.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -71,6 +73,7 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
+	await validateCSRF(formData, request.headers)
 
 	const submission = await parse(formData, {
 		schema: () =>
@@ -172,6 +175,7 @@ export default function TwoFactorRoute() {
 				</p>
 				<div className="flex w-full max-w-xs flex-col justify-center gap-4">
 					<Form method="POST" {...form.props} className="flex-1">
+						<AuthenticityTokenInput />
 						<Field
 							labelProps={{
 								htmlFor: fields.code.id,

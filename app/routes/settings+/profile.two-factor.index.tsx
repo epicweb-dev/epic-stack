@@ -2,9 +2,11 @@ import { generateTOTP } from '@epic-web/totp'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 import { twoFAVerifyVerificationType } from './profile.two-factor.verify.tsx'
@@ -24,6 +26,7 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export async function action({ request }: DataFunctionArgs) {
 	const userId = await requireUserId(request)
+	await validateCSRF(await request.formData(), request.headers)
 	const { otp: _otp, ...config } = generateTOTP()
 	const verificationData = {
 		...config,
@@ -73,7 +76,8 @@ export default function TwoFactorRoute() {
 						</a>{' '}
 						to log in.
 					</p>
-					<enable2FAFetcher.Form method="POST" preventScrollReset>
+					<enable2FAFetcher.Form method="POST">
+						<AuthenticityTokenInput />
 						<StatusButton
 							type="submit"
 							name="intent"

@@ -3,6 +3,8 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { generateTOTP, verifyTOTP } from '@epic-web/totp'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
+import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -12,7 +14,9 @@ import { handleVerification as handleChangeEmailVerification } from '#app/routes
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { type twoFAVerifyVerificationType } from '#app/routes/settings+/profile.two-factor.verify.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { ensurePrimary } from '#app/utils/litefs.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -39,7 +43,10 @@ const VerifySchema = z.object({
 })
 
 export async function action({ request }: DataFunctionArgs) {
-	return validateRequest(request, await request.formData())
+	const formData = await request.formData()
+	checkHoneypot(formData)
+	await validateCSRF(formData, request.headers)
+	return validateRequest(request, formData)
 }
 
 export function getRedirectToUrl({
@@ -277,6 +284,8 @@ export default function VerifyRoute() {
 				</div>
 				<div className="flex w-full gap-2">
 					<Form method="POST" {...form.props} className="flex-1">
+						<AuthenticityTokenInput />
+						<HoneypotInputs />
 						<Field
 							labelProps={{
 								htmlFor: fields[codeQueryParam].id,

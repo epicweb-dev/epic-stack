@@ -72,6 +72,7 @@
     "compression": "^1.7.4",
     "confetti-react": "^2.5.0",
     "cross-env": "^7.0.3",
+    "crypto-js": "^4.1.1",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "eslint-plugin-remix-react-routes": "^1.0.5",
