@@ -1,5 +1,5 @@
 import { Index as ConfettiShower } from 'confetti-react'
-import { ClientOnly } from 'remix-utils'
+import { ClientOnly } from 'remix-utils/client-only'
 
 export function Confetti({ id }: { id?: string | null }) {
 	if (!id) return null
