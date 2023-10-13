@@ -274,8 +274,10 @@ if (MODE === 'development') {
 	const dirname = path.dirname(fileURLToPath(import.meta.url))
 	const watchPath = path.join(dirname, WATCH_PATH).replace(/\\/g, '/')
 
-	chokidar
+	const buildWatcher = chokidar
 		.watch(watchPath, { ignoreInitial: true })
 		.on('add', reloadBuild)
 		.on('change', reloadBuild)
+
+	closeWithGrace(() => buildWatcher.close())
 }
