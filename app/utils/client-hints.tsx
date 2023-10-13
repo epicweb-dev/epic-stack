@@ -95,7 +95,7 @@ export function ClientHintCheck({ nonce }: { nonce: string }) {
 		function handleThemeChange() {
 			document.cookie = `${clientHints.theme.cookieName}=${
 				themeQuery.matches ? 'dark' : 'light'
-			}`
+			}; Max-Age=31536000; Path=/`
 			revalidate()
 		}
 		themeQuery.addEventListener('change', handleThemeChange)
@@ -126,7 +126,7 @@ ${Object.values(clientHints)
 for (const hint of hints) {
 	if (decodeURIComponent(hint.cookie) !== hint.actual) {
 		cookieChanged = true;
-		document.cookie = encodeURIComponent(hint.name) + '=' + encodeURIComponent(hint.actual) + ';path=/';
+		document.cookie = encodeURIComponent(hint.name) + '=' + encodeURIComponent(hint.actual) + '; Max-Age=31536000; path=/';
 	}
 }
 // if the cookie changed, reload the page, unless the browser doesn't support
