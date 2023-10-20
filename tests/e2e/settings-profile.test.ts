@@ -66,7 +66,7 @@ test('Users can update their profile photo', async ({ page, login }) => {
 
 	await page
 		.getByRole('textbox', { name: /change/i })
-		.setInputFiles('./tests/fixtures/images/user/kody.png')
+		.setInputFiles('./tests/fixtures/images/user/pat.png')
 
 	await page.getByRole('button', { name: /save/i }).click()
 

@@ -25,7 +25,7 @@ export default function Index() {
 									className="block uppercase text-white drop-shadow-md"
 									href="https://www.epicweb.dev/stack"
 								>
-									<span>Epic Stack</span>
+									<span>Epic Pat Stack</span>
 									<svg
 										className="mx-auto mt-2"
 										xmlns="http://www.w3.org/2000/svg"
