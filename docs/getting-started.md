@@ -56,5 +56,5 @@ This starts your app in development mode, rebuilding assets on file changes.
 The database seed script creates a new user with some data you can use to get
 started:
 
-- Username: `kody`
-- Password: `kodylovesyou`
+- Username: `pat`
+- Password: `patrocks!0`
