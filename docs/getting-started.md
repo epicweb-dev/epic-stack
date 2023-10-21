@@ -28,7 +28,7 @@ environment variables when you run the script:
 So, if you enabled all of these it would be:
 
 ```sh
-SKIP_SETUP=true SKIP_FORMAT=true SKIP_DEPLOYMENT npx create-remix@latest --install --init-script --git-init --template epicweb-dev/epic-stack
+SKIP_SETUP=true SKIP_FORMAT=true SKIP_DEPLOYMENT=true npx create-remix@latest --install --init-script --git-init --template epicweb-dev/epic-stack
 ```
 
 Or, on windows:
