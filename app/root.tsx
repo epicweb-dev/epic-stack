@@ -25,6 +25,7 @@ import {
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
+import rdtStylesheet from 'remix-development-tools/index.css'
 import { AuthenticityTokenProvider } from 'remix-utils/csrf/react'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
@@ -85,6 +86,9 @@ export const links: LinksFunction = () => {
 		{ rel: 'stylesheet', href: fontStyleSheetUrl },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
+		...(process.env.NODE_ENV === 'development'
+			? [{ rel: 'stylesheet', href: rdtStylesheet }]
+			: []),
 	].filter(Boolean)
 }
 
@@ -297,7 +301,16 @@ function AppWithProviders() {
 	)
 }
 
-export default withSentry(AppWithProviders)
+let AppExport = AppWithProviders
+// This imports the dev tools only if you're in development
+if (process.env.NODE_ENV === 'development') {
+	const { withDevTools } = await import('remix-development-tools')
+	AppExport = withDevTools(AppExport)
+} else {
+	AppExport = withSentry(AppExport)
+}
+
+export default AppExport
 
 function UserDropdown() {
 	const user = useUser()
