@@ -9,7 +9,6 @@ import {
 	type MetaFunction,
 } from '@remix-run/node'
 import {
-	Link,
 	Links,
 	LiveReload,
 	Meta,
@@ -19,7 +18,6 @@ import {
 	useFetcher,
 	useFetchers,
 	useLoaderData,
-	useMatches,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
 import rdtStylesheet from 'remix-development-tools/index.css'
@@ -29,12 +27,10 @@ import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { ErrorList } from './components/forms.tsx'
-import { Header, Nav } from './components/layout/index.ts'
+import { NavLogo } from './components/layout/index.ts'
 import { EpicProgress } from './components/progress-bar.tsx'
-import { SearchBar } from './components/search-bar.tsx'
-import DropdownNavigation from './components/templates/dropdown-navigation.tsx'
+import { PageHeader } from './components/templates/index.ts'
 import { EpicToaster } from './components/toaster.tsx'
-import { Button } from './components/ui/button.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import fontStyleSheetUrl from './styles/font.css'
 import tailwindStyleSheetUrl from './styles/tailwind.css'
@@ -45,13 +41,12 @@ import { csrf } from './utils/csrf.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
-import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
+import { combineHeaders, getDomainUrl } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { useRequestInfo } from './utils/request-info.ts'
 import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -230,48 +225,19 @@ function Document({
 function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
-	const user = useOptionalUser()
 	const theme = useTheme()
-	const matches = useMatches()
-	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
-	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
 			<div className="flex h-screen flex-col justify-between">
-				<Header className="container py-6">
-					<Nav variant="marketing">
-						<div className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
-							<Link to="/">
-								<div className="font-light">epic</div>
-								<div className="font-bold">notes</div>
-							</Link>
-							<div className="ml-auto hidden max-w-sm flex-1 sm:block">
-								{searchBar}
-							</div>
-							<div className="flex items-center gap-10">
-								{user ? (
-									<UserDropdown />
-								) : (
-									<Button asChild variant="default" size="sm">
-										<Link to="/login">Log In</Link>
-									</Button>
-								)}
-							</div>
-							<div className="block w-full sm:hidden">{searchBar}</div>
-						</div>
-					</Nav>
-				</Header>
+				<PageHeader />
 
 				<div className="flex-1">
 					<Outlet />
 				</div>
 
 				<div className="container flex justify-between pb-5">
-					<Link to="/">
-						<div className="font-light">epic</div>
-						<div className="font-bold">notes</div>
-					</Link>
+					<NavLogo />
 					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 				</div>
 			</div>
@@ -303,34 +269,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default AppExport
-
-function UserDropdown() {
-	const user = useUser()
-
-	return (
-		<DropdownNavigation
-			menuItems={[
-				{
-					label: 'Profile',
-					to: `/users/${user.username}`,
-					iconName: 'avatar',
-				},
-				{
-					label: 'Notes',
-					to: `/users/${user.username}/notes`,
-					iconName: 'pencil-2',
-				},
-			]}
-			button={{
-				to: `/users/${user.username}`,
-				alt: user.name ?? user.username,
-				imgSrc: getUserImgSrc(user.image?.id),
-				label: user.name ?? user.username,
-			}}
-			logout
-		/>
-	)
-}
 
 /**
  * @returns the user's theme preference, or the client hint theme if the user

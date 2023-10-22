@@ -1,2 +1,5 @@
-export * from './Header.tsx'
-export * from './Nav.tsx'
+export * from './header.tsx'
+export * from './nav.tsx'
+export * from './nav-logo.tsx'
+export * from './nav-search.tsx'
+export * from './nav-user-controls.tsx'
