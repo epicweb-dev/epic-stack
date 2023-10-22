@@ -29,6 +29,7 @@ import { z } from 'zod'
 import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { ErrorList } from './components/forms.tsx'
+import { Header, Nav } from './components/layout/index.ts'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
 import DropdownNavigation from './components/templates/dropdown-navigation.tsx'
@@ -238,8 +239,8 @@ function App() {
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
 			<div className="flex h-screen flex-col justify-between">
-				<header className="container py-6">
-					<nav>
+				<Header className="container py-6">
+					<Nav variant="marketing">
 						<div className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
 							<Link to="/">
 								<div className="font-light">epic</div>
@@ -259,8 +260,8 @@ function App() {
 							</div>
 							<div className="block w-full sm:hidden">{searchBar}</div>
 						</div>
-					</nav>
-				</header>
+					</Nav>
+				</Header>
 
 				<div className="flex-1">
 					<Outlet />
