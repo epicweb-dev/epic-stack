@@ -23,7 +23,7 @@ function PageSidebar({ owner, title, list }: PageSidebarProps) {
 					ownerDisplayName={ownerDisplayName}
 					ownerUsername={owner.username}
 					ownerImageId={owner.image?.id}
-					title={`${ownerDisplayName}'s ${title}}`}
+					title={`${ownerDisplayName}'s ${title}`}
 				/>
 				<SidebarList isOwner={isOwner} items={list} />
 			</div>

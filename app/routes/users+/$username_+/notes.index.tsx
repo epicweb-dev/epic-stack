@@ -1,12 +1,9 @@
 import { type MetaFunction } from '@remix-run/react'
+import { PageContentIndex } from '#app/components/templates/index.ts'
 import { type loader as notesLoader } from './notes.tsx'
 
 export default function NotesIndexRoute() {
-	return (
-		<div className="container pt-12">
-			<p className="text-body-md">Select a note</p>
-		</div>
-	)
+	return <PageContentIndex message="Select a note" />
 }
 
 export const meta: MetaFunction<
