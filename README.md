@@ -4,7 +4,12 @@ Forked from Epic Stack...
 
 ## My Changes
 
-- [Remix Dev Tools](https://github.com/Code-Forge-Net/Remix-Dev-Tools)
+### Added
+
+- [Remix Dev Tools](https://github.com/Code-Forge-Net/Remix-Dev-Tools) workflow
+  tool for working with Remix Run
+- [Husky](https://typicode.github.io/husky/) pre-commit hook runs commands
+  (build, validate, etc.) to help ensure code quality is being maintained
 
 <div align="center">
   <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
