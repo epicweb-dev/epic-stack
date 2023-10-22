@@ -1,3 +1,4 @@
+export * from './footer.tsx'
 export * from './header.tsx'
 export * from './nav.tsx'
 export * from './nav-logo.tsx'
