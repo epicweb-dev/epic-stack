@@ -23,3 +23,6 @@ node_modules
 
 # generated files
 /app/components/ui/icons
+/test-results/
+/playwright-report/
+/playwright/.cache/
