@@ -12,14 +12,18 @@ import {
 	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
-import { safeRedirect } from 'remix-utils'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
+import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
 import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { invariant, useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import {
@@ -64,6 +68,8 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	const email = await requireOnboardingEmail(request)
 	const formData = await request.formData()
+	await validateCSRF(formData, request.headers)
+	checkHoneypot(formData)
 	const submission = await parse(formData, {
 		schema: intent =>
 			SignupFormSchema.superRefine(async (data, ctx) => {
@@ -165,6 +171,8 @@ export default function SignupRoute() {
 					className="mx-auto min-w-[368px] max-w-sm"
 					{...form.props}
 				>
+					<AuthenticityTokenInput />
+					<HoneypotInputs />
 					<Field
 						labelProps={{ htmlFor: fields.username.id, children: 'Username' }}
 						inputProps={{

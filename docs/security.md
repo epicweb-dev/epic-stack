@@ -61,14 +61,19 @@ the `dangerouslySetInnerHTML` prop. This is a good thing, but it does mean that
 you need to be careful when rendering HTML. Never pass anything that is
 user-generated to this prop.
 
-## [Cross-Site Request Forgery (CSRF)](https://developer.mozilla.org/en-US/docs/Glossary/CSRF)
+## [Cross-Site Request Forgery (CSRF)](https://forms.epicweb.dev/07)
 
-There is nothing currently built-into the Epic Stack to prevent CSRF attacks
-currently. If this is a concern for you, we recommend you look at
-[`remix-utils`](https://github.com/sergiodxa/remix-utils) (already installed)
-which has
-[CSRF-related utilities](https://github.com/sergiodxa/remix-utils#csrf) that can
-be used to avoid these issues.
+The Epic Stack has built-in support to prevent CSRF attacks. We use the
+[`remix-utils`](https://github.com/sergiodxa/remix-utils)
+[CSRF-related utilities](https://github.com/sergiodxa/remix-utils#csrf) to do
+this.
+
+## [Honeypot](https://forms.epicweb.dev/06)
+
+The Epic Stack has built-in support for honeypot fields. We use the
+[`remix-utils`](https://github.com/sergiodxa/remix-utils)
+[honeypot-related utilities](https://github.com/sergiodxa/remix-utils#form-honeypot)
+to do this.
 
 ## Rate Limiting
 

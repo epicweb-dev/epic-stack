@@ -19,10 +19,7 @@ import { type VerifyFunctionArgs } from './verify.tsx'
 
 const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
+export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(submission.value, 'submission.value should be defined by now')
 	const target = submission.value.target
 	const user = await prisma.user.findFirst({

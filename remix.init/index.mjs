@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import fs from 'fs/promises'
 import path from 'path'
 import toml from '@iarna/toml'
-import { $, execa } from 'execa'
+import { $ } from 'execa'
 import inquirer from 'inquirer'
 import open from 'open'
 import parseGitHubURL from 'parse-github-url'
@@ -164,8 +164,8 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly apps create ${APP_NAME}`
 
 	console.log(`🤫 Setting secrets in apps`)
-	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} --app ${APP_NAME}-staging`
-	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} --app ${APP_NAME}`
+	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}-staging`
+	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
 
 	console.log(
 		`🔊 Creating volumes. Answer "yes" when it warns you about downtime. You can add more volumes later (when you actually start getting paying customers �).`,

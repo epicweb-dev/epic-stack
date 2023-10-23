@@ -19,6 +19,7 @@ import {
 } from '@remix-run/node'
 import { Form, useFetcher } from '@remix-run/react'
 import { useRef, useState } from 'react'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
@@ -29,6 +30,7 @@ import { Label } from '#app/components/ui/label.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn, getNoteImgSrc } from '#app/utils/misc.tsx'
 
@@ -78,6 +80,7 @@ export async function action({ request }: DataFunctionArgs) {
 		request,
 		createMemoryUploadHandler({ maxPartSize: MAX_UPLOAD_SIZE }),
 	)
+	await validateCSRF(formData, request.headers)
 
 	const submission = await parse(formData, {
 		schema: NoteEditorSchema.superRefine(async (data, ctx) => {
@@ -209,6 +212,7 @@ export function NoteEditor({
 				{...form.props}
 				encType="multipart/form-data"
 			>
+				<AuthenticityTokenInput />
 				{/*
 					This hidden submit button is here to ensure that when the user hits
 					"enter" on an input field, the primary form function is submitted
@@ -241,7 +245,7 @@ export function NoteEditor({
 									className="relative border-b-2 border-muted-foreground"
 								>
 									<button
-										className="text-foreground-destructive absolute right-0 top-0"
+										className="absolute right-0 top-0 text-foreground-destructive"
 										{...list.remove(fields.images.name, { index })}
 									>
 										<span aria-hidden>

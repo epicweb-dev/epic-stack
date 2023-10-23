@@ -7,7 +7,9 @@ import {
 	type MetaFunction,
 } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
-import { safeRedirect } from 'remix-utils'
+import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
+import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
@@ -24,7 +26,9 @@ import {
 	ProviderConnectionForm,
 	providerNames,
 } from '#app/utils/connections.tsx'
+import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import {
 	combineResponseInits,
 	invariant,
@@ -195,6 +199,8 @@ export async function loader({ request }: DataFunctionArgs) {
 export async function action({ request }: DataFunctionArgs) {
 	await requireAnonymous(request)
 	const formData = await request.formData()
+	await validateCSRF(formData, request.headers)
+	checkHoneypot(formData)
 	const submission = await parse(formData, {
 		schema: intent =>
 			LoginFormSchema.transform(async (data, ctx) => {
@@ -266,6 +272,8 @@ export default function LoginPage() {
 				<div>
 					<div className="mx-auto w-full max-w-md px-8">
 						<Form method="POST" {...form.props}>
+							<AuthenticityTokenInput />
+							<HoneypotInputs />
 							<Field
 								labelProps={{ children: 'Username' }}
 								inputProps={{

@@ -63,6 +63,11 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@jsfez](https://github.com/jsfez): An example of the Epic Stack
   with [Argos](https://www.argos-ci.com/) for visual testing
 - [Epic Stack monorepo with pnpm + turbo](https://github.com/PhilDL/epic-stack-monorepo):
+  An example of the Epic Stack in a monorepo setup, configs packages, UI package, and "client-hints" example package.
+- [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/) by
+  [@rperon](https://github.com/rperon): An example of the Epic Stack with passkeys
+  using [remix-auth-webauthn](https://github.com/alexanderson1993/remix-auth-webauthn) and 
+  [remix-auth](https://npm.im/remix-auth).
 - [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email):
   An example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of [react-email](https://react.email/)
 
