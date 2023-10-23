@@ -1,12 +1,14 @@
+import { Content } from '#app/components/layout/index.ts'
+
 interface PageContentIndexProps {
 	message: string
 }
 
 function PageContentIndex({ message }: PageContentIndexProps) {
 	return (
-		<div className="container pt-12">
+		<Content variant="index">
 			<p className="text-body-md">{message}</p>
-		</div>
+		</Content>
 	)
 }
 
