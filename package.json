@@ -107,7 +107,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.1.0",
-    "@playwright/test": "^1.38.1",
+    "@playwright/test": "^1.39.0",
     "@remix-run/dev": "^2.1.0",
     "@remix-run/eslint-config": "^2.1.0",
     "@remix-run/serve": "^2.1.0",
@@ -142,6 +142,7 @@
     "eslint-config-prettier": "^9.0.0",
     "fs-extra": "^11.1.1",
     "glob": "^10.3.7",
+    "husky": "^8.0.0",
     "jsdom": "^22.1.0",
     "msw": "0.0.0-fetch.rc-20",
     "node-html-parser": "^6.1.10",
@@ -154,8 +155,7 @@
     "tsx": "^3.14.0",
     "typescript": "^5.2.2",
     "vite": "^4.4.9",
-    "vitest": "^0.34.5",
-    "husky": "^8.0.0"
+    "vitest": "^0.34.5"
   },
   "engines": {
     "node": "18"
