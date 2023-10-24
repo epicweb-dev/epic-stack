@@ -2,6 +2,20 @@ import { type SerializeFrom } from '@remix-run/node'
 import { useRouteLoaderData } from '@remix-run/react'
 import { type loader as rootLoader } from '#app/root.tsx'
 
+interface OwnerImageData {
+	id?: string
+}
+export interface OwnerListData {
+	id: string
+	title: string
+}
+export interface OwnerData {
+	id: string
+	name: string | null
+	username: string
+	image?: OwnerImageData | null
+}
+
 function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
 	return user && typeof user === 'object' && typeof user.id === 'string'
 }
