@@ -147,7 +147,7 @@ async function seed() {
 			username: 'pat',
 			name: 'Pat',
 			image: { create: patImages.patUser },
-			password: { create: createPassword('patrocks!0') },
+			password: { create: createPassword('remixpat') },
 			connections: {
 				create: { providerName: 'github', providerId: githubUser.profile.id },
 			},

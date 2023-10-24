@@ -27,7 +27,10 @@ export interface NavSearchProps
 }
 
 const NavSearch = React.forwardRef<HTMLElement, NavSearchProps>(
-	({ className, variant, asChild = false, ...props }) => {
+	({ className, variant, asChild = false, ...props }, ref) => {
+		if (ref && typeof ref !== 'function') {
+			throw new Error('Ref must be a function')
+		}
 		const matches = useMatches()
 		const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
 		const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
@@ -38,6 +41,7 @@ const NavSearch = React.forwardRef<HTMLElement, NavSearchProps>(
 		return (
 			<Comp
 				className={cn(navSearchVariants({ variant, className }))}
+				ref={ref}
 				{...props}
 			>
 				{searchBar}

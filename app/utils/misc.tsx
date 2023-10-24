@@ -343,3 +343,15 @@ export async function downloadFile(url: string, retries: number = 0) {
 		return downloadFile(url, retries + 1)
 	}
 }
+
+/**
+ * Compare two strings ignoring line breaks
+ */
+export function compareStringsIgnoreLineBreaks(
+	str1: string,
+	str2: string,
+): boolean {
+	str1 = str1.replace(/\r?\n|\r/g, '')
+	str2 = str2.replace(/\r?\n|\r/g, '')
+	return str1 === str2
+}
