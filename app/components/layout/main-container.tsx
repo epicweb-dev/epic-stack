@@ -23,11 +23,15 @@ export interface MainContainerProps
 }
 
 const MainContainer = React.forwardRef<HTMLElement, MainContainerProps>(
-	({ className, variant, asChild = false, ...props }) => {
+	({ className, variant, asChild = false, ...props }, ref) => {
+		if (ref && typeof ref !== 'function') {
+			throw new Error('Ref must be a function')
+		}
 		const Comp = asChild ? Slot : 'div'
 		return (
 			<Comp
 				className={cn(mainContainerVariants({ variant, className }))}
+				ref={ref}
 				{...props}
 			/>
 		)
