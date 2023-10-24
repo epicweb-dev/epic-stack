@@ -68,6 +68,8 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@rperon](https://github.com/rperon): An example of the Epic Stack with passkeys
   using [remix-auth-webauthn](https://github.com/alexanderson1993/remix-auth-webauthn) and 
   [remix-auth](https://npm.im/remix-auth).
+- [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email):
+  An example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of [react-email](https://react.email/)
 
 ## How to contribute
 
