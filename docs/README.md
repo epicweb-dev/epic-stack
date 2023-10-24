@@ -6,7 +6,7 @@ ground running on their web applications.
 We recommend you watch Kent's introduction to the Epic Stack to get an
 understanding of the "why" behind the Stack:
 
-[![screenshot of a YouTube video](https://github.com/epicweb-dev/epic-stack/assets/1500684/6beafa78-41c6-47e1-b999-08d3d3e5cb57)](https://www.youtube.com/watch?v=yMK5SVRASxM)
+[![Epic Stack Talk slide showing Flynn Rider with knives, the text "I've been around and I've got opinions" and Kent speaking in the corner](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/277818553-47158e68-4efc-43ae-a477-9d1670d4217d.png)](https://www.epicweb.dev/talks/the-epic-stack)
 
 More of a reader? Read [the announcement post](https://epicweb.dev/epic-stack)
 or
