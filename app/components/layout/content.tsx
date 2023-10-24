@@ -25,6 +25,9 @@ export interface ContentProps
 
 const Content = React.forwardRef<HTMLElement, ContentProps>(
 	({ className, variant, asChild = false, ...props }, ref) => {
+		if (ref && typeof ref !== 'function') {
+			throw new Error('Ref must be a function')
+		}
 		const Comp = asChild ? Slot : 'div'
 		return (
 			<Comp
