@@ -1,40 +1,87 @@
 import { test, expect } from '#tests/playwright-utils.ts'
-import { clickLink, fillSubmitForm, goTo } from '#tests/utils/page-utils.ts'
+import { clickLink, goTo } from '#tests/utils/page-utils.ts'
 import { expectURL } from '#tests/utils/url-utils.ts'
-import { createNote } from './notes-utils.ts'
+import {
+	createNote,
+	expectCreatedNotePage,
+	expectFieldInvalid,
+	expectNewNotePage,
+	expectNoteHeading,
+	fillAndSubmitNoteForm,
+	goToUserNotes,
+} from './notes-utils.ts'
 
 test.describe('Users cannot create notes', () => {
-	test('when not logged in', async ({ page, login }) => {
-		await goTo(page, '/users/username/notes/new')
-		await expectURL({ page, url: /\/login/ })
+	test.describe('when not authorized', () => {
+		test('when not logged in', async ({ page, login }) => {
+			await goTo(page, '/users/username/notes/new')
+			await expectURL({ page, url: /\/login/ })
+		})
+
+		// TODO: what to do when this happens?
+		// test('when logged in as another user', async ({ page, login }) => {
+		// 	const user = await login()
+		// 	const anotherUser = await login()
+		// 	await goTo(page, `/users/${anotherUser.username}/notes/new`)
+		// 	await expectURL({ page, url: new RegExp(`/users/${user.username}/notes`) })
+		// })
 	})
 
-	// TODO: what to do when this happens?
-	// test('when logged in as another user', async ({ page, login }) => {
-	// 	const user = await login()
-	// 	const anotherUser = await login()
-	// 	await goTo(page, `/users/${anotherUser.username}/notes/new`)
-	// 	await expectURL({ page, url: new RegExp(`/users/${user.username}/notes`) })
-	// })
+	test.describe('when form is incomplete', () => {
+		test('when title is missing', async ({ page, login }) => {
+			const user = await login()
+
+			await goToUserNotes(page, user.username)
+			await clickLink(page, 'New Note')
+
+			const newNote = createNote()
+			await fillAndSubmitNoteForm(page, '', newNote.content)
+
+			await expectNewNotePage(page, user.username)
+			await expectFieldInvalid(page, 'title')
+		})
+
+		test('when content is missing', async ({ page, login }) => {
+			const user = await login()
+
+			await goToUserNotes(page, user.username)
+			await clickLink(page, 'New Note')
+
+			const newNote = createNote()
+			await fillAndSubmitNoteForm(page, newNote.title, '')
+
+			await expectNewNotePage(page, user.username)
+			await expectFieldInvalid(page, 'content')
+		})
+	})
 })
 
-test('Users can create notes', async ({ page, login }) => {
-	const user = await login()
-	await goTo(page, `/users/${user.username}/notes`)
+test.describe('Users can create notes', () => {
+	test('with completed form', async ({ page, login }) => {
+		const user = await login()
 
-	const newNote = createNote()
-	await clickLink(page, 'New Note')
+		await goToUserNotes(page, user.username)
+		await clickLink(page, 'New Note')
 
-	await fillSubmitForm({
-		page,
-		fields: [
-			{ role: 'textbox', name: 'title', value: newNote.title },
-			{ role: 'textbox', name: 'content', value: newNote.content },
-		],
-		submit: true,
+		// find links with href prefix
+		const noteLinks = page
+			.getByRole('main')
+			.getByRole('list')
+			.getByRole('listitem')
+			.getByRole('link')
+		const countBefore = await noteLinks.count()
+
+		const newNote = createNote()
+		await fillAndSubmitNoteForm(page, newNote.title, newNote.content)
+
+		await expectCreatedNotePage(page, user.username)
+		await expectNoteHeading(page, newNote.title)
+
+		// check for new note in list
+		const countAfter = await noteLinks.count()
+		expect(countAfter).toEqual(countBefore + 1)
 	})
 
-	// successful redirect
-	await expectURL({ page, url: new RegExp(`/users/${user.username}/notes/.*`) })
-	await expect(page.getByRole('heading', { name: newNote.title })).toBeVisible()
+	// https://playwright.dev/docs/api/class-filechooser
+	test('with completed form and an image', async ({ page, login }) => {})
 })

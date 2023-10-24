@@ -9,6 +9,10 @@ export const clickLink = async (page: Page, name: string) => {
 	await page.getByRole('link', { name: new RegExp(name, 'i') }).click()
 }
 
+export const clickButton = async (page: Page, name: string) => {
+	await page.getByRole('button', { name: new RegExp(name, 'i') }).click()
+}
+
 interface FieldProps {
 	role: RoleType
 	name: string
