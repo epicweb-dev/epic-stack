@@ -23,11 +23,15 @@ export interface ListItemProps
 }
 
 const ListItem = React.forwardRef<HTMLElement, ListItemProps>(
-	({ className, variant, asChild = false, ...props }) => {
+	({ className, variant, asChild = false, ...props }, ref) => {
+		if (ref && typeof ref !== 'function') {
+			throw new Error('Ref must be a function')
+		}
 		const Comp = asChild ? Slot : 'li'
 		return (
 			<Comp
 				className={cn(listItemVariants({ variant, className }))}
+				ref={ref}
 				{...props}
 			/>
 		)

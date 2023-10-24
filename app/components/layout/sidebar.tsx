@@ -22,11 +22,15 @@ export interface SidebarProps
 }
 
 const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
-	({ className, variant, asChild = false, ...props }) => {
+	({ className, variant, asChild = false, ...props }, ref) => {
+		if (ref && typeof ref !== 'function') {
+			throw new Error('Ref must be a function')
+		}
 		const Comp = asChild ? Slot : 'aside'
 		return (
 			<Comp
 				className={cn(sidebarVariants({ variant, className }))}
+				ref={ref}
 				{...props}
 			/>
 		)
