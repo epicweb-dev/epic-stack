@@ -23,7 +23,7 @@ export default function Index() {
 							<h1 className="text-center text-mega font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
 								<a
 									className="block uppercase text-white drop-shadow-md"
-									href="https://www.epicweb.dev/stack"
+									href="https://github.com/goodeats/epic-pat-stack"
 								>
 									<span>Epic Pat Stack</span>
 									<svg
