@@ -20,7 +20,7 @@ import typescript from './typescript.svg'
 import vitest from './vitest.svg'
 import zod from './zod.svg'
 
-export { default as stars } from './stars.jpg'
+export { default as triangles } from './triangles.png'
 
 export const logos = [
 	{
