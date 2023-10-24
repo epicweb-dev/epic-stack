@@ -3,7 +3,6 @@ import { parse } from '@conform-to/zod'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import {
 	Form,
-	Link,
 	useActionData,
 	useLoaderData,
 	type MetaFunction,
@@ -12,27 +11,14 @@ import { formatDistanceToNow } from 'date-fns'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
-import {
-	Content,
-	ContentActionbar,
-	ContentBody,
-	ContentHeader,
-	ContentImages,
-} from '#app/components/layout/index.ts'
 import { PageContentShow } from '#app/components/templates/index.ts'
-import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	getNoteImgSrc,
-	invariantResponse,
-	useIsPending,
-} from '#app/utils/misc.tsx'
+import { invariantResponse, useIsPending } from '#app/utils/misc.tsx'
 import {
 	requireUserWithPermission,
 	userHasPermission,
