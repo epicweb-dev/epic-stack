@@ -210,7 +210,7 @@ function CacheKeyRow({
 	const valuePage = `/admin/cache/${type}/${encodedKey}?instance=${instance}`
 	return (
 		<div className="flex items-center gap-2 font-mono">
-			<fetcher.Form method="post">
+			<fetcher.Form method="POST">
 				<input type="hidden" name="cacheKey" value={cacheKey} />
 				<input type="hidden" name="instance" value={instance} />
 				<input type="hidden" name="type" value={type} />

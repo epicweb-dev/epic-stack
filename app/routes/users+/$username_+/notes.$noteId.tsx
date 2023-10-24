@@ -170,7 +170,7 @@ export function DeleteNote({ id }: { id: string }) {
 	})
 
 	return (
-		<Form method="post" {...form.props}>
+		<Form method="POST" {...form.props}>
 			<AuthenticityTokenInput />
 			<input type="hidden" name="noteId" value={id} />
 			<StatusButton

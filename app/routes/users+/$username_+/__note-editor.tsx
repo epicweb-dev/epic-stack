@@ -207,7 +207,7 @@ export function NoteEditor({
 	return (
 		<div className="absolute inset-0">
 			<Form
-				method="post"
+				method="POST"
 				className="flex h-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden px-10 pb-28 pt-12"
 				{...form.props}
 				encType="multipart/form-data"
