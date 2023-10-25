@@ -1,6 +1,6 @@
 import { useInputEvent } from '@conform-to/react'
 import React, { useId, useRef } from 'react'
-import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Checkbox, type CheckboxProps } from '#app/components/index.ts'
 import { Input } from './ui/input.tsx'
 import { Label } from './ui/label.tsx'
 import { Textarea } from './ui/textarea.tsx'
@@ -19,7 +19,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-foreground-destructive text-[10px]">
+				<li key={e} className="text-[10px] text-foreground-destructive">
 					{e}
 				</li>
 			))}
