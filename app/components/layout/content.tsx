@@ -28,7 +28,6 @@ const Content = React.forwardRef<HTMLElement, ContentProps>(
 		if (ref && typeof ref !== 'function') {
 			throw new Error('Ref must be a function')
 		}
-
 		const Comp = asChild ? Slot : 'div'
 		return (
 			<Comp

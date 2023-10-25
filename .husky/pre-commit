@@ -5,7 +5,7 @@
 if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null ; then
     echo "🚨🚨🚨"
     echo "Port 3000 is already in use, please close the process and try again."
-    echo "🚨🚨🚨"
+    echo "🤡🤡🤡"
     exit 1
 else
     npm run build
