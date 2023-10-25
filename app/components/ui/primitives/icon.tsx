@@ -1,7 +1,7 @@
 import { type SVGProps } from 'react'
 import { cn } from '#app/utils/misc.tsx'
 import { type IconName } from '@/icon-name'
-import href from './icons/sprite.svg'
+import href from '../icons/sprite.svg'
 
 export { href }
 export { IconName }

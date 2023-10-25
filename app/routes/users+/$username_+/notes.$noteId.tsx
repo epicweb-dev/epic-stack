@@ -10,11 +10,13 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList } from '#app/components/forms.tsx'
-import { PageContentShow } from '#app/components/templates/index.ts'
-import { Icon } from '#app/components/ui/icon.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	ErrorList,
+	Icon,
+	GeneralErrorBoundary,
+	StatusButton,
+	PageContentShow,
+} from '#app/components/index.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'

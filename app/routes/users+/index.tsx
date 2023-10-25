@@ -1,9 +1,11 @@
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList } from '#app/components/forms.tsx'
-import { SearchBar } from '#app/components/search-bar.tsx'
+import {
+	ErrorList,
+	GeneralErrorBoundary,
+	SearchBar,
+} from '#app/components/index.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 

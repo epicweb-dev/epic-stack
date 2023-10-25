@@ -1,7 +1,10 @@
 import React, { useId } from 'react'
-import { Input } from '#app/components/ui/input.tsx'
-import { Label } from '#app/components/ui/label.tsx'
-import { Errors, type ListOfErrors } from './errors.tsx'
+import {
+	Input,
+	Label,
+	Errors,
+	type ListOfErrors,
+} from '#app/components/index.ts'
 
 export function Field({
 	labelProps,

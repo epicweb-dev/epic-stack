@@ -4,7 +4,7 @@ import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '#app/components/ui/tooltip.tsx'
+} from '#app/components/index.ts'
 import { logos, triangles } from './logos/logos.ts'
 
 export const meta: MetaFunction = () => [{ title: 'Epic Pat Remix Stack' }]

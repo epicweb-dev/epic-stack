@@ -23,12 +23,16 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
-import { ErrorList, Field, TextareaField } from '#app/components/forms.tsx'
-import { Button } from '#app/components/index.ts'
-import { Icon } from '#app/components/ui/icon.tsx'
-import { Label } from '#app/components/ui/label.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { Textarea } from '#app/components/ui/textarea.tsx'
+import {
+	Button,
+	Icon,
+	Label,
+	ErrorList,
+	Field,
+	Textarea,
+	TextareaField,
+	StatusButton,
+} from '#app/components/index.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'

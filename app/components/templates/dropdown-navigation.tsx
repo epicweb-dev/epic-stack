@@ -1,14 +1,15 @@
 import { Link, useSubmit, Form } from '@remix-run/react'
 import React, { useRef } from 'react'
-import { Button } from '#app/components/index.ts'
 import {
+	Button,
 	DropdownMenu,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuPortal,
-} from '#app/components/ui/dropdown-menu.tsx'
-import { Icon, type IconName } from '../ui/icon.tsx'
+	Icon,
+	type IconName,
+} from '#app/components/index.ts'
 
 interface DropdownNavigationMenuItem {
 	label: string

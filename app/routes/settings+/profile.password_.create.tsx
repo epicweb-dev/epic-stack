@@ -3,10 +3,13 @@ import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useActionData } from '@remix-run/react'
-import { ErrorList, Field } from '#app/components/forms.tsx'
-import { Button } from '#app/components/index.ts'
-import { Icon } from '#app/components/ui/icon.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	Button,
+	ErrorList,
+	Field,
+	Icon,
+	StatusButton,
+} from '#app/components/index.ts'
 import { getPasswordHash, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'

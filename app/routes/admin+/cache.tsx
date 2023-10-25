@@ -8,9 +8,7 @@ import {
 	useSearchParams,
 	useSubmit,
 } from '@remix-run/react'
-import { Field } from '#app/components/forms.tsx'
-import { Button } from '#app/components/index.ts'
-import { Spacer } from '#app/components/spacer.tsx'
+import { Button, Field, Spacer } from '#app/components/index.ts'
 import {
 	cache,
 	getAllCacheKeys,

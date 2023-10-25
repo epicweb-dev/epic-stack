@@ -16,9 +16,13 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
-import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	CheckboxField,
+	ErrorList,
+	Field,
+	Spacer,
+	StatusButton,
+} from '#app/components/index.ts'
 import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
 import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'

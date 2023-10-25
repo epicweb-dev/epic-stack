@@ -1,9 +1,8 @@
 import { useForm } from '@conform-to/react'
 import { useFetcher } from '@remix-run/react'
-import { Icon } from '#app/components/ui/icon.tsx'
+import { ErrorList, Icon } from '#app/components/index.ts'
 import { type action, useOptimisticThemeMode } from '#app/root.tsx'
 import { type Theme } from '#app/utils/theme.server.ts'
-import { ErrorList } from '../forms.tsx'
 
 // TODO: move loader/action here
 

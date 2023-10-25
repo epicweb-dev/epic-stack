@@ -1,8 +1,7 @@
 import { Link } from '@remix-run/react'
-import { Button } from '#app/components/index.ts'
+import { Button, Icon, type IconName } from '#app/components/index.ts'
 import { DeleteNote } from '#app/routes/users+/$username_+/notes.$noteId.tsx'
 import { floatingToolbarClassName } from '../floating-toolbar.tsx'
-import { Icon, type IconName } from '../ui/icon.tsx'
 
 interface ContentActionbarProps {
 	timestamp?: string

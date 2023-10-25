@@ -11,9 +11,12 @@ import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, Field } from '#app/components/forms.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	ErrorList,
+	Field,
+	GeneralErrorBoundary,
+	StatusButton,
+} from '#app/components/index.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,

@@ -11,10 +11,14 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
-import { StatusButton } from '#app/components/ui/status-button.tsx'
+import {
+	CheckboxField,
+	ErrorList,
+	Field,
+	StatusButton,
+	GeneralErrorBoundary,
+	Spacer,
+} from '#app/components/index.ts'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import {
 	getUserId,

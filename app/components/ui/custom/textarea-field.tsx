@@ -1,7 +1,10 @@
 import React, { useId } from 'react'
-import { Label } from '#app/components/ui/label.tsx'
-import { Textarea } from '#app/components/ui/textarea.tsx'
-import { ErrorList, type ListOfErrors } from './errors.tsx'
+import {
+	Textarea,
+	Label,
+	ErrorList,
+	type ListOfErrors,
+} from '#app/components/index.ts'
 
 export function TextareaField({
 	labelProps,
