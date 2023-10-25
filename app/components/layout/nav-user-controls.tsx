@@ -1,8 +1,8 @@
 import { Link } from '@remix-run/react'
+import { Button } from '#app/components/index.ts'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
 import { useOptionalUser, useUser } from '#app/utils/user.ts'
 import DropdownNavigation from '../templates/dropdown-navigation.tsx'
-import { Button } from '../ui/button.tsx'
 
 function NavUserControls() {
 	const user = useOptionalUser()

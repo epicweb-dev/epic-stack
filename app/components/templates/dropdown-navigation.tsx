@@ -1,6 +1,6 @@
 import { Link, useSubmit, Form } from '@remix-run/react'
 import React, { useRef } from 'react'
-import { Button } from '#app/components/ui/button.tsx'
+import { Button } from '#app/components/index.ts'
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
