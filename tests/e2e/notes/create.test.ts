@@ -1,6 +1,6 @@
 import { test, expect } from '#tests/playwright-utils.ts'
 import { clickLink, goTo } from '#tests/utils/page-utils.ts'
-import { expectURL } from '#tests/utils/url-utils.ts'
+import { expectUrl } from '#tests/utils/url-utils.ts'
 import {
 	createNote,
 	expectCreatedNotePage,
@@ -15,7 +15,7 @@ test.describe('Users cannot create notes', () => {
 	test.describe('when not authorized', () => {
 		test('when not logged in', async ({ page, login }) => {
 			await goTo(page, '/users/username/notes/new')
-			await expectURL({ page, url: /\/login/ })
+			await expectUrl({ page, url: /\/login/ })
 		})
 
 		// TODO: what to do when this happens?
@@ -23,7 +23,7 @@ test.describe('Users cannot create notes', () => {
 		// 	const user = await login()
 		// 	const anotherUser = await login()
 		// 	await goTo(page, `/users/${anotherUser.username}/notes/new`)
-		// 	await expectURL({ page, url: new RegExp(`/users/${user.username}/notes`) })
+		// 	await expectUrl({ page, url: new RegExp(`/users/${user.username}/notes`) })
 		// })
 	})
 

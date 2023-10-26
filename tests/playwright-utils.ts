@@ -45,6 +45,20 @@ async function getOrInsertUser({
 		username ??= userData.username
 		password ??= userData.username
 		email ??= userData.email
+
+		// create roles if they don't exist
+		for (const role of roles) {
+			const existingRole = await prisma.role.findUnique({
+				where: { name: role },
+			})
+
+			if (!existingRole) {
+				await prisma.role.create({
+					data: { name: role },
+				})
+			}
+		}
+
 		return await prisma.user.create({
 			select,
 			data: {

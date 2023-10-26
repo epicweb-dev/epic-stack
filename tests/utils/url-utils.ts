@@ -5,7 +5,7 @@ interface ExpectURLProps {
 	url: string | RegExp
 }
 
-export async function expectURL({ page, url }: ExpectURLProps) {
+export async function expectUrl({ page, url }: ExpectURLProps) {
 	await expect(page).toHaveURL(url)
 }
 
@@ -21,6 +21,5 @@ export async function expectLoginUrl({
 	const expectedUrl = redirectTo
 		? `/login?redirectTo=${encodeURIComponent(redirectTo)}`
 		: '/login'
-	await expectURL({ page, url: expectedUrl })
-	// await expectURL({ page, url: '/login' })
+	await expectUrl({ page, url: expectedUrl })
 }

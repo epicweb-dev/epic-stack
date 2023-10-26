@@ -9,7 +9,7 @@ import {
 	expectNoLink,
 	goTo,
 } from '#tests/utils/page-utils.ts'
-import { expectURL } from '#tests/utils/url-utils.ts'
+import { expectUrl } from '#tests/utils/url-utils.ts'
 
 export async function goToUserPage(page: Page, username: string) {
 	await goTo(page, `/users/${username}`)
@@ -17,7 +17,7 @@ export async function goToUserPage(page: Page, username: string) {
 
 export async function expectUserPage(page: Page, username: string) {
 	const url = `/users/${username}`
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 async function getUser(username: string) {

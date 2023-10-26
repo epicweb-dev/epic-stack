@@ -8,6 +8,7 @@ import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
+import { redirectWithToast } from './toast.server.ts'
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
 export const getSessionExpirationDate = () =>
@@ -59,6 +60,22 @@ export async function requireUserId(
 			.filter(Boolean)
 			.join('?')
 		throw redirect(loginRedirect)
+	}
+	return userId
+}
+
+export async function requireAdminUserId(request: Request) {
+	const userId = await requireUserId(request)
+	const user = await prisma.user.findFirst({
+		select: { id: true },
+		where: { id: userId, roles: { some: { name: 'admin' } } },
+	})
+	if (!user) {
+		throw await redirectWithToast(request.headers.get('Referer') ?? '/', {
+			title: 'Unauthorized',
+			description: `You do not have permission to access this page.`,
+			type: 'error',
+		})
 	}
 	return userId
 }

@@ -3,7 +3,7 @@ import { type Page } from '@playwright/test'
 import { prisma } from '#app/utils/db.server.ts'
 import { expect } from '#tests/playwright-utils.ts'
 import { fillSubmitForm, goTo } from '#tests/utils/page-utils.ts'
-import { expectURL } from '#tests/utils/url-utils.ts'
+import { expectUrl } from '#tests/utils/url-utils.ts'
 
 export interface TestNote {
 	title: string
@@ -53,17 +53,17 @@ export async function fillAndSubmitNoteForm(
 
 export async function expectNotesPage(page: Page, username: string) {
 	const url = `/users/${username}/notes`
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 export async function expectNewNotePage(page: Page, username: string) {
 	const url = `/users/${username}/notes/new`
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 export async function expectCreatedNotePage(page: Page, username: string) {
 	const url = new RegExp(`/users/${username}/notes/.*`)
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 export async function expectNotePage(
@@ -72,7 +72,7 @@ export async function expectNotePage(
 	noteId: string,
 ) {
 	const url = `/users/${username}/notes/${noteId}`
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 export async function expectNoteEditPage(
@@ -81,7 +81,7 @@ export async function expectNoteEditPage(
 	noteId: string,
 ) {
 	const url = `/users/${username}/notes/${noteId}/edit`
-	await expectURL({ page, url })
+	await expectUrl({ page, url })
 }
 
 export async function expectFieldInvalid(page: Page, fieldName: string) {
