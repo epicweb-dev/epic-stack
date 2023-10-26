@@ -17,6 +17,7 @@ type GetOrInsertUserOptions = {
 	username?: UserModel['username']
 	password?: string
 	email?: UserModel['email']
+	roles?: string[]
 }
 
 type User = {
@@ -31,6 +32,7 @@ async function getOrInsertUser({
 	username,
 	password,
 	email,
+	roles = ['user'],
 }: GetOrInsertUserOptions = {}): Promise<User> {
 	const select = { id: true, email: true, username: true, name: true }
 	if (id) {
@@ -49,7 +51,7 @@ async function getOrInsertUser({
 				...userData,
 				email,
 				username,
-				roles: { connect: { name: 'user' } },
+				roles: { connect: roles.map(role => ({ name: role })) },
 				password: { create: { hash: await getPasswordHash(password) } },
 			},
 		})

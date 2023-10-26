@@ -6,6 +6,7 @@ import {
 	GeneralErrorBoundary,
 	SearchBar,
 } from '#app/components/index.ts'
+import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 
@@ -19,6 +20,8 @@ const UserSearchResultSchema = z.object({
 const UserSearchResultsSchema = z.array(UserSearchResultSchema)
 
 export async function loader({ request }: DataFunctionArgs) {
+	await requireUserId(request)
+
 	const searchTerm = new URL(request.url).searchParams.get('search')
 	if (searchTerm === '') {
 		return redirect('/users')

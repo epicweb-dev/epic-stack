@@ -1,7 +1,8 @@
 import { invariant } from '#app/utils/misc.tsx'
 import { expect, test } from '#tests/playwright-utils.ts'
 
-test('Search from home page', async ({ page, insertNewUser }) => {
+test('Search from home page', async ({ page, login, insertNewUser }) => {
+	await login()
 	const newUser = await insertNewUser()
 	await page.goto('/')
 

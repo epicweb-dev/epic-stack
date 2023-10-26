@@ -1,10 +1,9 @@
 import { test } from '#tests/playwright-utils.ts'
-import { clickLink } from '#tests/utils/page-utils.ts'
+import { clickLink, expectNoButton } from '#tests/utils/page-utils.ts'
 import {
 	createNote,
 	createPrismaNote,
 	expectFieldInvalid,
-	expectNoButton,
 	expectNoteEditPage,
 	expectNoteHeading,
 	expectNotePage,

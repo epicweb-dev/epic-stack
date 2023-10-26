@@ -96,10 +96,6 @@ export async function expectNoteHeading(page: Page, title: string) {
 	).toBeVisible()
 }
 
-export async function expectNoButton(page: Page, name: string) {
-	await expect(page.getByRole('button', { name })).not.toBeVisible()
-}
-
 export async function getNoteLinks(page: Page) {
 	return page
 		.getByRole('main')

@@ -1,8 +1,7 @@
 import { test, expect } from '#tests/playwright-utils.ts'
-import { clickButton } from '#tests/utils/page-utils.ts'
+import { clickButton, expectNoButton } from '#tests/utils/page-utils.ts'
 import {
 	createPrismaNote,
-	expectNoButton,
 	expectNotesPage,
 	goToUserNote,
 } from './notes-utils.ts'

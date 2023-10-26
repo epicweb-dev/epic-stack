@@ -33,6 +33,7 @@ test.describe('Users cannot create notes', () => {
 
 			await goToUserNotes(page, user.username)
 			await clickLink(page, 'New Note')
+			await expectNewNotePage(page, user.username)
 
 			const newNote = createNote()
 			await fillAndSubmitNoteForm(page, '', newNote.content)
@@ -46,6 +47,7 @@ test.describe('Users cannot create notes', () => {
 
 			await goToUserNotes(page, user.username)
 			await clickLink(page, 'New Note')
+			await expectNewNotePage(page, user.username)
 
 			const newNote = createNote()
 			await fillAndSubmitNoteForm(page, newNote.title, '')
@@ -62,6 +64,7 @@ test.describe('Users can create notes', () => {
 
 		await goToUserNotes(page, user.username)
 		await clickLink(page, 'New Note')
+		await expectNewNotePage(page, user.username)
 
 		// find links with href prefix
 		const noteLinks = page

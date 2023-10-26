@@ -2,11 +2,14 @@ import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Button, Icon, Spacer } from '#app/components/index.ts'
+import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getUserImgSrc, invariantResponse } from '#app/utils/misc.tsx'
+import { userHasRole } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ request, params }: DataFunctionArgs) {
+	await requireUserId(request)
 	const user = await prisma.user.findFirst({
 		select: {
 			id: true,
@@ -14,6 +17,7 @@ export async function loader({ params }: DataFunctionArgs) {
 			username: true,
 			createdAt: true,
 			image: { select: { id: true } },
+			roles: { select: { name: true, permissions: true } },
 		},
 		where: {
 			username: params.username,
@@ -22,12 +26,18 @@ export async function loader({ params }: DataFunctionArgs) {
 
 	invariantResponse(user, 'User not found', { status: 404 })
 
-	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
+	const isAdmin = userHasRole(user, 'admin')
+
+	return json({
+		user,
+		isAdmin,
+		userJoinedDisplay: user.createdAt.toLocaleDateString(),
+	})
 }
 
 export default function ProfileRoute() {
 	const data = useLoaderData<typeof loader>()
-	const user = data.user
+	const { user, isAdmin } = data
 	const userDisplayName = user.name ?? user.username
 	const loggedInUser = useOptionalUser()
 	const isLoggedInUser = data.user.id === loggedInUser?.id
@@ -58,6 +68,9 @@ export default function ProfileRoute() {
 					<p className="mt-2 text-center text-muted-foreground">
 						Joined {data.userJoinedDisplay}
 					</p>
+					{isAdmin ? (
+						<p className="mt-2 text-center text-muted-foreground">Admin</p>
+					) : null}
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">
 							<Button type="submit" variant="link" size="pill">
@@ -80,6 +93,13 @@ export default function ProfileRoute() {
 										Edit profile
 									</Link>
 								</Button>
+								{isAdmin ? (
+									<Button asChild>
+										<Link to="/admin" prefetch="intent">
+											Admin
+										</Link>
+									</Button>
+								) : null}
 							</>
 						) : (
 							<Button asChild>
