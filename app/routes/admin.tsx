@@ -1,12 +1,10 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import {
 	Main,
 	MainContainer,
 	MainContent,
-	Sidebar,
-	SidebarList,
 } from '#app/components/layout/index.ts'
 import { PageSidebar } from '#app/components/templates/index.ts'
 import { requireAdminUserId } from '#app/utils/auth.server.ts'
