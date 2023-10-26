@@ -231,7 +231,7 @@ function App() {
 	return (
 		<Document nonce={nonce} theme={theme} env={data.ENV}>
 			<div className="flex h-screen flex-col justify-between">
-				<PageHeader />
+				<PageHeader userId={data.user?.id} />
 
 				<div className="flex-1">
 					<Outlet />
