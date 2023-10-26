@@ -6,15 +6,16 @@ import { ListItem } from './list-item.tsx'
 import { List } from './list.tsx'
 
 interface SidebarAvatarProps {
-	isOwner: boolean
+	displayNew: boolean
 	items: OwnerListData[]
+	newTitle?: string
 }
 
 const navLinkDefaultClassName =
 	'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 
-function SidebarList({ isOwner, items }: SidebarAvatarProps) {
-	const newItem = () => {
+function SidebarList({ displayNew, items, newTitle }: SidebarAvatarProps) {
+	const NewItem = () => {
 		return (
 			<ListItem variant="sidebar">
 				<NavLink
@@ -23,7 +24,7 @@ function SidebarList({ isOwner, items }: SidebarAvatarProps) {
 						cn(navLinkDefaultClassName, isActive && 'bg-accent')
 					}
 				>
-					<Icon name="plus">New Note</Icon>
+					<Icon name="plus">{newTitle || 'Create New'}</Icon>
 				</NavLink>
 			</ListItem>
 		)
@@ -31,7 +32,7 @@ function SidebarList({ isOwner, items }: SidebarAvatarProps) {
 
 	return (
 		<List variant="sidebar">
-			{isOwner ? newItem() : null}
+			{displayNew ? <NewItem /> : null}
 			{items.map(item => (
 				<ListItem key={item.id} variant="sidebar">
 					<NavLink

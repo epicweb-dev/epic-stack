@@ -33,7 +33,15 @@ export default function NotesRoute() {
 	return (
 		<Main>
 			<MainContainer>
-				<PageSidebar owner={owner} title="Notes" list={owner.notes} />
+				<PageSidebar
+					owner={owner}
+					title="Notes"
+					headerLink={`/users/${owner.username}`}
+					avatar={true}
+					list={owner.notes}
+					newTitle="New Note"
+					displayNew
+				/>
 				<MainContent>
 					<Outlet />
 				</MainContent>

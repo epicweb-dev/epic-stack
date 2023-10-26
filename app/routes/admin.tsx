@@ -1,10 +1,12 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Link, Outlet, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import {
 	Main,
 	MainContainer,
 	MainContent,
+	Sidebar,
+	SidebarList,
 } from '#app/components/layout/index.ts'
 import { PageSidebar } from '#app/components/templates/index.ts'
 import { requireAdminUserId } from '#app/utils/auth.server.ts'
@@ -29,10 +31,11 @@ export async function loader({ request }: DataFunctionArgs) {
 export default function AdminRoute() {
 	const data = useLoaderData<typeof loader>()
 	const { user } = data
+
 	return (
 		<Main>
 			<MainContainer>
-				<PageSidebar owner={user} title="Admin" list={[]} />
+				<PageSidebar owner={user} title="Admin" headerLink="/admin" list={[]} />
 				<MainContent>
 					<Outlet />
 				</MainContent>
