@@ -1,5 +1,45 @@
 # Database
 
+## Primary Instance
+
+The way that LiteFS works is that it has a "primary instance" that is the only
+instance that can write to the database. All other instances are "replicas" that
+can only read from the database. This is a pretty common pattern for databases
+and it's how Fly's Postgres service works as well.
+
+The primary instance is determined by Fly's [consul](https://www.consul.io/)
+service and can change over time. By default, all instances are allowed to be
+primary instances. However, writes will be slower for people who are not
+geographically close to the primary instance, so the Epic Stack has configured
+consul to only allow instances in the primary region and it's recommended that
+you choose a primary region that's closest to most of your users. This
+configuration can be found in `other/litefs.yml`. The `PRIMARY_REGION` is
+determined from the `primary_region` property in the `fly.toml` file.
+
+When you initialize an Epic Stack app, it will ask you which region you wish to
+deploy to and this will set the `primary_region` in the `fly.toml` file. It is
+recommended that you deploy two instances in this region so you have zero
+downtime deploys.
+
+You can determine which instance is the primary instance by running the
+following command:
+
+```sh
+fly status --app [YOUR_APP_NAME]
+```
+
+This will show you a table of all your instances and the primary instance will
+have "ROLE" set to "primary".
+
+To deploy more regions, you can run `fly scale count`. For example, if I wanted
+to have two instances in `sjc` (my primary region) and one in `ams`, I would
+run:
+
+```sh
+fly scale count 2 --region sjc
+fly scale count 1 --region ams
+```
+
 ## Connecting to your production database
 
 The location of the sqlite database is kinda funny. The real location is in
@@ -33,10 +73,11 @@ To work with Prisma Studio and your deployed app's database, simply open
 > **Note**: You may want to add `--select` to the `fly ssh console` command to
 > select the instance you want to connect to if you have multiple instances
 > running. Otherwise you could connect to a non-primary instance. The easiest
-> way to determine the primary instance (because it can change) is to open your
-> deployed application and check the request headers. One of them will be
-> `Fly-Primary-Instance` which will tell you the instance ID of the primary
-> instance.
+> way to determine the primary instance (because it can change) is to run
+> `fly status` and the row that has "ROLE" set to "primary" is the primary
+> instance. Alternatively, you can open the deployed application and check the
+> request headers. One of them will be `Fly-Primary-Instance` which will tell
+> you the instance ID of the primary instance.
 
 ## Migrations
 
@@ -109,8 +150,8 @@ if what you need to seed is a lot of data), so here's an easy way to help out:
    sqlite3 seed.db .dump > seed.sql
    ```
 1. Copy the relevant bits from the `seed.sql` file into your `migration.sql`
-   file (it will include create table/index lines etc. You probably just want
-   `INSERT` commands).
+   file. The `seed.sql` will include create table/index lines etc. which should
+   already be in your `migration.sql`. You probably just want `INSERT` commands.
 1. Deploy your app and verify that the data was seeded correctly.
 
 If your app has already applied all migrations, then the changes to the
@@ -127,7 +168,7 @@ fly ssh console -C "npx prisma migrate reset --skip-seed --force" --app [YOUR_AP
 If you have existing data in your production database and you'd like to seed it
 with more data without performing a migration, then it's a bit more involved.
 
-1. Backup your production database (lol).
+1. Backup your production database.
 1. Create a new database file (locally) with the data you want to seed.
 1. Create a "dump" of the seed database using the `sqlite3` command line tool.
    ```sh nonumber
