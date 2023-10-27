@@ -20,12 +20,7 @@ import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { type prometheus as prometheusType } from '#server/prometheus.server.ts'
-// @ts-ignore - this file may not exist if you haven't built yet, but it will
-// definitely exist by the time the dev or prod server actually runs.
-import { prometheus as _prometheus } from '#server-build/prometheus.server.js'
-
-const prometheus = _prometheus as typeof prometheusType
+import { prometheus } from './prometheus.server.ts'
 
 installGlobals()
 
