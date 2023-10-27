@@ -93,6 +93,12 @@ app.use(
 // more aggressive with this caching.
 app.use(express.static('public', { maxAge: '1h' }))
 
+app.get(['/build/*', '/img/*', '/fonts/*', '/favicons/*'], (req, res) => {
+	// if we made it past the express.static for these, then we're missing something.
+	// So we'll just send a 404 and won't bother calling other middleware.
+	return res.status(404).send('Not found')
+})
+
 app.use((req, res, next) => {
 	const start = Date.now()
 	res.on('finish', () => {
