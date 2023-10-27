@@ -1,6 +1,7 @@
 import { remember } from '@epic-web/remember'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, type Prisma } from '@prisma/client'
 import chalk from 'chalk'
+import { prometheus } from '#server/prometheus.server.ts'
 
 export const prisma = remember('prisma', () => {
 	// NOTE: if you change anything in this function you'll need to restart
@@ -17,6 +18,7 @@ export const prisma = remember('prisma', () => {
 		],
 	})
 	client.$on('query', async e => {
+		recordMetrics(e)
 		if (e.duration < logThreshold) return
 		const color =
 			e.duration < logThreshold * 1.1
@@ -34,3 +36,9 @@ export const prisma = remember('prisma', () => {
 	client.$connect()
 	return client
 })
+
+const recordMetrics = (e: Prisma.QueryEvent) => {
+	prometheus.sqlQueryCounter.inc({ query: e.query })
+	prometheus.sqlQueryDuration.observe({ query: e.query }, e.duration)
+	prometheus.sqlQueryDurationSummary.observe({ query: e.query }, e.duration)
+}

@@ -15,6 +15,10 @@ destination = "/data"
 [deploy]
 release_command = "node ./other/sentry-create-release"
 
+[metrics]
+port = 9091
+path = "/metrics"
+
 [[services]]
 internal_port = 8080
 processes = [ "app" ]

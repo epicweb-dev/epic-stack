@@ -87,6 +87,7 @@
     "lru-cache": "^10.0.1",
     "morgan": "^1.10.0",
     "prisma": "^5.3.1",
+    "prom-client": "^15.0.0",
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
