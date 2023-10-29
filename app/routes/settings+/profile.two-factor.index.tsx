@@ -52,9 +52,7 @@ export default function TwoFactorRoute() {
 			{data.is2FAEnabled ? (
 				<>
 					<p className="text-lg">
-						<Icon name="check">
-							You have enabled two-factor authentication.
-						</Icon>
+						<Icon name="check">You have enabled two-factor authentication.</Icon>
 					</p>
 					<Link to="disable">
 						<Icon name="lock-open-1">Disable 2FA</Icon>
@@ -63,14 +61,11 @@ export default function TwoFactorRoute() {
 			) : (
 				<>
 					<p>
-						<Icon name="lock-open-1">
-							You have not enabled two-factor authentication yet.
-						</Icon>
+						<Icon name="lock-open-1">You have not enabled two-factor authentication yet.</Icon>
 					</p>
 					<p className="text-sm">
-						Two factor authentication adds an extra layer of security to your
-						account. You will need to enter a code from an authenticator app
-						like{' '}
+						Two factor authentication adds an extra layer of security to your account. You will need
+						to enter a code from an authenticator app like{' '}
 						<a className="underline" href="https://1password.com/">
 							1Password
 						</a>{' '}

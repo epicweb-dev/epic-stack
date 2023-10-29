@@ -14,9 +14,7 @@ test('Users can update their basic info', async ({ page, login }) => {
 	const newUserData = createUser()
 
 	await page.getByRole('textbox', { name: /^name/i }).fill(newUserData.name)
-	await page
-		.getByRole('textbox', { name: /^username/i })
-		.fill(newUserData.username)
+	await page.getByRole('textbox', { name: /^username/i }).fill(newUserData.username)
 
 	await page.getByRole('button', { name: /^save/i }).click()
 })
@@ -29,27 +27,21 @@ test('Users can update their password', async ({ page, login }) => {
 
 	await page.getByRole('link', { name: /change password/i }).click()
 
-	await page
-		.getByRole('textbox', { name: /^current password/i })
-		.fill(oldPassword)
+	await page.getByRole('textbox', { name: /^current password/i }).fill(oldPassword)
 	await page.getByRole('textbox', { name: /^new password/i }).fill(newPassword)
-	await page
-		.getByRole('textbox', { name: /^confirm new password/i })
-		.fill(newPassword)
+	await page.getByRole('textbox', { name: /^confirm new password/i }).fill(newPassword)
 
 	await page.getByRole('button', { name: /^change password/i }).click()
 
 	await expect(page).toHaveURL(`/settings/profile`)
 
 	const { username } = user
-	expect(
-		await verifyUserPassword({ username }, oldPassword),
-		'Old password still works',
-	).toEqual(null)
-	expect(
-		await verifyUserPassword({ username }, newPassword),
-		'New password does not work',
-	).toEqual({ id: user.id })
+	expect(await verifyUserPassword({ username }, oldPassword), 'Old password still works').toEqual(
+		null,
+	)
+	expect(await verifyUserPassword({ username }, newPassword), 'New password does not work').toEqual(
+		{ id: user.id },
+	)
 })
 
 test('Users can update their profile photo', async ({ page, login }) => {
@@ -70,10 +62,9 @@ test('Users can update their profile photo', async ({ page, login }) => {
 
 	await page.getByRole('button', { name: /save/i }).click()
 
-	await expect(
-		page,
-		'Was not redirected after saving the profile photo',
-	).toHaveURL(`/settings/profile`)
+	await expect(page, 'Was not redirected after saving the profile photo').toHaveURL(
+		`/settings/profile`,
+	)
 
 	const afterSrc = await page
 		.getByRole('img', { name: user.name ?? user.username })

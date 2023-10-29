@@ -10,8 +10,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
 	const searchParams = new URL(request.url).searchParams
 	const currentInstanceInfo = await getInstanceInfo()
 	const allInstances = await getAllInstances()
-	const instance =
-		searchParams.get('instance') ?? currentInstanceInfo.currentInstance
+	const instance = searchParams.get('instance') ?? currentInstanceInfo.currentInstance
 	await ensureInstance(instance)
 
 	const { cacheKey } = params

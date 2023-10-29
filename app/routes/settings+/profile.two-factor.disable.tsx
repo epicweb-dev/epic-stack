@@ -45,8 +45,8 @@ export default function TwoFactorDisableRoute() {
 			<disable2FAFetcher.Form method="POST">
 				<AuthenticityTokenInput />
 				<p>
-					Disabling two factor authentication is not recommended. However, if
-					you would like to do so, click here:
+					Disabling two factor authentication is not recommended. However, if you would like to do
+					so, click here:
 				</p>
 				<StatusButton
 					variant="destructive"

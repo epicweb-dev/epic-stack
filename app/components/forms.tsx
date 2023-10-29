@@ -7,19 +7,13 @@ import { Textarea } from './ui/textarea.tsx'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
-export function ErrorList({
-	id,
-	errors,
-}: {
-	errors?: ListOfErrors
-	id?: string
-}) {
+export function ErrorList({ id, errors }: { errors?: ListOfErrors; id?: string }) {
 	const errorsToRender = errors?.filter(Boolean)
 	if (!errorsToRender?.length) return null
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-foreground-destructive text-[10px]">
+				<li key={e} className="text-[10px] text-foreground-destructive">
 					{e}
 				</li>
 			))}
@@ -105,8 +99,7 @@ export function CheckboxField({
 	const control = useInputEvent({
 		// Retrieve the checkbox element by name instead as Radix does not expose the internal checkbox element
 		// See https://github.com/radix-ui/primitives/discussions/874
-		ref: () =>
-			buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
+		ref: () => buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
 		onFocus: () => buttonRef.current?.focus(),
 	})
 	const id = buttonProps.id ?? buttonProps.name ?? fallbackId

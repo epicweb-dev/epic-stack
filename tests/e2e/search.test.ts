@@ -8,9 +8,7 @@ test('Search from home page', async ({ page, insertNewUser }) => {
 	await page.getByRole('searchbox', { name: /search/i }).fill(newUser.username)
 	await page.getByRole('button', { name: /search/i }).click()
 
-	await page.waitForURL(
-		`/users?${new URLSearchParams({ search: newUser.username })}`,
-	)
+	await page.waitForURL(`/users?${new URLSearchParams({ search: newUser.username })}`)
 	await expect(page.getByText('Epic Notes Users')).toBeVisible()
 	const userList = page.getByRole('main').getByRole('list')
 	await expect(userList.getByRole('listitem')).toHaveCount(1)

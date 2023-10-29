@@ -3,12 +3,7 @@ import { useSpinDelay } from 'spin-delay'
 import { cn } from '#app/utils/misc.tsx'
 import { Button, type ButtonProps } from './button.tsx'
 import { Icon } from './icon.tsx'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from './tooltip.tsx'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.tsx'
 
 export const StatusButton = React.forwardRef<
 	HTMLButtonElement,
@@ -43,11 +38,7 @@ export const StatusButton = React.forwardRef<
 	}[status]
 
 	return (
-		<Button
-			ref={ref}
-			className={cn('flex justify-center gap-4', className)}
-			{...props}
-		>
+		<Button ref={ref} className={cn('flex justify-center gap-4', className)} {...props}>
 			<div>{children}</div>
 			{message ? (
 				<TooltipProvider>

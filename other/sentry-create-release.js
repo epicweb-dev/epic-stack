@@ -13,7 +13,5 @@ if (
 ) {
 	createRelease({}, DEFAULT_URL_PREFIX, DEFAULT_BUILD_PATH)
 } else {
-	console.log(
-		'Missing Sentry environment variables, skipping sourcemap upload.',
-	)
+	console.log('Missing Sentry environment variables, skipping sourcemap upload.')
 }

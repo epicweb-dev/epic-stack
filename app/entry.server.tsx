@@ -23,22 +23,14 @@ if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
 export default async function handleRequest(...args: DocRequestArgs) {
-	const [
-		request,
-		responseStatusCode,
-		responseHeaders,
-		remixContext,
-		loadContext,
-	] = args
+	const [request, responseStatusCode, responseHeaders, remixContext, loadContext] = args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
 	responseHeaders.set('fly-region', process.env.FLY_REGION ?? 'unknown')
 	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
 	responseHeaders.set('fly-primary-instance', primaryInstance)
 	responseHeaders.set('fly-instance', currentInstance)
 
-	const callbackName = isbot(request.headers.get('user-agent'))
-		? 'onAllReady'
-		: 'onShellReady'
+	const callbackName = isbot(request.headers.get('user-agent')) ? 'onAllReady' : 'onShellReady'
 
 	const nonce = String(loadContext.cspNonce) ?? undefined
 	return new Promise(async (resolve, reject) => {

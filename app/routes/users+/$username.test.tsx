@@ -15,8 +15,7 @@ import { default as UsernameRoute, loader } from './$username.tsx'
 
 test('The user profile when not logged in as self', async () => {
 	const userImages = await getUserImages()
-	const userImage =
-		userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
+	const userImage = userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
 	const user = await prisma.user.create({
 		select: { id: true, username: true, name: true },
 		data: { ...createUser(), image: { create: userImage } },
@@ -39,8 +38,7 @@ test('The user profile when not logged in as self', async () => {
 
 test('The user profile when logged in as self', async () => {
 	const userImages = await getUserImages()
-	const userImage =
-		userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
+	const userImage = userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
 	const user = await prisma.user.create({
 		select: { id: true, username: true, name: true },
 		data: { ...createUser(), image: { create: userImage } },

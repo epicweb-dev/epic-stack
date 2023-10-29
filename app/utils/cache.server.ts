@@ -47,10 +47,7 @@ function createDatabase(tryAgain = true): Database.Database {
 	return db
 }
 
-const lru = remember(
-	'lru-cache',
-	() => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }),
-)
+const lru = remember('lru-cache', () => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }))
 
 export const lruCache = lruCacheAdapter(lru)
 
@@ -70,9 +67,7 @@ const cacheQueryResultSchema = z.object({
 export const cache: CachifiedCache = {
 	name: 'SQLite cache',
 	get(key) {
-		const result = cacheDb
-			.prepare('SELECT value, metadata FROM cache WHERE key = ?')
-			.get(key)
+		const result = cacheDb.prepare('SELECT value, metadata FROM cache WHERE key = ?').get(key)
 		const parseResult = cacheQueryResultSchema.safeParse(result)
 		if (!parseResult.success) return null
 

@@ -5,11 +5,7 @@ import {
 	createRequestHandler as _createRequestHandler,
 	type RequestHandler,
 } from '@remix-run/express'
-import {
-	broadcastDevReady,
-	installGlobals,
-	type ServerBuild,
-} from '@remix-run/node'
+import { broadcastDevReady, installGlobals, type ServerBuild } from '@remix-run/node'
 import { wrapExpressCreateRequestHandler } from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
@@ -25,9 +21,7 @@ installGlobals()
 
 const MODE = process.env.NODE_ENV
 
-const createRequestHandler = wrapExpressCreateRequestHandler(
-	_createRequestHandler,
-)
+const createRequestHandler = wrapExpressCreateRequestHandler(_createRequestHandler)
 
 const BUILD_PATH = '../build/index.js'
 const WATCH_PATH = '../build/version.txt'
@@ -77,16 +71,10 @@ app.use(compression())
 app.disable('x-powered-by')
 
 // Remix fingerprints its assets so we can cache forever.
-app.use(
-	'/build',
-	express.static('public/build', { immutable: true, maxAge: '1y' }),
-)
+app.use('/build', express.static('public/build', { immutable: true, maxAge: '1y' }))
 
 // Aggressively cache fonts for a year
-app.use(
-	'/fonts',
-	express.static('public/fonts', { immutable: true, maxAge: '1y' }),
-)
+app.use('/fonts', express.static('public/fonts', { immutable: true, maxAge: '1y' }))
 
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
@@ -149,8 +137,7 @@ app.use(
 // When running tests or running in development, we want to effectively disable
 // rate limiting because playwright tests are very fast and we don't want to
 // have to wait for the rate limit to reset between tests.
-const maxMultiple =
-	MODE !== 'production' || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
+const maxMultiple = MODE !== 'production' || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
 const rateLimitDefault = {
 	windowMs: 60 * 1000,
 	max: 1000 * maxMultiple,
@@ -224,17 +211,11 @@ const portToUse = await getPort({
 const server = app.listen(portToUse, () => {
 	const addy = server.address()
 	const portUsed =
-		desiredPort === portToUse
-			? desiredPort
-			: addy && typeof addy === 'object'
-			? addy.port
-			: 0
+		desiredPort === portToUse ? desiredPort : addy && typeof addy === 'object' ? addy.port : 0
 
 	if (portUsed !== desiredPort) {
 		console.warn(
-			chalk.yellow(
-				`⚠️  Port ${desiredPort} is not available, using ${portUsed} instead.`,
-			),
+			chalk.yellow(`⚠️  Port ${desiredPort} is not available, using ${portUsed} instead.`),
 		)
 	}
 	console.log(`🚀  We have liftoff!`)

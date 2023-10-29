@@ -1,13 +1,7 @@
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { json, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useActionData,
-	useLoaderData,
-	type MetaFunction,
-} from '@remix-run/react'
+import { Form, Link, useActionData, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { formatDistanceToNow } from 'date-fns'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
@@ -20,15 +14,8 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	getNoteImgSrc,
-	invariantResponse,
-	useIsPending,
-} from '#app/utils/misc.tsx'
-import {
-	requireUserWithPermission,
-	userHasPermission,
-} from '#app/utils/permissions.ts'
+import { getNoteImgSrc, invariantResponse, useIsPending } from '#app/utils/misc.tsx'
+import { requireUserWithPermission, userHasPermission } from '#app/utils/permissions.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { type loader as notesLoader } from './notes.tsx'
@@ -90,10 +77,7 @@ export async function action({ request }: DataFunctionArgs) {
 	invariantResponse(note, 'Not found', { status: 404 })
 
 	const isOwner = note.ownerId === userId
-	await requireUserWithPermission(
-		request,
-		isOwner ? `delete:note:own` : `delete:note:any`,
-	)
+	await requireUserWithPermission(request, isOwner ? `delete:note:own` : `delete:note:any`)
 
 	await prisma.note.delete({ where: { id: note.id } })
 
@@ -108,10 +92,7 @@ export default function NoteRoute() {
 	const data = useLoaderData<typeof loader>()
 	const user = useOptionalUser()
 	const isOwner = user?.id === data.note.ownerId
-	const canDelete = userHasPermission(
-		user,
-		isOwner ? `delete:note:own` : `delete:note:any`,
-	)
+	const canDelete = userHasPermission(user, isOwner ? `delete:note:own` : `delete:note:any`)
 	const displayBar = canDelete || isOwner
 
 	return (
@@ -131,9 +112,7 @@ export default function NoteRoute() {
 						</li>
 					))}
 				</ul>
-				<p className="whitespace-break-spaces text-sm md:text-lg">
-					{data.note.content}
-				</p>
+				<p className="whitespace-break-spaces text-sm md:text-lg">{data.note.content}</p>
 			</div>
 			{displayBar ? (
 				<div className={floatingToolbarClassName}>
@@ -144,10 +123,7 @@ export default function NoteRoute() {
 					</span>
 					<div className="grid flex-1 grid-cols-2 justify-end gap-2 min-[525px]:flex md:gap-4">
 						{canDelete ? <DeleteNote id={data.note.id} /> : null}
-						<Button
-							asChild
-							className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
-						>
+						<Button asChild className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0">
 							<Link to="edit">
 								<Icon name="pencil-1" className="scale-125 max-md:scale-150">
 									<span className="max-md:hidden">Edit</span>
@@ -195,15 +171,11 @@ export const meta: MetaFunction<
 	typeof loader,
 	{ 'routes/users+/$username_+/notes': typeof notesLoader }
 > = ({ data, params, matches }) => {
-	const notesMatch = matches.find(
-		m => m.id === 'routes/users+/$username_+/notes',
-	)
+	const notesMatch = matches.find(m => m.id === 'routes/users+/$username_+/notes')
 	const displayName = notesMatch?.data?.owner.name ?? params.username
 	const noteTitle = data?.note.title ?? 'Note'
 	const noteContentsSummary =
-		data && data.note.content.length > 100
-			? data?.note.content.slice(0, 97) + '...'
-			: 'No content'
+		data && data.note.content.length > 100 ? data?.note.content.slice(0, 97) + '...' : 'No content'
 	return [
 		{ title: `${noteTitle} | ${displayName}'s Notes | Epic Notes` },
 		{
@@ -218,9 +190,7 @@ export function ErrorBoundary() {
 		<GeneralErrorBoundary
 			statusHandlers={{
 				403: () => <p>You are not allowed to do that</p>,
-				404: ({ params }) => (
-					<p>No note with the id "{params.noteId}" exists</p>
-				),
+				404: ({ params }) => <p>No note with the id "{params.noteId}" exists</p>,
 			}}
 		/>
 	)

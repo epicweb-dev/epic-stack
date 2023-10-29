@@ -20,9 +20,7 @@ export async function action({ request, params }: DataFunctionArgs) {
 			const formData = await request.formData()
 			const rawRedirectTo = formData.get('redirectTo')
 			const redirectTo =
-				typeof rawRedirectTo === 'string'
-					? rawRedirectTo
-					: getReferrerRoute(request)
+				typeof rawRedirectTo === 'string' ? rawRedirectTo : getReferrerRoute(request)
 			const redirectToCookie = getRedirectCookieHeader(redirectTo)
 			if (redirectToCookie) {
 				error.headers.append('set-cookie', redirectToCookie)

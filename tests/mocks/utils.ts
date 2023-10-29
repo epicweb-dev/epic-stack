@@ -10,11 +10,7 @@ export async function readFixture(subdir: string, name: string) {
 	return fsExtra.readJSON(path.join(fixturesDirPath, subdir, `${name}.json`))
 }
 
-export async function createFixture(
-	subdir: string,
-	name: string,
-	data: unknown,
-) {
+export async function createFixture(subdir: string, name: string, data: unknown) {
 	const dir = path.join(fixturesDirPath, subdir)
 	await fsExtra.ensureDir(dir)
 	return fsExtra.writeJSON(path.join(dir, `./${name}.json`), data)
@@ -52,14 +48,8 @@ export async function readEmail(recipient: string) {
 
 export function requireHeader(headers: Headers, header: string) {
 	if (!headers.has(header)) {
-		const headersString = JSON.stringify(
-			Object.fromEntries(headers.entries()),
-			null,
-			2,
-		)
-		throw new Error(
-			`Header "${header}" required, but not found in ${headersString}`,
-		)
+		const headersString = JSON.stringify(Object.fromEntries(headers.entries()), null, 2)
+		throw new Error(`Header "${header}" required, but not found in ${headersString}`)
 	}
 	return headers.get(header)
 }

@@ -31,16 +31,11 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 const newEmailAddressSessionKey = 'new-email-address'
 
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
+export async function handleVerification({ request, submission }: VerifyFunctionArgs) {
 	await requireRecentVerification(request)
 	invariant(submission.value, 'submission.value should be defined by now')
 
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession(request.headers.get('cookie'))
 	const newEmail = verifySession.get(newEmailAddressSessionKey)
 	if (!newEmail) {
 		submission.error[''] = [
@@ -150,13 +145,7 @@ export async function action({ request }: DataFunctionArgs) {
 	}
 }
 
-export function EmailChangeEmail({
-	verifyUrl,
-	otp,
-}: {
-	verifyUrl: string
-	otp: string
-}) {
+export function EmailChangeEmail({ verifyUrl, otp }: { verifyUrl: string; otp: string }) {
 	return (
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
@@ -186,15 +175,13 @@ export function EmailChangeNoticeEmail({ userId }: { userId: string }) {
 				</h1>
 				<p>
 					<E.Text>
-						We're writing to let you know that your Epic Notes email has been
-						changed.
+						We're writing to let you know that your Epic Notes email has been changed.
 					</E.Text>
 				</p>
 				<p>
 					<E.Text>
-						If you changed your email address, then you can safely ignore this.
-						But if you did not change your email address, then please contact
-						support immediately.
+						If you changed your email address, then you can safely ignore this. But if you did not
+						change your email address, then please contact support immediately.
 					</E.Text>
 				</p>
 				<p>
@@ -223,9 +210,7 @@ export default function ChangeEmailIndex() {
 		<div>
 			<h1 className="text-h1">Change Email</h1>
 			<p>You will receive an email at the new email address to confirm.</p>
-			<p>
-				An email notice will also be sent to your old address {data.user.email}.
-			</p>
+			<p>An email notice will also be sent to your old address {data.user.email}.</p>
 			<div className="mx-auto mt-5 max-w-sm">
 				<Form method="POST" {...form.props}>
 					<AuthenticityTokenInput />
@@ -236,9 +221,7 @@ export default function ChangeEmailIndex() {
 					/>
 					<ErrorList id={form.errorId} errors={form.errors} />
 					<div>
-						<StatusButton
-							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
-						>
+						<StatusButton status={isPending ? 'pending' : actionData?.status ?? 'idle'}>
 							Send Confirmation
 						</StatusButton>
 					</div>

@@ -1,32 +1,12 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useFetcher,
-	useLoaderData,
-	useSearchParams,
-	useSubmit,
-} from '@remix-run/react'
+import { Form, Link, useFetcher, useLoaderData, useSearchParams, useSubmit } from '@remix-run/react'
 import { Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
-import {
-	cache,
-	getAllCacheKeys,
-	lruCache,
-	searchCacheKeys,
-} from '#app/utils/cache.server.ts'
-import {
-	ensureInstance,
-	getAllInstances,
-	getInstanceInfo,
-} from '#app/utils/litefs.server.ts'
-import {
-	invariantResponse,
-	useDebounce,
-	useDoubleCheck,
-} from '#app/utils/misc.tsx'
+import { cache, getAllCacheKeys, lruCache, searchCacheKeys } from '#app/utils/cache.server.ts'
+import { ensureInstance, getAllInstances, getInstanceInfo } from '#app/utils/litefs.server.ts'
+import { invariantResponse, useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.ts'
 
 export const handle: SEOHandle = {
@@ -44,8 +24,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const limit = Number(searchParams.get('limit') ?? 100)
 
 	const currentInstanceInfo = await getInstanceInfo()
-	const instance =
-		searchParams.get('instance') ?? currentInstanceInfo.currentInstance
+	const instance = searchParams.get('instance') ?? currentInstanceInfo.currentInstance
 	const instances = await getAllInstances()
 	await ensureInstance(instance)
 
@@ -110,10 +89,7 @@ export default function CacheAdminRoute() {
 			>
 				<div className="flex-1">
 					<div className="flex flex-1 gap-4">
-						<button
-							type="submit"
-							className="flex h-16 items-center justify-center"
-						>
+						<button type="submit" className="flex h-16 items-center justify-center">
 							🔎
 						</button>
 						<Field
@@ -153,12 +129,8 @@ export default function CacheAdminRoute() {
 								{[
 									inst,
 									`(${region})`,
-									inst === data.currentInstanceInfo.currentInstance
-										? '(current)'
-										: '',
-									inst === data.currentInstanceInfo.primaryInstance
-										? ' (primary)'
-										: '',
+									inst === data.currentInstanceInfo.currentInstance ? '(current)' : '',
+									inst === data.currentInstanceInfo.primaryInstance ? ' (primary)' : '',
 								]
 									.filter(Boolean)
 									.join(' ')}
@@ -171,24 +143,14 @@ export default function CacheAdminRoute() {
 			<div className="flex flex-col gap-4">
 				<h2 className="text-h2">LRU Cache:</h2>
 				{data.cacheKeys.lru.map(key => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
-						type="lru"
-					/>
+					<CacheKeyRow key={key} cacheKey={key} instance={instance} type="lru" />
 				))}
 			</div>
 			<Spacer size="3xs" />
 			<div className="flex flex-col gap-4">
 				<h2 className="text-h2">SQLite Cache:</h2>
 				{data.cacheKeys.sqlite.map(key => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
-						type="sqlite"
-					/>
+					<CacheKeyRow key={key} cacheKey={key} instance={instance} type="sqlite" />
 				))}
 			</div>
 		</div>
@@ -214,16 +176,8 @@ function CacheKeyRow({
 				<input type="hidden" name="cacheKey" value={cacheKey} />
 				<input type="hidden" name="instance" value={instance} />
 				<input type="hidden" name="type" value={type} />
-				<Button
-					size="sm"
-					variant="secondary"
-					{...dc.getButtonProps({ type: 'submit' })}
-				>
-					{fetcher.state === 'idle'
-						? dc.doubleCheck
-							? 'You sure?'
-							: 'Delete'
-						: 'Deleting...'}
+				<Button size="sm" variant="secondary" {...dc.getButtonProps({ type: 'submit' })}>
+					{fetcher.state === 'idle' ? (dc.doubleCheck ? 'You sure?' : 'Delete') : 'Deleting...'}
 				</Button>
 			</fetcher.Form>
 			<Link reloadDocument to={valuePage}>

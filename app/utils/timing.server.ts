@@ -2,12 +2,7 @@ import { type CreateReporter } from 'cachified'
 
 export type Timings = Record<
 	string,
-	Array<
-		{ desc?: string } & (
-			| { time: number; start?: never }
-			| { time?: never; start: number }
-		)
-	>
+	Array<{ desc?: string } & ({ time: number; start?: never } | { time?: never; start: number })>
 >
 
 export function makeTimings(type: string, desc?: string) {
@@ -97,10 +92,7 @@ export function cachifiedTimingReporter<Value>(
 	if (!timings) return
 
 	return ({ key }) => {
-		const cacheRetrievalTimer = createTimer(
-			`cache:${key}`,
-			`${key} cache retrieval`,
-		)
+		const cacheRetrievalTimer = createTimer(`cache:${key}`, `${key} cache retrieval`)
 		let getFreshValueTimer: ReturnType<typeof createTimer> | undefined
 		return event => {
 			switch (event.name) {

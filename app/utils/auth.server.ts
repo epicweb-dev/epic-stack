@@ -10,23 +10,18 @@ import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
-export const getSessionExpirationDate = () =>
-	new Date(Date.now() + SESSION_EXPIRATION_TIME)
+export const getSessionExpirationDate = () => new Date(Date.now() + SESSION_EXPIRATION_TIME)
 
 export const sessionKey = 'sessionId'
 
-export const authenticator = new Authenticator<ProviderUser>(
-	connectionSessionStorage,
-)
+export const authenticator = new Authenticator<ProviderUser>(connectionSessionStorage)
 
 for (const [providerName, provider] of Object.entries(providers)) {
 	authenticator.use(provider.getAuthStrategy(), providerName)
 }
 
 export async function getUserId(request: Request) {
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
 	const sessionId = authSession.get(sessionKey)
 	if (!sessionId) return null
 	const session = await prisma.session.findUnique({
@@ -51,13 +46,9 @@ export async function requireUserId(
 	if (!userId) {
 		const requestUrl = new URL(request.url)
 		redirectTo =
-			redirectTo === null
-				? null
-				: redirectTo ?? `${requestUrl.pathname}${requestUrl.search}`
+			redirectTo === null ? null : redirectTo ?? `${requestUrl.pathname}${requestUrl.search}`
 		const loginParams = redirectTo ? new URLSearchParams({ redirectTo }) : null
-		const loginRedirect = ['/login', loginParams?.toString()]
-			.filter(Boolean)
-			.join('?')
+		const loginRedirect = ['/login', loginParams?.toString()].filter(Boolean).join('?')
 		throw redirect(loginRedirect)
 	}
 	return userId
@@ -170,9 +161,7 @@ export async function signupWithConnection({
 					name,
 					roles: { connect: { name: 'user' } },
 					connections: { create: { providerId, providerName } },
-					image: imageUrl
-						? { create: await downloadFile(imageUrl) }
-						: undefined,
+					image: imageUrl ? { create: await downloadFile(imageUrl) } : undefined,
 				},
 			},
 		},
@@ -192,9 +181,7 @@ export async function logout(
 	},
 	responseInit?: ResponseInit,
 ) {
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
 	const sessionId = authSession.get(sessionKey)
 	// if this fails, we still need to delete the session from the user's browser
 	// and it doesn't do any harm staying in the db anyway.

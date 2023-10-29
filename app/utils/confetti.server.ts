@@ -6,9 +6,7 @@ const cookieName = 'en_confetti'
 
 export function getConfetti(request: Request) {
 	const cookieHeader = request.headers.get('cookie')
-	const confettiId = cookieHeader
-		? cookie.parse(cookieHeader)[cookieName]
-		: null
+	const confettiId = cookieHeader ? cookie.parse(cookieHeader)[cookieName] : null
 	return {
 		confettiId,
 		headers: confettiId ? createConfettiHeaders(null) : null,
@@ -23,9 +21,7 @@ export function getConfetti(request: Request) {
  * @param value the value for the cookie in the set-cookie header
  * @returns Headers with a set-cookie header set to the value
  */
-export function createConfettiHeaders(
-	value: string | null = String(Date.now()),
-) {
+export function createConfettiHeaders(value: string | null = String(Date.now())) {
 	return new Headers({
 		'set-cookie': cookie.serialize(cookieName, value ? value : '', {
 			path: '/',

@@ -141,13 +141,7 @@ export async function action({ request }: DataFunctionArgs) {
 		return json({ status: 'error', submission } as const, { status: 400 })
 	}
 
-	const {
-		id: noteId,
-		title,
-		content,
-		imageUpdates = [],
-		newImages = [],
-	} = submission.value
+	const { id: noteId, title, content, imageUpdates = [], newImages = [] } = submission.value
 
 	const updatedNote = await prisma.note.upsert({
 		select: { id: true, owner: { select: { username: true } } },
@@ -172,9 +166,7 @@ export async function action({ request }: DataFunctionArgs) {
 		},
 	})
 
-	return redirect(
-		`/users/${updatedNote.owner.username}/notes/${updatedNote.id}`,
-	)
+	return redirect(`/users/${updatedNote.owner.username}/notes/${updatedNote.id}`)
 }
 
 export function NoteEditor({
@@ -240,10 +232,7 @@ export function NoteEditor({
 						<Label>Images</Label>
 						<ul className="flex flex-col gap-4">
 							{imageList.map((image, index) => (
-								<li
-									key={image.key}
-									className="relative border-b-2 border-muted-foreground"
-								>
+								<li key={image.key} className="relative border-b-2 border-muted-foreground">
 									<button
 										className="absolute right-0 top-0 text-foreground-destructive"
 										{...list.remove(fields.images.name, { index })}
@@ -258,10 +247,7 @@ export function NoteEditor({
 							))}
 						</ul>
 					</div>
-					<Button
-						className="mt-3"
-						{...list.append(fields.images.name, { defaultValue: {} })}
-					>
+					<Button className="mt-3" {...list.append(fields.images.name, { defaultValue: {} })}>
 						<span aria-hidden>
 							<Icon name="plus">Image</Icon>
 						</span>{' '}
@@ -287,11 +273,7 @@ export function NoteEditor({
 	)
 }
 
-function ImageChooser({
-	config,
-}: {
-	config: FieldConfig<z.infer<typeof ImageFieldsetSchema>>
-}) {
+function ImageChooser({ config }: { config: FieldConfig<z.infer<typeof ImageFieldsetSchema>> }) {
 	const ref = useRef<HTMLFieldSetElement>(null)
 	const fields = useFieldset(ref, config)
 	const existingImage = Boolean(fields.id.defaultValue)
@@ -312,8 +294,7 @@ function ImageChooser({
 						<label
 							htmlFor={fields.file.id}
 							className={cn('group absolute h-32 w-32 rounded-lg', {
-								'bg-accent opacity-40 focus-within:opacity-100 hover:opacity-100':
-									!previewImage,
+								'bg-accent opacity-40 focus-within:opacity-100 hover:opacity-100': !previewImage,
 								'cursor-pointer focus-within:ring-4': !existingImage,
 							})}
 						>
@@ -378,10 +359,7 @@ function ImageChooser({
 						{...conform.textarea(fields.altText, { ariaAttributes: true })}
 					/>
 					<div className="min-h-[32px] px-4 pb-3 pt-1">
-						<ErrorList
-							id={fields.altText.errorId}
-							errors={fields.altText.errors}
-						/>
+						<ErrorList id={fields.altText.errorId} errors={fields.altText.errors} />
 					</div>
 				</div>
 			</div>
@@ -396,9 +374,7 @@ export function ErrorBoundary() {
 	return (
 		<GeneralErrorBoundary
 			statusHandlers={{
-				404: ({ params }) => (
-					<p>No note with the id "{params.noteId}" exists</p>
-				),
+				404: ({ params }) => <p>No note with the id "{params.noteId}" exists</p>,
 			}}
 		/>
 	)

@@ -112,9 +112,8 @@ jobs:
         with:
           path: prisma/data.db
           key:
-            db-cache-schema_${{ hashFiles('./prisma/schema.prisma')
-            }}-migrations_${{ hashFiles('./prisma/migrations/*/migration.sql')
-            }}
+            db-cache-schema_${{ hashFiles('./prisma/schema.prisma') }}-migrations_${{
+            hashFiles('./prisma/migrations/*/migration.sql') }}
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
@@ -142,8 +141,8 @@ jobs:
     needs: [lint, typecheck, vitest, playwright]
     # only build/deploy main branch on pushes
     if:
-      ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
-      github.event_name == 'push' }}
+      ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && github.event_name
+      == 'push' }}
 
     steps:
       - name: ⬇️ Checkout repo
@@ -168,14 +167,13 @@ jobs:
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
         run:
-          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
-          --app ${{ steps.app_name.outputs.value }}-staging
+          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }} --app ${{
+          steps.app_name.outputs.value }}-staging
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
-        run:
-          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+        run: flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

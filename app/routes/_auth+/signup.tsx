@@ -1,12 +1,7 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import * as E from '@react-email/components'
-import {
-	json,
-	redirect,
-	type DataFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
@@ -14,10 +9,7 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import {
-	ProviderConnectionForm,
-	providerNames,
-} from '#app/utils/connections.tsx'
+import { ProviderConnectionForm, providerNames } from '#app/utils/connections.tsx'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
@@ -81,13 +73,7 @@ export async function action({ request }: DataFunctionArgs) {
 	}
 }
 
-export function SignupEmail({
-	onboardingUrl,
-	otp,
-}: {
-	onboardingUrl: string
-	otp: string
-}) {
+export function SignupEmail({ onboardingUrl, otp }: { onboardingUrl: string; otp: string }) {
 	return (
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
@@ -133,9 +119,7 @@ export default function SignupRoute() {
 		<div className="container flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Let's start your journey!</h1>
-				<p className="mt-3 text-body-md text-muted-foreground">
-					Please enter your email.
-				</p>
+				<p className="mt-3 text-body-md text-muted-foreground">Please enter your email.</p>
 			</div>
 			<div className="mx-auto mt-16 min-w-[368px] max-w-sm">
 				<Form method="POST" {...form.props}>

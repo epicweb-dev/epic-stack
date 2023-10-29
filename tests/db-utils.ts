@@ -101,13 +101,7 @@ export async function getUserImages() {
 	return userImages
 }
 
-export async function img({
-	altText,
-	filepath,
-}: {
-	altText?: string
-	filepath: string
-}) {
+export async function img({ altText, filepath }: { altText?: string; filepath: string }) {
 	return {
 		altText,
 		contentType: filepath.endsWith('.png') ? 'image/png' : 'image/jpeg',
@@ -124,9 +118,7 @@ export async function cleanupDb(prisma: PrismaClient) {
 		// Disable FK constraints to avoid relation conflicts during deletion
 		prisma.$executeRawUnsafe(`PRAGMA foreign_keys = OFF`),
 		// Delete all rows from each table, preserving table structures
-		...tables.map(({ name }) =>
-			prisma.$executeRawUnsafe(`DELETE from "${name}"`),
-		),
+		...tables.map(({ name }) => prisma.$executeRawUnsafe(`DELETE from "${name}"`)),
 		prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON`),
 	])
 }

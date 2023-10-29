@@ -1,9 +1,5 @@
 import { redirect, type DataFunctionArgs } from '@remix-run/node'
-import {
-	authenticator,
-	getSessionExpirationDate,
-	getUserId,
-} from '#app/utils/auth.server.ts'
+import { authenticator, getSessionExpirationDate, getUserId } from '#app/utils/auth.server.ts'
 import { ProviderNameSchema, providerLabels } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { combineHeaders } from '#app/utils/misc.tsx'
@@ -11,10 +7,7 @@ import {
 	destroyRedirectToHeader,
 	getRedirectCookieValue,
 } from '#app/utils/redirect-cookie.server.ts'
-import {
-	createToastHeaders,
-	redirectWithToast,
-} from '#app/utils/toast.server.ts'
+import { createToastHeaders, redirectWithToast } from '#app/utils/toast.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { handleNewSession } from './login.tsx'
 import {
@@ -157,11 +150,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
 }
 
 async function makeSession(
-	{
-		request,
-		userId,
-		redirectTo,
-	}: { request: Request; userId: string; redirectTo?: string | null },
+	{ request, userId, redirectTo }: { request: Request; userId: string; redirectTo?: string | null },
 	responseInit?: ResponseInit,
 ) {
 	redirectTo ??= '/'

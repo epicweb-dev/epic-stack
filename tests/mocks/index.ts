@@ -10,11 +10,7 @@ const miscHandlers = [
 		: null,
 ].filter(Boolean)
 
-export const server = setupServer(
-	...miscHandlers,
-	...resendHandlers,
-	...githubHandlers,
-)
+export const server = setupServer(...miscHandlers, ...resendHandlers, ...githubHandlers)
 
 server.listen({ onUnhandledRequest: 'warn' })
 

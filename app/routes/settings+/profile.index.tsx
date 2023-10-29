@@ -12,11 +12,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	getUserImgSrc,
-	invariantResponse,
-	useDoubleCheck,
-} from '#app/utils/misc.tsx'
+import { getUserImgSrc, invariantResponse, useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
@@ -136,9 +132,7 @@ export default function EditUserProfile() {
 			<div className="col-span-full flex flex-col gap-6">
 				<div>
 					<Link to="change-email">
-						<Icon name="envelope-closed">
-							Change email from {data.user.email}
-						</Icon>
+						<Icon name="envelope-closed">Change email from {data.user.email}</Icon>
 					</Link>
 				</div>
 				<div>
@@ -264,11 +258,7 @@ function UpdateProfile() {
 					size="wide"
 					name="intent"
 					value={profileUpdateActionIntent}
-					status={
-						fetcher.state !== 'idle'
-							? 'pending'
-							: fetcher.data?.status ?? 'idle'
-					}
+					status={fetcher.state !== 'idle' ? 'pending' : fetcher.data?.status ?? 'idle'}
 				>
 					Save changes
 				</StatusButton>
@@ -278,14 +268,9 @@ function UpdateProfile() {
 }
 
 async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
 	const sessionId = authSession.get(sessionKey)
-	invariantResponse(
-		sessionId,
-		'You must be authenticated to sign out of other sessions',
-	)
+	invariantResponse(sessionId, 'You must be authenticated to sign out of other sessions')
 	await prisma.session.deleteMany({
 		where: {
 			userId,
@@ -313,11 +298,7 @@ function SignOutOfSessions() {
 							value: signOutOfSessionsActionIntent,
 						})}
 						variant={dc.doubleCheck ? 'destructive' : 'default'}
-						status={
-							fetcher.state !== 'idle'
-								? 'pending'
-								: fetcher.data?.status ?? 'idle'
-						}
+						status={fetcher.state !== 'idle' ? 'pending' : fetcher.data?.status ?? 'idle'}
 					>
 						<Icon name="avatar">
 							{dc.doubleCheck
@@ -359,9 +340,7 @@ function DeleteData() {
 					variant={dc.doubleCheck ? 'destructive' : 'default'}
 					status={fetcher.state !== 'idle' ? 'pending' : 'idle'}
 				>
-					<Icon name="trash">
-						{dc.doubleCheck ? `Are you sure?` : `Delete all your data`}
-					</Icon>
+					<Icon name="trash">{dc.doubleCheck ? `Are you sure?` : `Delete all your data`}</Icon>
 				</StatusButton>
 			</fetcher.Form>
 		</div>

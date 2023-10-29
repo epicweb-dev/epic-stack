@@ -33,9 +33,7 @@ function formatColors() {
 		if (typeof color === 'string') {
 			colors.push(key)
 		} else {
-			const colorGroup = Object.keys(color).map(subKey =>
-				subKey === 'DEFAULT' ? '' : subKey,
-			)
+			const colorGroup = Object.keys(color).map(subKey => (subKey === 'DEFAULT' ? '' : subKey))
 			colors.push({ [key]: colorGroup })
 		}
 	}
@@ -78,9 +76,7 @@ export function getReferrerRoute(request: Request) {
 	// spelling errors and whatever makes this annoyingly inconsistent
 	// in my own testing, `referer` returned the right value, but 🤷‍♂️
 	const referrer =
-		request.headers.get('referer') ??
-		request.headers.get('referrer') ??
-		request.referrer
+		request.headers.get('referer') ?? request.headers.get('referrer') ?? request.referrer
 	const domain = getDomainUrl(request)
 	if (referrer?.startsWith(domain)) {
 		return referrer.slice(domain.length)
@@ -92,9 +88,7 @@ export function getReferrerRoute(request: Request) {
 /**
  * Merge multiple headers objects into one (uses set so headers are overridden)
  */
-export function mergeHeaders(
-	...headers: Array<ResponseInit['headers'] | null | undefined>
-) {
+export function mergeHeaders(...headers: Array<ResponseInit['headers'] | null | undefined>) {
 	const merged = new Headers()
 	for (const header of headers) {
 		if (!header) continue
@@ -108,9 +102,7 @@ export function mergeHeaders(
 /**
  * Combine multiple header objects into one (uses append so headers are not overridden)
  */
-export function combineHeaders(
-	...headers: Array<ResponseInit['headers'] | null | undefined>
-) {
+export function combineHeaders(...headers: Array<ResponseInit['headers'] | null | undefined>) {
 	const combined = new Headers()
 	for (const header of headers) {
 		if (!header) continue
@@ -124,9 +116,7 @@ export function combineHeaders(
 /**
  * Combine multiple response init objects into one (uses combineHeaders)
  */
-export function combineResponseInits(
-	...responseInits: Array<ResponseInit | null | undefined>
-) {
+export function combineResponseInits(...responseInits: Array<ResponseInit | null | undefined>) {
 	let combined: ResponseInit = {}
 	for (const responseInit of responseInits) {
 		combined = {
@@ -153,10 +143,7 @@ export function combineResponseInits(
  *
  * @throws {Error} if condition is falsey
  */
-export function invariant(
-	condition: any,
-	message: string | (() => string),
-): asserts condition {
+export function invariant(condition: any, message: string | (() => string)): asserts condition {
 	if (!condition) {
 		throw new Error(typeof message === 'function' ? message() : message)
 	}
@@ -212,9 +199,7 @@ export function useIsPending({
 	const contextualFormAction = useFormAction()
 	const navigation = useNavigation()
 	const isPendingState =
-		state === 'non-idle'
-			? navigation.state !== 'idle'
-			: navigation.state === state
+		state === 'non-idle' ? navigation.state !== 'idle' : navigation.state === state
 	return (
 		isPendingState &&
 		navigation.formAction === (formAction ?? contextualFormAction) &&
@@ -235,8 +220,7 @@ export function useDelayedIsPending({
 	formMethod,
 	delay = 400,
 	minDuration = 300,
-}: Parameters<typeof useIsPending>[0] &
-	Parameters<typeof useSpinDelay>[1] = {}) {
+}: Parameters<typeof useIsPending>[0] & Parameters<typeof useSpinDelay>[1] = {}) {
 	const isPending = useIsPending({ formAction, formMethod })
 	const delayedIsPending = useSpinDelay(isPending, {
 		delay,
@@ -260,26 +244,22 @@ function callAll<Args extends Array<unknown>>(
 export function useDoubleCheck() {
 	const [doubleCheck, setDoubleCheck] = useState(false)
 
-	function getButtonProps(
-		props?: React.ButtonHTMLAttributes<HTMLButtonElement>,
-	) {
-		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] =
-			() => setDoubleCheck(false)
+	function getButtonProps(props?: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+		const onBlur: React.ButtonHTMLAttributes<HTMLButtonElement>['onBlur'] = () =>
+			setDoubleCheck(false)
 
-		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] =
-			doubleCheck
-				? undefined
-				: e => {
-						e.preventDefault()
-						setDoubleCheck(true)
-				  }
+		const onClick: React.ButtonHTMLAttributes<HTMLButtonElement>['onClick'] = doubleCheck
+			? undefined
+			: e => {
+					e.preventDefault()
+					setDoubleCheck(true)
+			  }
 
-		const onKeyUp: React.ButtonHTMLAttributes<HTMLButtonElement>['onKeyUp'] =
-			e => {
-				if (e.key === 'Escape') {
-					setDoubleCheck(false)
-				}
+		const onKeyUp: React.ButtonHTMLAttributes<HTMLButtonElement>['onKeyUp'] = e => {
+			if (e.key === 'Escape') {
+				setDoubleCheck(false)
 			}
+		}
 
 		return {
 			...props,
@@ -319,11 +299,7 @@ export function useDebounce<
 		callbackRef.current = callback
 	})
 	return useMemo(
-		() =>
-			debounce(
-				(...args: Parameters<Callback>) => callbackRef.current(...args),
-				delay,
-			),
+		() => debounce((...args: Parameters<Callback>) => callbackRef.current(...args), delay),
 		[delay],
 	)
 }

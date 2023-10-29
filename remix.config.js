@@ -13,12 +13,7 @@ export default {
 	watchPaths: ['./tailwind.config.ts'],
 	routes: async defineRoutes => {
 		return flatRoutes('routes', defineRoutes, {
-			ignoredRouteFiles: [
-				'.*',
-				'**/*.css',
-				'**/*.test.{js,jsx,ts,tsx}',
-				'**/__*.*',
-			],
+			ignoredRouteFiles: ['.*', '**/*.css', '**/*.test.{js,jsx,ts,tsx}', '**/__*.*'],
 		})
 	},
 }

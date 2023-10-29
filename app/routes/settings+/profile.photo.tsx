@@ -8,12 +8,7 @@ import {
 	unstable_parseMultipartFormData,
 	type DataFunctionArgs,
 } from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useNavigation,
-} from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import { useState } from 'react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
@@ -24,12 +19,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	getUserImgSrc,
-	invariantResponse,
-	useDoubleCheck,
-	useIsPending,
-} from '#app/utils/misc.tsx'
+import { getUserImgSrc, invariantResponse, useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -156,9 +146,7 @@ export default function PhotoRoute() {
 			>
 				<AuthenticityTokenInput />
 				<img
-					src={
-						newImageSrc ?? (data.user ? getUserImgSrc(data.user.image?.id) : '')
-					}
+					src={newImageSrc ?? (data.user ? getUserImgSrc(data.user.image?.id) : '')}
 					className="h-52 w-52 rounded-full object-cover"
 					alt={data.user?.name ?? data.user?.username}
 				/>
@@ -210,11 +198,7 @@ export default function PhotoRoute() {
 					>
 						Save Photo
 					</StatusButton>
-					<Button
-						type="reset"
-						variant="destructive"
-						className="peer-invalid:hidden"
-					>
+					<Button type="reset" variant="destructive" className="peer-invalid:hidden">
 						<Icon name="trash">Reset</Icon>
 					</Button>
 					{data.user.image?.id ? (
@@ -235,9 +219,7 @@ export default function PhotoRoute() {
 							}
 						>
 							<Icon name="trash">
-								{doubleCheckDeleteImage.doubleCheck
-									? 'Are you sure?'
-									: 'Delete'}
+								{doubleCheckDeleteImage.doubleCheck ? 'Are you sure?' : 'Delete'}
 							</Icon>
 						</StatusButton>
 					) : null}

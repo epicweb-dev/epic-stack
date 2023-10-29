@@ -157,10 +157,7 @@ export async function isCodeValid({
 	return true
 }
 
-async function validateRequest(
-	request: Request,
-	body: URLSearchParams | FormData,
-) {
+async function validateRequest(request: Request, body: URLSearchParams | FormData) {
 	const submission = await parse(body, {
 		schema: VerifySchema.superRefine(async (data, ctx) => {
 			const codeIsValid = await isCodeValid({
@@ -227,9 +224,7 @@ export default function VerifyRoute() {
 	const [searchParams] = useSearchParams()
 	const isPending = useIsPending()
 	const actionData = useActionData<typeof action>()
-	const parsedType = VerificationTypeSchema.safeParse(
-		searchParams.get(typeQueryParam),
-	)
+	const parsedType = VerificationTypeSchema.safeParse(searchParams.get(typeQueryParam))
 	const type = parsedType.success ? parsedType.data : null
 
 	const checkEmail = (
@@ -272,9 +267,7 @@ export default function VerifyRoute() {
 
 	return (
 		<main className="container flex flex-col justify-center pb-32 pt-20">
-			<div className="text-center">
-				{type ? headings[type] : 'Invalid Verification Type'}
-			</div>
+			<div className="text-center">{type ? headings[type] : 'Invalid Verification Type'}</div>
 
 			<Spacer size="xs" />
 
@@ -294,12 +287,8 @@ export default function VerifyRoute() {
 							inputProps={conform.input(fields[codeQueryParam])}
 							errors={fields[codeQueryParam].errors}
 						/>
-						<input
-							{...conform.input(fields[typeQueryParam], { type: 'hidden' })}
-						/>
-						<input
-							{...conform.input(fields[targetQueryParam], { type: 'hidden' })}
-						/>
+						<input {...conform.input(fields[typeQueryParam], { type: 'hidden' })} />
+						<input {...conform.input(fields[targetQueryParam], { type: 'hidden' })} />
 						<input
 							{...conform.input(fields[redirectToQueryParam], {
 								type: 'hidden',

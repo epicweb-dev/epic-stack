@@ -56,9 +56,7 @@ export function getHints(request?: Request) {
 		(acc, [name, hint]) => {
 			const hintName = name as ClientHintNames
 			if ('transform' in hint) {
-				acc[hintName] = hint.transform(
-					getCookieValue(cookieString, hintName) ?? hint.fallback,
-				)
+				acc[hintName] = hint.transform(getCookieValue(cookieString, hintName) ?? hint.fallback)
 			} else {
 				// @ts-expect-error - this is fine (PRs welcome though)
 				acc[hintName] = getCookieValue(cookieString, hintName) ?? hint.fallback

@@ -39,15 +39,9 @@ export default async function main({ rootDirectory }) {
 
 	const newEnv = env
 		.replace(/^SESSION_SECRET=.*$/m, `SESSION_SECRET="${getRandomString(16)}"`)
-		.replace(
-			/^INTERNAL_COMMAND_TOKEN=.*$/m,
-			`INTERNAL_COMMAND_TOKEN="${getRandomString(16)}"`,
-		)
+		.replace(/^INTERNAL_COMMAND_TOKEN=.*$/m, `INTERNAL_COMMAND_TOKEN="${getRandomString(16)}"`)
 
-	const newFlyTomlContent = flyTomlContent.replace(
-		new RegExp(appNameRegex, 'g'),
-		APP_NAME,
-	)
+	const newFlyTomlContent = flyTomlContent.replace(new RegExp(appNameRegex, 'g'), APP_NAME)
 
 	const packageJson = JSON.parse(packageJsonString)
 
@@ -148,14 +142,9 @@ async function setupDeployment({ rootDirectory }) {
 	console.log('🔎 Determining the best region for you...')
 	const primaryRegion = await getPreferredRegion()
 
-	const flyConfig = toml.parse(
-		await fs.readFile(path.join(rootDirectory, 'fly.toml')),
-	)
+	const flyConfig = toml.parse(await fs.readFile(path.join(rootDirectory, 'fly.toml')))
 	flyConfig.primary_region = primaryRegion
-	await fs.writeFile(
-		path.join(rootDirectory, 'fly.toml'),
-		toml.stringify(flyConfig),
-	)
+	await fs.writeFile(path.join(rootDirectory, 'fly.toml'), toml.stringify(flyConfig))
 
 	const { app: APP_NAME } = flyConfig
 
@@ -231,9 +220,7 @@ async function setupDeployment({ rootDirectory }) {
 		// any errors and hope things work out.
 		await $I`git init`.catch(() => {})
 
-		console.log(
-			`Opening repo.new. Please create a new repo and paste the URL below.`,
-		)
+		console.log(`Opening repo.new. Please create a new repo and paste the URL below.`)
 		await open(`https://repo.new`)
 
 		const { repoURL } = await inquirer.prompt([

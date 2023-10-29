@@ -1,11 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import {
-	json,
-	redirect,
-	type DataFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -46,12 +41,8 @@ const ResetPasswordSchema = PasswordAndConfirmPasswordSchema
 
 async function requireResetPasswordUsername(request: Request) {
 	await requireAnonymous(request)
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
-	const resetPasswordUsername = verifySession.get(
-		resetPasswordUsernameSessionKey,
-	)
+	const verifySession = await verifySessionStorage.getSession(request.headers.get('cookie'))
+	const resetPasswordUsername = verifySession.get(resetPasswordUsernameSessionKey)
 	if (typeof resetPasswordUsername !== 'string' || !resetPasswordUsername) {
 		throw redirect('/login')
 	}

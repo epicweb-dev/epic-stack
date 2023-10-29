@@ -69,10 +69,9 @@ export default function UsersRoute() {
 				{data.status === 'idle' ? (
 					data.users.length ? (
 						<ul
-							className={cn(
-								'flex w-full flex-wrap items-center justify-center gap-4 delay-200',
-								{ 'opacity-50': isPending },
-							)}
+							className={cn('flex w-full flex-wrap items-center justify-center gap-4 delay-200', {
+								'opacity-50': isPending,
+							})}
 						>
 							{data.users.map(user => (
 								<li key={user.id}>

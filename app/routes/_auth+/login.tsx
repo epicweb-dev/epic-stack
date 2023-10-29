@@ -1,11 +1,6 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import {
-	json,
-	redirect,
-	type DataFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
+import { json, redirect, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
@@ -16,24 +11,12 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
-import {
-	getUserId,
-	login,
-	requireAnonymous,
-	sessionKey,
-} from '#app/utils/auth.server.ts'
-import {
-	ProviderConnectionForm,
-	providerNames,
-} from '#app/utils/connections.tsx'
+import { getUserId, login, requireAnonymous, sessionKey } from '#app/utils/auth.server.ts'
+import { ProviderConnectionForm, providerNames } from '#app/utils/connections.tsx'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import {
-	combineResponseInits,
-	invariant,
-	useIsPending,
-} from '#app/utils/misc.tsx'
+import { combineResponseInits, invariant, useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
@@ -81,17 +64,14 @@ export async function handleNewSession(
 			combineResponseInits(
 				{
 					headers: {
-						'set-cookie':
-							await verifySessionStorage.commitSession(verifySession),
+						'set-cookie': await verifySessionStorage.commitSession(verifySession),
 					},
 				},
 				responseInit,
 			),
 		)
 	} else {
-		const authSession = await authSessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
+		const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
 		authSession.set(sessionKey, session.id)
 
 		return redirect(
@@ -110,17 +90,10 @@ export async function handleNewSession(
 	}
 }
 
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
+export async function handleVerification({ request, submission }: VerifyFunctionArgs) {
 	invariant(submission.value, 'Submission should have a value by this point')
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
+	const verifySession = await verifySessionStorage.getSession(request.headers.get('cookie'))
 
 	const remember = verifySession.get(rememberKey)
 	const { redirectTo } = submission.value
@@ -149,27 +122,17 @@ export async function handleVerification({
 			}),
 		)
 	} else {
-		headers.append(
-			'set-cookie',
-			await authSessionStorage.commitSession(authSession),
-		)
+		headers.append('set-cookie', await authSessionStorage.commitSession(authSession))
 	}
 
-	headers.append(
-		'set-cookie',
-		await verifySessionStorage.destroySession(verifySession),
-	)
+	headers.append('set-cookie', await verifySessionStorage.destroySession(verifySession))
 
 	return redirect(safeRedirect(redirectTo), { headers })
 }
 
 export async function shouldRequestTwoFA(request: Request) {
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
+	const verifySession = await verifySessionStorage.getSession(request.headers.get('cookie'))
 	if (verifySession.has(unverifiedSessionIdKey)) return true
 	const userId = await getUserId(request)
 	if (!userId) return false
@@ -263,9 +226,7 @@ export default function LoginPage() {
 			<div className="mx-auto w-full max-w-md">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome back!</h1>
-					<p className="text-body-md text-muted-foreground">
-						Please enter your details.
-					</p>
+					<p className="text-body-md text-muted-foreground">Please enter your details.</p>
 				</div>
 				<Spacer size="xs" />
 
@@ -304,18 +265,13 @@ export default function LoginPage() {
 									errors={fields.remember.errors}
 								/>
 								<div>
-									<Link
-										to="/forgot-password"
-										className="text-body-xs font-semibold"
-									>
+									<Link to="/forgot-password" className="text-body-xs font-semibold">
 										Forgot password?
 									</Link>
 								</div>
 							</div>
 
-							<input
-								{...conform.input(fields.redirectTo, { type: 'hidden' })}
-							/>
+							<input {...conform.input(fields.redirectTo, { type: 'hidden' })} />
 							<ErrorList errors={form.errors} id={form.errorId} />
 
 							<div className="flex items-center justify-between gap-6 pt-3">
@@ -342,13 +298,7 @@ export default function LoginPage() {
 						</ul>
 						<div className="flex items-center justify-center gap-2 pt-6">
 							<span className="text-muted-foreground">New here?</span>
-							<Link
-								to={
-									redirectTo
-										? `/signup?${encodeURIComponent(redirectTo)}`
-										: '/signup'
-								}
-							>
+							<Link to={redirectTo ? `/signup?${encodeURIComponent(redirectTo)}` : '/signup'}>
 								Create an account
 							</Link>
 						</div>

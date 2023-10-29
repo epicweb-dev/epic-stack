@@ -44,10 +44,7 @@ export class GitHubProvider implements AuthProvider {
 		)
 	}
 
-	async resolveConnectionData(
-		providerId: string,
-		{ timings }: { timings?: Timings } = {},
-	) {
+	async resolveConnectionData(providerId: string, { timings }: { timings?: Timings } = {}) {
 		const result = await cachified({
 			key: `connection-data:github:${providerId}`,
 			cache,
@@ -56,10 +53,9 @@ export class GitHubProvider implements AuthProvider {
 			swr: 1000 * 60 * 60 * 24 * 7,
 			async getFreshValue(context) {
 				await new Promise(r => setTimeout(r, 3000))
-				const response = await fetch(
-					`https://api.github.com/user/${providerId}`,
-					{ headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } },
-				)
+				const response = await fetch(`https://api.github.com/user/${providerId}`, {
+					headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+				})
 				const rawJson = await response.json()
 				const result = GitHubUserSchema.safeParse(rawJson)
 				if (!result.success) {
@@ -89,8 +85,7 @@ export class GitHubProvider implements AuthProvider {
 		const searchParams = new URLSearchParams({ code, state })
 		throw redirect(`/auth/github/callback?${searchParams}`, {
 			headers: {
-				'set-cookie':
-					await connectionSessionStorage.commitSession(connectionSession),
+				'set-cookie': await connectionSessionStorage.commitSession(connectionSession),
 			},
 		})
 	}

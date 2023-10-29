@@ -8,9 +8,7 @@ import { expect, test } from 'vitest'
 import { useDoubleCheck } from './misc.tsx'
 
 function TestComponent() {
-	const [defaultPrevented, setDefaultPrevented] = useState<
-		'idle' | 'no' | 'yes'
-	>('idle')
+	const [defaultPrevented, setDefaultPrevented] = useState<'idle' | 'no' | 'yes'>('idle')
 	const dc = useDoubleCheck()
 	return (
 		<div>

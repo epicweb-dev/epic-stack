@@ -1,17 +1,7 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
-import {
-	json,
-	redirect,
-	type DataFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useSearchParams,
-} from '@remix-run/react'
+import { json, redirect, type DataFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { Form, useActionData, useLoaderData, useSearchParams } from '@remix-run/react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
@@ -41,8 +31,7 @@ const SignupFormSchema = z
 		username: UsernameSchema,
 		name: NameSchema,
 		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
-			required_error:
-				'You must agree to the terms of service and privacy policy',
+			required_error: 'You must agree to the terms of service and privacy policy',
 		}),
 		remember: z.boolean().optional(),
 		redirectTo: z.string().optional(),
@@ -51,9 +40,7 @@ const SignupFormSchema = z
 
 async function requireOnboardingEmail(request: Request) {
 	await requireAnonymous(request)
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const verifySession = await verifySessionStorage.getSession(request.headers.get('cookie'))
 	const email = verifySession.get(onboardingEmailSessionKey)
 	if (typeof email !== 'string' || !email) {
 		throw redirect('/signup')
@@ -103,9 +90,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const { session, remember, redirectTo } = submission.value
 
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+	const authSession = await authSessionStorage.getSession(request.headers.get('cookie'))
 	authSession.set(sessionKey, session.id)
 	const verifySession = await verifySessionStorage.getSession()
 	const headers = new Headers()
@@ -115,10 +100,7 @@ export async function action({ request }: DataFunctionArgs) {
 			expires: remember ? session.expirationDate : undefined,
 		}),
 	)
-	headers.append(
-		'set-cookie',
-		await verifySessionStorage.destroySession(verifySession),
-	)
+	headers.append('set-cookie', await verifySessionStorage.destroySession(verifySession))
 
 	return redirectWithConfetti(safeRedirect(redirectTo), { headers })
 }
@@ -161,16 +143,10 @@ export default function SignupRoute() {
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard {data.email}!</h1>
-					<p className="text-body-md text-muted-foreground">
-						Please enter your details.
-					</p>
+					<p className="text-body-md text-muted-foreground">Please enter your details.</p>
 				</div>
 				<Spacer size="xs" />
-				<Form
-					method="POST"
-					className="mx-auto min-w-[368px] max-w-sm"
-					{...form.props}
-				>
+				<Form method="POST" className="mx-auto min-w-[368px] max-w-sm" {...form.props}>
 					<AuthenticityTokenInput />
 					<HoneypotInputs />
 					<Field
@@ -214,13 +190,11 @@ export default function SignupRoute() {
 					<CheckboxField
 						labelProps={{
 							htmlFor: fields.agreeToTermsOfServiceAndPrivacyPolicy.id,
-							children:
-								'Do you agree to our Terms of Service and Privacy Policy?',
+							children: 'Do you agree to our Terms of Service and Privacy Policy?',
 						}}
-						buttonProps={conform.input(
-							fields.agreeToTermsOfServiceAndPrivacyPolicy,
-							{ type: 'checkbox' },
-						)}
+						buttonProps={conform.input(fields.agreeToTermsOfServiceAndPrivacyPolicy, {
+							type: 'checkbox',
+						})}
 						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
 					/>
 					<CheckboxField

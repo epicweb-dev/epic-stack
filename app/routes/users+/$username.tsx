@@ -57,9 +57,7 @@ export default function ProfileRoute() {
 					<div className="flex flex-wrap items-center justify-center gap-4">
 						<h1 className="text-center text-h2">{userDisplayName}</h1>
 					</div>
-					<p className="mt-2 text-center text-muted-foreground">
-						Joined {data.userJoinedDisplay}
-					</p>
+					<p className="mt-2 text-center text-muted-foreground">Joined {data.userJoinedDisplay}</p>
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">
 							<Button type="submit" variant="link" size="pill">
@@ -112,9 +110,7 @@ export function ErrorBoundary() {
 	return (
 		<GeneralErrorBoundary
 			statusHandlers={{
-				404: ({ params }) => (
-					<p>No user with the username "{params.username}" exists</p>
-				),
+				404: ({ params }) => <p>No user with the username "{params.username}" exists</p>,
 			}}
 		/>
 	)

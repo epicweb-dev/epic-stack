@@ -250,9 +250,7 @@ function App() {
 								<div className="font-light">epic</div>
 								<div className="font-bold">notes</div>
 							</Link>
-							<div className="ml-auto hidden max-w-sm flex-1 sm:block">
-								{searchBar}
-							</div>
+							<div className="ml-auto hidden max-w-sm flex-1 sm:block">{searchBar}</div>
 							<div className="flex items-center gap-10">
 								{user ? (
 									<UserDropdown />
@@ -318,9 +316,7 @@ function UserDropdown() {
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.id)}
 						/>
-						<span className="text-body-sm font-bold">
-							{user.name ?? user.username}
-						</span>
+						<span className="text-body-sm font-bold">{user.name ?? user.username}</span>
 					</Link>
 				</Button>
 			</DropdownMenuTrigger>
@@ -400,8 +396,7 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 
 	const optimisticMode = useOptimisticThemeMode()
 	const mode = optimisticMode ?? userPreference ?? 'system'
-	const nextMode =
-		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
+	const nextMode = mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
 	const modeLabel = {
 		light: (
 			<Icon name="sun">
@@ -424,10 +419,7 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 		<fetcher.Form method="POST" {...form.props}>
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
-				<button
-					type="submit"
-					className="flex h-8 w-8 cursor-pointer items-center justify-center"
-				>
+				<button type="submit" className="flex h-8 w-8 cursor-pointer items-center justify-center">
 					{modeLabel[mode]}
 				</button>
 			</div>

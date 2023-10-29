@@ -10,12 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const here = (...s: Array<string>) => path.join(__dirname, ...s)
 
 const githubUserFixturePath = path.join(
-	here(
-		'..',
-		'fixtures',
-		'github',
-		`users.${process.env.VITEST_POOL_ID || 0}.local.json`,
-	),
+	here('..', 'fixtures', 'github', `users.${process.env.VITEST_POOL_ID || 0}.local.json`),
 )
 
 await fsExtra.ensureDir(path.dirname(githubUserFixturePath))
@@ -102,9 +97,7 @@ export async function insertGitHubUser(code?: string | null) {
 }
 
 async function getUser(request: Request) {
-	const accessToken = request.headers
-		.get('authorization')
-		?.slice('token '.length)
+	const accessToken = request.headers.get('authorization')?.slice('token '.length)
 
 	if (!accessToken) {
 		return new Response('Unauthorized', { status: 401 })
@@ -117,31 +110,27 @@ async function getUser(request: Request) {
 	return user
 }
 
-const passthroughGitHub =
-	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') && !process.env.TESTING
+const passthroughGitHub = !process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') && !process.env.TESTING
 export const handlers: Array<HttpHandler> = [
-	http.post(
-		'https://github.com/login/oauth/access_token',
-		async ({ request }) => {
-			if (passthroughGitHub) return passthrough()
-			const params = new URLSearchParams(await request.text())
+	http.post('https://github.com/login/oauth/access_token', async ({ request }) => {
+		if (passthroughGitHub) return passthrough()
+		const params = new URLSearchParams(await request.text())
 
-			const code = params.get('code')
-			const githubUsers = await getGitHubUsers()
-			let user = githubUsers.find(u => u.code === code)
-			if (!user) {
-				user = await insertGitHubUser(code)
-			}
+		const code = params.get('code')
+		const githubUsers = await getGitHubUsers()
+		let user = githubUsers.find(u => u.code === code)
+		if (!user) {
+			user = await insertGitHubUser(code)
+		}
 
-			return new Response(
-				new URLSearchParams({
-					access_token: user.accessToken,
-					token_type: '__MOCK_TOKEN_TYPE__',
-				}).toString(),
-				{ headers: { 'content-type': 'application/x-www-form-urlencoded' } },
-			)
-		},
-	),
+		return new Response(
+			new URLSearchParams({
+				access_token: user.accessToken,
+				token_type: '__MOCK_TOKEN_TYPE__',
+			}).toString(),
+			{ headers: { 'content-type': 'application/x-www-form-urlencoded' } },
+		)
+	}),
 	http.get('https://api.github.com/user/emails', async ({ request }) => {
 		if (passthroughGitHub) return passthrough()
 
@@ -153,9 +142,7 @@ export const handlers: Array<HttpHandler> = [
 	http.get('https://api.github.com/user/:id', async ({ params }) => {
 		if (passthroughGitHub) return passthrough()
 
-		const mockUser = (await getGitHubUsers()).find(
-			u => u.profile.id === params.id,
-		)
+		const mockUser = (await getGitHubUsers()).find(u => u.profile.id === params.id)
 		if (mockUser) return json(mockUser.profile)
 
 		return new Response('Not Found', { status: 404 })

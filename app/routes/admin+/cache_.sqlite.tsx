@@ -11,8 +11,7 @@ export async function action({ request }: DataFunctionArgs) {
 		)
 	}
 	const token = process.env.INTERNAL_COMMAND_TOKEN
-	const isAuthorized =
-		request.headers.get('Authorization') === `Bearer ${token}`
+	const isAuthorized = request.headers.get('Authorization') === `Bearer ${token}`
 	if (!isAuthorized) {
 		// nah, you can't be here...
 		return redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')

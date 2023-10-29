@@ -9,11 +9,7 @@ import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import {
-	getPasswordHash,
-	requireUserId,
-	verifyUserPassword,
-} from '#app/utils/auth.server.ts'
+import { getPasswordHash, requireUserId, verifyUserPassword } from '#app/utils/auth.server.ts'
 import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -65,20 +61,18 @@ export async function action({ request }: DataFunctionArgs) {
 	await validateCSRF(formData, request.headers)
 	const submission = await parse(formData, {
 		async: true,
-		schema: ChangePasswordForm.superRefine(
-			async ({ currentPassword, newPassword }, ctx) => {
-				if (currentPassword && newPassword) {
-					const user = await verifyUserPassword({ id: userId }, currentPassword)
-					if (!user) {
-						ctx.addIssue({
-							path: ['currentPassword'],
-							code: z.ZodIssueCode.custom,
-							message: 'Incorrect password.',
-						})
-					}
+		schema: ChangePasswordForm.superRefine(async ({ currentPassword, newPassword }, ctx) => {
+			if (currentPassword && newPassword) {
+				const user = await verifyUserPassword({ id: userId }, currentPassword)
+				if (!user) {
+					ctx.addIssue({
+						path: ['currentPassword'],
+						code: z.ZodIssueCode.custom,
+						message: 'Incorrect password.',
+					})
 				}
-			},
-		),
+			}
+		}),
 	})
 	// clear the payload so we don't send the password back to the client
 	submission.payload = {}
@@ -155,10 +149,7 @@ export default function ChangePasswordRoute() {
 				<Button variant="secondary" asChild>
 					<Link to="..">Cancel</Link>
 				</Button>
-				<StatusButton
-					type="submit"
-					status={isPending ? 'pending' : actionData?.status ?? 'idle'}
-				>
+				<StatusButton type="submit" status={isPending ? 'pending' : actionData?.status ?? 'idle'}>
 					Change Password
 				</StatusButton>
 			</div>

@@ -5,11 +5,9 @@
 	font-style: normal;
 	font-weight: 200;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-200italic - latin_latin-ext */
 @font-face {
@@ -18,11 +16,9 @@
 	font-style: italic;
 	font-weight: 200;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-300 - latin_latin-ext */
 @font-face {
@@ -31,11 +27,9 @@
 	font-style: normal;
 	font-weight: 300;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-300italic - latin_latin-ext */
 @font-face {
@@ -44,11 +38,9 @@
 	font-style: italic;
 	font-weight: 300;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-300italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-regular - latin_latin-ext */
 @font-face {
@@ -57,11 +49,9 @@
 	font-style: normal;
 	font-weight: 400;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-regular.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-regular.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-regular.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-regular.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-italic - latin_latin-ext */
 @font-face {
@@ -70,11 +60,9 @@
 	font-style: italic;
 	font-weight: 400;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-600 - latin_latin-ext */
 @font-face {
@@ -83,11 +71,9 @@
 	font-style: normal;
 	font-weight: 600;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-600italic - latin_latin-ext */
 @font-face {
@@ -96,11 +82,9 @@
 	font-style: italic;
 	font-weight: 600;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-600italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-700 - latin_latin-ext */
 @font-face {
@@ -109,11 +93,9 @@
 	font-style: normal;
 	font-weight: 700;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-700italic - latin_latin-ext */
 @font-face {
@@ -122,11 +104,9 @@
 	font-style: italic;
 	font-weight: 700;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-700italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-800 - latin_latin-ext */
 @font-face {
@@ -135,11 +115,9 @@
 	font-style: normal;
 	font-weight: 800;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-800italic - latin_latin-ext */
 @font-face {
@@ -148,11 +126,9 @@
 	font-style: italic;
 	font-weight: 800;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-800italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-900 - latin_latin-ext */
 @font-face {
@@ -161,11 +137,9 @@
 	font-style: normal;
 	font-weight: 900;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* nunito-sans-900italic - latin_latin-ext */
 @font-face {
@@ -174,11 +148,9 @@
 	font-style: italic;
 	font-weight: 900;
 	src:
-		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900italic.woff2')
-			format('woff2'),
+		url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900italic.woff2') format('woff2'),
 		/* Chrome 36+, Opera 23+, Firefox 39+ */
-			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900italic.woff')
-			format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			url('/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-900italic.woff') format('woff'); /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* Font metric overrides reduces CLS from font-swap.
 This is manually inserted, metric generated using CLI commands:
