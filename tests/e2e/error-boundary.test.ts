@@ -1,8 +1,17 @@
+import { type Request } from '@playwright/test'
 import { expect, test } from '#tests/playwright-utils.ts'
 
 test('Test root error boundary caught', async ({ page }) => {
-	await page.goto('/does-not-exist')
+	const pageUrl = '/does-not-exist'
+	await page.goto(pageUrl)
 
 	await expect(page.getByText(/We can't find this page/i)).toBeVisible()
-	// TODO: figure out how to assert the 404 status code
+
+	const listener = (request: Request) => {
+		if (request.url().includes(pageUrl)) {
+			request.response().then(response => expect(response?.status()).toBe(404))
+		}
+	}
+
+	page.on('request', listener)
 })
