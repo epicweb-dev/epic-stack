@@ -2,20 +2,17 @@ import {
 	SidebarAvatar,
 	SidebarHeader,
 	SidebarList,
+	type SidebarListItem,
 } from '#app/components/layout/index.ts'
 import { Sidebar } from '#app/components/layout/sidebar.tsx'
-import {
-	type OwnerData,
-	type OwnerListData,
-	useOptionalUser,
-} from '#app/utils/user.ts'
+import { type OwnerData, useOptionalUser } from '#app/utils/user.ts'
 
 interface PageSidebarProps {
 	owner: OwnerData
 	title: string
 	headerLink: string
 	avatar?: boolean
-	list: OwnerListData[]
+	list: SidebarListItem[]
 	newTitle?: string
 	displayNew?: boolean
 }

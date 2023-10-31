@@ -1,13 +1,16 @@
 import { NavLink } from '@remix-run/react'
 import { Icon } from '#app/components/index.ts'
 import { cn } from '#app/utils/misc.tsx'
-import { type OwnerListData } from '#app/utils/user.ts'
 import { ListItem } from './list-item.tsx'
 import { List } from './list.tsx'
 
+export interface SidebarListItem {
+	id: string
+	title: string
+}
 interface SidebarAvatarProps {
 	displayNew: boolean
-	items: OwnerListData[]
+	items: SidebarListItem[]
 	newTitle?: string
 }
 

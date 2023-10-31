@@ -30,10 +30,17 @@ export default function AdminRoute() {
 	const data = useLoaderData<typeof loader>()
 	const { user } = data
 
+	const list = [{ id: 'users', title: 'Users' }]
+
 	return (
 		<Main>
 			<MainContainer>
-				<PageSidebar owner={user} title="Admin" headerLink="/admin" list={[]} />
+				<PageSidebar
+					owner={user}
+					title="Admin"
+					headerLink="/admin"
+					list={list}
+				/>
 				<MainContent>
 					<Outlet />
 				</MainContent>
@@ -43,13 +50,5 @@ export default function AdminRoute() {
 }
 
 export function ErrorBoundary() {
-	return (
-		<GeneralErrorBoundary
-			statusHandlers={{
-				404: ({ params }) => (
-					<p>No user with the username "{params.username}" exists</p>
-				),
-			}}
-		/>
-	)
+	return <GeneralErrorBoundary />
 }
