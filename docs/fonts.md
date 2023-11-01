@@ -1,6 +1,6 @@
 ## Font Metric Overrides
 
-When using custom fonts, your site elements may stretch or shrink to accomodate
+When using custom fonts, your site elements may stretch or shrink to accommodate
 the font. This is because the browser doesn't know the dimensions of the font
 you're using until it arrives, which introduces Cumulative Layout Shift and
 impact its web vitals.
