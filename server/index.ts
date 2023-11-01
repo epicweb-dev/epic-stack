@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import { type IncomingMessage, type Server, type ServerResponse } from 'http'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import {
@@ -21,7 +20,7 @@ import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { prometheus } from './prometheus.server.js'
+import { installMetrics } from './prometheus.server.ts'
 
 installGlobals()
 
@@ -42,6 +41,7 @@ const build = await import(BUILD_PATH)
 let devBuild = build
 
 const app = express()
+const closeMetricsWithGrace = await installMetrics(app)
 
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
@@ -99,24 +99,6 @@ app.get(['/build/*', '/img/*', '/fonts/*', '/favicons/*'], (req, res) => {
 	// So we'll just send a 404 and won't bother calling other middleware.
 	return res.status(404).send('Not found')
 })
-
-if (MODE === 'production' || process.env.ENABLE_METRICS === 'true') {
-	app.use((req, res, next) => {
-		const start = Date.now()
-		res.on('finish', () => {
-			const duration = Date.now() - start
-			prometheus.requestCounter.inc({
-				method: req.method,
-				path: req.path,
-				status: res.statusCode.toString(),
-			})
-			prometheus.requestDuration.observe({ path: req.path }, duration)
-			prometheus.requestDurationSummary.observe({ path: req.path }, duration)
-		})
-
-		next()
-	})
-}
 
 morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
 app.use(
@@ -236,33 +218,6 @@ app.all(
 		: getRequestHandler(build),
 )
 
-const metricsApp = express()
-let metricsServer: Server<typeof IncomingMessage, typeof ServerResponse>
-if (MODE === 'production' || process.env.ENABLE_METRICS === 'true') {
-	metricsApp.use(morgan('tiny'))
-
-	metricsApp.get('/metrics', async (_, res) => {
-		const metrics = await prometheus.client.register.metrics()
-		res.set('Content-Type', 'text/plain')
-		res.send(metrics)
-	})
-
-	const desiredMetricsPort = 9091
-	const metricsPort = await getPort({
-		port: portNumbers(desiredMetricsPort, desiredMetricsPort + 100),
-	})
-	metricsServer = metricsApp.listen(metricsPort, () => {
-		if (metricsPort !== desiredMetricsPort) {
-			console.warn(
-				chalk.yellow(
-					`⚠️  Metrics port ${desiredMetricsPort} is not available, using ${metricsPort} instead.`,
-				),
-			)
-		}
-		console.log(`📈 Metrics server listening on at ${metricsPort}/metrics`)
-	})
-}
-
 const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
@@ -312,9 +267,9 @@ closeWithGrace(async () => {
 	await new Promise((resolve, reject) => {
 		server.close(e => (e ? reject(e) : resolve('ok')))
 	})
-	await new Promise((resolve, reject) => {
-		metricsServer.close(e => (e ? reject(e) : resolve('ok')))
-	})
+	if (closeMetricsWithGrace) {
+		closeMetricsWithGrace()
+	}
 })
 
 // during dev, we'll keep the build module up to date with the changes

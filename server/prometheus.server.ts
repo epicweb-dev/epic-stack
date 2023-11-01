@@ -1,4 +1,8 @@
 import { remember } from '@epic-web/remember'
+import chalk from 'chalk'
+import express, { type Express } from 'express'
+import getPort, { portNumbers } from 'get-port'
+import morgan from 'morgan'
 import * as client from 'prom-client'
 
 export const prometheus = remember('prometheus-client', () => {
@@ -53,3 +57,56 @@ export const prometheus = remember('prometheus-client', () => {
 		sqlQueryDurationSummary,
 	}
 })
+
+export const installMetrics = async (remixApp: Express) => {
+	if (
+		process.env.NODE_ENV === 'production' ||
+		process.env.ENABLE_METRICS === 'true'
+	) {
+		const metricsApp = express()
+		metricsApp.use(morgan('tiny'))
+
+		metricsApp.get('/metrics', async (_, res) => {
+			const metrics = await prometheus.client.register.metrics()
+			res.set('Content-Type', 'text/plain')
+			res.send(metrics)
+		})
+
+		const desiredMetricsPort = 9091
+		const metricsPort = await getPort({
+			port: portNumbers(desiredMetricsPort, desiredMetricsPort + 100),
+		})
+		const metricsServer = metricsApp.listen(metricsPort, () => {
+			if (metricsPort !== desiredMetricsPort) {
+				console.warn(
+					chalk.yellow(
+						`⚠️  Metrics port ${desiredMetricsPort} is not available, using ${metricsPort} instead.`,
+					),
+				)
+			}
+			console.log(`📈 Metrics server listening on at ${metricsPort}/metrics`)
+		})
+		//attached app to remix app
+		remixApp.use((req, res, next) => {
+			const start = Date.now()
+			res.on('finish', () => {
+				const duration = Date.now() - start
+				prometheus.requestCounter.inc({
+					method: req.method,
+					path: req.path,
+					status: res.statusCode.toString(),
+				})
+				prometheus.requestDuration.observe({ path: req.path }, duration)
+				prometheus.requestDurationSummary.observe({ path: req.path }, duration)
+			})
+
+			next()
+		})
+		return async function closeWithGrace() {
+			return new Promise((resolve, reject) => {
+				metricsServer.close(e => (e ? reject(e) : resolve('ok')))
+			})
+		}
+	}
+	return null
+}
