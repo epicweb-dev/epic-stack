@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { type IncomingMessage, type Server, type ServerResponse } from 'http'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import {
@@ -234,29 +235,34 @@ app.all(
 )
 
 const metricsApp = express()
+let metricsServer: Server<typeof IncomingMessage, typeof ServerResponse>
+if (
+	process.env.NODE_ENV === 'production' ||
+	process.env.ENABLE_METRICS === 'true'
+) {
+	metricsApp.use(morgan('tiny'))
 
-metricsApp.use(morgan('tiny'))
+	metricsApp.get('/metrics', async (_, res) => {
+		const metrics = await prometheus.client.register.metrics()
+		res.set('Content-Type', 'text/plain')
+		res.send(metrics)
+	})
 
-metricsApp.get('/metrics', async (_, res) => {
-	const metrics = await prometheus.client.register.metrics()
-	res.set('Content-Type', 'text/plain')
-	res.send(metrics)
-})
-
-const desiredMetricsPort = 9091
-const metricsPort = await getPort({
-	port: portNumbers(desiredMetricsPort, desiredMetricsPort + 100),
-})
-const metricsServer = metricsApp.listen(metricsPort, () => {
-	if (metricsPort !== desiredMetricsPort) {
-		console.warn(
-			chalk.yellow(
-				`⚠️  Metrics port ${desiredMetricsPort} is not available, using ${metricsPort} instead.`,
-			),
-		)
-	}
-	console.log(`📈 Metrics server listening on port ${metricsPort}`)
-})
+	const desiredMetricsPort = 9091
+	const metricsPort = await getPort({
+		port: portNumbers(desiredMetricsPort, desiredMetricsPort + 100),
+	})
+	metricsServer = metricsApp.listen(metricsPort, () => {
+		if (metricsPort !== desiredMetricsPort) {
+			console.warn(
+				chalk.yellow(
+					`⚠️  Metrics port ${desiredMetricsPort} is not available, using ${metricsPort} instead.`,
+				),
+			)
+		}
+		console.log(`📈 Metrics server listening on at ${metricsPort}/metrics`)
+	})
+}
 
 const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({
