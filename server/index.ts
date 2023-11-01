@@ -100,21 +100,26 @@ app.get(['/build/*', '/img/*', '/fonts/*', '/favicons/*'], (req, res) => {
 	return res.status(404).send('Not found')
 })
 
-app.use((req, res, next) => {
-	const start = Date.now()
-	res.on('finish', () => {
-		const duration = Date.now() - start
-		prometheus.requestCounter.inc({
-			method: req.method,
-			path: req.path,
-			status: res.statusCode.toString(),
+if (
+	process.env.NODE_ENV === 'production' ||
+	process.env.ENABLE_METRICS === 'true'
+) {
+	app.use((req, res, next) => {
+		const start = Date.now()
+		res.on('finish', () => {
+			const duration = Date.now() - start
+			prometheus.requestCounter.inc({
+				method: req.method,
+				path: req.path,
+				status: res.statusCode.toString(),
+			})
+			prometheus.requestDuration.observe({ path: req.path }, duration)
+			prometheus.requestDurationSummary.observe({ path: req.path }, duration)
 		})
-		prometheus.requestDuration.observe({ path: req.path }, duration)
-		prometheus.requestDurationSummary.observe({ path: req.path }, duration)
-	})
 
-	next()
-})
+		next()
+	})
+}
 
 morgan.token('url', (req, res) => decodeURIComponent(req.url ?? ''))
 app.use(
