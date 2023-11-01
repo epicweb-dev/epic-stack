@@ -100,10 +100,7 @@ app.get(['/build/*', '/img/*', '/fonts/*', '/favicons/*'], (req, res) => {
 	return res.status(404).send('Not found')
 })
 
-if (
-	process.env.NODE_ENV === 'production' ||
-	process.env.ENABLE_METRICS === 'true'
-) {
+if (MODE === 'production' || process.env.ENABLE_METRICS === 'true') {
 	app.use((req, res, next) => {
 		const start = Date.now()
 		res.on('finish', () => {
@@ -241,10 +238,7 @@ app.all(
 
 const metricsApp = express()
 let metricsServer: Server<typeof IncomingMessage, typeof ServerResponse>
-if (
-	process.env.NODE_ENV === 'production' ||
-	process.env.ENABLE_METRICS === 'true'
-) {
+if (MODE === 'production' || process.env.ENABLE_METRICS === 'true') {
 	metricsApp.use(morgan('tiny'))
 
 	metricsApp.get('/metrics', async (_, res) => {
