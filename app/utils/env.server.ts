@@ -33,7 +33,7 @@ export function init() {
 			parsed.error.flatten().fieldErrors,
 		)
 
-		throw new Error('Invalid envirmonment variables')
+		throw new Error('Invalid environment variables')
 	}
 }
 
