@@ -20,7 +20,7 @@ import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { installMetrics } from './prometheus.server.ts'
+import { installMetrics } from './prometheus.server.js'
 
 installGlobals()
 
