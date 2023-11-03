@@ -1,9 +1,11 @@
 import { PassThrough } from 'stream'
 import {
 	createReadableStreamFromReadable,
+	type DataFunctionArgs,
 	type HandleDocumentRequestFunction,
 } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
+import * as Sentry from '@sentry/remix'
 import isbot from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
 import { renderToPipeableStream } from 'react-dom/server'
@@ -88,4 +90,15 @@ export async function handleDataRequest(response: Response) {
 	response.headers.set('fly-instance', currentInstance)
 
 	return response
+}
+
+export function handleError(
+	error: unknown,
+	{ request }: DataFunctionArgs,
+): void {
+	if (error instanceof Error) {
+		Sentry.captureRemixServerException(error, 'remix.server', request)
+	} else {
+		Sentry.captureException(error)
+	}
 }

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 export function init() {
 	Sentry.init({
 		dsn: ENV.SENTRY_DSN,
+		environment: ENV.MODE,
 		integrations: [
 			new Sentry.BrowserTracing({
 				routingInstrumentation: Sentry.remixRouterInstrumentation(
