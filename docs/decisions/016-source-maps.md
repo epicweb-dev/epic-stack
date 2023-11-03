@@ -2,7 +2,7 @@
 
 Date: 2023-06-14
 
-Status: accepted
+Status: superseded by [034-source-maps](034-source-maps.md)
 
 ## Context
 
