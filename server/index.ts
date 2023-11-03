@@ -10,7 +10,7 @@ import {
 	installGlobals,
 	type ServerBuild,
 } from '@remix-run/node'
-import { wrapExpressCreateRequestHandler } from '@sentry/remix'
+import * as Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -25,7 +25,7 @@ installGlobals()
 
 const MODE = process.env.NODE_ENV
 
-const createRequestHandler = wrapExpressCreateRequestHandler(
+const createRequestHandler = Sentry.wrapExpressCreateRequestHandler(
 	_createRequestHandler,
 )
 
@@ -75,6 +75,9 @@ app.use(compression())
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
+
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.tracingHandler())
 
 // Remix fingerprints its assets so we can cache forever.
 app.use(
