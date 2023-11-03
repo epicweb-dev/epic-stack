@@ -1,5 +1,5 @@
+import fs from 'node:fs'
 import { createRelease } from '@sentry/remix/scripts/createRelease.js'
-import fsExtra from 'fs-extra'
 import { glob } from 'glob'
 import 'dotenv/config'
 
@@ -21,5 +21,6 @@ if (
 }
 const files = await glob(['./public/**/*.map', './build/**/*.map'])
 for (const file of files) {
-	await fsExtra.remove(file)
+	// remove file
+	await fs.promises.unlink(file)
 }
