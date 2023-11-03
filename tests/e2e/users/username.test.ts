@@ -36,6 +36,9 @@ test.describe('User can view user', () => {
 			await goToUserPage(page, user.username)
 			await expectUserPage(page, user.username)
 
+			await expectUserContent(page, user.username)
+			await expectMyUserContent(page, user.username)
+
 			await page.getByText('Admin')
 			await expectLink(page, 'Admin')
 		})
