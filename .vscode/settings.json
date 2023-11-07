@@ -15,5 +15,7 @@
   ],
   "workbench.editorAssociations": {
     "*.db": "sqlite-viewer.view"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
