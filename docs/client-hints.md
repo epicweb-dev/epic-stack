@@ -22,7 +22,7 @@ for the user.
 And what often happens is we render HTML that's wrong and then hydrate the
 application to be interactive with client-side JavaScript that now knows the
 user preferences and now we know the right thing to render. This is great,
-except we've already render the wrong thing so by hydrating we cause a shift
+except we've already rendered the wrong thing so by hydrating we cause a shift
 from the wrong thing to the right thing which is jarring and can be even a worse
 user experience than leaving the wrong thing in place (I call this a "flash of
 incorrect content"). You'll get an error in the console from React when this
