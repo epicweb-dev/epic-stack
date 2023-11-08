@@ -48,6 +48,7 @@
     "@epic-web/totp": "^1.1.1",
     "@nasa-gcn/remix-seo": "^2.0.0",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@pppaaattt/goodui": "^0.0.15",
     "@prisma/client": "^5.3.1",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
