@@ -1,5 +1,9 @@
-import { Footer, NavLogo } from '#app/components/layout/index.ts'
-import { ThemeSwitch, type ThemeSwitchProps } from '../theme-switch.tsx'
+import {
+	Footer,
+	NavLogo,
+	ThemeSwitch,
+	type ThemeSwitchProps,
+} from '#app/components/index.ts'
 
 function PageFooter({ userPreference }: ThemeSwitchProps) {
 	return (

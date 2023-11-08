@@ -1,5 +1,6 @@
 export * from './checkbox-field.tsx'
 export * from './errors.tsx'
 export * from './field.tsx'
+export * from './icon.tsx'
 export * from './status-button.tsx'
 export * from './textarea-field.tsx'

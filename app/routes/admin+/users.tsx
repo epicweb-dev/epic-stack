@@ -1,6 +1,6 @@
 import { type DataFunctionArgs, json } from '@remix-run/node'
 import { type MetaFunction } from '@remix-run/react'
-import { PageContentIndex } from '#app/components/templates/index.ts'
+import { PageContentIndex } from '#app/components/index.ts'
 import { requireAdminUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 

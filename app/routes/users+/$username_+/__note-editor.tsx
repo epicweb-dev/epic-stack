@@ -21,9 +21,9 @@ import { Form, useFetcher } from '@remix-run/react'
 import { useRef, useState } from 'react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import {
+	floatingToolbarClassName,
+	GeneralErrorBoundary,
 	Button,
 	Icon,
 	Label,

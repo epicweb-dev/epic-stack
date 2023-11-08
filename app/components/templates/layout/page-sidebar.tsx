@@ -1,10 +1,10 @@
 import {
+	Sidebar,
 	SidebarAvatar,
 	SidebarHeader,
 	SidebarList,
 	type SidebarListItem,
-} from '#app/components/layout/index.ts'
-import { Sidebar } from '#app/components/layout/sidebar.tsx'
+} from '#app/components/index.ts'
 import { type OwnerData, useOptionalUser } from '#app/utils/user.ts'
 
 interface PageSidebarProps {

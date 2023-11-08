@@ -4,7 +4,7 @@ import {
 	NavLogo,
 	NavSearch,
 	NavUserControls,
-} from '#app/components/layout/index.ts'
+} from '#app/components/index.ts'
 
 interface PageHeaderProps {
 	userId?: string | undefined

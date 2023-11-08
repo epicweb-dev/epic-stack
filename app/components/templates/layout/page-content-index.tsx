@@ -1,4 +1,4 @@
-import { Content } from '#app/components/layout/index.ts'
+import { Content } from '#app/components/index.ts'
 
 interface PageContentIndexProps {
 	message: string

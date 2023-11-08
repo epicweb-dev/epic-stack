@@ -1,5 +1,5 @@
 import { type MetaFunction } from '@remix-run/react'
-import { PageContentIndex } from '#app/components/templates/index.ts'
+import { PageContentIndex } from '#app/components/index.ts'
 
 export default function AdminIndexRoute() {
 	return <PageContentIndex message="Hello admin" />

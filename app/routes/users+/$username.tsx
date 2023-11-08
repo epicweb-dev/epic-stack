@@ -1,7 +1,11 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { Button, Icon, Spacer } from '#app/components/index.ts'
+import {
+	GeneralErrorBoundary,
+	Button,
+	Icon,
+	Spacer,
+} from '#app/components/index.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import {

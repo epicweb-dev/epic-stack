@@ -28,7 +28,7 @@ interface DropdownNavigationProps {
 	logout: boolean
 }
 
-export default function DropdownNavigation({
+export function DropdownNavigation({
 	menuItems,
 	button,
 	logout,

@@ -1,12 +1,12 @@
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Outlet, useLoaderData } from '@remix-run/react'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import {
+	GeneralErrorBoundary,
 	Main,
 	MainContainer,
 	MainContent,
-} from '#app/components/layout/index.ts'
-import { PageSidebar } from '#app/components/templates/index.ts'
+	PageSidebar,
+} from '#app/components/index.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 

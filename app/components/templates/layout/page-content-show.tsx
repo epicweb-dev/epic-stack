@@ -4,7 +4,7 @@ import {
 	ContentBody,
 	ContentHeader,
 	ContentImages,
-} from '#app/components/layout/index.ts'
+} from '#app/components/index.ts'
 
 interface PageContentShowProps {
 	itemId: string
