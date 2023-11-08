@@ -1,3 +1,4 @@
+import { ProfilingIntegration } from '@sentry/profiling-node'
 import * as Sentry from '@sentry/remix'
 import { prisma } from './db.server.ts'
 
@@ -19,6 +20,7 @@ export function init() {
 		integrations: [
 			new Sentry.Integrations.Http({ tracing: true }),
 			new Sentry.Integrations.Prisma({ client: prisma }),
+			new ProfilingIntegration(),
 		],
 		beforeSendTransaction(event) {
 			// ignore all healthcheck related transactions

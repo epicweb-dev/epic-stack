@@ -16,6 +16,7 @@ export function init() {
 			}),
 			// Replay is only available in the client
 			new Sentry.Replay(),
+			new Sentry.BrowserProfilingIntegration(),
 		],
 
 		// Set tracesSampleRate to 1.0 to capture 100%
