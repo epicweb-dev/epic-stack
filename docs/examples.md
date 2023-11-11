@@ -70,6 +70,8 @@ This page links to examples of how to implement some things with the Epic Stack.
   [remix-auth](https://npm.im/remix-auth).
 - [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email):
   An example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of [react-email](https://react.email/)
+- [Epic Stack with Query](https://github.com/gc-victor/epic-stack-with-query) by [@gc-victor](https://github.com/gc-victor):
+  An example of the Epic Stack using [Query](https://github.com/gc-victor/query). Using Epic Stack with Query, you can access the databases directly from your application while enjoying a range of benefits from Query to manage your databases, including [Query CLI](https://github.com/gc-victor/query/blob/main/README.md#cli), [Query API](https://github.com/gc-victor/query/blob/main/README.md#apis), [Query Funcions](https://github.com/gc-victor/query?tab=readme-ov-file#function) and [Query Studio](https://github.com/gc-victor/query-studio).
 
 ## How to contribute
 
