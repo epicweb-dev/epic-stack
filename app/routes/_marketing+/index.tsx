@@ -5,9 +5,10 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
+import { SITE_NAME } from '#app/config/index.ts'
 import { logos, stars } from './logos/logos.ts'
 
-export const meta: MetaFunction = () => [{ title: 'Epic Notes' }]
+export const meta: MetaFunction = () => [{ title: SITE_NAME }]
 
 export default function Index() {
 	return (

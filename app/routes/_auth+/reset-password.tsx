@@ -10,6 +10,7 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { SITE_NAME } from '#app/config/index.ts'
 import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant, useIsPending } from '#app/utils/misc.tsx'
@@ -87,7 +88,7 @@ export async function action({ request }: DataFunctionArgs) {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Reset Password | Epic Notes' }]
+	return [{ title: `Reset Password | ${SITE_NAME}` }]
 }
 
 export default function ResetPasswordPage() {

@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { SITE_NAME } from '#app/config/index.ts'
 import {
 	prepareVerification,
 	requireRecentVerification,
@@ -132,7 +133,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const response = await sendEmail({
 		to: submission.value.email,
-		subject: `Epic Notes Email Change Verification`,
+		subject: `${SITE_NAME} Email Change Verification`,
 		react: <EmailChangeEmail verifyUrl={verifyUrl.toString()} otp={otp} />,
 	})
 
@@ -161,7 +162,7 @@ export function EmailChangeEmail({
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
 				<h1>
-					<E.Text>Epic Notes Email Change</E.Text>
+					<E.Text>{SITE_NAME} Email Change</E.Text>
 				</h1>
 				<p>
 					<E.Text>
@@ -182,11 +183,11 @@ export function EmailChangeNoticeEmail({ userId }: { userId: string }) {
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
 				<h1>
-					<E.Text>Your Epic Notes email has been changed</E.Text>
+					<E.Text>Your {SITE_NAME} email has been changed</E.Text>
 				</h1>
 				<p>
 					<E.Text>
-						We're writing to let you know that your Epic Notes email has been
+						We're writing to let you know that your {SITE_NAME} email has been
 						changed.
 					</E.Text>
 				</p>

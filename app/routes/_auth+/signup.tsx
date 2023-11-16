@@ -14,6 +14,7 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { SITE_NAME } from '#app/config/index.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,
@@ -69,7 +70,7 @@ export async function action({ request }: DataFunctionArgs) {
 
 	const response = await sendEmail({
 		to: email,
-		subject: `Welcome to Epic Notes!`,
+		subject: `Welcome to ${SITE_NAME}!`,
 		react: <SignupEmail onboardingUrl={verifyUrl.toString()} otp={otp} />,
 	})
 
@@ -92,7 +93,7 @@ export function SignupEmail({
 		<E.Html lang="en" dir="ltr">
 			<E.Container>
 				<h1>
-					<E.Text>Welcome to Epic Notes!</E.Text>
+					<E.Text>Welcome to {SITE_NAME}!</E.Text>
 				</h1>
 				<p>
 					<E.Text>
@@ -109,7 +110,7 @@ export function SignupEmail({
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Sign Up | Epic Notes' }]
+	return [{ title: `Sign Up | ${SITE_NAME}` }]
 }
 
 export default function SignupRoute() {

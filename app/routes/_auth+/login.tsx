@@ -15,6 +15,7 @@ import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { SITE_NAME } from '#app/config/index.ts'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import {
 	getUserId,
@@ -360,7 +361,7 @@ export default function LoginPage() {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Login to Epic Notes' }]
+	return [{ title: `Login to ${SITE_NAME}` }]
 }
 
 export function ErrorBoundary() {

@@ -1,3 +1,4 @@
+import { SITE_NAME } from '#app/config/index.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { expect, test } from '#tests/playwright-utils.ts'
 
@@ -11,7 +12,7 @@ test('Search from home page', async ({ page, insertNewUser }) => {
 	await page.waitForURL(
 		`/users?${new URLSearchParams({ search: newUser.username })}`,
 	)
-	await expect(page.getByText('Epic Notes Users')).toBeVisible()
+	await expect(page.getByText(`${SITE_NAME} Users`)).toBeVisible()
 	const userList = page.getByRole('main').getByRole('list')
 	await expect(userList.getByRole('listitem')).toHaveCount(1)
 	invariant(newUser.name, 'User name not found')
