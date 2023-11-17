@@ -42,22 +42,24 @@ function formatColors() {
 	return colors
 }
 
-const customTwMerge = extendTailwindMerge({
-	theme: {
-		colors: formatColors(),
-		borderRadius: Object.keys(extendedTheme.borderRadius),
-	},
-	classGroups: {
-		'font-size': [
-			{
-				text: Object.keys(extendedTheme.fontSize),
-			},
-		],
-		animate: [
-			{
-				animate: Object.keys(extendedTheme.animation),
-			},
-		],
+const customTwMerge = extendTailwindMerge<string, string>({
+	extend: {
+		theme: {
+			colors: formatColors(),
+			borderRadius: Object.keys(extendedTheme.borderRadius),
+		},
+		classGroups: {
+			'font-size': [
+				{
+					text: Object.keys(extendedTheme.fontSize),
+				},
+			],
+			animate: [
+				{
+					animate: Object.keys(extendedTheme.animation),
+				},
+			],
+		},
 	},
 })
 
