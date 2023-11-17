@@ -60,18 +60,32 @@ This page links to examples of how to implement some things with the Epic Stack.
   using [i18next](https://www.i18next.com/) and
   [remix-18next](https://github.com/sergiodxa/remix-i18next)
 - [Epic Stack + Argos](https://github.com/jsfez/epic-stack-with-argos) by
-  [@jsfez](https://github.com/jsfez): An example of the Epic Stack
-  with [Argos](https://www.argos-ci.com/) for visual testing
+  [@jsfez](https://github.com/jsfez): An example of the Epic Stack with
+  [Argos](https://www.argos-ci.com/) for visual testing
 - [Epic Stack monorepo with pnpm + turbo](https://github.com/PhilDL/epic-stack-monorepo):
-  An example of the Epic Stack in a monorepo setup, configs packages, UI package, and "client-hints" example package.
-- [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/) by
-  [@rperon](https://github.com/rperon): An example of the Epic Stack with passkeys
-  using [remix-auth-webauthn](https://github.com/alexanderson1993/remix-auth-webauthn) and 
-  [remix-auth](https://npm.im/remix-auth).
-- [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email):
-  An example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of [react-email](https://react.email/)
-- [Epic Stack with Query](https://github.com/gc-victor/epic-stack-with-query) by [@gc-victor](https://github.com/gc-victor):
-  An example of the Epic Stack using [Query](https://github.com/gc-victor/query). Using Epic Stack with Query, you can access the databases directly from your application while enjoying a range of benefits from Query to manage your databases, including [Query CLI](https://github.com/gc-victor/query/blob/main/README.md#cli), [Query API](https://github.com/gc-victor/query/blob/main/README.md#apis), [Query Funcions](https://github.com/gc-victor/query?tab=readme-ov-file#function) and [Query Studio](https://github.com/gc-victor/query-studio).
+  An example of the Epic Stack in a monorepo setup, configs packages, UI
+  package, and "client-hints" example package.
+- [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/)
+  by [@rperon](https://github.com/rperon): An example of the Epic Stack with
+  passkeys using
+  [remix-auth-webauthn](https://github.com/alexanderson1993/remix-auth-webauthn)
+  and [remix-auth](https://npm.im/remix-auth).
+- [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email): An
+  example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of
+  [react-email](https://react.email/)
+- [Epic Stack with Query](https://github.com/gc-victor/epic-stack-with-query) by
+  [@gc-victor](https://github.com/gc-victor): An example of the Epic Stack using
+  [Query](https://github.com/gc-victor/query). Using Epic Stack with Query, you
+  can access the databases directly from your application while enjoying a range
+  of benefits from Query to manage your databases, including
+  [Query CLI](https://github.com/gc-victor/query/blob/main/README.md#cli),
+  [Query API](https://github.com/gc-victor/query/blob/main/README.md#apis),
+  [Query Funcions](https://github.com/gc-victor/query?tab=readme-ov-file#function)
+  and [Query Studio](https://github.com/gc-victor/query-studio).
+- [`has-js` class](https://github.com/kentcdodds/epic-stack-example-has-js-class)
+  by [@kentcdodds](https://github.com/kentcdodds): An example of adding a
+  `has-js` class on the `<html>` element so you can use that to easily display
+  different content for users who do not have JavaScript enabled.
 
 ## How to contribute
 
