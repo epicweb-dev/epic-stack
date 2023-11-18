@@ -140,7 +140,7 @@ export default function ForgotPasswordRoute() {
 						No worries, we'll send you reset instructions.
 					</p>
 				</div>
-				<div className="mx-auto mt-16 min-w-[368px] max-w-sm">
+				<div className="mx-auto mt-16 min-w-full sm:min-w-[368px] max-w-sm">
 					<forgotPassword.Form method="POST" {...form.props}>
 						<AuthenticityTokenInput />
 						<HoneypotInputs />

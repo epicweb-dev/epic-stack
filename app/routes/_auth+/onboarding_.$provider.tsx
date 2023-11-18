@@ -209,7 +209,7 @@ export default function SignupRoute() {
 				<Spacer size="xs" />
 				<Form
 					method="POST"
-					className="mx-auto min-w-[368px] max-w-sm"
+					className="mx-auto min-w-full sm:min-w-[368px] max-w-sm"
 					{...form.props}
 				>
 					{fields.imageUrl.defaultValue ? (
