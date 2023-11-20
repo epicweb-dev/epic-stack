@@ -24,11 +24,11 @@ import {
 	sessionKey,
 	signupWithConnection,
 } from '#app/utils/auth.server.ts'
-import { redirectWithConfetti } from '#app/utils/confetti.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant, useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { type VerifyFunctionArgs } from './verify.tsx'
@@ -162,7 +162,11 @@ export async function action({ request, params }: DataFunctionArgs) {
 		await verifySessionStorage.destroySession(verifySession),
 	)
 
-	return redirectWithConfetti(safeRedirect(redirectTo), { headers })
+	return redirectWithToast(
+		safeRedirect(redirectTo),
+		{ title: 'Welcome', description: 'Thanks for signing up!' },
+		{ headers },
+	)
 }
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
@@ -209,7 +213,7 @@ export default function SignupRoute() {
 				<Spacer size="xs" />
 				<Form
 					method="POST"
-					className="mx-auto min-w-full sm:min-w-[368px] max-w-sm"
+					className="mx-auto min-w-full max-w-sm sm:min-w-[368px]"
 					{...form.props}
 				>
 					{fields.imageUrl.defaultValue ? (

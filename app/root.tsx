@@ -28,7 +28,6 @@ import { useRef } from 'react'
 import { AuthenticityTokenProvider } from 'remix-utils/csrf/react'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
-import { Confetti } from './components/confetti.tsx'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { ErrorList } from './components/forms.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
@@ -47,7 +46,6 @@ import fontStyleSheetUrl from './styles/font.css'
 import tailwindStyleSheetUrl from './styles/tailwind.css'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
-import { getConfetti } from './utils/confetti.server.ts'
 import { csrf } from './utils/csrf.server.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
@@ -133,7 +131,6 @@ export async function loader({ request }: DataFunctionArgs) {
 		await logout({ request, redirectTo: '/' })
 	}
 	const { toast, headers: toastHeaders } = await getToast(request)
-	const { confettiId, headers: confettiHeaders } = getConfetti(request)
 	const honeyProps = honeypot.getInputProps()
 	const [csrfToken, csrfCookieHeader] = await csrf.commitToken()
 
@@ -150,7 +147,6 @@ export async function loader({ request }: DataFunctionArgs) {
 			},
 			ENV: getEnv(),
 			toast,
-			confettiId,
 			honeyProps,
 			csrfToken,
 		},
@@ -158,7 +154,6 @@ export async function loader({ request }: DataFunctionArgs) {
 			headers: combineHeaders(
 				{ 'Server-Timing': timings.toString() },
 				toastHeaders,
-				confettiHeaders,
 				csrfCookieHeader ? { 'set-cookie': csrfCookieHeader } : null,
 			),
 		},
@@ -279,7 +274,6 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 				</div>
 			</div>
-			<Confetti id={data.confettiId} />
 			<EpicToaster toast={data.toast} />
 			<EpicProgress />
 		</Document>
