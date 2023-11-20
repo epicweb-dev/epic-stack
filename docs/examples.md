@@ -86,6 +86,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@kentcdodds](https://github.com/kentcdodds): An example of adding a
   `has-js` class on the `<html>` element so you can use that to easily display
   different content for users who do not have JavaScript enabled.
+- [Confetti](https://github.com/kentcdodds/epic-stack-example-confetti) by
+  [@kentcdodds](https://github.com/kentcdodds): Display confetti when the user
+  does something worthy of a celebration.
 
 ## How to contribute
 
