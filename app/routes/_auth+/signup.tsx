@@ -137,7 +137,7 @@ export default function SignupRoute() {
 					Please enter your email.
 				</p>
 			</div>
-			<div className="mx-auto mt-16 min-w-[368px] max-w-sm">
+			<div className="mx-auto mt-16 min-w-full sm:min-w-[368px] max-w-sm">
 				<Form method="POST" {...form.props}>
 					<AuthenticityTokenInput />
 					<HoneypotInputs />
