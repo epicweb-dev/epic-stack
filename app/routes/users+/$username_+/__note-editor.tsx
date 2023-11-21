@@ -206,7 +206,7 @@ export function NoteEditor({
 
 	return (
 		<div className="absolute inset-0">
-			<Form
+			<noteFetcher.Form
 				method="POST"
 				className="flex h-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden px-10 pb-28 pt-12"
 				{...form.props}
@@ -269,7 +269,7 @@ export function NoteEditor({
 					</Button>
 				</div>
 				<ErrorList id={form.errorId} errors={form.errors} />
-			</Form>
+			</noteFetcher.Form>
 			<div className={floatingToolbarClassName}>
 				<Button form={form.id} variant="destructive" type="reset">
 					Reset
