@@ -7,7 +7,7 @@ import {
 	clientHint as colorSchemeHint,
 	subscribeToSchemeChange,
 } from '@epic-web/client-hints/color-scheme'
-import { clientHint as timeZoneHint } from '@epic-web/client-hints/time-zome'
+import { clientHint as timeZoneHint } from '@epic-web/client-hints/time-zone'
 import { useRevalidator } from '@remix-run/react'
 import * as React from 'react'
 import { useRequestInfo } from './request-info.ts'
