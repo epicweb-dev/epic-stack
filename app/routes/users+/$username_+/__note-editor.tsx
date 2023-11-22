@@ -17,7 +17,7 @@ import {
 	type DataFunctionArgs,
 	type SerializeFrom,
 } from '@remix-run/node'
-import { Form, useFetcher } from '@remix-run/react'
+import { Form, useActionData } from '@remix-run/react'
 import { useRef, useState } from 'react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
@@ -186,13 +186,13 @@ export function NoteEditor({
 		}
 	>
 }) {
-	const noteFetcher = useFetcher<typeof action>()
-	const isPending = noteFetcher.state !== 'idle'
+	const actionData = useActionData<typeof action>()
+	const isPending = actionData?.status === 'error'
 
 	const [form, fields] = useForm({
 		id: 'note-editor',
 		constraint: getFieldsetConstraint(NoteEditorSchema),
-		lastSubmission: noteFetcher.data?.submission,
+		lastSubmission: actionData?.submission,
 		onValidate({ formData }) {
 			return parse(formData, { schema: NoteEditorSchema })
 		},
@@ -206,7 +206,7 @@ export function NoteEditor({
 
 	return (
 		<div className="absolute inset-0">
-			<noteFetcher.Form
+			<Form
 				method="POST"
 				className="flex h-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden px-10 pb-28 pt-12"
 				{...form.props}
@@ -269,7 +269,7 @@ export function NoteEditor({
 					</Button>
 				</div>
 				<ErrorList id={form.errorId} errors={form.errors} />
-			</noteFetcher.Form>
+			</Form>
 			<div className={floatingToolbarClassName}>
 				<Button form={form.id} variant="destructive" type="reset">
 					Reset
