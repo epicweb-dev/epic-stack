@@ -140,7 +140,7 @@ async function seed() {
 
 	const githubUser = await insertGitHubUser('MOCK_CODE_GITHUB_KODY')
 
-	await prisma.user.create({
+	const kodyUser = await prisma.user.create({
 		select: { id: true },
 		data: {
 			email: 'kody@kcd.dev',
@@ -254,6 +254,116 @@ async function seed() {
 		},
 	})
 	console.timeEnd(`🐨 Created admin user "kody"`)
+
+	console.time(`👩‍🏫 Created teacher user "teacher1"`)
+	const teacher1User = await prisma.user.create({
+		select: { id: true },
+		data: {
+			email: 'teacher1@teacher.com',
+			username: 'teacher1',
+			name: 'Teacher1',
+			password: { create: createPassword('teacher1') },
+			roles: { connect: [{ name: 'user' }] },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created teacher user "teacher1"`)
+
+	console.time(`👩‍🏫 Created teacher "teacher1"`)
+	const teacher1 = await prisma.teacher.create({
+		select: { id: true },
+		data: {
+			user: { connect: { id: teacher1User.id } },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created teacher "teacher1"`)
+
+	console.time(`👩‍🏫 Created teacher user "teacher2"`)
+	const teacher2User = await prisma.user.create({
+		select: { id: true },
+		data: {
+			email: 'teacher2@teacher.com',
+			username: 'teacher2',
+			name: 'Teacher2',
+
+			password: { create: createPassword('teacher2') },
+			roles: { connect: [{ name: 'user' }] },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created teacher user "teacher2"`)
+
+	console.time(`👩‍🏫 Created teacher "teacher2"`)
+	const teacher2 = await prisma.teacher.create({
+		select: { id: true },
+		data: {
+			user: {
+				connect: { id: teacher2User.id },
+			},
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created teacher "teacher2"`)
+
+	console.time(`👩‍🏫 Created student user "student1"`)
+	const student1User = await prisma.user.create({
+		select: { id: true },
+		data: {
+			email: 'student1@student.com',
+			username: 'student1',
+			name: 'student1',
+			password: { create: createPassword('student1') },
+			roles: { connect: [{ name: 'user' }] },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created student user "student1"`)
+
+	console.time(`👩‍🏫 Created student "student1"`)
+	const student1 = await prisma.student.create({
+		data: {
+			id: 'clno72cwk00238u8rt2ji672r',
+			user: { connect: { id: student1User.id } },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created student "student1"`)
+
+	console.time(`👩‍🏫 Created student user "student2"`)
+	const student2User = await prisma.user.create({
+		select: { id: true },
+		data: {
+			email: 'student2@student.com',
+			username: 'student2',
+			name: 'student2',
+
+			password: { create: createPassword('student2') },
+			roles: { connect: [{ name: 'user' }] },
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created student user "student2"`)
+
+	console.time(`👩‍🏫 Created student "student2"`)
+	const student2 = await prisma.student.create({
+		select: { id: true },
+		data: {
+			user: {
+				connect: { id: student2User.id },
+			},
+		},
+	})
+	console.timeEnd(`👩‍🏫 Created student "student2"`)
+
+	console.time(`👩‍🎓 Created school "kody's school"`)
+	await prisma.school.create({
+		select: { id: true },
+		data: {
+			name: "Kody's School",
+			owner: { connect: { id: kodyUser.id } },
+			teachers: {
+				connect: [{ id: teacher1.id }, { id: teacher2.id }],
+			},
+			students: {
+				connect: [{ id: student1.id }, { id: student2.id }],
+			},
+		},
+	})
+	console.timeEnd(`👩‍🎓 Created school "kody's school"`)
 
 	console.timeEnd(`🌱 Database has been seeded`)
 }

@@ -11,20 +11,79 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  username String  @unique
-  name     String?
+  id             String        @id @default(cuid())
+  email          String        @unique
+  username       String        @unique
+  name           String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  image          UserImage?
+  password       Password?
+  notes          Note[]
+  roles          Role[]
+  sessions       Session[]
+  connections    Connection[]
+  teachers       Teacher[]     @relation("UserTeachers") // Teachers associated with this user
+  managedSchools School[]      @relation("UserManagedSchools") // Schools managed by the user
+  studentProfile Student?      @relation("StudentProfile") // Link to the user's own student profile
+  application    Application[] // Enrollments associated with this user
+  events         Event[] // Events related to the user
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Teacher {
+  id              String   @id @default(cuid())
+  user            User     @relation("UserTeachers", fields: [userId], references: [id])
+  userId          String
+  schools         School[] @relation("TeacherSchools") // Schools where the teacher teaches
+  scheduledEvents Event[]  @relation("TeacherScheduledEvents") // Events scheduled by this teacher
+  // Other teacher-specific fields can be added here
+}
 
-  image       UserImage?
-  password    Password?
-  notes       Note[]
-  roles       Role[]
-  sessions    Session[]
-  connections Connection[]
+model Student {
+  id              String   @id @default(cuid())
+  schools         School[] @relation("StudentSchools") // Schools where the student is enrolled
+  scheduledEvents Event[]  @relation("StudentScheduledEvents") // Events scheduled for this student
+  user            User?    @relation("StudentProfile", fields: [userId], references: [id]) // Link to the student's user profile
+  userId          String?  @unique
+  // Other student-specific fields can be added here
+}
+
+model School {
+  id          String        @id @default(cuid())
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation("UserManagedSchools", fields: [ownerId], references: [id])
+  ownerId     String
+  teachers    Teacher[]     @relation("TeacherSchools") // Teachers in this school
+  students    Student[]     @relation("StudentSchools") // Students in this school
+  application Application[] @relation("SchoolApplication") // Enrollments associated with this school
+  events      Event[] // Events related to the school
+  // Other fields specific to the School model can be added here
+}
+
+model Application {
+  id              String @id @default(cuid())
+  user            User   @relation(fields: [userId], references: [id])
+  userId          String
+  school          School @relation("SchoolApplication", fields: [schoolId], references: [id])
+  schoolId        String
+  applicationType String
+
+  @@map("Application")
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  startTime DateTime
+  endTime   DateTime
+  school    School    @relation(fields: [schoolId], references: [id])
+  schoolId  String
+  teachers  Teacher[] @relation("TeacherScheduledEvents") // Teachers who have scheduled this event
+  students  Student[] @relation("StudentScheduledEvents") // Students who have scheduled this event
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 model Note {
