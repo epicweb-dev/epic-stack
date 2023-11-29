@@ -57,12 +57,6 @@ async function seed() {
 	})
 	console.timeEnd('👑 Created roles...')
 
-	if (process.env.MINIMAL_SEED) {
-		console.log('👍 Minimal seed complete')
-		console.timeEnd(`🌱 Database has been seeded`)
-		return
-	}
-
 	const totalUsers = 5
 	console.time(`👤 Created ${totalUsers} users...`)
 	const noteImages = await getNoteImages()
