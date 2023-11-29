@@ -42,6 +42,7 @@
   "dependencies": {
     "@conform-to/react": "^0.9.1",
     "@conform-to/zod": "^0.9.1",
+    "@epic-web/cachified": "^4.0.0",
     "@epic-web/client-hints": "^1.2.2",
     "@epic-web/remember": "^1.0.2",
     "@epic-web/totp": "^1.1.1",
@@ -66,7 +67,6 @@
     "autoprefixer": "^10.4.16",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^9.1.1",
-    "cachified": "^3.5.4",
     "chalk": "^5.3.0",
     "class-variance-authority": "^0.7.0",
     "close-with-grace": "^1.2.0",

@@ -1,4 +1,4 @@
-import { type CreateReporter } from 'cachified'
+import { type CreateReporter } from '@epic-web/cachified'
 
 export type Timings = Record<
 	string,
