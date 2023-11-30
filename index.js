@@ -1,8 +1,9 @@
 import 'dotenv/config'
-import ssourceMapSupport from 'source-map-support'
+import * as fs from 'fs'
 import { installGlobals } from '@remix-run/node'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
+import sourceMapSupport from 'source-map-support'
 
 sourceMapSupport.install({
 	retrieveSourceMap: function (source) {
