@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import 'source-map-support'
+import ssourceMapSupport from 'source-map-support'
 import { installGlobals } from '@remix-run/node'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
