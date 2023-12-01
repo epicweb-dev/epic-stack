@@ -187,7 +187,7 @@ with more data without performing a migration, then it's a bit more involved.
 
 ### LiteFS Cloud Backups
 
-LifeFS Cloud is a service offered by Fly.io for managing backup and restore
+LiteFS Cloud is a service offered by Fly.io for managing backup and restore
 functionality.
 
 This is the simplest method for backing up your database.
@@ -236,7 +236,7 @@ You can manually create a backup for your database using the following steps:
 1. Create a backup file using `litefs export`, and exit the console (it is
    recommended to name the exported file with the current date):
    ```sh
-   lifefs export -name sqlite.db /backups/backup-2023-10-10.db
+   litefs export -name sqlite.db /backups/backup-2023-10-10.db
    exit
    ```
 1. Use sftp to download the backup file:
