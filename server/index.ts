@@ -230,8 +230,8 @@ const server = app.listen(portToUse, () => {
 		desiredPort === portToUse
 			? desiredPort
 			: addy && typeof addy === 'object'
-			? addy.port
-			: 0
+			  ? addy.port
+			  : 0
 
 	if (portUsed !== desiredPort) {
 		console.warn(
