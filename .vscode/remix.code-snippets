@@ -1,0 +1,76 @@
+{
+	"loader": {
+		"prefix": "/ loader",
+		"body": [
+			"import { type DataFunctionArgs, json } from \"@remix-run/node\"",
+			"",
+			"export async function loader({ request }: DataFunctionArgs) {",
+			"  return json({})",
+			"}"
+		]
+	},
+	"action": {
+		"prefix": "/action",
+		"body": [
+			"import { type DataFunctionArgs, json } from \"@remix-run/node\"",
+			"",
+			"export async function action({ request }: DataFunctionArgs) {",
+			"  return json({})",
+			"}"
+		]
+	},
+	"default": {
+		"prefix": "/default",
+		"body": [
+			"export default function ${TM_FILENAME_BASE/[^a-zA-Z0-9]*([a-zA-Z0-9])([a-zA-Z0-9]*)/${1:/capitalize}${2}/g}() {",
+			" return (",
+			"  <div>",
+			"    <h1>Unknown Route</h1>",
+			"  </div>",
+			" )",
+			"}"
+		]
+	},
+	"headers": {
+		"prefix": "/headers",
+		"body": [
+			"import type { HeadersFunction } from '@remix-run/node'",
+			"",
+			"export const headers: HeadersFunction = ({ loaderHeaders }) => ({",
+			"  'Cache-Control': loaderHeaders.get('Cache-Control') ?? '',",
+			"})"
+		]
+	},
+	"links": {
+		"prefix": "/links",
+		"body": [
+			"import type { LinksFunction } from '@remix-run/node'",
+			"",
+			"export const links: LinksFunction = () => {",
+			"  return []",
+			"}"
+		]
+	},
+	"meta": {
+		"prefix": "/meta",
+		"body": [
+			"import type { MetaFunction } from '@remix-run/node'",
+			"",
+			"export const meta: MetaFunction<typeof loader> = ({ data }) => [{",
+			"  title: 'Title',",
+			"}]"
+		]
+	},
+	"shouldRevalidate": {
+		"prefix": "/shouldRevalidate",
+		"body": [
+			"import type { ShouldRevalidateFunction } from '@remix-run/react'",
+			"",
+			"export const shouldRevalidate: ShouldRevalidateFunction = ({",
+			"  defaultShouldRevalidate",
+			"}) => {",
+			"  return defaultShouldRevalidate",
+			"}"
+		]
+	}
+}
