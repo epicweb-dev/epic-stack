@@ -1,6 +1,6 @@
 {
 	"loader": {
-		"prefix": "/ loader",
+		"prefix": "/loader",
 		"body": [
 			"import { type DataFunctionArgs, json } from \"@remix-run/node\"",
 			"",
