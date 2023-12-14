@@ -22,44 +22,44 @@ Now you've added your font, there's a few places you need to update to use it.
 
 1. Add your font to the CSS variables.
 
-```css
-/* tailwind.css */
-@layer base {
-	:root {
-		--font-sans: <YourFont>;
-	}
-}
-```
+   ```css
+   /* tailwind.css */
+   @layer base {
+   	:root {
+   		--font-sans: <YourFont>;
+   	}
+   }
+   ```
 
 2. Add your font to the `fontFamily` property.
 
-```ts
-// tailwind.config.ts
-extend: {
-	...
-	fontFamily: {
-		...
-		sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
-	}
-}
+   ```ts
+   // tailwind.config.ts
+   extend: {
+   	...
+   	fontFamily: {
+   		...
+   		sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+   	}
+   }
 
-```
+   ```
 
 3. Import your font stylesheet.
 
-```tsx
-// root.tsx
-import fontStyleSheetUrl from './styles/yourfont.css'
-```
+   ```tsx
+   // root.tsx
+   import fontStyleSheetUrl from './styles/yourfont.css'
+   ```
 
-Add the font stylesheet to the links array.
+   Add the font stylesheet to the links array.
 
-```tsx
-// root.tsx
-...
-{ rel: 'preload', href: fontStyleSheetUrl, as: 'style' },
-{ rel: 'stylesheet', href: fontStyleSheetUrl },
-```
+   ```tsx
+   // root.tsx
+   ...
+   { rel: 'preload', href: fontStyleSheetUrl, as: 'style' },
+   { rel: 'stylesheet', href: fontStyleSheetUrl },
+   ```
 
 That's it! You can now use your custom font should now be available to use in
 your site.
@@ -78,62 +78,63 @@ Follow the steps below to add Font Metric Overrides to your custom fonts.
 
 1. Generate the overrides for your font.
 
-You can use [fontpie](https://www.npmjs.com/package/fontpie) utility to generate
-the overrides. For each of your fonts, write the following in your terminal:
+   You can use [fontpie](https://www.npmjs.com/package/fontpie) utility to
+   generate the overrides. For each of your fonts, write the following in your
+   terminal:
 
-```bash
-npx fontpie ./local/font/location.woff2 -w font-weight -s normal/italic -n YourFont
-```
+   ```bash
+   npx fontpie ./local/font/location.woff2 -w font-weight -s normal/italic -n YourFont
+   ```
 
-### Example
+   #### Example
 
-```sh
-npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2 -w 200 -s normal -n NunitoSans
-```
+   ```sh
+   npx fontpie ./public/fonts/nunito-sans/nunito-sans-v12-latin_latin-ext-200.woff2 -w 200 -s normal -n NunitoSans
+   ```
 
-```css
-@font-face {
-	font-family: 'NunitoSans Fallback';
-	font-style: normal;
-	font-weight: 200;
-	src: local('Arial');
-	ascent-override: 103.02%;
-	descent-override: 35.97%;
-	line-gap-override: 0%;
-	size-adjust: 98.13%;
-}
-```
+   ```css
+   @font-face {
+   	font-family: 'NunitoSans Fallback';
+   	font-style: normal;
+   	font-weight: 200;
+   	src: local('Arial');
+   	ascent-override: 103.02%;
+   	descent-override: 35.97%;
+   	line-gap-override: 0%;
+   	size-adjust: 98.13%;
+   }
+   ```
 
-If you've got a lot of font files to override, you can use
-[fontpie-from-css](https://github.com/matt-kinton/fontpie-from-css) to generate
-the overrides from a CSS file.
+   If you've got a lot of font files to override, you can use
+   [fontpie-from-css](https://github.com/matt-kinton/fontpie-from-css) to
+   generate the overrides from a CSS file.
 
-```sh
-npx fontpie-from-css ./public/fonts/yourfont/yourfont.css
-```
+   ```sh
+   npx fontpie-from-css ./public/fonts/yourfont/yourfont.css
+   ```
 
-**_Note:_** _If you've been following the steps above, you might have to copy
-your `yourfont.css` file temporarily to the `./public/fonts/yourfont` folder as
-`fontpie-from-css` loads fonts relative to the CSS file._
+   **_Note:_** _If you've been following the steps above, you might have to copy
+   your `yourfont.css` file temporarily to the `./public/fonts/yourfont` folder
+   as `fontpie-from-css` loads fonts relative to the CSS file._
 
 2. Add the overrides to your font stylesheet.
 
-Use fontpie for every custom font used (including variants) or fontpie-from-css
-and add the metric overrides to `yourfont.css`.
+   Use fontpie for every custom font used (including variants) or
+   fontpie-from-css and add the metric overrides to `yourfont.css`.
 
-_Ensure the original font has the `font-display: swap` property or the fallback
-wouldn't work!_
+   _Ensure the original font has the `font-display: swap` property or the
+   fallback wouldn't work!_
 
 3. Add the font fallback to the stylesheet.
 
-```css
-/* tailwind.css */
-@layer base {
-	:root {
-		--font-sans: <YourFont> <YourFontFallback>;
-	}
-}
-```
+   ```css
+   /* tailwind.css */
+   @layer base {
+   	:root {
+   		--font-sans: <YourFont> <YourFontFallback>;
+   	}
+   }
+   ```
 
 That's it! You can now use your custom font without worrying about Cumulative
 Layout Shift!
