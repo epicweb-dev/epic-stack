@@ -1,3 +1,4 @@
+import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, type DataFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useMatches } from '@remix-run/react'
@@ -6,7 +7,7 @@ import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { cn, invariantResponse } from '#app/utils/misc.tsx'
+import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })

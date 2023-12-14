@@ -1,4 +1,4 @@
-import { invariant } from '#app/utils/misc.tsx'
+import { invariant } from '@epic-web/invariant'
 import { expect, test } from '#tests/playwright-utils.ts'
 
 test('Search from home page', async ({ page, insertNewUser }) => {
