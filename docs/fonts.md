@@ -114,8 +114,8 @@ Follow the steps below to add Font Metric Overrides to your custom fonts.
    ```
 
    **_Note:_** _If you've been following the steps above, you might have to copy
-   your `yourfont.css` file temporarily to the `./public/fonts/yourfont` folder
-   as `fontpie-from-css` loads fonts relative to the CSS file._
+   your `yourfont.css` file temporarily to the `./public` folder as
+   `fontpie-from-css` loads fonts relative to the CSS file._
 
 2. Add the overrides to your font stylesheet.
 
