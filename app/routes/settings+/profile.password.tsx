@@ -135,19 +135,28 @@ export default function ChangePasswordRoute() {
 			<AuthenticityTokenInput />
 			<Field
 				labelProps={{ children: 'Current Password' }}
-				inputProps={conform.input(fields.currentPassword, { type: 'password' })}
+				inputProps={{
+					...conform.input(fields.currentPassword, { type: 'password' }),
+					autoComplete: 'current-password',
+				}}
 				errors={fields.currentPassword.errors}
 			/>
 			<Field
 				labelProps={{ children: 'New Password' }}
-				inputProps={conform.input(fields.newPassword, { type: 'password' })}
+				inputProps={{
+					...conform.input(fields.newPassword, { type: 'password' }),
+					autoComplete: 'new-password',
+				}}
 				errors={fields.newPassword.errors}
 			/>
 			<Field
 				labelProps={{ children: 'Confirm New Password' }}
-				inputProps={conform.input(fields.confirmNewPassword, {
-					type: 'password',
-				})}
+				inputProps={{
+					...conform.input(fields.confirmNewPassword, {
+						type: 'password',
+					}),
+					autoComplete: 'new-password',
+				}}
 				errors={fields.confirmNewPassword.errors}
 			/>
 			<ErrorList id={form.errorId} errors={form.errors} />

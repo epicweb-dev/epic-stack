@@ -232,7 +232,10 @@ export default function ChangeEmailIndex() {
 					<AuthenticityTokenInput />
 					<Field
 						labelProps={{ children: 'New Email' }}
-						inputProps={conform.input(fields.email)}
+						inputProps={{
+							...conform.input(fields.email),
+							autoComplete: 'email',
+						}}
 						errors={fields.email.errors}
 					/>
 					<ErrorList id={form.errorId} errors={form.errors} />

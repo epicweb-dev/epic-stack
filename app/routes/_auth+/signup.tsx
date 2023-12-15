@@ -146,7 +146,11 @@ export default function SignupRoute() {
 							htmlFor: fields.email.id,
 							children: 'Email',
 						}}
-						inputProps={{ ...conform.input(fields.email), autoFocus: true }}
+						inputProps={{
+							...conform.input(fields.email),
+							autoFocus: true,
+							autoComplete: 'email',
+						}}
 						errors={fields.email.errors}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />

@@ -277,15 +277,19 @@ export default function LoginPage() {
 									...conform.input(fields.username),
 									autoFocus: true,
 									className: 'lowercase',
+									autoComplete: 'username',
 								}}
 								errors={fields.username.errors}
 							/>
 
 							<Field
 								labelProps={{ children: 'Password' }}
-								inputProps={conform.input(fields.password, {
-									type: 'password',
-								})}
+								inputProps={{
+									...conform.input(fields.password, {
+										type: 'password',
+									}),
+									autoComplete: 'current-password',
+								}}
 								errors={fields.password.errors}
 							/>
 
