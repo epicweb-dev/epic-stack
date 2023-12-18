@@ -61,6 +61,18 @@ Now you've added your font, there's a few places you need to update to use it.
    { rel: 'stylesheet', href: fontStyleSheetUrl },
    ```
 
+4. Expose and cache your fonts folder.
+
+   ```ts
+   // server.ts
+   ...
+   app.use(
+      '/fonts',
+      // Can aggressively cache fonts as they don't change often
+      express.static('public/fonts', { immutable: true, maxAge: '1y' }),
+   )
+   ```
+
 That's it! You can now use your custom font should now be available to use in
 your site.
 
