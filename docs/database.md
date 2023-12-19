@@ -67,14 +67,16 @@ you can utilize Fly's `ssh` and `proxy` commands.
   fly proxy 5556:5555 --app [YOUR_APP_NAME]
   ```
 
-If you have multiple instances of your app running, and you'd like to make edits to your database, you will need to run `prisma:studio` on the primary instance.
+If you have multiple instances of your app running, and you'd like to make edits
+to your database, you will need to run `prisma:studio` on the primary instance.
 
-- Get a list of your app instances, the `ROLE` column will show which instance is `primary`
-   ```sh
-   fly status --app [YOUR_APP_NAME]
-   ```
+- Get a list of your app instances, the `ROLE` column will show which instance
+  is `primary`
+  ```sh
+  fly status --app [YOUR_APP_NAME]
+  ```
 - Run the console command with the `-s` select flag
-   ```sh
+  ```sh
   fly ssh console -C "npm run prisma:studio" -s --app [YOUR_APP_NAME]
   ```
 - Use your arrow keys to select the primary instance
