@@ -39,7 +39,7 @@ export default function Index() {
 								href="https://www.epicweb.dev/stack"
 								initial={{ opacity: 0, x: 20 }}
 								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', delay: 0.5 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}
 							>
 								<svg
 									className="size-20 text-foreground xl:-mt-4"
@@ -59,7 +59,7 @@ export default function Index() {
 								className="mt-8 text-4xl font-medium text-foreground md:text-5xl xl:mt-4 xl:text-6xl"
 								initial={{ opacity: 0, x: 20 }}
 								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', delay: 0.9 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 1 }}
 							>
 								<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
 							</motion.h1>
@@ -68,7 +68,7 @@ export default function Index() {
 								className="mt-6 text-xl/7 text-muted-foreground"
 								initial={{ opacity: 0, x: 20 }}
 								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', delay: 1.15 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 1.3 }}
 							>
 								Check the{' '}
 								<a
@@ -94,7 +94,7 @@ export default function Index() {
 									animate={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
 									transition={{
 										type: 'spring',
-										delay: i * 0.07 + 0.2,
+										delay: i * 0.06 + 0.2,
 										bounce: 0.3,
 									}}
 								>
