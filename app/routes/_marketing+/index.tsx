@@ -93,8 +93,9 @@ export default function Index() {
 									initial={{ opacity: 0, x: -20, scale: 0.2, rotate: 12 }}
 									animate={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
 									transition={{
-										ease: 'easeOut',
+										type: 'spring',
 										delay: i * 0.07 + 0.2,
+										bounce: 0.3,
 									}}
 								>
 									<Tooltip>
