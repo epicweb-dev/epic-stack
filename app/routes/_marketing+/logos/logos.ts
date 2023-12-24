@@ -81,7 +81,7 @@ export const logos = [
 	},
 	{
 		src: tailwind,
-		alt: 'Tailwind',
+		alt: 'Tailwind CSS',
 		href: 'https://tailwindcss.com',
 		column: 3,
 		row: 3,
