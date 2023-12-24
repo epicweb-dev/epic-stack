@@ -34,12 +34,16 @@ export default function Index() {
 			<div className="font-poppins grid place-items-center">
 				<div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
 					<div className="xl:order-2">
-						<div className="flex max-w-md flex-col items-center text-center xl:items-start xl:text-left">
+						<div className="flex max-w-md flex-col items-center text-center [--framer-translate-x:0] [--framer-translate-y:20px] xl:items-start xl:text-left xl:[--framer-translate-x:20px] xl:[--framer-translate-y:0]">
 							<motion.a
 								href="https://www.epicweb.dev/stack"
-								initial={{ opacity: 0, x: 20 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}
+								initial={{
+									opacity: 0,
+									x: 'var(--framer-translate-x)',
+									y: 'var(--framer-translate-y)',
+								}}
+								animate={{ opacity: 1, x: 0, y: 0 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 0 }}
 							>
 								<svg
 									className="size-20 text-foreground xl:-mt-4"
@@ -57,18 +61,26 @@ export default function Index() {
 							<motion.h1
 								data-heading
 								className="mt-8 text-4xl font-medium text-foreground md:text-5xl xl:mt-4 xl:text-6xl"
-								initial={{ opacity: 0, x: 20 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 1 }}
+								initial={{
+									opacity: 0,
+									x: 'var(--framer-translate-x)',
+									y: 'var(--framer-translate-y)',
+								}}
+								animate={{ opacity: 1, x: 0, y: 0 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}
 							>
 								<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
 							</motion.h1>
 							<motion.p
 								data-paragraph
 								className="mt-6 text-xl/7 text-muted-foreground"
-								initial={{ opacity: 0, x: 20 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 1.3 }}
+								initial={{
+									opacity: 0,
+									x: 'var(--framer-translate-x)',
+									y: 'var(--framer-translate-y)',
+								}}
+								animate={{ opacity: 1, x: 0, y: 0 }}
+								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.8 }}
 							>
 								Check the{' '}
 								<a
