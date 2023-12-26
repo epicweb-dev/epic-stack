@@ -32,7 +32,7 @@ export default function Index() {
 		<main className="font-poppins grid place-items-center">
 			<div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
 				<div className="xl:order-2">
-					<div className="flex max-w-md flex-col items-center text-center [--framer-translate-x:0] [--framer-translate-y:20px] xl:items-start xl:text-left xl:[--framer-translate-x:20px] xl:[--framer-translate-y:0]">
+					<div className="flex max-w-md flex-col items-center text-center xl:items-start xl:text-left">
 						<a
 							href="https://www.epicweb.dev/stack"
 							className="animate-slide-top xl:animate-slide-left [animation-fill-mode:backwards] xl:[animation-delay:0.5s] xl:[animation-fill-mode:backwards]"
