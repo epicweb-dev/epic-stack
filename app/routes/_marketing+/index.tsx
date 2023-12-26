@@ -1,5 +1,4 @@
 import { type MetaFunction } from '@remix-run/node'
-import { motion } from 'framer-motion'
 import {
 	Tooltip,
 	TooltipContent,
@@ -35,15 +34,9 @@ export default function Index() {
 				<div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
 					<div className="xl:order-2">
 						<div className="flex max-w-md flex-col items-center text-center [--framer-translate-x:0] [--framer-translate-y:20px] xl:items-start xl:text-left xl:[--framer-translate-x:20px] xl:[--framer-translate-y:0]">
-							<motion.a
+							<a
 								href="https://www.epicweb.dev/stack"
-								initial={{
-									opacity: 0,
-									x: 'var(--framer-translate-x)',
-									y: 'var(--framer-translate-y)',
-								}}
-								animate={{ opacity: 1, x: 0, y: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 0 }}
+								className="animate-slide-top xl:animate-slide-left [animation-fill-mode:backwards] xl:[animation-delay:0.5s] xl:[animation-fill-mode:backwards]"
 							>
 								<svg
 									className="size-20 text-foreground xl:-mt-4"
@@ -56,31 +49,17 @@ export default function Index() {
 										d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
 									></path>
 								</svg>
-							</motion.a>
+							</a>
 
-							<motion.h1
+							<h1
 								data-heading
-								className="mt-8 text-4xl font-medium text-foreground md:text-5xl xl:mt-4 xl:text-6xl"
-								initial={{
-									opacity: 0,
-									x: 'var(--framer-translate-x)',
-									y: 'var(--framer-translate-y)',
-								}}
-								animate={{ opacity: 1, x: 0, y: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.5 }}
+								className="animate-slide-top xl:animate-slide-left mt-8 text-4xl font-medium text-foreground [animation-fill-mode:backwards] [animation-delay:0.3s] md:text-5xl xl:mt-4 xl:text-6xl xl:[animation-fill-mode:backwards] xl:[animation-delay:0.8s]"
 							>
 								<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
-							</motion.h1>
-							<motion.p
+							</h1>
+							<p
 								data-paragraph
-								className="mt-6 text-xl/7 text-muted-foreground"
-								initial={{
-									opacity: 0,
-									x: 'var(--framer-translate-x)',
-									y: 'var(--framer-translate-y)',
-								}}
-								animate={{ opacity: 1, x: 0, y: 0 }}
-								transition={{ ease: 'easeOut', duration: 0.5, delay: 0.8 }}
+								className="animate-slide-top xl:animate-slide-left mt-6 text-xl/7 text-muted-foreground [animation-fill-mode:backwards] [animation-delay:0.8s] xl:mt-8 xl:text-xl/6 xl:leading-10 xl:[animation-fill-mode:backwards] xl:[animation-delay:1s]"
 							>
 								Check the{' '}
 								<a
@@ -90,25 +69,20 @@ export default function Index() {
 									Getting Started guide
 								</a>{' '}
 								file for how to get your project off the ground!
-							</motion.p>
+							</p>
 						</div>
 					</div>
 					<ul className="mt-16 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-4 xl:mt-0 xl:grid xl:grid-flow-col xl:grid-cols-5 xl:grid-rows-6">
 						<TooltipProvider>
 							{logos.map((logo, i) => (
-								<motion.li
+								<li
 									key={logo.href}
 									className={cn(
 										columnClasses[logo.column],
 										rowClasses[logo.row],
+										'animate-roll-reveal [animation-fill-mode:backwards]',
 									)}
-									initial={{ opacity: 0, x: -20, scale: 0.2, rotate: 12 }}
-									animate={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
-									transition={{
-										type: 'spring',
-										delay: i * 0.06 + 0.2,
-										bounce: 0.3,
-									}}
+									style={{ animationDelay: `${i * 0.07}s` }}
 								>
 									<Tooltip>
 										<TooltipTrigger asChild>
@@ -121,7 +95,7 @@ export default function Index() {
 										</TooltipTrigger>
 										<TooltipContent>{logo.alt}</TooltipContent>
 									</Tooltip>
-								</motion.li>
+								</li>
 							))}
 						</TooltipProvider>
 					</ul>
