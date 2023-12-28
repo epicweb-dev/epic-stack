@@ -1,5 +1,4 @@
-import { json } from '@remix-run/node'
-import { type DataFunctionArgs } from '@remix-run/server-runtime'
+import { json , type DataFunctionArgs } from '@remix-run/node'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { NoteEditor, action } from './__note-editor.tsx'
 
