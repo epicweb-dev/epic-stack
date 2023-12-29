@@ -273,7 +273,7 @@ function App() {
 					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
 				</div>
 			</div>
-			<EpicToaster position="top-center" theme={theme} />
+			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />
 		</Document>
 	)
