@@ -31,6 +31,14 @@ lease:
 exec:
   - cmd: node ./other/setup-swap.js
 
+  # Set the journal mode for the database to WAL. This reduces concurrency deadlock issues
+  - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
+    if-candidate: true
+
+  # Set the journal mode to for the cache WAL. This reduces concurrency deadlock issues
+  - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
+    if-candidate: true
+
   - cmd: npx prisma migrate deploy
     if-candidate: true
 
