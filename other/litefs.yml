@@ -35,7 +35,7 @@ exec:
   - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
-  # Set the journal mode to for the cache WAL. This reduces concurrency deadlock issues
+  # Set the journal mode for the cache to WAL. This reduces concurrency deadlock issues
   - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
