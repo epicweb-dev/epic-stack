@@ -82,7 +82,7 @@ This page links to examples of how to implement some things with the Epic Stack.
   [Query API](https://github.com/gc-victor/query/blob/main/README.md#apis),
   [Query Funcions](https://github.com/gc-victor/query?tab=readme-ov-file#function)
   and [Query Studio](https://github.com/gc-victor/query-studio).
-- [`has-js` class](https://github.com/kentcdodds/epic-stack-example-has-js-class)
+- [`has-js` class](https://github.com/epicweb-dev/epic-stack-example-has-js-class)
   by [@kentcdodds](https://github.com/kentcdodds): An example of adding a
   `has-js` class on the `<html>` element so you can use that to easily display
   different content for users who do not have JavaScript enabled.
