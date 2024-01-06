@@ -4,7 +4,7 @@ import { sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import {
-	type OptionalToast,
+	type ToastInput,
 	toastSessionStorage,
 	toastKey,
 } from '#app/utils/toast.server.ts'
@@ -114,7 +114,7 @@ expect.extend({
 				} created in the database for ${userId}`,
 		}
 	},
-	async toSendToast(response: Response, toast: OptionalToast) {
+	async toSendToast(response: Response, toast: ToastInput) {
 		const setCookies = getSetCookie(response.headers)
 		const toastSetCookie = setCookies.find(
 			c => setCookieParser.parseString(c).name === 'en_toast',
@@ -157,7 +157,7 @@ expect.extend({
 interface CustomMatchers<R = unknown> {
 	toHaveRedirect(redirectTo: string | null): R
 	toHaveSessionForUser(userId: string): Promise<R>
-	toSendToast(toast: OptionalToast): Promise<R>
+	toSendToast(toast: ToastInput): Promise<R>
 }
 
 declare module 'vitest' {
