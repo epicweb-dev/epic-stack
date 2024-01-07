@@ -54,11 +54,6 @@ const customTwMerge = extendTailwindMerge<string, string>({
 					text: Object.keys(extendedTheme.fontSize),
 				},
 			],
-			animate: [
-				{
-					animate: Object.keys(extendedTheme.animation),
-				},
-			],
 		},
 	},
 })
