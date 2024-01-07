@@ -86,7 +86,7 @@ export default function Index() {
 											href={logo.href}
 											className="grid size-20 place-items-center rounded-2xl bg-violet-600/10 p-4 transition hover:-rotate-6 hover:bg-violet-600/15 sm:size-24 dark:bg-violet-200 dark:hover:bg-violet-100"
 										>
-											<img src={logo.src} alt="" className="w-16" />
+											<img src={logo.src} alt="" />
 										</a>
 									</TooltipTrigger>
 									<TooltipContent>{logo.alt}</TooltipContent>
