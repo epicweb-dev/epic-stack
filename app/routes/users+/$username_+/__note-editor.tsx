@@ -314,7 +314,7 @@ function ImageChooser({
 							className={cn('group absolute h-32 w-32 rounded-lg', {
 								'bg-accent opacity-40 focus-within:opacity-100 hover:opacity-100':
 									!previewImage,
-								'cursor-pointer focus-within:ring-4': !existingImage,
+								'cursor-pointer focus-within:ring-2': !existingImage,
 							})}
 						>
 							{previewImage ? (
