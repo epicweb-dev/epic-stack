@@ -1,7 +1,8 @@
 import { PassThrough } from 'stream'
 import {
 	createReadableStreamFromReadable,
-	type DataFunctionArgs,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
 	type HandleDocumentRequestFunction,
 } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
@@ -94,7 +95,7 @@ export async function handleDataRequest(response: Response) {
 
 export function handleError(
 	error: unknown,
-	{ request }: DataFunctionArgs,
+	{ request }: LoaderFunctionArgs | ActionFunctionArgs,
 ): void {
 	if (error instanceof Error) {
 		Sentry.captureRemixServerException(error, 'remix.server', request)

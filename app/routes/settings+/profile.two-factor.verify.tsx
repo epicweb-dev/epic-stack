@@ -1,7 +1,12 @@
 import { conform, useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import {
+	json,
+	redirect,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
+} from '@remix-run/node'
 import {
 	Form,
 	useActionData,
@@ -39,7 +44,7 @@ const ActionSchema = z.union([CancelSchema, VerifySchema])
 
 export const twoFAVerifyVerificationType = '2fa-verify'
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	const verification = await prisma.verification.findUnique({
 		where: {
@@ -70,7 +75,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	return json({ otpUri, qrCode })
 }
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 	await validateCSRF(formData, request.headers)

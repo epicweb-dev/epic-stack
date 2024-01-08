@@ -33,7 +33,7 @@ import {
 	time,
 } from '#app/utils/timing.server.ts'
 
-export async function loader({ params }: DataFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
 	const timings = makeTimings('notes loader') // <-- 1. Setup Timings
 	// 2. Time functions
 	const owner = await time(
