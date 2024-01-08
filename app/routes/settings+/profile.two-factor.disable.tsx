@@ -1,5 +1,9 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import {
+	json,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
+} from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -18,12 +22,12 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	await requireRecentVerification(request)
 	return json({})
 }
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	await requireRecentVerification(request)
 	await validateCSRF(await request.formData(), request.headers)
 	const userId = await requireUserId(request)

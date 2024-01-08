@@ -7,7 +7,8 @@ import {
 	redirect,
 	unstable_createMemoryUploadHandler,
 	unstable_parseMultipartFormData,
-	type DataFunctionArgs,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
 } from '@remix-run/node'
 import {
 	Form,
@@ -53,7 +54,7 @@ const NewImageSchema = z.object({
 
 const PhotoFormSchema = z.union([DeleteImageSchema, NewImageSchema])
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
@@ -68,7 +69,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	return json({ user })
 }
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await unstable_parseMultipartFormData(
 		request,

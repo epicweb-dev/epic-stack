@@ -1,9 +1,9 @@
-import { type DataFunctionArgs, json, redirect } from '@remix-run/node'
+import { type ActionFunctionArgs, json, redirect } from '@remix-run/node'
 import { getInstanceInfo, getInternalInstanceDomain } from 'litefs-js'
 import { z } from 'zod'
 import { cache } from '#app/utils/cache.server.ts'
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
 	if (!currentIsPrimary) {
 		throw new Error(

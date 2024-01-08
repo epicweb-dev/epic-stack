@@ -2,7 +2,8 @@ import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
-	type DataFunctionArgs,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
 	type SerializeFrom,
 	type HeadersFunction,
 } from '@remix-run/node'
@@ -49,7 +50,7 @@ async function userCanDeleteConnections(userId: string) {
 	return Boolean(user?._count.connections && user?._count.connections > 1)
 }
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	const timings = makeTimings('profile connections loader')
 	const rawConnections = await prisma.connection.findMany({
@@ -96,7 +97,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers
 }
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 	invariantResponse(

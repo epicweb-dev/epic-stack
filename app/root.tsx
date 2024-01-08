@@ -3,7 +3,8 @@ import { parse } from '@conform-to/zod'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
-	type DataFunctionArgs,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
 	type HeadersFunction,
 	type LinksFunction,
 	type MetaFunction,
@@ -91,7 +92,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	]
 }
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
@@ -169,7 +170,7 @@ const ThemeFormSchema = z.object({
 	theme: z.enum(['system', 'light', 'dark']),
 })
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	const submission = parse(formData, {
 		schema: ThemeFormSchema,
