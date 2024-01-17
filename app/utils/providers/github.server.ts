@@ -55,7 +55,6 @@ export class GitHubProvider implements AuthProvider {
 			ttl: 1000 * 60,
 			swr: 1000 * 60 * 60 * 24 * 7,
 			async getFreshValue(context) {
-				await new Promise(r => setTimeout(r, 3000))
 				const response = await fetch(
 					`https://api.github.com/user/${providerId}`,
 					{ headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } },
