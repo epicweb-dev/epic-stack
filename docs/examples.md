@@ -89,6 +89,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Confetti](https://github.com/kentcdodds/epic-stack-example-confetti) by
   [@kentcdodds](https://github.com/kentcdodds): Display confetti when the user
   does something worthy of a celebration.
+- [Epic Stack Border animation](https://github.com/hakimLyon/epic-stack-with-css-border-animation)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
+  CSS border animation.
 
 ## How to contribute
 
