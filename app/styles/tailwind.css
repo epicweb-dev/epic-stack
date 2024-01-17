@@ -77,4 +77,9 @@
 
 		--ring: 217.2 32.6% 60%;
 	}
+	@property --a {
+		syntax: '<angle>';
+		inherits: false;
+		initial-value: 0deg;
+	}
 }

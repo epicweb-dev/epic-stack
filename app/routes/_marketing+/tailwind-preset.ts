@@ -25,3 +25,23 @@ export const marketingPreset = {
 		},
 	},
 } satisfies Omit<Config, 'content'>
+
+export const borderAnimationPreset = {
+	theme: {
+		extend: {
+			keyframes: {
+				rotate: {
+					'0%': { '--a': '0deg' },
+					'100%': { '--a': '360deg' },
+				},
+			},
+			animation: {
+				rotate: 'rotate 6s linear infinite',
+			},
+			backgroundImage: {
+				'box-pattern': `repeating-conic-gradient(from var(--a), theme('colors.primary.DEFAULT') 0%, theme('colors.primary.DEFAULT') 5%, transparent 5%, transparent 40%, theme('colors.primary.DEFAULT') 50%)`,
+				'box-pattern-dark': `repeating-conic-gradient(from var(--a), theme('colors.primary.DEFAULT') 0%, theme('colors.primary.DEFAULT') 5%, transparent 5%, transparent 40%, theme('colors.primary.DEFAULT') 50%)`,
+			},
+		},
+	},
+} satisfies Omit<Config, 'content'>
