@@ -7,7 +7,7 @@ import {
 } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import * as Sentry from '@sentry/remix'
-import isbot from 'isbot'
+import { isbot } from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
 import { renderToPipeableStream } from 'react-dom/server'
 import { getEnv, init } from './utils/env.server.ts'
