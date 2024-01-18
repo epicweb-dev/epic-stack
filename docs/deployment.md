@@ -87,8 +87,8 @@ Prior to your first deployment, you'll need to do a few things:
   ([learn more about configuring consul](https://fly.io/docs/litefs/getting-started/#lease-configuration)).
 
   ```sh
-  fly consul attach --app [YOUR_APP_NAME]
-  fly consul attach --app [YOUR_APP_NAME]-staging
+  fly consul attach --app epic-stack
+  fly consul attach --app epic-stack-staging
   ```
 
 8. Commit!
