@@ -31,7 +31,7 @@ export const handle: SEOHandle = {
 // in your routes/url-that-doesnt-need-sitemap
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 
-export let loader: LoaderFunction = ({ request }) => {
+export let loader = ({ request }: LoaderFunctionArgs) => {
 	/**/
 }
 
