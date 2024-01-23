@@ -1,5 +1,5 @@
-import { useInputEvent } from '@conform-to/react'
-import React, { useId, useRef } from 'react'
+import { useInputControl } from '@conform-to/react'
+import React, { useId } from 'react'
 import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
 import { Input } from './ui/input.tsx'
 import { Label } from './ui/label.tsx'
@@ -94,42 +94,45 @@ export function CheckboxField({
 	className,
 }: {
 	labelProps: JSX.IntrinsicElements['label']
-	buttonProps: CheckboxProps
+	buttonProps: CheckboxProps & {
+		name: string
+		form: string
+		value?: string
+	}
 	errors?: ListOfErrors
 	className?: string
 }) {
+	const { key, defaultChecked, ...checkboxProps } = buttonProps
 	const fallbackId = useId()
-	const buttonRef = useRef<HTMLButtonElement>(null)
-	// To emulate native events that Conform listen to:
-	// See https://conform.guide/integrations
-	const control = useInputEvent({
-		// Retrieve the checkbox element by name instead as Radix does not expose the internal checkbox element
-		// See https://github.com/radix-ui/primitives/discussions/874
-		ref: () =>
-			buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
-		onFocus: () => buttonRef.current?.focus(),
+	const checkedValue = buttonProps.value ?? 'on'
+	const input = useInputControl({
+		key,
+		name: buttonProps.name,
+		formId: buttonProps.form,
+		initialValue: defaultChecked ? checkedValue : undefined,
 	})
-	const id = buttonProps.id ?? buttonProps.name ?? fallbackId
+	const id = buttonProps.id ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
+
 	return (
 		<div className={className}>
 			<div className="flex gap-2">
 				<Checkbox
+					{...checkboxProps}
 					id={id}
-					ref={buttonRef}
 					aria-invalid={errorId ? true : undefined}
 					aria-describedby={errorId}
-					{...buttonProps}
+					checked={input.value === checkedValue}
 					onCheckedChange={state => {
-						control.change(Boolean(state.valueOf()))
+						input.change(state.valueOf() ? checkedValue : '')
 						buttonProps.onCheckedChange?.(state)
 					}}
 					onFocus={event => {
-						control.focus()
+						input.focus()
 						buttonProps.onFocus?.(event)
 					}}
 					onBlur={event => {
-						control.blur()
+						input.blur()
 						buttonProps.onBlur?.(event)
 					}}
 					type="button"

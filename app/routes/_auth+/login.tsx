@@ -1,5 +1,5 @@
-import { conform, useForm } from '@conform-to/react'
-import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { useForm, getFormProps, getInputProps } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariant } from '@epic-web/invariant'
 import {
 	json,
@@ -110,7 +110,10 @@ export async function handleVerification({
 	request,
 	submission,
 }: VerifyFunctionArgs) {
-	invariant(submission.value, 'Submission should have a value by this point')
+	invariant(
+		submission.status === 'success',
+		'Submission should be successful by now',
+	)
 	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
@@ -196,10 +199,10 @@ export async function action({ request }: ActionFunctionArgs) {
 	await requireAnonymous(request)
 	const formData = await request.formData()
 	checkHoneypot(formData)
-	const submission = await parse(formData, {
+	const submission = await parseWithZod(formData, {
 		schema: intent =>
 			LoginFormSchema.transform(async (data, ctx) => {
-				if (intent !== 'submit') return { ...data, session: null }
+				if (intent !== null) return { ...data, session: null }
 
 				const session = await login(data)
 				if (!session) {
@@ -214,16 +217,18 @@ export async function action({ request }: ActionFunctionArgs) {
 			}),
 		async: true,
 	})
-	// get the password off the payload that's sent back
-	delete submission.payload.password
 
-	if (submission.intent !== 'submit') {
-		// @ts-expect-error - conform should probably have support for doing this
-		delete submission.value?.password
-		return json({ status: 'idle', submission } as const)
-	}
-	if (!submission.value?.session) {
-		return json({ status: 'error', submission } as const, { status: 400 })
+	if (submission.status !== 'success' || !submission.value.session) {
+		return json(
+			{
+				result: submission.reply({
+					hideFields: ['password'],
+				}),
+			},
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		)
 	}
 
 	const { session, remember, redirectTo } = submission.value
@@ -244,11 +249,11 @@ export default function LoginPage() {
 
 	const [form, fields] = useForm({
 		id: 'login-form',
-		constraint: getFieldsetConstraint(LoginFormSchema),
+		constraint: getZodConstraint(LoginFormSchema),
 		defaultValue: { redirectTo },
-		lastSubmission: actionData?.submission,
+		lastResult: actionData?.result,
 		onValidate({ formData }) {
-			return parse(formData, { schema: LoginFormSchema })
+			return parseWithZod(formData, { schema: LoginFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -266,12 +271,12 @@ export default function LoginPage() {
 
 				<div>
 					<div className="mx-auto w-full max-w-md px-8">
-						<Form method="POST" {...form.props}>
+						<Form method="POST" {...getFormProps(form)}>
 							<HoneypotInputs />
 							<Field
 								labelProps={{ children: 'Username' }}
 								inputProps={{
-									...conform.input(fields.username),
+									...getInputProps(fields.username, { type: 'text' }),
 									autoFocus: true,
 									className: 'lowercase',
 									autoComplete: 'username',
@@ -282,7 +287,7 @@ export default function LoginPage() {
 							<Field
 								labelProps={{ children: 'Password' }}
 								inputProps={{
-									...conform.input(fields.password, {
+									...getInputProps(fields.password, {
 										type: 'password',
 									}),
 									autoComplete: 'current-password',
@@ -296,7 +301,7 @@ export default function LoginPage() {
 										htmlFor: fields.remember.id,
 										children: 'Remember me',
 									}}
-									buttonProps={conform.input(fields.remember, {
+									buttonProps={getInputProps(fields.remember, {
 										type: 'checkbox',
 									})}
 									errors={fields.remember.errors}
@@ -312,14 +317,14 @@ export default function LoginPage() {
 							</div>
 
 							<input
-								{...conform.input(fields.redirectTo, { type: 'hidden' })}
+								{...getInputProps(fields.redirectTo, { type: 'hidden' })}
 							/>
 							<ErrorList errors={form.errors} id={form.errorId} />
 
 							<div className="flex items-center justify-between gap-6 pt-3">
 								<StatusButton
 									className="w-full"
-									status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+									status={isPending ? 'pending' : form.status ?? 'idle'}
 									type="submit"
 									disabled={isPending}
 								>
