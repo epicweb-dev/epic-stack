@@ -7,7 +7,7 @@ import { type Timings } from './timing.server.ts'
 export const connectionSessionStorage = createCookieSessionStorage({
 	cookie: {
 		name: 'en_connection',
-		sameSite: 'lax',
+		sameSite: 'lax', // CSRF protection is advised if changing to 'none'
 		path: '/',
 		httpOnly: true,
 		maxAge: 60 * 10, // 10 minutes

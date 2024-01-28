@@ -2,7 +2,6 @@ import { conform, useForm, type Submission } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
-import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -13,7 +12,6 @@ import { handleVerification as handleChangeEmailVerification } from '#app/routes
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { type twoFAVerifyVerificationType } from '#app/routes/settings+/profile.two-factor.verify.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { ensurePrimary } from '#app/utils/litefs.server.ts'
@@ -45,7 +43,6 @@ const VerifySchema = z.object({
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	checkHoneypot(formData)
-	await validateCSRF(formData, request.headers)
 	return validateRequest(request, formData)
 }
 
@@ -284,7 +281,6 @@ export default function VerifyRoute() {
 				</div>
 				<div className="flex w-full gap-2">
 					<Form method="POST" {...form.props} className="flex-1">
-						<AuthenticityTokenInput />
 						<HoneypotInputs />
 						<Field
 							labelProps={{

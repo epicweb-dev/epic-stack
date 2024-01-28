@@ -8,7 +8,6 @@ import {
 	type MetaFunction,
 } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
-import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -18,7 +17,6 @@ import {
 	ProviderConnectionForm,
 	providerNames,
 } from '#app/utils/connections.tsx'
-import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
@@ -33,7 +31,6 @@ const SignupSchema = z.object({
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 
-	await validateCSRF(formData, request.headers)
 	checkHoneypot(formData)
 
 	const submission = await parse(formData, {
@@ -139,7 +136,6 @@ export default function SignupRoute() {
 			</div>
 			<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
 				<Form method="POST" {...form.props}>
-					<AuthenticityTokenInput />
 					<HoneypotInputs />
 					<Field
 						labelProps={{
