@@ -18,7 +18,7 @@ export type ToastInput = z.input<typeof ToastSchema>
 export const toastSessionStorage = createCookieSessionStorage({
 	cookie: {
 		name: 'en_toast',
-		sameSite: 'lax', // CSRF protection is advised if changing to 'none'
+		sameSite: 'lax',
 		path: '/',
 		httpOnly: true,
 		secrets: process.env.SESSION_SECRET.split(','),
@@ -56,7 +56,7 @@ export async function getToast(request: Request) {
 		headers: toast
 			? new Headers({
 					'set-cookie': await toastSessionStorage.destroySession(session),
-			  })
+				})
 			: null,
 	}
 }
