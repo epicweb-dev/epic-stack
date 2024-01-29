@@ -11,7 +11,7 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@kentcdodds](https://github.com/kentcdodds): Using client hints to avoid
   content layout shift with `prefers-reduced-motion` and framer motion
   animations.
-- [Cross-site Request Forgery Protection (CSRF)](https://github.com/kentcdodds/epic-stack-with-csrf)
+- [Cross-site Request Forgery Protection (CSRF)](https://github.com/epicweb-dev/epic-stack-example-csrf)
   by [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
   with CSRF protection on forms.
 - [Epic Stack + OpenAI](https://github.com/kentcdodds/epic-ai): by
