@@ -30,7 +30,7 @@ import {
 	getInstanceInfo,
 } from '#app/utils/litefs.server.ts'
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
-import { requireUserWithRole } from '#app/utils/permissions.ts'
+import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
