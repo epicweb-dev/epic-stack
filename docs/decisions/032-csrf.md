@@ -2,7 +2,7 @@
 
 Date: 2023-10-11
 
-Status: accepted
+Status: superseded by [035](./035-remove-csrf.md)
 
 ## Context
 

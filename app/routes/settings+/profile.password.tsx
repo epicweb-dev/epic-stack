@@ -8,7 +8,6 @@ import {
 	type ActionFunctionArgs,
 } from '@remix-run/node'
 import { Form, Link, useActionData } from '@remix-run/react'
-import { AuthenticityTokenInput } from 'remix-utils/csrf/react'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
@@ -19,7 +18,6 @@ import {
 	requireUserId,
 	verifyUserPassword,
 } from '#app/utils/auth.server.ts'
-import { validateCSRF } from '#app/utils/csrf.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -67,7 +65,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	await requirePassword(userId)
 	const formData = await request.formData()
-	await validateCSRF(formData, request.headers)
 	const submission = await parse(formData, {
 		async: true,
 		schema: ChangePasswordForm.superRefine(
@@ -137,7 +134,6 @@ export default function ChangePasswordRoute() {
 
 	return (
 		<Form method="POST" {...form.props} className="mx-auto max-w-md">
-			<AuthenticityTokenInput />
 			<Field
 				labelProps={{ children: 'Current Password' }}
 				inputProps={{

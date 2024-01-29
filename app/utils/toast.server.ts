@@ -56,7 +56,7 @@ export async function getToast(request: Request) {
 		headers: toast
 			? new Headers({
 					'set-cookie': await toastSessionStorage.destroySession(session),
-			  })
+				})
 			: null,
 	}
 }
