@@ -147,9 +147,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	if (submission.status !== 'success') {
 		return json(
 			{ result: submission.reply() },
-			{
-				status: submission.status === 'error' ? 400 : 200,
-			},
+			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
 

@@ -51,9 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (submission.status !== 'success') {
 		return json(
 			{ result: submission.reply() },
-			{
-				status: submission.status === 'error' ? 400 : 200,
-			},
+			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
 	const { usernameOrEmail } = submission.value
@@ -82,12 +80,8 @@ export async function action({ request }: ActionFunctionArgs) {
 		return redirect(redirectTo.toString())
 	} else {
 		return json(
-			{
-				result: submission.reply({ formErrors: [response.error.message] }),
-			},
-			{
-				status: 500,
-			},
+			{ result: submission.reply({ formErrors: [response.error.message] }) },
+			{ status: 500 },
 		)
 	}
 }

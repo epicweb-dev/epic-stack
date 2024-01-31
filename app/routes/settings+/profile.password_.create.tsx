@@ -56,9 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					hideFields: ['password', 'confirmPassword'],
 				}),
 			},
-			{
-				status: submission.status === 'error' ? 400 : 200,
-			},
+			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
 
