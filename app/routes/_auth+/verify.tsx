@@ -1,5 +1,10 @@
-import { useForm, type Submission, getFormProps, getInputProps } from '@conform-to/react'
-import { getZodConstraint, parseWithZod} from '@conform-to/zod'
+import {
+	useForm,
+	type Submission,
+	getFormProps,
+	getInputProps,
+} from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
@@ -124,7 +129,11 @@ export async function prepareVerification({
 
 export type VerifyFunctionArgs = {
 	request: Request
-	submission: Submission<z.input<typeof VerifySchema>, string[], z.output<typeof VerifySchema>>
+	submission: Submission<
+		z.input<typeof VerifySchema>,
+		string[],
+		z.output<typeof VerifySchema>
+	>
 	body: FormData | URLSearchParams
 }
 
@@ -178,9 +187,12 @@ async function validateRequest(
 	})
 
 	if (submission.status !== 'success') {
-		return json({ result: submission.reply() }, {
-			status: submission.status === 'error' ? 400 : 200,
-		})
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		)
 	}
 
 	// this code path could be part of a loader (GET request), so we need to make

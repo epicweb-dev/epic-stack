@@ -145,9 +145,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json({ result: submission.reply() }, {
-			status: submission.status === 'error' ? 400 : 200,
-		})
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		)
 	}
 
 	const { session, remember, redirectTo } = submission.value
@@ -176,7 +179,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
-	invariant(submission.status === 'success', 'Submission should be successful by now')
+	invariant(
+		submission.status === 'success',
+		'Submission should be successful by now',
+	)
 	const verifySession = await verifySessionStorage.getSession()
 	verifySession.set(onboardingEmailSessionKey, submission.value.target)
 	return redirect('/onboarding', {
