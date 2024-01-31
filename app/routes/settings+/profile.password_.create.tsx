@@ -1,5 +1,5 @@
-import { conform, useForm } from '@conform-to/react'
-import { getFieldsetConstraint, parse } from '@conform-to/zod'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
@@ -45,19 +45,21 @@ export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	await requireNoPassword(userId)
 	const formData = await request.formData()
-	const submission = await parse(formData, {
+	const submission = await parseWithZod(formData, {
 		async: true,
 		schema: CreatePasswordForm,
 	})
-	// clear the payload so we don't send the password back to the client
-	submission.payload = {}
-	if (submission.intent !== 'submit') {
-		// clear the value so we don't send the password back to the client
-		submission.value = undefined
-		return json({ status: 'idle', submission } as const)
-	}
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 })
+	if (submission.status !== 'success') {
+		return json(
+			{
+				result: submission.reply({
+					hideFields: ['password', 'confirmPassword'],
+				}),
+			},
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		)
 	}
 
 	const { password } = submission.value
@@ -83,20 +85,20 @@ export default function CreatePasswordRoute() {
 
 	const [form, fields] = useForm({
 		id: 'password-create-form',
-		constraint: getFieldsetConstraint(CreatePasswordForm),
-		lastSubmission: actionData?.submission,
+		constraint: getZodConstraint(CreatePasswordForm),
+		lastResult: actionData?.result,
 		onValidate({ formData }) {
-			return parse(formData, { schema: CreatePasswordForm })
+			return parseWithZod(formData, { schema: CreatePasswordForm })
 		},
 		shouldRevalidate: 'onBlur',
 	})
 
 	return (
-		<Form method="POST" {...form.props} className="mx-auto max-w-md">
+		<Form method="POST" {...getFormProps(form)} className="mx-auto max-w-md">
 			<Field
 				labelProps={{ children: 'New Password' }}
 				inputProps={{
-					...conform.input(fields.password, { type: 'password' }),
+					...getInputProps(fields.password, { type: 'password' }),
 					autoComplete: 'new-password',
 				}}
 				errors={fields.password.errors}
@@ -104,7 +106,7 @@ export default function CreatePasswordRoute() {
 			<Field
 				labelProps={{ children: 'Confirm New Password' }}
 				inputProps={{
-					...conform.input(fields.confirmPassword, {
+					...getInputProps(fields.confirmPassword, {
 						type: 'password',
 					}),
 					autoComplete: 'new-password',
@@ -118,7 +120,7 @@ export default function CreatePasswordRoute() {
 				</Button>
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+					status={isPending ? 'pending' : form.status ?? 'idle'}
 				>
 					Create Password
 				</StatusButton>

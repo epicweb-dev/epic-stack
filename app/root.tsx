@@ -1,5 +1,6 @@
-import { useForm } from '@conform-to/react'
-import { parse } from '@conform-to/zod'
+import { useForm, getFormProps } from '@conform-to/react'
+import { parseWithZod } from '@conform-to/zod'
+import { invariantResponse } from '@epic-web/invariant'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -29,7 +30,6 @@ import { useRef } from 'react'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
-import { ErrorList } from './components/forms.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
 import { useToast } from './components/toaster.tsx'
@@ -119,7 +119,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 						where: { id: userId },
 					}),
 				{ timings, type: 'find user', desc: 'find user in root' },
-		  )
+			)
 		: null
 	if (userId && !user) {
 		console.info('something weird happened')
@@ -167,21 +167,18 @@ const ThemeFormSchema = z.object({
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
-	const submission = parse(formData, {
+	const submission = parseWithZod(formData, {
 		schema: ThemeFormSchema,
 	})
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const)
-	}
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 })
-	}
+
+	invariantResponse(submission.status === 'success', 'Invalid theme received')
+
 	const { theme } = submission.value
 
 	const responseInit = {
 		headers: { 'set-cookie': setTheme(theme) },
 	}
-	return json({ success: true, submission }, responseInit)
+	return json({ result: submission.reply() }, responseInit)
 }
 
 function Document({
@@ -375,10 +372,13 @@ export function useOptimisticThemeMode() {
 	const themeFetcher = fetchers.find(f => f.formAction === '/')
 
 	if (themeFetcher && themeFetcher.formData) {
-		const submission = parse(themeFetcher.formData, {
+		const submission = parseWithZod(themeFetcher.formData, {
 			schema: ThemeFormSchema,
 		})
-		return submission.value?.theme
+
+		if (submission.status === 'success') {
+			return submission.value.theme
+		}
 	}
 }
 
@@ -387,7 +387,7 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 
 	const [form] = useForm({
 		id: 'theme-switch',
-		lastSubmission: fetcher.data?.submission,
+		lastResult: fetcher.data?.result,
 	})
 
 	const optimisticMode = useOptimisticThemeMode()
@@ -413,7 +413,7 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 	}
 
 	return (
-		<fetcher.Form method="POST" {...form.props}>
+		<fetcher.Form method="POST" {...getFormProps(form)}>
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
 				<button
@@ -423,7 +423,6 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 					{modeLabel[mode]}
 				</button>
 			</div>
-			<ErrorList errors={form.errors} id={form.errorId} />
 		</fetcher.Form>
 	)
 }
