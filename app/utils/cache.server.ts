@@ -1,12 +1,14 @@
 import fs from 'fs'
 import {
 	cachified as baseCachified,
-	lruCacheAdapter,
 	verboseReporter,
 	mergeReporters,
 	type CacheEntry,
 	type Cache as CachifiedCache,
 	type CachifiedOptions,
+	type Cache,
+	totalTtl,
+	type Reporter,
 } from '@epic-web/cachified'
 import { remember } from '@epic-web/remember'
 import Database from 'better-sqlite3'
@@ -52,7 +54,19 @@ const lru = remember(
 	() => new LRUCache<string, CacheEntry<unknown>>({ max: 5000 }),
 )
 
-export const lruCache = lruCacheAdapter(lru)
+export const lruCache = {
+	name: 'app-memory-cache',
+	set: (key, value) => {
+		const ttl = totalTtl(value?.metadata)
+		lru.set(key, value, {
+			ttl: ttl === Infinity ? undefined : ttl,
+			start: value?.metadata?.createdTime,
+		})
+		return value
+	},
+	get: key => lru.get(key),
+	delete: key => lru.delete(key),
+} satisfies Cache
 
 const cacheEntrySchema = z.object({
 	metadata: z.object({
@@ -155,13 +169,14 @@ export async function searchCacheKeys(search: string, limit: number) {
 
 export async function cachified<Value>({
 	timings,
-	reporter = verboseReporter(),
+	reporter = verboseReporter<Value>(),
 	...options
 }: CachifiedOptions<Value> & {
 	timings?: Timings
+	reporter?: Reporter<Value>
 }): Promise<Value> {
-	return baseCachified({
-		...options,
-		reporter: mergeReporters(cachifiedTimingReporter(timings), reporter),
-	})
+	return baseCachified(
+		options,
+		mergeReporters(cachifiedTimingReporter(timings), reporter),
+	)
 }
