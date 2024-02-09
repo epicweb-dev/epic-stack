@@ -42,7 +42,7 @@
   "dependencies": {
     "@conform-to/react": "^1.0.0",
     "@conform-to/zod": "^1.0.0",
-    "@epic-web/cachified": "^4.0.0",
+    "@epic-web/cachified": "^5.1.1",
     "@epic-web/client-hints": "^1.2.2",
     "@epic-web/invariant": "^1.0.0",
     "@epic-web/remember": "^1.0.2",
