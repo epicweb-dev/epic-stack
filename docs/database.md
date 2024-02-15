@@ -192,7 +192,11 @@ with more data without performing a migration, then it's a bit more involved.
    `fly sftp`)
 1. SSH into your production server and run the following command:
    ```sh nonumber
-   sqlite3 data.db < seed.sql
+   sqlite3 /tmp/data.db < seed.sql
+   ```
+1. Import the data into your database via litefs:
+   ```sh nonumber
+   litefs import -name sqlite.db /tmp/data.db
    ```
 1. Verify that your production database has been seeded correctly. If it hasn't,
    then restore your backup (asap).
