@@ -16,6 +16,10 @@ export const prisma = remember('prisma', () => {
 			{ level: 'warn', emit: 'stdout' },
 		],
 	})
+
+	client.$queryRaw`PRAGMA journal_mode = WAL;`
+  .catch((error) => { console.log("Failed due to:", error); process.exit(1); });
+	
 	client.$on('query', async e => {
 		if (e.duration < logThreshold) return
 		const color =
