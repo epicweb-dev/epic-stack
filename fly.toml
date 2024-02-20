@@ -1,4 +1,4 @@
-app = "epic-stack-template"
+app = "test-epic-stack"
 primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5

@@ -52,7 +52,7 @@ export default function Index() {
 						data-heading
 						className="mt-8 animate-slide-top text-4xl font-medium text-foreground [animation-fill-mode:backwards] [animation-delay:0.3s] md:text-5xl xl:mt-4 xl:animate-slide-left xl:text-6xl xl:[animation-fill-mode:backwards] xl:[animation-delay:0.8s]"
 					>
-						<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
+						<a href="https://www.epicweb.dev/stack">Testing The Epic Stack Now!</a>
 					</h1>
 					<p
 						data-paragraph
