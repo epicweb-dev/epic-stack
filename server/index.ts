@@ -14,7 +14,7 @@ import morgan from 'morgan'
 
 installGlobals()
 
-const MODE = process.env.NODE_ENV
+const MODE = process.env.NODE_ENV ?? 'development'
 
 const createRequestHandler =
 	MODE === 'production'
