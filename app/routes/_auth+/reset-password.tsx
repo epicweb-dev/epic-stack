@@ -1,11 +1,10 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { invariant } from '@epic-web/invariant'
 import {
 	json,
 	redirect,
-	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
@@ -13,45 +12,11 @@ import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
-import { type VerifyFunctionArgs } from './verify.tsx'
 
-const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
-
-export async function handleVerification({ submission }: VerifyFunctionArgs) {
-	invariant(
-		submission.status === 'success',
-		'Submission should be successful by now',
-	)
-	const target = submission.value.target
-	const user = await prisma.user.findFirst({
-		where: { OR: [{ email: target }, { username: target }] },
-		select: { email: true, username: true },
-	})
-	// we don't want to say the user is not found if the email is not found
-	// because that would allow an attacker to check if an email is registered
-	if (!user) {
-		return json(
-			{
-				result: submission.reply({ fieldErrors: { code: ['Invalid code'] } }),
-			},
-			{
-				status: 400,
-			},
-		)
-	}
-
-	const verifySession = await verifySessionStorage.getSession()
-	verifySession.set(resetPasswordUsernameSessionKey, user.username)
-	return redirect('/reset-password', {
-		headers: {
-			'set-cookie': await verifySessionStorage.commitSession(verifySession),
-		},
-	})
-}
+export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 
 const ResetPasswordSchema = PasswordAndConfirmPasswordSchema
 
