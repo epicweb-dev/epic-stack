@@ -5,7 +5,7 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "module": "ES2022",
+    "module": "ESNext",
     "target": "ES2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,

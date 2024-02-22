@@ -14,7 +14,7 @@ import { remember } from '@epic-web/remember'
 import Database from 'better-sqlite3'
 import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
-import { updatePrimaryCacheValue } from '#app/routes/admin+/cache_.sqlite.tsx'
+import { updatePrimaryCacheValue } from '#app/routes/admin+/cache_.sqlite.server.ts'
 import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 

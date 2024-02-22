@@ -1,23 +1,15 @@
 import {
-	type FieldMetadata,
-	useForm,
+	FormProvider,
+	getFieldsetProps,
+	getFormProps,
 	getInputProps,
 	getTextareaProps,
-	getFormProps,
-	getFieldsetProps,
-	FormProvider,
+	useForm,
+	type FieldMetadata,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { createId as cuid } from '@paralleldrive/cuid2'
 import { type Note, type NoteImage } from '@prisma/client'
-import {
-	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
-	json,
-	unstable_parseMultipartFormData as parseMultipartFormData,
-	redirect,
-	type ActionFunctionArgs,
-	type SerializeFrom,
-} from '@remix-run/node'
+import { type SerializeFrom } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -29,16 +21,15 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { Label } from '#app/components/ui/label.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
-import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { cn, getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
+import { type action } from './__note-editor.server'
 
 const titleMinLength = 1
 const titleMaxLength = 100
 const contentMinLength = 1
 const contentMaxLength = 10000
 
-const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
+export const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
 
 const ImageFieldsetSchema = z.object({
 	id: z.string().optional(),
@@ -51,128 +42,14 @@ const ImageFieldsetSchema = z.object({
 	altText: z.string().optional(),
 })
 
-type ImageFieldset = z.infer<typeof ImageFieldsetSchema>
+export type ImageFieldset = z.infer<typeof ImageFieldsetSchema>
 
-function imageHasFile(
-	image: ImageFieldset,
-): image is ImageFieldset & { file: NonNullable<ImageFieldset['file']> } {
-	return Boolean(image.file?.size && image.file?.size > 0)
-}
-
-function imageHasId(
-	image: ImageFieldset,
-): image is ImageFieldset & { id: NonNullable<ImageFieldset['id']> } {
-	return image.id != null
-}
-
-const NoteEditorSchema = z.object({
+export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(titleMinLength).max(titleMaxLength),
 	content: z.string().min(contentMinLength).max(contentMaxLength),
 	images: z.array(ImageFieldsetSchema).max(5).optional(),
 })
-
-export async function action({ request }: ActionFunctionArgs) {
-	const userId = await requireUserId(request)
-
-	const formData = await parseMultipartFormData(
-		request,
-		createMemoryUploadHandler({ maxPartSize: MAX_UPLOAD_SIZE }),
-	)
-
-	const submission = await parseWithZod(formData, {
-		schema: NoteEditorSchema.superRefine(async (data, ctx) => {
-			if (!data.id) return
-
-			const note = await prisma.note.findUnique({
-				select: { id: true },
-				where: { id: data.id, ownerId: userId },
-			})
-			if (!note) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: 'Note not found',
-				})
-			}
-		}).transform(async ({ images = [], ...data }) => {
-			return {
-				...data,
-				imageUpdates: await Promise.all(
-					images.filter(imageHasId).map(async i => {
-						if (imageHasFile(i)) {
-							return {
-								id: i.id,
-								altText: i.altText,
-								contentType: i.file.type,
-								blob: Buffer.from(await i.file.arrayBuffer()),
-							}
-						} else {
-							return {
-								id: i.id,
-								altText: i.altText,
-							}
-						}
-					}),
-				),
-				newImages: await Promise.all(
-					images
-						.filter(imageHasFile)
-						.filter(i => !i.id)
-						.map(async image => {
-							return {
-								altText: image.altText,
-								contentType: image.file.type,
-								blob: Buffer.from(await image.file.arrayBuffer()),
-							}
-						}),
-				),
-			}
-		}),
-		async: true,
-	})
-
-	if (submission.status !== 'success') {
-		return json(
-			{ result: submission.reply() },
-			{ status: submission.status === 'error' ? 400 : 200 },
-		)
-	}
-
-	const {
-		id: noteId,
-		title,
-		content,
-		imageUpdates = [],
-		newImages = [],
-	} = submission.value
-
-	const updatedNote = await prisma.note.upsert({
-		select: { id: true, owner: { select: { username: true } } },
-		where: { id: noteId ?? '__new_note__' },
-		create: {
-			ownerId: userId,
-			title,
-			content,
-			images: { create: newImages },
-		},
-		update: {
-			title,
-			content,
-			images: {
-				deleteMany: { id: { notIn: imageUpdates.map(i => i.id) } },
-				updateMany: imageUpdates.map(updates => ({
-					where: { id: updates.id },
-					data: { ...updates, id: updates.blob ? cuid() : updates.id },
-				})),
-				create: newImages,
-			},
-		},
-	})
-
-	return redirect(
-		`/users/${updatedNote.owner.username}/notes/${updatedNote.id}`,
-	)
-}
 
 export function NoteEditor({
 	note,
