@@ -15,6 +15,9 @@ destination = "/data"
 [deploy]
 release_command = "node ./other/sentry-create-release"
 
+[env]
+PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
+
 [[services]]
 internal_port = 8080
 processes = [ "app" ]
