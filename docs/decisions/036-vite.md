@@ -23,6 +23,10 @@ vite plugin will fail the build if it finds any issues so if it builds, it
 works. Additionally, this will help us make a cleaner separation between server
 and server/client code which is a good thing.
 
+The simple rule is this: if it's a Remix export (like `loader`, or `action`) then
+it can be in the route. If it's our own utility (like `requireRecentVerification`
+we had in the `/verify` route) then it needs to go in a `.server` file.
+
 ## Decision
 
 Adopt vite.
