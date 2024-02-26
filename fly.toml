@@ -15,10 +15,6 @@ destination = "/data"
 [deploy]
 release_command = "node ./other/sentry-create-release"
 
-[env]
-# For WAL support: https://github.com/prisma/prisma-engines/issues/4675#issuecomment-1914383246
-PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
-
 [[services]]
 internal_port = 8080
 processes = [ "app" ]
