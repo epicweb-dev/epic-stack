@@ -34,13 +34,12 @@ exec:
   - cmd: npx prisma migrate deploy
     if-candidate: true
 
-  # re-enable these when this is fixed: https://github.com/superfly/litefs/issues/425
-  # # Set the journal mode for the database to WAL. This reduces concurrency deadlock issues
-  # - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
-  #   if-candidate: true
+  # Set the journal mode for the database to WAL. This reduces concurrency deadlock issues
+  - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
+    if-candidate: true
 
-  # # Set the journal mode for the cache to WAL. This reduces concurrency deadlock issues
-  # - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
-  #   if-candidate: true
+  # Set the journal mode for the cache to WAL. This reduces concurrency deadlock issues
+  - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
+    if-candidate: true
 
   - cmd: npm start

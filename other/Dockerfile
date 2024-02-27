@@ -52,6 +52,8 @@ ENV CACHE_DATABASE_PATH="$LITEFS_DIR/$CACHE_DATABASE_FILENAME"
 ENV INTERNAL_PORT="8080"
 ENV PORT="8081"
 ENV NODE_ENV="production"
+# For WAL support: https://github.com/prisma/prisma-engines/issues/4675#issuecomment-1914383246
+ENV PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
 
 # add shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
@@ -68,7 +70,7 @@ COPY --from=build /myapp/prisma /myapp/prisma
 COPY --from=build /myapp/app/components/ui/icons /myapp/app/components/ui/icons
 
 # prepare for litefs
-COPY --from=flyio/litefs:0.5.8 /usr/local/bin/litefs /usr/local/bin/litefs
+COPY --from=flyio/litefs:0.5.11 /usr/local/bin/litefs /usr/local/bin/litefs
 ADD other/litefs.yml /etc/litefs.yml
 RUN mkdir -p /data ${LITEFS_DIR}
 
