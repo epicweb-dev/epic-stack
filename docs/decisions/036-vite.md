@@ -1,6 +1,6 @@
 # Adopting Vite
 
-Date: 2026-02-22
+Date: 2024-02-22
 
 Status: accepted
 
