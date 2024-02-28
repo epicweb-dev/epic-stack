@@ -140,10 +140,9 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-22.04
     needs: [lint, typecheck, vitest, playwright]
-    # only build/deploy main branch on pushes
+    # only build/deploy branches on pushes
     if:
-      ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
-      github.event_name == 'push' }}
+      ${{ github.event_name == 'push' }}
 
     steps:
       - name: ⬇️ Checkout repo
