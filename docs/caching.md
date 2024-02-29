@@ -23,7 +23,7 @@ indexes before caching the results.
 ## Using the cache
 
 You won't typically interact directly with the caches. Instead, you will use
-[`cachified`](https://npm.im/cachified) which is a nice abstraction for cache
+[`cachified`](https://www.npmjs.com/package/@epic-web/cachified) which is a nice abstraction for cache
 management. We have a small abstraction on top of it which allows you to pass
 `timings` to work seamlessly with
 [the server timing utility](./server-timing.md).
