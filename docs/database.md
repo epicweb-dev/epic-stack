@@ -158,14 +158,26 @@ if what you need to seed is a lot of data), so here's an easy way to help out:
 
 1. Create a script very similar to our `prisma/seed.ts` file which creates all
    the data you want to seed.
-1. Run the script locally to generate the data you want to seed.
+   ```sh nonumber
+   cp prisma/seed.ts ./prod-seed.local.ts
+   ```
+   Then modify that file to create the data you want to seed.
+1. Create a temporary database file to seed the data into.
+   ```sh
+   DATABASE_URL=file:./seed.local.db npx prisma migrate reset --skip-seed --force
+   ```
+1. Run the custom seed script locally to generate the data you want to seed.
+   ```sh
+   DATABASE_URL=file:./seed.local.db npx tsx ./prod-seed.local.ts
+   ```
 1. Create a "dump" of the seed database using the `sqlite3` command line tool.
    ```sh nonumber
-   sqlite3 seed.db .dump > seed.sql
+   sqlite3 ./prisma/seed.local.db .dump > seed.local.sql
    ```
-1. Copy the relevant bits from the `seed.sql` file into your `migration.sql`
-   file. The `seed.sql` will include create table/index lines etc. which should
-   already be in your `migration.sql`. You probably just want `INSERT` commands.
+1. Copy the relevant bits from the `seed.local.sql` file into your
+   `migration.sql` file. The `seed.local.sql` will include create table/index
+   lines etc. which should already be in your `migration.sql`. You probably just
+   want `INSERT` commands.
 1. Deploy your app and verify that the data was seeded correctly.
 
 If your app has already applied all migrations, then the changes to the
