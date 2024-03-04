@@ -196,7 +196,7 @@ app.use((req, res, next) => {
 
 async function getBuild() {
 	const build = viteDevServer
-		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
+		? () => viteDevServer.ssrLoadModule('virtual:remix/server-build')
 		: // @ts-ignore this should exist before running the server
 			// but it may not exist just yet.
 			await import('#build/server/index.js')
@@ -213,7 +213,7 @@ app.all(
 		}),
 		mode: MODE,
 		// @sentry/remix needs to be updated to handle the function signature
-		build: MODE === 'production' ? await getBuild() : getBuild,
+		build: await getBuild(),
 	}),
 )
 
