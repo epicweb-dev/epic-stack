@@ -146,10 +146,10 @@ jobs:
 
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 👀 Read app name
-        uses: SebRollen/toml-action@v1.0.2
+        uses: SebRollen/toml-action@v1.2.0
         id: app_name
         with:
           file: 'fly.toml'
@@ -162,7 +162,7 @@ jobs:
           mv ./other/.dockerignore ./.dockerignore
 
       - name: 🎈 Setup Fly
-        uses: superfly/flyctl-actions/setup-flyctl@v1.4
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
