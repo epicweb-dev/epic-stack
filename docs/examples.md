@@ -92,6 +92,7 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack Border animation](https://github.com/hakimLyon/epic-stack-with-css-border-animation)
   by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
   CSS border animation.
+- [Epic Stack with Keystatic]() by [@simonswiss](https://github.com/simonswiss): An example adding a MDX blog, editable from an elegant Admin UI with Keystatic.
 
 ## How to contribute
 
