@@ -11,10 +11,10 @@ You can use custom fonts by adding them to the `./public/fonts` directory,
 fonts. You will also need to add the `css` file for the font to the
 `./app/styles` directory, if your font doesn't come with one (Google Fonts
 don't) you can generate one using a tool like
-[Transfonter](https://transfonter.org/).
+[Transfonter](https://transfonter.org/). Transfonter now has a fonts directory
+setting. Set that to `fonts` to have the `url` preset.
 
-You may need to edit the `url` property in the `css` file to point to the
-correct location of the font files, that path is relative to the `public`
+Verify the `url` in the `css` is relative to the `public` 
 folder. So it should look something like
 `url('/fonts/yourfont/yourfont-200.woff2')`.
 
@@ -31,14 +31,14 @@ Now you've added your font, there's a few places you need to update to use it.
    }
    ```
 
-2. Add your font to the `fontFamily` property.
+2. Import the default theme and add your font to the `fontFamily` property.
 
    ```ts
+   import defaultTheme from 'tailwindcss/defaultTheme.js'
    // tailwind.config.ts
    extend: {
-   	...
+   	...extendedTheme,
    	fontFamily: {
-   		...
    		sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
    	}
    }
@@ -48,14 +48,14 @@ Now you've added your font, there's a few places you need to update to use it.
 3. Import your font stylesheet.
 
    ```tsx
-   // root.tsx
-   import fontStyleSheetUrl from './styles/yourfont.css'
+   // app/routes/root.tsx
+   import fontStyleSheetUrl from './styles/yourfont.css?url'
    ```
 
    Add the font stylesheet to the links array.
 
    ```tsx
-   // root.tsx
+   // app/routes/root.tsx
    ...
    { rel: 'preload', href: fontStyleSheetUrl, as: 'style' },
    { rel: 'stylesheet', href: fontStyleSheetUrl },
@@ -64,7 +64,7 @@ Now you've added your font, there's a few places you need to update to use it.
 4. Expose and cache your fonts folder.
 
    ```ts
-   // server.ts
+   // server/index.ts
    ...
    app.use(
       '/fonts',
