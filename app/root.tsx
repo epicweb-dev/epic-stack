@@ -60,7 +60,6 @@ export const links: LinksFunction = () => {
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
 		// Preload CSS as a resource to avoid render blocking
-		{ rel: 'preload', href: tailwindStyleSheetUrl, as: 'style' },
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
 			rel: 'alternate icon',
