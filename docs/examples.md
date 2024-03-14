@@ -92,6 +92,7 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack Border animation](https://github.com/hakimLyon/epic-stack-with-css-border-animation)
   by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
   CSS border animation.
+- [Epic Stack + Ariakit](https://github.com/gnapse/epic-stack) by [@gnapse](https://github.com/gnapse): A fork of the Epic Stack that uses [Ariakit](https://ariakit.org/) instead of Radix UI.
 
 ## How to contribute
 
