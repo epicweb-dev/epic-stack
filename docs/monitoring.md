@@ -44,4 +44,21 @@ Add `--sourcemapClient --sourcemapServer` to the `build:remix` script in your `p
 
 If using the vite-sentry plugin, you should also uncomment the relevant env vars in the 'build' section of the Dockerfile, as they must be available to the vite config when `npm run build` is run. Note that these do not need to be added to the `env.server` env vars schema, as they are only used during the build and not the runtime.
 
-You can use the plugin to create sentry releases for you and automatically associate commits if you set up a GitHub integration with it. One simple strategy for naming releases would be to use the commit sha, passed in as a build arg via the GitHub action workflow.
+You can use the plugin to create sentry releases for you and automatically associate commits if you set up a GitHub integration with it. One simple strategy for naming releases would be to use the commit sha, passed in as a build arg via the GitHub action workflow, as follows:
+
+```
+sentryVitePlugin({
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+	org: process.env.SENTRY_ORG,
+	project: process.env.SENTRY_PROJECT,
+	release: {
+		name: process.env.COMMIT_SHA,
+		setCommits: {
+			auto: true,
+		},
+	},
+	sourcemaps: {
+		filesToDeleteAfterUpload: await glob(['./public/**/*.map', './build/**/*.map']),
+	},
+)
+```
