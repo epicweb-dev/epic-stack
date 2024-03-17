@@ -29,13 +29,15 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
-# vars needed for the build (in vite.config)
+# vars needed for integration of sentry into the vite build
 #ARG COMMIT_SHA
 #ENV COMMIT_SHA=$COMMIT_SHA
 #ARG SENTRY_AUTH_TOKEN
 #ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-#ENV SENTRY_ORG="org"
-#ENV SENTRY_PROJECT="project"
+#ARG SENTRY_ORG
+#ENV SENTRY_ORG=$SENTRY_ORG
+#ARG SENTRY_PROJECT
+#ENV SENTRY_PROJECT=$SENTRY_PROJECT
 
 WORKDIR /myapp
 
