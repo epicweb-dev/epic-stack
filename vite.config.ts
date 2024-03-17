@@ -39,6 +39,7 @@ export default defineConfig({
 	}), 
 		// Uncomment if using sentry
 	// 	sentryVitePlugin({
+	// 	disable: MODE !== 'production',
 	// 	authToken: process.env.SENTRY_AUTH_TOKEN,
 	// 	org: process.env.SENTRY_ORG,
 	// 	project: process.env.SENTRY_PROJECT,
