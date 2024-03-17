@@ -32,12 +32,6 @@ FROM base as build
 # vars needed for integration of sentry into the vite build
 #ARG COMMIT_SHA
 #ENV COMMIT_SHA=$COMMIT_SHA
-#ARG SENTRY_AUTH_TOKEN
-#ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-#ARG SENTRY_ORG
-#ENV SENTRY_ORG=$SENTRY_ORG
-#ARG SENTRY_PROJECT
-#ENV SENTRY_PROJECT=$SENTRY_PROJECT
 
 WORKDIR /myapp
 
@@ -47,6 +41,9 @@ ADD prisma .
 RUN npx prisma generate
 
 ADD . .
+
+# Replace the run command when setting up sentry
+# RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN sh -c 'export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && npm run build'
 RUN npm run build
 
 # Finally, build the production image with minimal footprint
