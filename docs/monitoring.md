@@ -39,3 +39,9 @@ fly secrets set SENTRY_DSN=<your_dsn> SENTRY_AUTH_TOKEN=<your_auth_token> SENTRY
 
 Note that `javascript-remix` is the name of the default Remix project in Sentry
 and if you use a different project name you'll need to update that value here.
+
+Add `--sourcemapClient --sourcemapServer` to the `build:remix` script in your `package.json` if you want sourcemaps for both the client and server code. Remember that you must delete the maps from the production build. The vite-sentry plugin will do this for you, if you use that.
+
+If using the vite-sentry plugin, you should also uncomment the relevant env vars in the 'build' section of the Dockerfile, as they must be available to the vite config when `npm run build` is run. Note that these do not need to be added to the `env.server` env vars schema, as they are only used during the build and not the runtime.
+
+You can use the plugin to create sentry releases for you and automatically associate commits if you set up a GitHub integration with it. One simple strategy for naming releases would be to use the commit sha, passed in as a build arg via the GitHub action workflow.

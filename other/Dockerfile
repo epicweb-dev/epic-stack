@@ -29,6 +29,14 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
+# vars needed for the build (in vite.config)
+#ARG COMMIT_SHA
+#ENV COMMIT_SHA=$COMMIT_SHA
+#ARG SENTRY_AUTH_TOKEN
+#ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+#ENV SENTRY_ORG="org"
+#ENV SENTRY_PROJECT="project"
+
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
