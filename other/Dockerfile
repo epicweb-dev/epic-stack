@@ -29,9 +29,8 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
-# vars needed for integration of sentry into the vite build
-#ARG COMMIT_SHA
-#ENV COMMIT_SHA=$COMMIT_SHA
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
 
 WORKDIR /myapp
 
