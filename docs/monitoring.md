@@ -41,5 +41,5 @@ organization slug (`SENTRY_ORG`), and the slug name for your project too (`SENTR
 
 Uncomment the sentry-vite plugin in `vite.config` and the build command in the 'build' section of the Dockerfile, which shows how to pass the `SENTRY_AUTH_TOKEN` (below) as a docker secret, so it is available to the vite config when `npm run build` is run (you will need to do the same for `SENTRY_ORG` and `SENTRY_PROJECT`). Note that these do not need to be added to the `env.server` env vars schema, as they are only used during the build and not the runtime.
 
-The plugin will create sentry releases for you and automatically associate commits during the vite build if you set up a GitHub integration with it. In this setup we have utilised a simple strategy for naming releases of using the commit sha, passed in as a build arg via the GitHub action workflow.
+The plugin will create sentry releases for you and automatically associate commits during the vite build once you set the `SENTRY_AUTH_TOKEN` in [your GitHub action secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). In this setup we have utilized a simple strategy for naming releases of using the commit sha, passed in as a build arg via the GitHub action workflow.
 
