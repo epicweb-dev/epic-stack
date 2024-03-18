@@ -141,8 +141,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [lint, typecheck, vitest, playwright]
     # only build/deploy branches on pushes
-    if:
-      ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: ⬇️ Checkout repo
@@ -175,8 +174,7 @@ jobs:
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
         run:
-          flyctl deploy --remote-only
-          --build-arg COMMIT_SHA=${{ github.sha }}
+          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
           --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

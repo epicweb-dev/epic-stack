@@ -41,8 +41,10 @@ RUN npx prisma generate
 
 ADD . .
 
-# Replace the run command when setting up sentry
-# RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN sh -c 'export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && npm run build'
+# Mount the secret and set it as an environment variable
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && export SENTRY_AUTH_TOKEN
+# Proceed with the npm build
 RUN npm run build
 
 # Finally, build the production image with minimal footprint
