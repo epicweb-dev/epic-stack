@@ -38,21 +38,25 @@ export default defineConfig({
 				})
 			},
 		}),
-		process.env.SENTRY_AUTH_TOKEN ?
-			sentryVitePlugin({
-				disable: MODE !== 'production',
-				authToken: process.env.SENTRY_AUTH_TOKEN,
-				org: process.env.SENTRY_ORG,
-				project: process.env.SENTRY_PROJECT,
-				release: {
-					name: process.env.COMMIT_SHA,
-					setCommits: {
-						auto: true,
+		process.env.SENTRY_AUTH_TOKEN
+			? sentryVitePlugin({
+					disable: MODE !== 'production',
+					authToken: process.env.SENTRY_AUTH_TOKEN,
+					org: process.env.SENTRY_ORG,
+					project: process.env.SENTRY_PROJECT,
+					release: {
+						name: process.env.COMMIT_SHA,
+						setCommits: {
+							auto: true,
+						},
 					},
-				},
-				sourcemaps: {
-					filesToDeleteAfterUpload: await glob(['./build/**/*.map', '.server-build/**/*.map']),
-				},
-			}) : null,
+					sourcemaps: {
+						filesToDeleteAfterUpload: await glob([
+							'./build/**/*.map',
+							'.server-build/**/*.map',
+						]),
+					},
+				})
+			: null,
 	],
 })
