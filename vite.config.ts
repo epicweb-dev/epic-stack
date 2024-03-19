@@ -38,7 +38,7 @@ export default defineConfig({
 				})
 			},
 		}),
-		process.env.SENTRY_AUTH_TOKEN ??
+		process.env.SENTRY_AUTH_TOKEN ?
 			sentryVitePlugin({
 				disable: MODE !== 'production',
 				authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -53,6 +53,6 @@ export default defineConfig({
 				sourcemaps: {
 					filesToDeleteAfterUpload: await glob(['./build/**/*.map', '.server-build/**/*.map']),
 				},
-			}),
+			}) : null,
 	],
 })
