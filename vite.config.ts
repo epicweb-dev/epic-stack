@@ -51,10 +51,7 @@ export default defineConfig({
 					},
 				},
 				sourcemaps: {
-					filesToDeleteAfterUpload: await glob([
-						'./public/**/*.map',
-						'./build/**/*.map',
-					]),
+					filesToDeleteAfterUpload: await glob(['./build/**/*.map', '.server-build/**/*.map']),
 				},
 			}),
 	],
