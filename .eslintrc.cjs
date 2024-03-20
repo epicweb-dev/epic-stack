@@ -2,7 +2,7 @@ const vitestFiles = ['app/**/__tests__/**/*', 'app/**/*.{spec,test}.*']
 const testFiles = ['**/tests/**', ...vitestFiles]
 const appFiles = ['app/**']
 
-/** @type {import('@types/eslint').Linter.BaseConfig} */
+/** @type {import('@types/eslint').Linter.Config} */
 module.exports = {
 	extends: [
 		'@remix-run/eslint-config',

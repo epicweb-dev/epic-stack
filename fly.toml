@@ -12,9 +12,6 @@ auto_rollback = true
 source = "data"
 destination = "/data"
 
-[deploy]
-release_command = "node ./other/sentry-create-release"
-
 [[services]]
 internal_port = 8080
 processes = [ "app" ]

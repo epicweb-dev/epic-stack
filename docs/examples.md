@@ -93,6 +93,7 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
   CSS border animation.
 - [Epic Stack with Keystatic](https://github.com/simonswiss/epic-stack-with-keystatic) by [@simonswiss](https://github.com/simonswiss): An example adding a MDX blog, editable from an elegant Admin UI with Keystatic.
+- [Epic Stack + Ariakit](https://github.com/gnapse/epic-stack) by [@gnapse](https://github.com/gnapse): A fork of the Epic Stack that uses [Ariakit](https://ariakit.org/) instead of Radix UI.
 
 ## How to contribute
 
