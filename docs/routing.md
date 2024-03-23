@@ -4,7 +4,7 @@ The Epic Stack uses file-based routing with Remix. However, it's not using the
 built-in routing convention of Remix and instead is using
 [remix-flat-routes](https://github.com/kiliman/remix-flat-routes) which is a
 special implementation of the Remix convention that adds a few features. You'll
-find it configured for the application in the `remix.config.js` file at the root
+find it configured for the application in the `vite.config.js` file at the root
 of the app. Specifically "hybrid routes."
 
 We'll defer to the `remix-flat-routes` documentation for specifics, but an
