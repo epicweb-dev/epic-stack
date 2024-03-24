@@ -45,16 +45,19 @@ under "Tokens", and copy that to secure location (this becomes
 organization slug (`SENTRY_ORG`), and the slug name for your project too
 (`SENTRY_PROJECT`).
 
-Uncomment the sentry-vite plugin in `vite.config` and the build command in the
-'build' section of the Dockerfile, which shows how to pass the
-`SENTRY_AUTH_TOKEN` (below) as a docker secret, so it is available to the vite
-config when `npm run build` is run (you will need to do the same for
-`SENTRY_ORG` and `SENTRY_PROJECT`). Note that these do not need to be added to
-the `env.server` env vars schema, as they are only used during the build and not
-the runtime.
+In the 'build' section of the [Dockerfile](../other/Dockerfile), there is an
+example of how to pass (mount) the `SENTRY_AUTH_TOKEN` as a docker secret, so it
+is available to Vite when `npm run build` is run. You can do the same for
+`SENTRY_ORG` and `SENTRY_PROJECT` or actually any other secret (environment
+variable) you need at build time, just make sure those secrets (variables) are
+available on the CI runner: see the 'deploy' job from
+[`deploy`](../.github/workflows/deploy.yml) workflow. Note that these do not
+need to be added to the [`env.server`](../app/utils/env.server.ts) env vars
+schema, as they are only used during the build and not the runtime.
 
-The plugin will create sentry releases for you and automatically associate
-commits during the vite build once you set the `SENTRY_AUTH_TOKEN` in
-[your GitHub action secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
+The Sentry Vite plugin in [`vite.config.ts`](../vite.config.ts) will create
+sentry releases for you and automatically associate commits during the vite
+build once the `SENTRY_AUTH_TOKEN` is set, which in our set-up is done via
+[GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 In this setup we have utilized a simple strategy for naming releases of using
 the commit sha, passed in as a build arg via the GitHub action workflow.
