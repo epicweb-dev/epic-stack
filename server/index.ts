@@ -107,6 +107,8 @@ app.use((_, res, next) => {
 
 app.use(
 	helmet({
+		// https://github.com/helmetjs/helmet?tab=readme-ov-file#x-powered-by
+		xPoweredBy: false,
 		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
