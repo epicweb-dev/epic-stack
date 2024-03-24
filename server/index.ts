@@ -15,20 +15,19 @@ import morgan from 'morgan'
 installGlobals()
 
 const MODE = process.env.NODE_ENV ?? 'development'
+const IS_PROD = MODE === 'production'
 
-const createRequestHandler =
-	MODE === 'production'
-		? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
-		: _createRequestHandler
+const createRequestHandler = IS_PROD
+	? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
+	: _createRequestHandler
 
-const viteDevServer =
-	MODE === 'production'
-		? undefined
-		: await import('vite').then(vite =>
-				vite.createServer({
-					server: { middlewareMode: true },
-				}),
-			)
+const viteDevServer = IS_PROD
+	? undefined
+	: await import('vite').then(vite =>
+			vite.createServer({
+				server: { middlewareMode: true },
+			}),
+		)
 
 const app = express()
 
@@ -213,7 +212,7 @@ app.all(
 		}),
 		mode: MODE,
 		// @sentry/remix needs to be updated to handle the function signature
-		build: MODE === 'production' ? await getBuild() : getBuild,
+		build: IS_PROD ? await getBuild() : getBuild,
 	}),
 )
 
