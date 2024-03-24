@@ -211,8 +211,7 @@ app.all(
 			serverBuild: getBuild(),
 		}),
 		mode: MODE,
-		// @sentry/remix needs to be updated to handle the function signature
-		build: IS_PROD ? await getBuild() : getBuild,
+		build: getBuild,
 	}),
 )
 
