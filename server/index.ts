@@ -220,28 +220,29 @@ const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })
+const portAvailable = desiredPort === portToUse
+if (MODE !== 'development' && !portAvailable) {
+	console.log(`⚠️ Port ${desiredPort} is not available.`)
+	process.exit(1)
+}
 
 const server = app.listen(portToUse, () => {
-	const addy = server.address()
-	const portActuallyUsed =
-		addy === null || typeof addy === 'string' ? 0 : addy.port
-
-	if (portActuallyUsed !== desiredPort) {
+	if (!portAvailable) {
 		console.warn(
 			chalk.yellow(
-				`⚠️  Port ${desiredPort} is not available, using ${portActuallyUsed} instead.`,
+				`⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`,
 			),
 		)
 	}
 	console.log(`🚀  We have liftoff!`)
-	const localUrl = `http://localhost:${portActuallyUsed}`
+	const localUrl = `http://localhost:${portToUse}`
 	let lanUrl: string | null = null
 	const localIp = ipAddress() ?? 'Unknown'
 	// Check if the address is a private ip
 	// https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
 	// https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
 	if (/^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)) {
-		lanUrl = `http://${localIp}:${portActuallyUsed}`
+		lanUrl = `http://${localIp}:${portToUse}`
 	}
 
 	console.log(
