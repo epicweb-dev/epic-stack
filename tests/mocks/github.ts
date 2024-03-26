@@ -118,7 +118,9 @@ async function getUser(request: Request) {
 }
 
 const passthroughGitHub =
-	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') && !process.env.TESTING
+	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') &&
+	process.env.NODE_ENV !== 'test'
+
 export const handlers: Array<HttpHandler> = [
 	http.post(
 		'https://github.com/login/oauth/access_token',
