@@ -16,6 +16,7 @@ installGlobals()
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
+const IS_DEV = MODE === "development"
 
 const createRequestHandler = IS_PROD
 	? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
@@ -221,7 +222,7 @@ const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })
 const portAvailable = desiredPort === portToUse
-if (MODE !== 'development' && !portAvailable) {
+if (!portAvailable && !IS_DEV) {
 	console.log(`⚠️ Port ${desiredPort} is not available.`)
 	process.exit(1)
 }
