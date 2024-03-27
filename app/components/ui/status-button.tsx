@@ -14,10 +14,11 @@ export const StatusButton = React.forwardRef<
 	HTMLButtonElement,
 	ButtonProps & {
 		status: 'pending' | 'success' | 'error' | 'idle'
+		enabled?: boolean
 		message?: string | null
 		spinDelay?: Parameters<typeof useSpinDelay>[1]
 	}
->(({ message, status, className, children, spinDelay, ...props }, ref) => {
+>(({ message, status, enabled = true, className, children, spinDelay, ...props }, ref) => {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
 		minDuration: 300,
@@ -40,7 +41,7 @@ export const StatusButton = React.forwardRef<
 			</div>
 		),
 		idle: null,
-	}[status]
+	}[enabled ? status : 'idle']
 
 	return (
 		<Button
