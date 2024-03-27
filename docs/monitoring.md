@@ -39,7 +39,7 @@ To generate the auth token, click
 [this](https://sentry.io/orgredirect/settings/:orgslug/developer-settings/new-internal/)
 to create an internal integration (which grants the selected capabilities to the
 recipient, similar to how RBAC works). Give it a name and add the scope for
-`Releases:Admin`. Press Save, find the auth token at the bottom of the page
+`Releases:Admin` and `Organization:Read`. Press Save, find the auth token at the bottom of the page
 under "Tokens", and copy that to secure location (this becomes
 `SENTRY_AUTH_TOKEN`). Then visit the organization settings page and copy that
 organization slug (`SENTRY_ORG`), and the slug name for your project too
