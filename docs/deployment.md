@@ -67,6 +67,14 @@ Prior to your first deployment, you'll need to do a few things:
   > [1Password](https://1password.com/password-generator) to generate a random
   > secret, just replace `$(openssl rand -hex 32)` with the generated secret.
 
+- Add a `ALLOW_INDEXING` with `false` value to your non-production fly app
+  secrets, this is to prevent duplicate content from being indexed multiple
+  times by search engines. To do this you can run the following commands:
+
+  ```sh
+  fly secrets set ALLOW_INDEXING=false --app [YOUR_APP_NAME]-staging
+  ```
+
 6. Create production database:
 
    Create a persistent volume for the sqlite database for both your staging and
