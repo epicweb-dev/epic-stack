@@ -29,7 +29,7 @@ export const StatusButton = React.forwardRef<
 				role="status"
 				className="inline-flex h-6 w-6 items-center justify-center"
 			>
-				<Icon name="update" className="animate-spin" />
+				<Icon name="update" className="animate-spin" title="spinner" />
 			</div>
 		) : null,
 		success: (
@@ -37,7 +37,7 @@ export const StatusButton = React.forwardRef<
 				role="status"
 				className="inline-flex h-6 w-6 items-center justify-center"
 			>
-				<Icon name="check" />
+				<Icon name="check" title="check mark" />
 			</div>
 		),
 		error: (
@@ -45,7 +45,11 @@ export const StatusButton = React.forwardRef<
 				role="status"
 				className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-destructive"
 			>
-				<Icon name="cross-1" className="text-destructive-foreground" />
+				<Icon
+					name="cross-1"
+					className="text-destructive-foreground"
+					title="cross"
+				/>
 			</div>
 		),
 		idle: null,

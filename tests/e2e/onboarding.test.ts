@@ -181,13 +181,16 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 		name: /create an account/i,
 	})
 	expect(createAccountButton.getByRole('status')).not.toBeVisible()
+	expect(createAccountButton.getByText('cross')).not.toBeAttached()
 
 	// attempt 1
 	// Username is a string of alphanums and underscores from 3 to 20 chars
 	// long, that (NB!) will be lowercased upon sumbission. See: app/utils/user-validation.ts:
 	await usernameInput.fill('U$er_name') // $ is invalid char
 	await createAccountButton.click()
+
 	await expect(createAccountButton.getByRole('status')).toBeVisible()
+	expect(createAccountButton.getByText('cross')).toBeAttached()
 	await expect(
 		page.getByText(
 			/username can only include letters, numbers, and underscores/i,
@@ -205,6 +208,8 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await usernameInput.fill('')
 	await createAccountButton.click()
 	await expect(page.getByText(/username is required/i)).toBeVisible()
+	// the next assertion will fail...
+	// await expect(createAccountButton.getByText('cross')).toBeAttached()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// attempt 3
@@ -213,6 +218,8 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await expect(
 		page.getByText(/must agree to the terms of service and privacy policy/i),
 	).toBeVisible()
+	// the next assertion will fail...
+	// await expect(createAccountButton.getByText('cross')).toBeAttached()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// attempt 4 (we forgot about the checkbox)
@@ -220,6 +227,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
 	await createAccountButton.click()
+	// await expect(createAccountButton.getByText('cross')).not.toBeAttached()
 	await expect(page).toHaveURL(/signup/i) // home page
 
 	// we are still on the 'signup' route since that
