@@ -21,3 +21,8 @@ export interface AuthProvider {
 		link?: string | null
 	}>
 }
+
+export const normalizeEmail = (s: ProviderUser['email']) => s.toLowerCase()
+
+export const normalizeUsername = (s: ProviderUser['username']) =>
+	s?.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase()

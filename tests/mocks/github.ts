@@ -67,7 +67,7 @@ function createGitHubUser(code?: string | null) {
 
 type GitHubUser = ReturnType<typeof createGitHubUser>
 
-async function getGitHubUsers() {
+export async function getGitHubUsers() {
 	try {
 		if (await fsExtra.pathExists(githubUserFixturePath)) {
 			const json = await fsExtra.readJson(githubUserFixturePath)

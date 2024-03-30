@@ -1,6 +1,12 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
+import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
+import {
+	normalizeEmail,
+	normalizeUsername,
+} from '#app/utils/providers/provider'
+import { getGitHubUsers } from '#tests/mocks/github'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -129,6 +135,151 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	await page.getByRole('button', { name: /submit/i }).click()
 
 	await expect(page).toHaveURL(`/onboarding`)
+})
+
+test('onboarding with GitHub OAuth', async ({ page }) => {
+	// grab mock github users from tests/fixtures/github
+	const ghUsers = await getGitHubUsers()
+	const ghUser = ghUsers.find(u => u.code === MOCK_CODE_GITHUB)
+
+	// a github user can have numerous emails, but only one is primary,
+	// so we use it to query our users relation: if a user with this email
+	// is there, we simply create a link between the 'user' and  'connection'
+	// entities and make a new session, since the user is alrady on board
+	const user = await prisma.user.findUnique({
+		where: { email: ghUser?.primaryEmail.toLowerCase() },
+	})
+	if (user) await prisma.user.delete({ where: { id: user.id } })
+
+	// we remove the connection if any to keep the test clean
+	const conn = await prisma.connection.findFirst({
+		where: { providerName: 'github', userId: user?.id },
+	})
+	if (conn) await prisma.connection.delete({ where: { id: conn.id } })
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+	expect(
+		page.getByText(new RegExp(`welcome aboard ${ghUser?.primaryEmail}`, 'i')),
+	).toBeVisible()
+
+	// fields are pre-populated for the user
+	const usernameInput = page.getByRole('textbox', { name: /username/i })
+	expect(usernameInput).toHaveValue(
+		// @ts-ignore
+		normalizeUsername(ghUser!.profile.login),
+	)
+	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
+		ghUser!.profile.name,
+	)
+
+	// button currently in 'idle' (neutral) state and so has got no companion
+	const createAccountButton = page.getByRole('button', {
+		name: /create an account/i,
+	})
+	expect(createAccountButton.getByRole('status')).not.toBeVisible()
+
+	// attempt 1
+	// Username is a string of alphanums and underscores from 3 to 20 chars
+	// long, that (NB!) will be lowercased upon sumbission. See: app/utils/user-validation.ts:
+	await usernameInput.fill('U$er_name') // $ is invalid char
+	await createAccountButton.click()
+	await expect(createAccountButton.getByRole('status')).toBeVisible()
+	await expect(
+		page.getByText(
+			/username can only include letters, numbers, and underscores/i,
+		),
+	).toBeVisible()
+	// but we also never checked that privacy consent box
+	await expect(
+		page.getByText(
+			/you must agree to the terms of service and privacy policy/i,
+		),
+	).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// attempt 2
+	await usernameInput.fill('')
+	await createAccountButton.click()
+	await expect(page.getByText(/username is required/i)).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// attempt 3
+	await usernameInput.fill('U5er_name_0k')
+	await createAccountButton.click()
+	await expect(
+		page.getByText(/must agree to the terms of service and privacy policy/i),
+	).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// attempt 4 (we forgot about the checkbox)
+	await page
+		.getByLabel(/do you agree to our terms of service and privacy policy/i)
+		.check()
+	await createAccountButton.click()
+	await expect(page).toHaveURL(/signup/i) // home page
+
+	// we are still on the 'signup' route since that
+	// was the referrer and no 'redirectTo' has been specified
+	await expect(page).toHaveURL('/signup')
+	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
+
+	// internally, a user is being created:
+	const newlyCreatedUser = await prisma.user.findUniqueOrThrow({
+		where: { email: normalizeEmail(ghUser!.primaryEmail) },
+	})
+
+	// log out
+	await page
+		.getByRole('link', { name: newlyCreatedUser.name as string })
+		.click()
+	await page.getByRole('menuitem', { name: /logout/i }).click()
+	await expect(page).toHaveURL(`/`)
+
+	// delete newly created connection, but keep the user:
+	const newlyCreatedConn = await prisma.connection.findFirst({
+		where: { providerName: 'github', userId: newlyCreatedUser.id },
+	})
+	await prisma.connection.delete({ where: { id: newlyCreatedConn!.id } })
+
+	// now, try to sign up with GitHub once again:
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	// the user was already registered in out system, so we only create a new
+	// entry in 'connection' table, making a new session and redirecting them to home page:
+	await expect(page).toHaveURL('/')
+	expect(
+		// we also notify them with a toast
+		page.getByText(
+			new RegExp(
+				`your "${ghUser!.profile.login}" github account has been connected`,
+				'i',
+			),
+		),
+	).toBeVisible()
+
+	// clean up
+	await prisma.user.delete({
+		where: { username: newlyCreatedUser.username },
+	})
+	if (user) await prisma.user.create({ data: user })
+	if (conn) await prisma.connection.create({ data: conn })
+})
+
+test('login as existing user', async ({ page, insertNewUser }) => {
+	const password = faker.internet.password()
+	const user = await insertNewUser({ password })
+	invariant(user.name, 'User name not found')
+	await page.goto('/login')
+	await page.getByRole('textbox', { name: /username/i }).fill(user.username)
+	await page.getByLabel(/^password$/i).fill(password)
+	await page.getByRole('button', { name: /log in/i }).click()
+	await expect(page).toHaveURL(`/`)
+
+	await expect(page.getByRole('link', { name: user.name })).toBeVisible()
 })
 
 test('login as existing user', async ({ page, insertNewUser }) => {

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { promiseHash } from 'remix-utils/promise'
 import { prisma } from '#app/utils/db.server.ts'
+import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
 import {
 	cleanupDb,
 	createPassword,
@@ -132,7 +133,7 @@ async function seed() {
 		}),
 	})
 
-	const githubUser = await insertGitHubUser('MOCK_CODE_GITHUB_KODY')
+	const githubUser = await insertGitHubUser(MOCK_CODE_GITHUB)
 
 	await prisma.user.create({
 		select: { id: true },
