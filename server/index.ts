@@ -16,7 +16,8 @@ installGlobals()
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
-const IS_DEV = MODE === "development"
+const IS_DEV = MODE === 'development'
+const ALLOW_INDEXING = process.env.ALLOW_INDEXING !== 'false'
 
 const createRequestHandler = IS_PROD
 	? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
@@ -203,6 +204,13 @@ async function getBuild() {
 			await import('#build/server/index.js')
 	// not sure how to make this happy 🤷‍♂️
 	return build as unknown as ServerBuild
+}
+
+if (!ALLOW_INDEXING) {
+	app.use((_, res, next) => {
+		res.set('X-Robots-Tag', 'noindex, nofollow')
+		next()
+	})
 }
 
 app.all(
