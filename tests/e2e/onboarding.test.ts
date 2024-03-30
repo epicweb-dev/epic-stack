@@ -145,7 +145,8 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	// a github user can have numerous emails, but only one is primary,
 	// so we use it to query our users relation: if a user with this email
 	// is there, we simply create a link between the 'user' and  'connection'
-	// entities and make a new session, since the user is alrady on board
+	// entities and make a new session, since the user is already on board;
+	// this behavior will be tested later on, but for now we need to prepare the ground:
 	const user = await prisma.user.findUnique({
 		where: { email: ghUser?.primaryEmail.toLowerCase() },
 	})
