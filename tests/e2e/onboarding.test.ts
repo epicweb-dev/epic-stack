@@ -178,7 +178,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 
 	// attempt 1
 	// Username is a string of alphanums and underscores from 3 to 20 chars
-	// long, that (NB!) will be lowercased upon sumbission. See: app/utils/user-validation.ts:
+	// long, that will be lowercased upon sumbission. See: app/utils/user-validation.ts:
 	await usernameInput.fill('U$er_name') // $ is invalid char
 	await createAccountButton.click()
 
