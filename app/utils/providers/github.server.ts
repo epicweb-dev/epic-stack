@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { cache, cachified } from '../cache.server.ts'
 import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
-import { MOCK_CODE_GITHUB } from './constants.ts'
+import { MOCK_CODE_GITHUB_HEADER, MOCK_CODE_GITHUB } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })
@@ -87,7 +87,12 @@ export class GitHubProvider implements AuthProvider {
 		)
 		const state = cuid()
 		connectionSession.set('oauth2:state', state)
-		const searchParams = new URLSearchParams({ code: MOCK_CODE_GITHUB, state })
+
+		// allows us to inject a code when running e2e tests,
+		// but falls back to a pre-defined 🐼 constant
+		const code =
+			request.headers.get(MOCK_CODE_GITHUB_HEADER) || MOCK_CODE_GITHUB
+		const searchParams = new URLSearchParams({ code, state })
 		throw redirect(`/auth/github/callback?${searchParams}`, {
 			headers: {
 				'set-cookie':

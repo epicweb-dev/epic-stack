@@ -1,12 +1,15 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
-import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
+import {
+	MOCK_CODE_GITHUB,
+	MOCK_CODE_GITHUB_HEADER,
+} from '#app/utils/providers/constants'
 import {
 	normalizeEmail,
 	normalizeUsername,
 } from '#app/utils/providers/provider'
-import { getGitHubUsers } from '#tests/mocks/github'
+import { insertGitHubUser } from '#tests/mocks/github'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -138,25 +141,15 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 })
 
 test('onboarding with GitHub OAuth', async ({ page }) => {
+	const code = `${MOCK_CODE_GITHUB}_${crypto.randomUUID()}_PLAYWRIGHT_TEST`
+
+	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
+		const headers = { ...request.headers(), [MOCK_CODE_GITHUB_HEADER]: code }
+		await route.continue({ headers })
+	})
+
 	// grab mock github users from tests/fixtures/github
-	const ghUsers = await getGitHubUsers()
-	const ghUser = ghUsers.find(u => u.code === MOCK_CODE_GITHUB)
-
-	// a github user can have numerous emails, but only one is primary,
-	// so we use it to query our users relation: if a user with this email
-	// is there, we simply create a link between the 'user' and  'connection'
-	// entities and make a new session, since the user is already on board;
-	// this behavior will be tested later on, but for now we need to prepare the ground:
-	const user = await prisma.user.findUnique({
-		where: { email: ghUser?.primaryEmail.toLowerCase() },
-	})
-	if (user) await prisma.user.delete({ where: { id: user.id } })
-
-	// we remove the connection if any to keep the test clean
-	const conn = await prisma.connection.findFirst({
-		where: { providerName: 'github', userId: user?.id },
-	})
-	if (conn) await prisma.connection.delete({ where: { id: conn.id } })
+	const ghUser = await insertGitHubUser(code)
 
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
@@ -213,7 +206,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// attempt 3
-	await usernameInput.fill('U5er_name_0k')
+	await usernameInput.fill(`U5er_name_0k_${faker.person.lastName()}`)
 	await createAccountButton.click()
 	await expect(
 		page.getByText(/must agree to the terms of service and privacy policy/i),
@@ -274,8 +267,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await prisma.user.delete({
 		where: { username: newlyCreatedUser.username },
 	})
-	if (user) await prisma.user.create({ data: user })
-	if (conn) await prisma.connection.create({ data: conn })
+	await prisma.session.deleteMany({ where: { userId: newlyCreatedUser.id } })
 })
 
 test('login as existing user', async ({ page, insertNewUser }) => {
