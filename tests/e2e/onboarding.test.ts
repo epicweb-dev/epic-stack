@@ -1,10 +1,7 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	MOCK_CODE_GITHUB,
-	MOCK_CODE_GITHUB_HEADER,
-} from '#app/utils/providers/constants'
+import { MOCK_CODE_GITHUB_HEADER } from '#app/utils/providers/constants'
 import {
 	normalizeEmail,
 	normalizeUsername,
@@ -140,15 +137,16 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	await expect(page).toHaveURL(`/onboarding`)
 })
 
-test('onboarding with GitHub OAuth', async ({ page }) => {
-	const code = `${MOCK_CODE_GITHUB}_${crypto.randomUUID()}_PLAYWRIGHT_TEST`
-
+test('onboarding with GitHub OAuth', async ({ page }, testInfo) => {
 	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
-		const headers = { ...request.headers(), [MOCK_CODE_GITHUB_HEADER]: code }
+		const headers = {
+			...request.headers(),
+			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
+		}
 		await route.continue({ headers })
 	})
 
-	const ghUser = await insertGitHubUser(code)!
+	const ghUser = await insertGitHubUser(testInfo.testId)!
 
 	// let's verify we do not have user with that email in our system:
 	expect(
