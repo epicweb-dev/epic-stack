@@ -150,6 +150,13 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 
 	const ghUser = await insertGitHubUser(code)!
 
+	// let's verify we do not have user with that email in our system:
+	expect(
+		await prisma.user.findUnique({
+			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		}),
+	).toBeNull()
+
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
 
@@ -200,8 +207,6 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await usernameInput.fill('')
 	await createAccountButton.click()
 	await expect(page.getByText(/username is required/i)).toBeVisible()
-	// the next assertion will fail...
-	// await expect(createAccountButton.getByText('cross')).toBeAttached()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// attempt 3
@@ -210,8 +215,6 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await expect(
 		page.getByText(/must agree to the terms of service and privacy policy/i),
 	).toBeVisible()
-	// the next assertion will fail...
-	// await expect(createAccountButton.getByText('cross')).toBeAttached()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// attempt 4 (we forgot about the checkbox)
@@ -219,7 +222,6 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
 	await createAccountButton.click()
-	// await expect(createAccountButton.getByText('cross')).not.toBeAttached()
 	await expect(page).toHaveURL(/signup/i) // home page
 
 	// we are still on the 'signup' route since that
