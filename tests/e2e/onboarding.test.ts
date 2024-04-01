@@ -227,22 +227,20 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 
 	// internally, a user is being created:
-	const newlyCreatedUser = await prisma.user.findUniqueOrThrow({
+	const newUser = await prisma.user.findUniqueOrThrow({
 		where: { email: normalizeEmail(ghUser.primaryEmail) },
 	})
 
 	// log out
-	await page
-		.getByRole('link', { name: newlyCreatedUser.name as string })
-		.click()
+	await page.getByRole('link', { name: newUser.name as string }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
 
 	// delete newly created connection, but keep the user:
-	const newlyCreatedConn = await prisma.connection.findFirst({
-		where: { providerName: 'github', userId: newlyCreatedUser.id },
+	const newConnection = await prisma.connection.findFirst({
+		where: { providerName: 'github', userId: newUser.id },
 	})
-	await prisma.connection.delete({ where: { id: newlyCreatedConn!.id } })
+	await prisma.connection.delete({ where: { id: newConnection!.id } })
 
 	// now, try to sign up with GitHub once again:
 	await page.goto('/signup')
@@ -262,8 +260,8 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	).toBeVisible()
 
 	// clean up
-	await prisma.user.delete({ where: { username: newlyCreatedUser.username } })
-	await prisma.session.deleteMany({ where: { userId: newlyCreatedUser.id } })
+	await prisma.user.delete({ where: { username: newUser.username } })
+	await prisma.session.deleteMany({ where: { userId: newUser.id } })
 	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
