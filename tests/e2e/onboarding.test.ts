@@ -167,10 +167,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 
 	// fields are pre-populated for the user
 	const usernameInput = page.getByRole('textbox', { name: /username/i })
-	expect(usernameInput).toHaveValue(
-		// @ts-ignore
-		normalizeUsername(ghUser.profile.login),
-	)
+	expect(usernameInput).toHaveValue(normalizeUsername(ghUser.profile.login))
 	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
 		ghUser.profile.name,
 	)

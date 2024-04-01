@@ -140,7 +140,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	verifySession.set(prefilledProfileKey, {
 		...profile,
 		email: normalizeEmail(profile.email),
-		username: normalizeUsername(profile.username),
+		username:
+			typeof profile.username === 'string'
+				? normalizeUsername(profile.username)
+				: undefined,
 	})
 	verifySession.set(providerIdKey, profile.id)
 	const onboardingRedirect = [
