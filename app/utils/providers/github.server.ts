@@ -89,7 +89,7 @@ export class GitHubProvider implements AuthProvider {
 		connectionSession.set('oauth2:state', state)
 
 		// allows us to inject a code when running e2e tests,
-		// but falls back to a pre-defined 🐼 constant
+		// but falls back to a pre-defined 🐨 constant
 		const code =
 			request.headers.get(MOCK_CODE_GITHUB_HEADER) || MOCK_CODE_GITHUB
 		const searchParams = new URLSearchParams({ code, state })

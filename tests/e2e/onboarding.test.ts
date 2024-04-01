@@ -9,7 +9,7 @@ import {
 	normalizeEmail,
 	normalizeUsername,
 } from '#app/utils/providers/provider'
-import { insertGitHubUser } from '#tests/mocks/github'
+import { deleteGitHubUser, insertGitHubUser } from '#tests/mocks/github'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -148,25 +148,24 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 		await route.continue({ headers })
 	})
 
-	// grab mock github users from tests/fixtures/github
-	const ghUser = await insertGitHubUser(code)
+	const ghUser = await insertGitHubUser(code)!
 
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
 
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 	expect(
-		page.getByText(new RegExp(`welcome aboard ${ghUser?.primaryEmail}`, 'i')),
+		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
 	).toBeVisible()
 
 	// fields are pre-populated for the user
 	const usernameInput = page.getByRole('textbox', { name: /username/i })
 	expect(usernameInput).toHaveValue(
 		// @ts-ignore
-		normalizeUsername(ghUser!.profile.login),
+		normalizeUsername(ghUser.profile.login),
 	)
 	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
-		ghUser!.profile.name,
+		ghUser.profile.name,
 	)
 
 	// button currently in 'idle' (neutral) state and so has got no companion
@@ -230,7 +229,7 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 
 	// internally, a user is being created:
 	const newlyCreatedUser = await prisma.user.findUniqueOrThrow({
-		where: { email: normalizeEmail(ghUser!.primaryEmail) },
+		where: { email: normalizeEmail(ghUser.primaryEmail) },
 	})
 
 	// log out
@@ -264,10 +263,9 @@ test('onboarding with GitHub OAuth', async ({ page }) => {
 	).toBeVisible()
 
 	// clean up
-	await prisma.user.delete({
-		where: { username: newlyCreatedUser.username },
-	})
+	await prisma.user.delete({ where: { username: newlyCreatedUser.username } })
 	await prisma.session.deleteMany({ where: { userId: newlyCreatedUser.id } })
+	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
 test('login as existing user', async ({ page, insertNewUser }) => {

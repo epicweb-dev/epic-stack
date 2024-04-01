@@ -80,6 +80,14 @@ async function getGitHubUsers() {
 	}
 }
 
+export async function deleteGitHubUser(primaryEmail: string) {
+	const users = await getGitHubUsers()
+	const user = users.find(u => u.primaryEmail === primaryEmail)
+	if (!user) return null
+	await setGitHubUsers(users.filter(u => u.primaryEmail !== primaryEmail))
+	return user
+}
+
 export async function deleteGitHubUsers() {
 	await fsExtra.remove(githubUserFixturePath)
 }
