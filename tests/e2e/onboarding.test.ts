@@ -6,6 +6,10 @@ import {
 	normalizeEmail,
 	normalizeUsername,
 } from '#app/utils/providers/provider'
+import {
+	USERNAME_MAX_LENGTH,
+	USERNAME_MIN_LENGTH,
+} from '#app/utils/user-validation'
 import { deleteGitHubUser, insertGitHubUser } from '#tests/mocks/github'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
@@ -137,7 +141,9 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	await expect(page).toHaveURL(`/onboarding`)
 })
 
-test('onboarding with GitHub OAuth', async ({ page }, testInfo) => {
+test('completes onboarding after GitHub OAuth given valid user details', async ({
+	page,
+}, testInfo) => {
 	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
 		const headers = {
 			...request.headers(),
@@ -163,24 +169,142 @@ test('onboarding with GitHub OAuth', async ({ page }, testInfo) => {
 		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
 	).toBeVisible()
 
-	// fields are pre-populated for the user
+	// fields are pre-populated for the user, so we only need to accept
+	// terms of service and hit the 'crete an account' button
 	const usernameInput = page.getByRole('textbox', { name: /username/i })
 	expect(usernameInput).toHaveValue(normalizeUsername(ghUser.profile.login))
 	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
 		ghUser.profile.name,
 	)
+	const createAccountButton = page.getByRole('button', {
+		name: /create an account/i,
+	})
 
-	// button currently in 'idle' (neutral) state and so has got no companion
+	await page
+		.getByLabel(/do you agree to our terms of service and privacy policy/i)
+		.check()
+	await createAccountButton.click()
+	await expect(page).toHaveURL(/signup/i)
+
+	// we are still on the 'signup' route since that
+	// was the referrer and no 'redirectTo' has been specified
+	await expect(page).toHaveURL('/signup')
+	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
+
+	// internally, a user is being created:
+	const newUser = await prisma.user.findUniqueOrThrow({
+		where: { email: normalizeEmail(ghUser.primaryEmail) },
+	})
+
+	// log out
+	await page.getByRole('link', { name: newUser.name as string }).click()
+	await page.getByRole('menuitem', { name: /logout/i }).click()
+	await expect(page).toHaveURL(`/`)
+
+	// clean up
+	await prisma.user.delete({ where: { username: newUser.username } })
+	await prisma.session.deleteMany({ where: { userId: newUser.id } })
+	await deleteGitHubUser(ghUser.primaryEmail)
+})
+
+test('gets logged in after GitHub OAuth if already registered as app user', async ({
+	page,
+}, testInfo) => {
+	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
+		const headers = {
+			...request.headers(),
+			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
+		}
+		await route.continue({ headers })
+	})
+
+	const ghUser = await insertGitHubUser(testInfo.testId)!
+
+	// let's verify we do not have user with that email in our system ...
+	expect(
+		await prisma.user.findUnique({
+			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		}),
+	).toBeNull()
+	// ... and create one:
+	const name = faker.person.fullName()
+	const user = await prisma.user.create({
+		select: { id: true, name: true },
+		data: {
+			email: normalizeEmail(ghUser.primaryEmail),
+			username: normalizeUsername(ghUser.profile.login),
+			name,
+		},
+	})
+
+	// let's verify there is no connection between the GitHub user
+	// and out app's user:
+	const connection = await prisma.connection.findFirst({
+		where: { providerName: 'github', userId: user.id },
+	})
+	expect(connection).toBeNull()
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(`/`)
+	expect(
+		page.getByText(
+			new RegExp(
+				`your "${ghUser!.profile.login}" github account has been connected`,
+				'i',
+			),
+		),
+	).toBeVisible()
+
+	// internally, a connection has been craeted:
+	await prisma.connection.findFirstOrThrow({
+		where: { providerName: 'github', userId: user.id },
+	})
+
+	// log out
+	await page.getByRole('link', { name }).click()
+	await page.getByRole('menuitem', { name: /logout/i }).click()
+	await expect(page).toHaveURL(`/`)
+
+	// clean up
+	await prisma.user.delete({ where: { id: user.id } })
+	await prisma.session.deleteMany({ where: { userId: user.id } })
+	await deleteGitHubUser(ghUser.primaryEmail)
+})
+
+test('faces help texts when entering invald details on onboarding page after GitHub OAuth', async ({
+	page,
+}, testInfo) => {
+	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
+		const headers = {
+			...request.headers(),
+			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
+		}
+		await route.continue({ headers })
+	})
+
+	const ghUser = await insertGitHubUser(testInfo.testId)!
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+	expect(
+		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
+	).toBeVisible()
+
+	const usernameInput = page.getByRole('textbox', { name: /username/i })
+
+	// notice, how button is currently in 'idle' (neutral) state and so has got no companion
 	const createAccountButton = page.getByRole('button', {
 		name: /create an account/i,
 	})
 	expect(createAccountButton.getByRole('status')).not.toBeVisible()
 	expect(createAccountButton.getByText('cross')).not.toBeAttached()
 
-	// attempt 1
-	// Username is a string of alphanums and underscores from 3 to 20 chars
-	// long, that will be lowercased upon sumbission. See: app/utils/user-validation.ts:
-	await usernameInput.fill('U$er_name') // $ is invalid char
+	// invalid chars in username
+	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/user-validation.ts.
 	await createAccountButton.click()
 
 	await expect(createAccountButton.getByRole('status')).toBeVisible()
@@ -198,13 +322,31 @@ test('onboarding with GitHub OAuth', async ({ page }, testInfo) => {
 	).toBeVisible()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
-	// attempt 2
+	// empty username
 	await usernameInput.fill('')
 	await createAccountButton.click()
 	await expect(page.getByText(/username is required/i)).toBeVisible()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
-	// attempt 3
+	// too short username
+	await usernameInput.fill(
+		faker.string.alphanumeric({ length: USERNAME_MIN_LENGTH - 1 }),
+	)
+	await createAccountButton.click()
+	await expect(page.getByText(/username is too short/i)).toBeVisible()
+
+	// too long username
+	await usernameInput.fill(
+		faker.string.alphanumeric({
+			length: USERNAME_MAX_LENGTH + 1,
+		}),
+	)
+	// we are truncating the user's input
+	expect((await usernameInput.inputValue()).length).toBe(USERNAME_MAX_LENGTH)
+	await createAccountButton.click()
+	await expect(page.getByText(/username is too long/i)).not.toBeVisible()
+
+	// still unchecked 'terms of service' checkbox
 	await usernameInput.fill(`U5er_name_0k_${faker.person.lastName()}`)
 	await createAccountButton.click()
 	await expect(
@@ -212,54 +354,28 @@ test('onboarding with GitHub OAuth', async ({ page }, testInfo) => {
 	).toBeVisible()
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
-	// attempt 4 (we forgot about the checkbox)
+	// we are all set up and ...
 	await page
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
 	await createAccountButton.click()
-	await expect(page).toHaveURL(/signup/i) // home page
+	await expect(createAccountButton.getByText('cross')).not.toBeAttached()
 
-	// we are still on the 'signup' route since that
-	// was the referrer and no 'redirectTo' has been specified
-	await expect(page).toHaveURL('/signup')
+	// ... sign up is successful!
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 
-	// internally, a user is being created:
-	const newUser = await prisma.user.findUniqueOrThrow({
+	// log out
+	const user = await prisma.user.findUniqueOrThrow({
+		select: { id: true, name: true },
 		where: { email: normalizeEmail(ghUser.primaryEmail) },
 	})
-
-	// log out
-	await page.getByRole('link', { name: newUser.name as string }).click()
+	await page.getByRole('link', { name: user.name as string }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
 
-	// delete newly created connection, but keep the user:
-	const newConnection = await prisma.connection.findFirst({
-		where: { providerName: 'github', userId: newUser.id },
-	})
-	await prisma.connection.delete({ where: { id: newConnection!.id } })
-
-	// now, try to sign up with GitHub once again:
-	await page.goto('/signup')
-	await page.getByRole('button', { name: /signup with github/i }).click()
-
-	// the user was already registered in out system, so we only create a new
-	// entry in 'connection' table, making a new session and redirecting them to home page:
-	await expect(page).toHaveURL('/')
-	expect(
-		// we also notify them with a toast
-		page.getByText(
-			new RegExp(
-				`your "${ghUser!.profile.login}" github account has been connected`,
-				'i',
-			),
-		),
-	).toBeVisible()
-
 	// clean up
-	await prisma.user.delete({ where: { username: newUser.username } })
-	await prisma.session.deleteMany({ where: { userId: newUser.id } })
+	await prisma.user.delete({ where: { id: user.id } })
+	await prisma.session.deleteMany({ where: { userId: user.id } })
 	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
