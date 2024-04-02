@@ -12,7 +12,7 @@ export async function setup() {
 	if (databaseExists) return
 
 	await execaCommand(
-		'prisma migrate reset --force --skip-seed --skip-generate',
+		'npx prisma migrate reset --force --skip-seed --skip-generate',
 		{
 			stdio: 'inherit',
 			env: {
