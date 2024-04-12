@@ -1,16 +1,18 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
-	redirect,
-	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
+	json,
+	type LoaderFunctionArgs,
+	redirect,
 } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { generateTOTP } from '#app/utils/totp.server.ts'
+
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 import { twoFAVerifyVerificationType } from './profile.two-factor.verify.tsx'
 

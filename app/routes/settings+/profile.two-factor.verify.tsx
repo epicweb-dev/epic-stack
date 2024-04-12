@@ -2,10 +2,10 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
-	redirect,
-	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
+	json,
+	type LoaderFunctionArgs,
+	redirect,
 } from '@remix-run/node'
 import {
 	Form,
@@ -15,6 +15,7 @@ import {
 } from '@remix-run/react'
 import * as QRCode from 'qrcode'
 import { z } from 'zod'
+
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -24,6 +25,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { getTOTPAuthUri } from '#app/utils/totp.server.ts'
+
 import { type BreadcrumbHandle } from './profile.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 

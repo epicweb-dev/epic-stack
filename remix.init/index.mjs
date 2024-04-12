@@ -1,12 +1,12 @@
+import toml from '@iarna/toml'
 import { execSync } from 'child_process'
 import crypto from 'crypto'
-import fs from 'fs/promises'
-import path from 'path'
-import toml from '@iarna/toml'
 import { $ } from 'execa'
+import fs from 'fs/promises'
 import inquirer from 'inquirer'
 import open from 'open'
 import parseGitHubURL from 'parse-github-url'
+import path from 'path'
 
 const escapeRegExp = string =>
 	// $& means the whole matched string

@@ -1,6 +1,6 @@
-import path from 'node:path'
 import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
+import path from 'node:path'
 
 export const BASE_DATABASE_PATH = path.join(
 	process.cwd(),

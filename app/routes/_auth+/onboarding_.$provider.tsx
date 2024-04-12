@@ -1,34 +1,35 @@
 import {
 	getFormProps,
 	getInputProps,
-	useForm,
 	type SubmissionResult,
+	useForm,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import {
-	redirect,
-	json,
 	type ActionFunctionArgs,
+	json,
 	type LoaderFunctionArgs,
 	type MetaFunction,
+	redirect,
 } from '@remix-run/node'
 import {
-	type Params,
 	Form,
+	type Params,
 	useActionData,
 	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
+
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	authenticator,
+	requireAnonymous,
 	sessionKey,
 	signupWithConnection,
-	requireAnonymous,
 } from '#app/utils/auth.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
@@ -37,6 +38,7 @@ import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+
 import { onboardingEmailSessionKey } from './onboarding'
 
 export const providerIdKey = 'providerId'

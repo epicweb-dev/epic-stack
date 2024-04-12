@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { promiseHash } from 'remix-utils/promise'
+
 import { prisma } from '#app/utils/db.server.ts'
 import {
 	cleanupDb,

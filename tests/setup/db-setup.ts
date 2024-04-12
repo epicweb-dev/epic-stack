@@ -1,7 +1,9 @@
-import path from 'node:path'
 import fsExtra from 'fs-extra'
+import path from 'node:path'
 import { afterAll, afterEach, beforeAll } from 'vitest'
+
 import { cleanupDb } from '#tests/db-utils.ts'
+
 import { BASE_DATABASE_PATH } from './global-setup.ts'
 
 const databaseFile = `./tests/prisma/data.${process.env.VITEST_POOL_ID || 0}.db`

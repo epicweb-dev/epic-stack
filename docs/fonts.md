@@ -14,9 +14,8 @@ don't) you can generate one using a tool like
 [Transfonter](https://transfonter.org/). Transfonter now has a fonts directory
 setting. Set that to `fonts` to have the `url` preset.
 
-Verify the `url` in the `css` is relative to the `public` 
-folder. So it should look something like
-`url('/fonts/yourfont/yourfont-200.woff2')`.
+Verify the `url` in the `css` is relative to the `public` folder. So it should
+look something like `url('/fonts/yourfont/yourfont-200.woff2')`.
 
 Now you've added your font, there's a few places you need to update to use it.
 

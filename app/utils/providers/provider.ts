@@ -1,4 +1,5 @@
 import { type Strategy } from 'remix-auth'
+
 import { type Timings } from '../timing.server.ts'
 
 // Define a user type for cleaner typing

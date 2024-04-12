@@ -1,6 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { Form, Link, type MetaFunction, useLoaderData } from '@remix-run/react'
+
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'

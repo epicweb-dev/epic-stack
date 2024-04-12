@@ -1,16 +1,16 @@
+import '@testing-library/jest-dom/vitest'
 import * as setCookieParser from 'set-cookie-parser'
 import { expect } from 'vitest'
+
 import { sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import {
 	type ToastInput,
-	toastSessionStorage,
 	toastKey,
+	toastSessionStorage,
 } from '#app/utils/toast.server.ts'
 import { convertSetCookieToCookie } from '#tests/utils.ts'
-
-import '@testing-library/jest-dom/vitest'
 
 expect.extend({
 	toHaveRedirect(response: Response, redirectTo?: string) {

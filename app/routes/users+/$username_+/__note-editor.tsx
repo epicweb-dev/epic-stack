@@ -1,11 +1,11 @@
 import {
+	type FieldMetadata,
 	FormProvider,
 	getFieldsetProps,
 	getFormProps,
 	getInputProps,
 	getTextareaProps,
 	useForm,
-	type FieldMetadata,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type Note, type NoteImage } from '@prisma/client'
@@ -13,6 +13,7 @@ import { type SerializeFrom } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
 import { useState } from 'react'
 import { z } from 'zod'
+
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { ErrorList, Field, TextareaField } from '#app/components/forms.tsx'
@@ -22,6 +23,7 @@ import { Label } from '#app/components/ui/label.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
 import { cn, getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
+
 import { type action } from './__note-editor.server'
 
 const titleMinLength = 1

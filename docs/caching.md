@@ -23,9 +23,9 @@ indexes before caching the results.
 ## Using the cache
 
 You won't typically interact directly with the caches. Instead, you will use
-[`cachified`](https://www.npmjs.com/package/@epic-web/cachified) which is a nice abstraction for cache
-management. We have a small abstraction on top of it which allows you to pass
-`timings` to work seamlessly with
+[`cachified`](https://www.npmjs.com/package/@epic-web/cachified) which is a nice
+abstraction for cache management. We have a small abstraction on top of it which
+allows you to pass `timings` to work seamlessly with
 [the server timing utility](./server-timing.md).
 
 Let's say we're making a request to tito to get a list of events. Tito's API is
@@ -34,7 +34,7 @@ up by caching them and utilizing the stale-while-revalidate features in
 cachified. Here's how you would use cachified to do this:
 
 ```tsx
-import { cachified, cache } from '#app/utils/cache.server.ts'
+import { cache, cachified } from '#app/utils/cache.server.ts'
 import { type Timings } from '#app/utils/timing.server.ts'
 
 const eventSchema = z.object({

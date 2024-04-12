@@ -1,13 +1,14 @@
-import 'dotenv/config'
-import './db-setup.ts'
-import '#app/utils/env.server.ts'
 // we need these to be imported first 👆
-
 import { installGlobals } from '@remix-run/node'
 import { cleanup } from '@testing-library/react'
-import { afterEach, beforeEach, vi, type SpyInstance } from 'vitest'
+import 'dotenv/config'
+import { afterEach, beforeEach, type SpyInstance, vi } from 'vitest'
+
+import '#app/utils/env.server.ts'
 import { server } from '#tests/mocks/index.ts'
+
 import './custom-matchers.ts'
+import './db-setup.ts'
 
 installGlobals()
 
