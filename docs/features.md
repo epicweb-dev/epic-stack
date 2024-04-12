@@ -22,7 +22,7 @@ Here are a few things you get today:
 - Database ORM with [Prisma](https://prisma.io/)
 - Role-based User Permissions.
 - Custom built image hosting
-- Caching via [cachified](https://npm.im/cachified): Both in-memory and
+- Caching via [cachified](https://npm.im/@epic-web/cachified): Both in-memory and
   SQLite-based (with
   [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))
 - Styling with [Tailwind](https://tailwindcss.com/)
