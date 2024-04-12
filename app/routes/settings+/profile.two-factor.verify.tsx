@@ -16,6 +16,8 @@ import {
 import * as QRCode from 'qrcode'
 import { z } from 'zod'
 
+import { type BreadcrumbHandle } from '#/app/routes/settings+/profile.tsx'
+import { twoFAVerificationType } from '#/app/routes/settings+/profile.two-factor.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -26,8 +28,6 @@ import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { getTOTPAuthUri } from '#app/utils/totp.server.ts'
 
-import { type BreadcrumbHandle } from './profile.tsx'
-import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="check">Verify</Icon>,

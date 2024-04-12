@@ -142,6 +142,7 @@
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-no-relative-import-paths": "^1.5.4",
     "fs-extra": "^11.2.0",
     "jsdom": "^24.0.0",
     "msw": "2.2.8",

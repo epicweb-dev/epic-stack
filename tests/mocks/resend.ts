@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { http, type HttpHandler, HttpResponse } from 'msw'
 
-import { requireHeader, writeEmail } from './utils.ts'
+import { requireHeader, writeEmail } from '#/tests/mocks/utils.ts'
 
 const { json } = HttpResponse
 

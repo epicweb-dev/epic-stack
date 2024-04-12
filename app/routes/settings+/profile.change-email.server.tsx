@@ -2,6 +2,7 @@ import { invariant } from '@epic-web/invariant'
 import * as E from '@react-email/components'
 import { json } from '@remix-run/node'
 
+import { newEmailAddressSessionKey } from '#/app/routes/settings+/profile.change-email'
 import {
 	requireRecentVerification,
 	type VerifyFunctionArgs,
@@ -11,7 +12,6 @@ import { sendEmail } from '#app/utils/email.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 
-import { newEmailAddressSessionKey } from './profile.change-email'
 
 export async function handleVerification({
 	request,

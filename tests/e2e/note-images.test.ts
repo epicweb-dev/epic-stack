@@ -1,6 +1,6 @@
+import fs from 'fs'
 import { faker } from '@faker-js/faker'
 import { type Note, type NoteImage } from '@prisma/client'
-import fs from 'fs'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { expect, test } from '#tests/playwright-utils.ts'

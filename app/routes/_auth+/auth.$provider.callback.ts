@@ -1,5 +1,8 @@
 import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 
+import { handleNewSession } from '#/app/routes/_auth+/login.server.ts'
+import { onboardingEmailSessionKey } from '#/app/routes/_auth+/onboarding.tsx'
+import { prefilledProfileKey, providerIdKey } from '#/app/routes/_auth+/onboarding_.$provider.tsx'
 import {
 	authenticator,
 	getSessionExpirationDate,
@@ -18,9 +21,6 @@ import {
 } from '#app/utils/toast.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 
-import { handleNewSession } from './login.server.ts'
-import { onboardingEmailSessionKey } from './onboarding.tsx'
-import { prefilledProfileKey, providerIdKey } from './onboarding_.$provider.tsx'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 

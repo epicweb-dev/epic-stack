@@ -7,8 +7,8 @@ import { afterEach, beforeEach, type SpyInstance, vi } from 'vitest'
 import '#app/utils/env.server.ts'
 import { server } from '#tests/mocks/index.ts'
 
-import './custom-matchers.ts'
-import './db-setup.ts'
+import '#/tests/setup/custom-matchers.ts'
+import '#/tests/setup/db-setup.ts'
 
 installGlobals()
 

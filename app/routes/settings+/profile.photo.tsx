@@ -19,6 +19,7 @@ import {
 import { useState } from 'react'
 import { z } from 'zod'
 
+import { type BreadcrumbHandle } from '#/app/routes/settings+/profile.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -31,7 +32,6 @@ import {
 	useIsPending,
 } from '#app/utils/misc.tsx'
 
-import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,

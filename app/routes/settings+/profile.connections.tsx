@@ -10,6 +10,7 @@ import {
 import { useFetcher, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 
+import { type BreadcrumbHandle } from '#/app/routes/settings+/profile.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
@@ -31,7 +32,6 @@ import { prisma } from '#app/utils/db.server.ts'
 import { makeTimings } from '#app/utils/timing.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 
-import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="link-2">Connections</Icon>,

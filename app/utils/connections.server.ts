@@ -1,9 +1,9 @@
 import { createCookieSessionStorage } from '@remix-run/node'
 
-import { type ProviderName } from './connections.tsx'
-import { GitHubProvider } from './providers/github.server.ts'
-import { type AuthProvider } from './providers/provider.ts'
-import { type Timings } from './timing.server.ts'
+import { type ProviderName } from '#/app/utils/connections.tsx'
+import { GitHubProvider } from '#/app/utils/providers/github.server.ts'
+import { type AuthProvider } from '#/app/utils/providers/provider.ts'
+import { type Timings } from '#/app/utils/timing.server.ts'
 
 export const connectionSessionStorage = createCookieSessionStorage({
 	cookie: {

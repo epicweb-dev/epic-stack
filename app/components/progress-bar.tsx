@@ -2,9 +2,9 @@ import { useNavigation } from '@remix-run/react'
 import { useEffect, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 
+import { Icon } from '#/app/components/ui/icon.tsx'
 import { cn } from '#app/utils/misc.tsx'
 
-import { Icon } from './ui/icon.tsx'
 
 function EpicProgress() {
 	const transition = useNavigation()

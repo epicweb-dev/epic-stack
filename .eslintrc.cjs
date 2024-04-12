@@ -9,6 +9,7 @@ module.exports = {
 		'@remix-run/eslint-config/node',
 		'prettier',
 	],
+	plugins: ['no-relative-import-paths'],
 	rules: {
 		// playwright requires destructuring in fixtures even if you don't use anything 🤷‍♂️
 		'no-empty-pattern': 'off',
@@ -35,6 +36,10 @@ module.exports = {
 					'index',
 				],
 			},
+		],
+		'no-relative-import-paths/no-relative-import-paths': [
+			'warn',
+			{ allowSameFolder: false, rootDir: '.', prefix: '#' },
 		],
 	},
 	overrides: [

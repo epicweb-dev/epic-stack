@@ -1,11 +1,11 @@
 import { invariant } from '@epic-web/invariant'
 import { json, redirect } from '@remix-run/node'
 
+import { resetPasswordUsernameSessionKey } from '#/app/routes/_auth+/reset-password.tsx'
+import { type VerifyFunctionArgs } from '#/app/routes/_auth+/verify.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 
-import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
-import { type VerifyFunctionArgs } from './verify.server.ts'
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(

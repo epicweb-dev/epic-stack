@@ -1,8 +1,8 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { faker } from '@faker-js/faker'
 import fsExtra from 'fs-extra'
 import { http, type HttpHandler, HttpResponse, passthrough } from 'msw'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 const { json } = HttpResponse
 

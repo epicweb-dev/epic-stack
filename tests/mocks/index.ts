@@ -1,8 +1,8 @@
 import closeWithGrace from 'close-with-grace'
 import { setupServer } from 'msw/node'
 
-import { handlers as githubHandlers } from './github.ts'
-import { handlers as resendHandlers } from './resend.ts'
+import { handlers as githubHandlers } from '#/tests/mocks/github.ts'
+import { handlers as resendHandlers } from '#/tests/mocks/resend.ts'
 
 export const server = setupServer(...resendHandlers, ...githubHandlers)
 

@@ -1,12 +1,12 @@
 import { Form, useSearchParams, useSubmit } from '@remix-run/react'
 import { useId } from 'react'
 
-import { useDebounce, useIsPending } from '#app/utils/misc.tsx'
 
-import { Icon } from './ui/icon.tsx'
-import { Input } from './ui/input.tsx'
-import { Label } from './ui/label.tsx'
-import { StatusButton } from './ui/status-button.tsx'
+import { Icon } from '#/app/components/ui/icon.tsx'
+import { Input } from '#/app/components/ui/input.tsx'
+import { Label } from '#/app/components/ui/label.tsx'
+import { StatusButton } from '#/app/components/ui/status-button.tsx'
+import { useDebounce, useIsPending } from '#app/utils/misc.tsx'
 
 export function SearchBar({
 	status,

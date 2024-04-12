@@ -9,14 +9,14 @@ import {
 } from '@remix-run/node'
 import { z } from 'zod'
 
-import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
-
 import {
 	type ImageFieldset,
 	MAX_UPLOAD_SIZE,
 	NoteEditorSchema,
-} from './__note-editor'
+} from '#/app/routes/users+/$username_+/__note-editor'
+import { requireUserId } from '#app/utils/auth.server.ts'
+import { prisma } from '#app/utils/db.server.ts'
+
 
 function imageHasFile(
 	image: ImageFieldset,

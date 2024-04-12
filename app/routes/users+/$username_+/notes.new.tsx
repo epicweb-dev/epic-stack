@@ -1,8 +1,8 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 
+import { NoteEditor } from '#/app/routes/users+/$username_+/__note-editor.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 
-import { NoteEditor } from './__note-editor.tsx'
 
 export { action } from './__note-editor.server.tsx'
 

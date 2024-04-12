@@ -3,10 +3,10 @@ import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 
-import { cache, cachified } from '../cache.server.ts'
-import { connectionSessionStorage } from '../connections.server.ts'
-import { type Timings } from '../timing.server.ts'
-import { type AuthProvider } from './provider.ts'
+import { cache, cachified } from '#/app/utils/cache.server.ts'
+import { connectionSessionStorage } from '#/app/utils/connections.server.ts'
+import { type AuthProvider } from '#/app/utils/providers/provider.ts'
+import { type Timings } from '#/app/utils/timing.server.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })
 const GitHubUserParseResult = z

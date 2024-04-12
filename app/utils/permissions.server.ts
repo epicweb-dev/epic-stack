@@ -1,8 +1,8 @@
 import { json } from '@remix-run/node'
 
-import { requireUserId } from './auth.server.ts'
-import { prisma } from './db.server.ts'
-import { parsePermissionString, type PermissionString } from './user.ts'
+import { requireUserId } from '#/app/utils/auth.server.ts'
+import { prisma } from '#/app/utils/db.server.ts'
+import { parsePermissionString, type PermissionString } from '#/app/utils/user.ts'
 
 export async function requireUserWithPermission(
 	request: Request,

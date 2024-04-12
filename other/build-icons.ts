@@ -1,8 +1,8 @@
+import * as path from 'node:path'
 import { $ } from 'execa'
 import fsExtra from 'fs-extra'
 import { glob } from 'glob'
 import { parse } from 'node-html-parser'
-import * as path from 'node:path'
 
 const cwd = process.cwd()
 const inputDir = path.join(cwd, 'other', 'svg-icons')

@@ -2,11 +2,11 @@ import { invariantResponse } from '@epic-web/invariant'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 
+import { NoteEditor } from '#/app/routes/users+/$username_+/__note-editor.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 
-import { NoteEditor } from './__note-editor.tsx'
 
 export { action } from './__note-editor.server.tsx'
 

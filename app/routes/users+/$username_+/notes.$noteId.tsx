@@ -16,6 +16,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { z } from 'zod'
 
+import { type loader as notesLoader } from '#/app/routes/users+/$username_+/notes.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
@@ -29,7 +30,6 @@ import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser, userHasPermission } from '#app/utils/user.ts'
 
-import { type loader as notesLoader } from './notes.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const note = await prisma.note.findUnique({
