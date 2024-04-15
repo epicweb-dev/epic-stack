@@ -23,16 +23,17 @@ vite plugin will fail the build if it finds any issues so if it builds, it
 works. Additionally, this will help us make a cleaner separation between server
 and server/client code which is a good thing.
 
-The simple rule is this: if it's a Remix export (like `loader`, or `action`) then
-it can be in the route. If it's our own utility export (like
-`requireRecentVerification` we had in the `/verify` route) then it needs to go in
-a `.server` file. To be clear, if you don't export it, then it's fine. Server-only
-utility functions are fine in routes. It just becomes a problem for remix when
-they are exported.
+The simple rule is this: if it's a Remix export (like `loader`, or `action`)
+then it can be in the route. If it's our own utility export (like
+`requireRecentVerification` we had in the `/verify` route) then it needs to go
+in a `.server` file. To be clear, if you don't export it, then it's fine.
+Server-only utility functions are fine in routes. It just becomes a problem for
+remix when they are exported.
 
-An interesting exception to this is sever-only code in the `handle` export like the
-[`getSitemapEntries` function](https://github.com/nasa-gcn/remix-seo). For this,
-you need to use [`vite-env-only`](https://github.com/pcattori/vite-env-only).
+An interesting exception to this is sever-only code in the `handle` export like
+the [`getSitemapEntries` function](https://github.com/nasa-gcn/remix-seo). For
+this, you need to use
+[`vite-env-only`](https://github.com/pcattori/vite-env-only).
 
 ## Decision
 
@@ -41,5 +42,5 @@ Adopt vite.
 ## Consequences
 
 Almost everything is better. We have slightly more complicated rules around the
-server/client code separation, but for the most part that's better and there are fewer
-surprises.
+server/client code separation, but for the most part that's better and there are
+fewer surprises.
