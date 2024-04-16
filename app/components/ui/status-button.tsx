@@ -48,7 +48,7 @@ export const StatusButton = React.forwardRef<
 				<Icon
 					name="cross-1"
 					className="text-destructive-foreground"
-					title="cross"
+					title="error"
 				/>
 			</div>
 		),
