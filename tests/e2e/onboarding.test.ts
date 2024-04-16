@@ -301,14 +301,14 @@ test('faces help texts when entering invald details on onboarding page after Git
 		name: /create an account/i,
 	})
 	expect(createAccountButton.getByRole('status')).not.toBeVisible()
-	expect(createAccountButton.getByText('cross')).not.toBeAttached()
+	expect(createAccountButton.getByText('error')).not.toBeAttached()
 
 	// invalid chars in username
 	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/user-validation.ts.
 	await createAccountButton.click()
 
 	await expect(createAccountButton.getByRole('status')).toBeVisible()
-	expect(createAccountButton.getByText('cross')).toBeAttached()
+	expect(createAccountButton.getByText('error')).toBeAttached()
 	await expect(
 		page.getByText(
 			/username can only include letters, numbers, and underscores/i,
@@ -359,7 +359,7 @@ test('faces help texts when entering invald details on onboarding page after Git
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
 	await createAccountButton.click()
-	await expect(createAccountButton.getByText('cross')).not.toBeAttached()
+	await expect(createAccountButton.getByText('error')).not.toBeAttached()
 
 	// ... sign up is successful!
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
