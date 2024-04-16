@@ -207,7 +207,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
-test('gets logged in after GitHub OAuth if already registered as app user', async ({
+test('logs user in after GitHub OAuth if they are already registered', async ({
 	page,
 }, testInfo) => {
 	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
@@ -273,7 +273,7 @@ test('gets logged in after GitHub OAuth if already registered as app user', asyn
 	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
-test('faces help texts when entering invald details on onboarding page after GitHub OAuth', async ({
+test('shows help texts on entering invalid details on onboarding page after GitHub OAuth', async ({
 	page,
 }, testInfo) => {
 	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
@@ -347,7 +347,9 @@ test('faces help texts when entering invald details on onboarding page after Git
 	await expect(page.getByText(/username is too long/i)).not.toBeVisible()
 
 	// still unchecked 'terms of service' checkbox
-	await usernameInput.fill(`U5er_name_0k_${faker.person.lastName()}`)
+	await usernameInput.fill(
+		normalizeUsername(`U5er_name_0k_${faker.person.lastName()}`),
+	)
 	await createAccountButton.click()
 	await expect(
 		page.getByText(/must agree to the terms of service and privacy policy/i),
