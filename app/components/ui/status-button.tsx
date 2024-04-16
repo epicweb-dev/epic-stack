@@ -37,7 +37,7 @@ export const StatusButton = React.forwardRef<
 				role="status"
 				className="inline-flex h-6 w-6 items-center justify-center"
 			>
-				<Icon name="check" title="check mark" />
+				<Icon name="check" title="success" />
 			</div>
 		),
 		error: (
