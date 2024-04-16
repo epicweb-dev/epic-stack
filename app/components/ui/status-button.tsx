@@ -29,7 +29,7 @@ export const StatusButton = React.forwardRef<
 				role="status"
 				className="inline-flex h-6 w-6 items-center justify-center"
 			>
-				<Icon name="update" className="animate-spin" title="spinner" />
+				<Icon name="update" className="animate-spin" title="loading" />
 			</div>
 		) : null,
 		success: (
