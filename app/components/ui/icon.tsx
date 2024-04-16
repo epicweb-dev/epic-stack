@@ -70,7 +70,7 @@ export function Icon({
 			{...props}
 			className={cn(sizeClassName[size], 'inline self-center', className)}
 		>
-			{title && <title>{title}</title>}
+			{title ? <title>{title}</title> : null}
 			<use href={`${href}#${name}`} />
 		</svg>
 	)
