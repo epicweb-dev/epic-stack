@@ -62,9 +62,8 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Argos](https://github.com/jsfez/epic-stack-with-argos) by
   [@jsfez](https://github.com/jsfez): An example of the Epic Stack with
   [Argos](https://www.argos-ci.com/) for visual testing
-- [Epic Stack monorepo with pnpm + turbo](https://github.com/PhilDL/epic-stack-monorepo):
-  An example of the Epic Stack in a monorepo setup, configs packages, UI
-  package, and "client-hints" example package.
+- [Epic Stack monorepo with pnpm + turbo](https://github.com/abetoots/epic-stack-turborepo):
+  An example of the Epic Stack in a monorepo setup
 - [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/)
   by [@rperon](https://github.com/rperon): An example of the Epic Stack with
   passkeys using
@@ -92,9 +91,19 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack Border animation](https://github.com/hakimLyon/epic-stack-with-css-border-animation)
   by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
   CSS border animation.
-- [Epic Stack with Keystatic](https://github.com/simonswiss/epic-stack-with-keystatic) by [@simonswiss](https://github.com/simonswiss): An example adding a MDX blog, editable from an elegant Admin UI with Keystatic.
-- [Epic Stack + Ariakit](https://github.com/gnapse/epic-stack) by [@gnapse](https://github.com/gnapse): A fork of the Epic Stack that uses [Ariakit](https://ariakit.org/) instead of Radix UI.
-- [Epic Stack + Stripe Payments](https://github.com/saurabhp75/epic-stripe) by [@saurabhp75](https://github.com/saurabhp75): An example of Epic Stack with [Stripe](https://ariakit.org/) payments.
+- [Epic Stack with Keystatic](https://github.com/simonswiss/epic-stack-with-keystatic)
+  by [@simonswiss](https://github.com/simonswiss): An example adding a MDX blog,
+  editable from an elegant Admin UI with Keystatic.
+- [Epic Stack + Ariakit](https://github.com/gnapse/epic-stack) by
+  [@gnapse](https://github.com/gnapse): A fork of the Epic Stack that uses
+  [Ariakit](https://ariakit.org/) instead of Radix UI.
+- [Epic Stack + Stripe Payments](https://github.com/saurabhp75/epic-stripe) by
+  [@saurabhp75](https://github.com/saurabhp75): An example of Epic Stack with
+  [Stripe](https://ariakit.org/) payments.
+- [Epic Stack + Remix PWA](https://github.com/ShafSpecs/offline-epic-stack) by
+  [@ShafSpecs](https://github.com/ShafSpecs): An example of using Epic Stack
+  offline with [Remix PWA](https://remix-pwa.run). The guide can be found
+  [here](https://remix-pwa.run/docs/main/offline)
 
 ## How to contribute
 

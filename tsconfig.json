@@ -17,11 +17,11 @@
       "#*": ["./*"],
       "@/icon-name": [
         "./app/components/ui/icons/name.d.ts",
-        "./types/icon-name.d.ts",
-      ],
+        "./types/icon-name.d.ts"
+      ]
     },
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true,
-  },
+    "noEmit": true
+  }
 }

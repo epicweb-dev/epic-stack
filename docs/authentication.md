@@ -89,8 +89,8 @@ app could have been registered with an Organisation or another person's GitHub
 account.
 
 Also make sure to register separate additional OAuth apps for each of your
-deployed environments (e.g. `staging` and `production`) and specify corresponding
-homepage and redirect urls in there.
+deployed environments (e.g. `staging` and `production`) and specify
+corresponding homepage and redirect urls in there.
 
 ## TOTP and Two-Factor Authentication
 
