@@ -23,13 +23,16 @@ async function seed() {
 	const entities = ['user', 'note']
 	const actions = ['create', 'read', 'update', 'delete']
 	const accesses = ['own', 'any'] as const
+
+	let permissionsToCreate = []
 	for (const entity of entities) {
 		for (const action of actions) {
 			for (const access of accesses) {
-				await prisma.permission.create({ data: { entity, action, access } })
+				permissionsToCreate.push({ entity, action, access })
 			}
 		}
 	}
+	await prisma.permission.createMany({ data: permissionsToCreate })
 	console.timeEnd('🔑 Created permissions...')
 
 	console.time('👑 Created roles...')
