@@ -104,6 +104,7 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@ShafSpecs](https://github.com/ShafSpecs): An example of using Epic Stack
   offline with [Remix PWA](https://remix-pwa.run). The guide can be found
   [here](https://remix-pwa.run/docs/main/offline)
+- [Stripped down Epic Stack for content sites](https://github.com/arpitdalal/epic-content-stack) by [@arpitdalal](https://github.com/arpitdalal): An example of stripped down Epic Stack without DB, E2E, and authentication code. It's suitable for content sites that don't need a DB or authentication.
 
 ## How to contribute
 
