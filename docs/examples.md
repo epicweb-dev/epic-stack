@@ -104,6 +104,9 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@ShafSpecs](https://github.com/ShafSpecs): An example of using Epic Stack
   offline with [Remix PWA](https://remix-pwa.run). The guide can be found
   [here](https://remix-pwa.run/docs/main/offline)
+- [Epic Stack + Shadcn Themes](https://github.com/saurabhp75/epic-themes) by
+  [@saurabhp75](https://github.com/saurabhp75): An example of Epic Stack with
+  [Shadcn Themes](https://ui.shadcn.com/themes).
 
 ## How to contribute
 
