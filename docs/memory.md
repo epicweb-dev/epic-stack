@@ -6,8 +6,8 @@ avoid memory pressure even at that scale, we allocate a 512MB swap file. Learn
 more about this decision in
 [the memory swap decision document](decisions/010-memory-swap.md).
 
-To modify or increase the swap file, check `other/setup-swap.js`. This file is
-executed before running our app within the `litefs.yml` config.
+To modify or increase the swap file, check `.swap_size_mb` in `fly.toml`. This
+file is executed before running our app within the `litefs.yml` config.
 
 > **NOTE**: PRs welcome to document how to determine the effectiveness of the
 > swap file for your app.
