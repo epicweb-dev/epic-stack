@@ -9,7 +9,18 @@ export const BASE_DATABASE_PATH = path.join(
 
 export async function setup() {
 	const databaseExists = await fsExtra.pathExists(BASE_DATABASE_PATH)
-	if (databaseExists) return
+
+	if (databaseExists) {
+		const databaseLastModifiedAt = (await fsExtra.stat(BASE_DATABASE_PATH))
+			.mtime
+		const prismaSchemaLastModifiedAt = (
+			await fsExtra.stat('./prisma/schema.prisma')
+		).mtime
+
+		if (prismaSchemaLastModifiedAt < databaseLastModifiedAt) {
+			return
+		}
+	}
 
 	await execaCommand(
 		'npx prisma migrate reset --force --skip-seed --skip-generate',
