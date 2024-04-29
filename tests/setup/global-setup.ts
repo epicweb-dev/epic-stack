@@ -8,7 +8,6 @@ export const BASE_DATABASE_PATH = path.join(
 )
 
 export async function setup() {
-	// Check if the database exists
 	const databaseExists = await fsExtra.pathExists(BASE_DATABASE_PATH)
 
 	if (databaseExists) {
