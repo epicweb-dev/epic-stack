@@ -216,9 +216,9 @@ if (!ALLOW_INDEXING) {
 app.all(
 	'*',
 	createRequestHandler({
-		getLoadContext: async (_: any, res: any) => ({
+		getLoadContext: (_: any, res: any) => ({
 			cspNonce: res.locals.cspNonce,
-			serverBuild: await getBuild(),
+			serverBuild: getBuild(),
 		}),
 		mode: MODE,
 		build: getBuild,
