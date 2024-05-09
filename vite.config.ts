@@ -14,6 +14,12 @@ export default defineConfig({
 			external: [/node:.*/, 'stream', 'crypto', 'fsevents'],
 		},
 
+		assetsInlineLimit: (source: string) => {
+			if (source.endsWith('sprite.svg')) {
+				return false;
+			}
+		},
+
 		sourcemap: true,
 	},
 	plugins: [
