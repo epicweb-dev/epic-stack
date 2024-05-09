@@ -44,6 +44,7 @@ import { EpicToaster } from './components/ui/sonner.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
+import { APP_NAME } from './utils/constants.ts'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
@@ -80,7 +81,7 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
+		{ title: data ? APP_NAME : `Error | ${APP_NAME}` },
 		{ name: 'description', content: `Your own captain's log` },
 	]
 }
@@ -270,14 +271,17 @@ function App() {
 }
 
 function Logo() {
+	const appNameSplit = APP_NAME.toLowerCase().split(' ')
 	return (
 		<Link to="/" className="group grid leading-snug">
 			<span className="font-light transition group-hover:-translate-x-1">
-				epic
+				{appNameSplit[0]}
 			</span>
-			<span className="font-bold transition group-hover:translate-x-1">
-				notes
-			</span>
+			{appNameSplit.length >= 2 ? (
+				<span className="font-bold transition group-hover:translate-x-1">
+					{appNameSplit.slice(1).join(' ')}
+				</span>
+			) : null}
 		</Link>
 	)
 }

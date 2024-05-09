@@ -1,4 +1,5 @@
 import { type MetaFunction } from '@remix-run/react'
+import { APP_NAME } from '#app/utils/constants.js'
 import { type loader as notesLoader } from './notes.tsx'
 
 export default function NotesIndexRoute() {
@@ -20,10 +21,10 @@ export const meta: MetaFunction<
 	const noteCount = notesMatch?.data?.owner.notes.length ?? 0
 	const notesText = noteCount === 1 ? 'note' : 'notes'
 	return [
-		{ title: `${displayName}'s Notes | Epic Notes` },
+		{ title: `${displayName}'s Notes | ${APP_NAME}` },
 		{
 			name: 'description',
-			content: `Checkout ${displayName}'s ${noteCount} ${notesText} on Epic Notes`,
+			content: `Checkout ${displayName}'s ${noteCount} ${notesText} on ${APP_NAME}`,
 		},
 	]
 }
