@@ -201,7 +201,7 @@ async function getBuild() {
 		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
 		: // @ts-ignore this should exist before running the server
 			// but it may not exist just yet.
-			await import('#build/server/index.js')
+			await import('../build/server/index.js')
 	// not sure how to make this happy 🤷‍♂️
 	return build as unknown as ServerBuild
 }
