@@ -7,7 +7,8 @@
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "type": "module",
   "imports": {
-    "#*": "./*"
+    "#app/*": "./app/*",
+    "#tests/*": "./tests/*"
   },
   "scripts": {
     "build": "run-s build:*",
