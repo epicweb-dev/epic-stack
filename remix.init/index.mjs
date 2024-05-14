@@ -113,7 +113,7 @@ async function setupDeployment({ rootDirectory }) {
 			name: 'shouldSetupDeployment',
 			type: 'confirm',
 			default: true,
-			message: 'Would you like to setup deployment right now?',
+			message: 'Would you like to set up deployment right now?',
 		},
 	])
 
