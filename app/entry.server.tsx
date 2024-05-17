@@ -13,6 +13,7 @@ import { getEnv, init } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
+import chalk from 'chalk'
 
 const ABORT_DELAY = 5000
 
@@ -97,9 +98,16 @@ export function handleError(
 	error: unknown,
 	{ request }: LoaderFunctionArgs | ActionFunctionArgs,
 ): void {
+	// Skip capturing if the request is aborted as Remix docs suggest
+	// Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
+	if (request.signal.aborted) {
+		return
+	}
 	if (error instanceof Error) {
+		console.error(chalk.red(error.stack))
 		Sentry.captureRemixServerException(error, 'remix.server', request)
 	} else {
+		console.error(chalk.red(error))
 		Sentry.captureException(error)
 	}
 }
