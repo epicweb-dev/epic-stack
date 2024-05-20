@@ -1,4 +1,3 @@
-import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import {
@@ -17,8 +16,6 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	useFetcher,
-	useFetchers,
 	useLoaderData,
 	useMatches,
 	useSubmit,
@@ -41,15 +38,15 @@ import {
 } from './components/ui/dropdown-menu.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { EpicToaster } from './components/ui/sonner.tsx'
+import { ThemeSwitch, useTheme } from './routes/resources+/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
-import { ClientHintCheck, getHints, useHints } from './utils/client-hints.tsx'
+import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
-import { useRequestInfo } from './utils/request-info.ts'
 import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
@@ -351,84 +348,6 @@ function UserDropdown() {
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
-	)
-}
-
-/**
- * @returns the user's theme preference, or the client hint theme if the user
- * has not set a preference.
- */
-export function useTheme() {
-	const hints = useHints()
-	const requestInfo = useRequestInfo()
-	const optimisticMode = useOptimisticThemeMode()
-	if (optimisticMode) {
-		return optimisticMode === 'system' ? hints.theme : optimisticMode
-	}
-	return requestInfo.userPrefs.theme ?? hints.theme
-}
-
-/**
- * If the user's changing their theme mode preference, this will return the
- * value it's being changed to.
- */
-export function useOptimisticThemeMode() {
-	const fetchers = useFetchers()
-	const themeFetcher = fetchers.find(f => f.formAction === '/')
-
-	if (themeFetcher && themeFetcher.formData) {
-		const submission = parseWithZod(themeFetcher.formData, {
-			schema: ThemeFormSchema,
-		})
-
-		if (submission.status === 'success') {
-			return submission.value.theme
-		}
-	}
-}
-
-function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
-	const fetcher = useFetcher<typeof action>()
-
-	const [form] = useForm({
-		id: 'theme-switch',
-		lastResult: fetcher.data?.result,
-	})
-
-	const optimisticMode = useOptimisticThemeMode()
-	const mode = optimisticMode ?? userPreference ?? 'system'
-	const nextMode =
-		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
-	const modeLabel = {
-		light: (
-			<Icon name="sun">
-				<span className="sr-only">Light</span>
-			</Icon>
-		),
-		dark: (
-			<Icon name="moon">
-				<span className="sr-only">Dark</span>
-			</Icon>
-		),
-		system: (
-			<Icon name="laptop">
-				<span className="sr-only">System</span>
-			</Icon>
-		),
-	}
-
-	return (
-		<fetcher.Form method="POST" {...getFormProps(form)}>
-			<input type="hidden" name="theme" value={nextMode} />
-			<div className="flex gap-2">
-				<button
-					type="submit"
-					className="flex h-8 w-8 cursor-pointer items-center justify-center"
-				>
-					{modeLabel[mode]}
-				</button>
-			</div>
-		</fetcher.Form>
 	)
 }
 
