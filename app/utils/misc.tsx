@@ -67,7 +67,7 @@ export function getDomainUrl(request: Request) {
 		request.headers.get('X-Forwarded-Host') ??
 		request.headers.get('host') ??
 		new URL(request.url).host
-	const protocol = host.includes('localhost') ? 'http' : 'https'
+	const protocol = request.headers.get('X-Forwarded-Proto') ?? 'http'
 	return `${protocol}://${host}`
 }
 
