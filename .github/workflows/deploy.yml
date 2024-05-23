@@ -167,6 +167,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/dev' }}
         run:
           flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+          --build-arg RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
           --app ${{ steps.app_name.outputs.value }}-staging
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -176,5 +177,6 @@ jobs:
         run:
           flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
           --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+          --build-arg RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
