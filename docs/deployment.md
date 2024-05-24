@@ -128,7 +128,7 @@ Find instructions for this optional step in [the database docs](./database.md).
 
 Find instructions for this optional step in [the database docs](./database.md).
 
-## Deploying locally
+## Deploying locally using fly
 
 If you'd like to deploy locally you definitely can. You need to (temporarily)
 move the `Dockerfile` and the `.dockerignore` to the root of the project first.
@@ -149,3 +149,37 @@ mv .dockerignore ./other/.dockerignore
 
 You can keep the `Dockerfile` and `.dockerignore` in the root if you prefer,
 just make sure to remove the move step from the `.github/workflows/deploy.yml`.
+
+## Deploying locally using docker/podman
+If you'd like to deploy locally by building a docker container image, you definitely can. For that you need to make some minimal changes to the Dockerfile located at other/Dockerfile. Remove everything from the line that says (#prepare for litefs) in "other/Dockerfile" till the end of file and swap with the contents below.
+
+```
+# prepare for litefs
+VOLUME /litefs
+ADD . .
+
+EXPOSE ${PORT}
+ENTRYPOINT ["/myapp/other/docker-entry-point.sh"]
+```
+
+There are 2 things that we are doing here. 
+1. docker volume is used to swap out the fly.io litefs mount.
+2. Docker ENTRYPOINT is used to execute some commands upon launching of the docker container
+
+Create a file at other/docker-entry-point.sh with the contents below.
+```
+#!/bin/sh -ex
+
+npx prisma migrate deploy
+sqlite3 /litefs/data/sqlite.db "PRAGMA journal_mode = WAL;"
+sqlite3 /litefs/data/cache.db "PRAGMA journal_mode = WAL;"
+npm run start
+```
+This takes care of applying the prisma migrations, followed by launching the node application (on port 8081). 
+
+Helpful commands:
+```
+docker build -t epic-stack . -f other/Dockerfile --build-arg COMMIT_SHA=`git rev-parse --short HEAD` # builds the docker container
+mkdir ~/litefs # mountpoint for your sqlite databases
+docker run -d -p 8081:8081 -e SESSION_SECRET='somesecret' -e INTERNAL_COMMAND_TOKEN='somesecret' -e HONEYPOT_SECRET='somesecret' -e FLY='false' -v ~/litefs:/litefs epic-stack     # Runs the docker container. http://localhost:8081 should now point to your docker instance. ~/litefs directory has the sqlite databases
+```
