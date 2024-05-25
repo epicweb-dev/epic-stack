@@ -144,6 +144,18 @@ to change that to `firstName` and `lastName` instead. Here's how you'd do that
 By following this strategy, you can ensure zero downtime deploys and schema
 migrations.
 
+### Multi-Branch Development
+
+When working with Prisma and SQLite in a multi-branch development environment, it's essential to handle migrations carefully to avoid conflicts and ensure a smooth development process. If migrations are applied on a feature branch but not reflected in the Prisma schema on the branch being switched to, it can lead to issues and unexpected behavior.
+
+I recommend creating a dedicated SQLite database file for each branch your work on.
+
+1. Duplicate your baseline SQLite database file. In most cases this would be the one in your `dev` branch.
+2. Rename the duplicate file with an identifier that reflects the branch name (e.g., `workflow_engine_branch_data.db`).
+3. Change the `DATABASE_PATH` value inside the `.env` file to the current branch database (e.g., `DATABASE_PATH="./prisma/workflow_engine_branch_data.db"`)
+
+
+
 ## Seeding Production
 
 In this application we have Role-based Access Control implemented. We initialize
