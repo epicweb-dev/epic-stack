@@ -5,6 +5,10 @@ kill_timeout = 5
 processes = [ ]
 swap_size_mb = 512
 
+[build]
+dockerfile = "other/Dockerfile"
+ignorefile = "other/.dockerignore"
+
 [experimental]
 allowed_public_ports = [ ]
 auto_rollback = true

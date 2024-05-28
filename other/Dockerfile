@@ -1,5 +1,3 @@
-# This file is moved to the root directory before building the image
-
 # base node image
 FROM node:20-bookworm-slim as base
 

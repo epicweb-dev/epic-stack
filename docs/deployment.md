@@ -130,28 +130,19 @@ Find instructions for this optional step in [the database docs](./database.md).
 
 ## Deploying locally using fly
 
-If you'd like to deploy locally you definitely can. You need to (temporarily)
-move the `Dockerfile` and the `.dockerignore` to the root of the project first.
-Then you can run the deploy command:
+If you'd like to deploy locally you definitely can with
 
 ```
-mv ./other/Dockerfile Dockerfile
-mv ./other/.dockerignore .dockerignore
 fly deploy
 ```
 
-Once it's done, move the files back:
-
-```
-mv Dockerfile ./other/Dockerfile
-mv .dockerignore ./other/.dockerignore
-```
-
-You can keep the `Dockerfile` and `.dockerignore` in the root if you prefer,
-just make sure to remove the move step from the `.github/workflows/deploy.yml`.
-
 ## Deploying locally using docker/podman
-If you'd like to deploy locally by building a docker container image, you definitely can. For that you need to make some minimal changes to the Dockerfile located at other/Dockerfile. Remove everything from the line that says (#prepare for litefs) in "other/Dockerfile" till the end of file and swap with the contents below.
+
+If you'd like to deploy locally by building a docker container image, you
+definitely can. For that you need to make some minimal changes to the Dockerfile
+located at other/Dockerfile. Remove everything from the line that says (#prepare
+for litefs) in "other/Dockerfile" till the end of file and swap with the
+contents below.
 
 ```
 # prepare for litefs
@@ -162,11 +153,14 @@ EXPOSE ${PORT}
 ENTRYPOINT ["/myapp/other/docker-entry-point.sh"]
 ```
 
-There are 2 things that we are doing here. 
+There are 2 things that we are doing here.
+
 1. docker volume is used to swap out the fly.io litefs mount.
-2. Docker ENTRYPOINT is used to execute some commands upon launching of the docker container
+2. Docker ENTRYPOINT is used to execute some commands upon launching of the
+   docker container
 
 Create a file at other/docker-entry-point.sh with the contents below.
+
 ```
 #!/bin/sh -ex
 
@@ -175,9 +169,12 @@ sqlite3 /litefs/data/sqlite.db "PRAGMA journal_mode = WAL;"
 sqlite3 /litefs/data/cache.db "PRAGMA journal_mode = WAL;"
 npm run start
 ```
-This takes care of applying the prisma migrations, followed by launching the node application (on port 8081). 
+
+This takes care of applying the prisma migrations, followed by launching the
+node application (on port 8081).
 
 Helpful commands:
+
 ```
 docker build -t epic-stack . -f other/Dockerfile --build-arg COMMIT_SHA=`git rev-parse --short HEAD` # builds the docker container
 mkdir ~/litefs # mountpoint for your sqlite databases
