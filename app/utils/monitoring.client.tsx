@@ -1,9 +1,14 @@
 import { useLocation, useMatches } from '@remix-run/react'
-import * as Sentry from '@sentry/remix'
+import {
+	init as sentryInit,
+	browserTracingIntegration,
+	replayIntegration,
+	browserProfilingIntegration,
+} from '@sentry/remix'
 import { useEffect } from 'react'
 
 export function init() {
-	Sentry.init({
+	sentryInit({
 		dsn: ENV.SENTRY_DSN,
 		environment: ENV.MODE,
 		beforeSend(event) {
@@ -20,16 +25,13 @@ export function init() {
 			return event
 		},
 		integrations: [
-			new Sentry.BrowserTracing({
-				routingInstrumentation: Sentry.remixRouterInstrumentation(
-					useEffect,
-					useLocation,
-					useMatches,
-				),
+			browserTracingIntegration({
+				useEffect,
+				useLocation,
+				useMatches,
 			}),
-			// Replay is only available in the client
-			new Sentry.Replay(),
-			new Sentry.BrowserProfilingIntegration(),
+			replayIntegration(),
+			browserProfilingIntegration(),
 		],
 
 		// Set tracesSampleRate to 1.0 to capture 100%
