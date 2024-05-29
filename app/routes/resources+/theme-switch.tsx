@@ -1,14 +1,8 @@
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
-import {
-	json,
-	type ActionFunctionArgs,
-} from '@remix-run/node'
-import {
-	useFetcher,
-	useFetchers,
-} from '@remix-run/react'
+import { json, type ActionFunctionArgs } from '@remix-run/node'
+import { useFetcher, useFetchers } from '@remix-run/react'
 import { z } from 'zod'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { useHints } from '#app/utils/client-hints.tsx'
@@ -35,7 +29,11 @@ export async function action({ request }: ActionFunctionArgs) {
 	return json({ result: submission.reply() }, responseInit)
 }
 
-export function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
+export function ThemeSwitch({
+	userPreference,
+}: {
+	userPreference?: Theme | null
+}) {
 	const fetcher = useFetcher<typeof action>()
 
 	const [form] = useForm({
@@ -66,7 +64,11 @@ export function ThemeSwitch({ userPreference }: { userPreference?: Theme | null 
 	}
 
 	return (
-		<fetcher.Form method="POST" {...getFormProps(form)} action="/resources/theme-switch">
+		<fetcher.Form
+			method="POST"
+			{...getFormProps(form)}
+			action="/resources/theme-switch"
+		>
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
 				<button
@@ -86,7 +88,9 @@ export function ThemeSwitch({ userPreference }: { userPreference?: Theme | null 
  */
 export function useOptimisticThemeMode() {
 	const fetchers = useFetchers()
-	const themeFetcher = fetchers.find(f => f.formAction === '/resources/theme-switch')
+	const themeFetcher = fetchers.find(
+		f => f.formAction === '/resources/theme-switch',
+	)
 
 	if (themeFetcher && themeFetcher.formData) {
 		const submission = parseWithZod(themeFetcher.formData, {

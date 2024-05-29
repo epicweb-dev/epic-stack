@@ -62,8 +62,8 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Argos](https://github.com/jsfez/epic-stack-with-argos) by
   [@jsfez](https://github.com/jsfez): An example of the Epic Stack with
   [Argos](https://www.argos-ci.com/) for visual testing
-- [Epic Stack with Nx](https://github.com/isaacplmann/epic-stack-with-nx):
-  An example of using [Nx](https://nx.dev) in an Epic Stack app
+- [Epic Stack with Nx](https://github.com/isaacplmann/epic-stack-with-nx): An
+  example of using [Nx](https://nx.dev) in an Epic Stack app
 - [Epic Stack monorepo with pnpm + turbo](https://github.com/abetoots/epic-stack-turborepo):
   An example of the Epic Stack in a monorepo setup
 - [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/)

@@ -16,7 +16,7 @@ export default defineConfig({
 
 		assetsInlineLimit: (source: string) => {
 			if (source.endsWith('sprite.svg')) {
-				return false;
+				return false
 			}
 		},
 

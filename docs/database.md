@@ -341,7 +341,8 @@ You've got a few options:
 
    2. Commit this change and deploy the app to fly.
       - This will make sure that after building the dockerfile and deploying it
-        to the fly machine, `npx prisma migrate deploy` and `npm start` commands won't be executed.
+        to the fly machine, `npx prisma migrate deploy` and `npm start` commands
+        won't be executed.
    3. Now that the main machine is up and running, you can SSH into it by
       running `fly ssh console --app [YOUR_APP_NAME]` in the terminal.
    4. Create a backup of the DB and download it by following the steps mentioned
