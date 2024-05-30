@@ -68,9 +68,6 @@ app.use(compression())
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler())
-
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares)
 } else {

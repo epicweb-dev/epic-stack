@@ -1,6 +1,5 @@
-import { ProfilingIntegration } from '@sentry/profiling-node'
-import * as Sentry from '@sentry/remix'
-import { prisma } from './db.server.ts'
+import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import Sentry from '@sentry/remix'
 
 export function init() {
 	Sentry.init({
@@ -18,9 +17,9 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			new Sentry.Integrations.Http({ tracing: true }),
-			new Sentry.Integrations.Prisma({ client: prisma }),
-			new ProfilingIntegration(),
+			Sentry.httpIntegration(),
+			Sentry.prismaIntegration(),
+			nodeProfilingIntegration(),
 		],
 		tracesSampler(samplingContext) {
 			// ignore healthcheck transactions by other services (consul, etc.)

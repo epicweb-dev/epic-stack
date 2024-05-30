@@ -86,7 +86,11 @@ async function seed() {
 									length: faker.number.int({ min: 1, max: 3 }),
 								}).map(() => {
 									const imgNumber = faker.number.int({ min: 0, max: 9 })
-									return noteImages[imgNumber]
+									const img = noteImages[imgNumber]
+									if (!img) {
+										throw new Error(`Could not find image #${imgNumber}`)
+									}
+									return img
 								}),
 							},
 						})),
@@ -263,3 +267,9 @@ seed()
 	.finally(async () => {
 		await prisma.$disconnect()
 	})
+
+// we're ok to import from the test directory in this file
+/*
+eslint
+	no-restricted-imports: "off",
+*/
