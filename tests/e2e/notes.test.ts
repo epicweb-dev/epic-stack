@@ -35,7 +35,7 @@ test('Users can edit notes', async ({ page, login }) => {
 		.fill(updatedNote.content)
 	await page.getByRole('button', { name: /submit/i }).click()
 
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
+	await expect(page).toHaveURL(`/users/${user.username}/notes/${note.id}`)
 	await expect(
 		page.getByRole('heading', { name: updatedNote.title }),
 	).toBeVisible()

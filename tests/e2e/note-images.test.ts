@@ -81,7 +81,7 @@ test('Users can edit note image', async ({ page, login }) => {
 	await page.getByLabel('alt text').nth(0).fill(updatedImage.altText)
 	await page.getByRole('button', { name: 'submit' }).click()
 
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
+	await expect(page).toHaveURL(`/users/${user.username}/notes/${note.id}`)
 	await expect(page.getByAltText(updatedImage.altText)).toBeVisible()
 })
 
@@ -108,7 +108,7 @@ test('Users can delete note image', async ({ page, login }) => {
 	await page.getByRole('link', { name: 'Edit', exact: true }).click()
 	await page.getByRole('button', { name: 'remove image' }).click()
 	await page.getByRole('button', { name: 'submit' }).click()
-	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
+	await expect(page).toHaveURL(`/users/${user.username}/notes/${note.id}`)
 	const countAfter = await images.count()
 	expect(countAfter).toEqual(countBefore - 1)
 })
