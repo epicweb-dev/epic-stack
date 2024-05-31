@@ -94,7 +94,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remix-auth": "^3.6.0",
-    "remix-auth-form": "^1.5.0",
     "remix-auth-github": "^1.7.0",
     "remix-utils": "^7.6.0",
     "set-cookie-parser": "^2.6.0",
