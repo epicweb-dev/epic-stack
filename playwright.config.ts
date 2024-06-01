@@ -36,6 +36,7 @@ export default defineConfig({
 		stderr: 'pipe',
 		env: {
 			PORT,
+			NODE_ENV: 'test',
 		},
 	},
 })

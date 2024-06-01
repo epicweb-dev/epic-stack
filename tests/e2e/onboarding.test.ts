@@ -1,6 +1,14 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
+import {
+	normalizeEmail,
+	normalizeUsername,
+} from '#app/utils/providers/provider'
+import {
+	USERNAME_MAX_LENGTH,
+	USERNAME_MIN_LENGTH,
+} from '#app/utils/user-validation'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -129,6 +137,191 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	await page.getByRole('button', { name: /submit/i }).click()
 
 	await expect(page).toHaveURL(`/onboarding`)
+})
+
+test('completes onboarding after GitHub OAuth given valid user details', async ({
+	page,
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
+
+	// let's verify we do not have user with that email in our system:
+	expect(
+		await prisma.user.findUnique({
+			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		}),
+	).toBeNull()
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+	expect(
+		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
+	).toBeVisible()
+
+	// fields are pre-populated for the user, so we only need to accept
+	// terms of service and hit the 'crete an account' button
+	const usernameInput = page.getByRole('textbox', { name: /username/i })
+	expect(usernameInput).toHaveValue(normalizeUsername(ghUser.profile.login))
+	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
+		ghUser.profile.name,
+	)
+	const createAccountButton = page.getByRole('button', {
+		name: /create an account/i,
+	})
+
+	await page
+		.getByLabel(/do you agree to our terms of service and privacy policy/i)
+		.check()
+	await createAccountButton.click()
+	await expect(page).toHaveURL(/signup/i)
+
+	// we are still on the 'signup' route since that
+	// was the referrer and no 'redirectTo' has been specified
+	await expect(page).toHaveURL('/signup')
+	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
+
+	// internally, a user has been created:
+	await prisma.user.findUniqueOrThrow({
+		where: { email: normalizeEmail(ghUser.primaryEmail) },
+	})
+})
+
+test('logs user in after GitHub OAuth if they are already registered', async ({
+	page,
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
+
+	// let's verify we do not have user with that email in our system ...
+	expect(
+		await prisma.user.findUnique({
+			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		}),
+	).toBeNull()
+	// ... and create one:
+	const name = faker.person.fullName()
+	const user = await prisma.user.create({
+		select: { id: true, name: true },
+		data: {
+			email: normalizeEmail(ghUser.primaryEmail),
+			username: normalizeUsername(ghUser.profile.login),
+			name,
+		},
+	})
+
+	// let's verify there is no connection between the GitHub user
+	// and out app's user:
+	const connection = await prisma.connection.findFirst({
+		where: { providerName: 'github', userId: user.id },
+	})
+	expect(connection).toBeNull()
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(`/`)
+	expect(
+		page.getByText(
+			new RegExp(
+				`your "${ghUser!.profile.login}" github account has been connected`,
+				'i',
+			),
+		),
+	).toBeVisible()
+
+	// internally, a connection (rather than a new user) has been created:
+	await prisma.connection.findFirstOrThrow({
+		where: { providerName: 'github', userId: user.id },
+	})
+})
+
+test('shows help texts on entering invalid details on onboarding page after GitHub OAuth', async ({
+	page,
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
+
+	await page.goto('/signup')
+	await page.getByRole('button', { name: /signup with github/i }).click()
+
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+	expect(
+		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
+	).toBeVisible()
+
+	const usernameInput = page.getByRole('textbox', { name: /username/i })
+
+	// notice, how button is currently in 'idle' (neutral) state and so has got no companion
+	const createAccountButton = page.getByRole('button', {
+		name: /create an account/i,
+	})
+	expect(createAccountButton.getByRole('status')).not.toBeVisible()
+	expect(createAccountButton.getByText('error')).not.toBeAttached()
+
+	// invalid chars in username
+	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/user-validation.ts.
+	await createAccountButton.click()
+
+	await expect(createAccountButton.getByRole('status')).toBeVisible()
+	expect(createAccountButton.getByText('error')).toBeAttached()
+	await expect(
+		page.getByText(
+			/username can only include letters, numbers, and underscores/i,
+		),
+	).toBeVisible()
+	// but we also never checked that privacy consent box
+	await expect(
+		page.getByText(
+			/you must agree to the terms of service and privacy policy/i,
+		),
+	).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// empty username
+	await usernameInput.fill('')
+	await createAccountButton.click()
+	await expect(page.getByText(/username is required/i)).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// too short username
+	await usernameInput.fill(
+		faker.string.alphanumeric({ length: USERNAME_MIN_LENGTH - 1 }),
+	)
+	await createAccountButton.click()
+	await expect(page.getByText(/username is too short/i)).toBeVisible()
+
+	// too long username
+	await usernameInput.fill(
+		faker.string.alphanumeric({
+			length: USERNAME_MAX_LENGTH + 1,
+		}),
+	)
+	// we are truncating the user's input
+	expect((await usernameInput.inputValue()).length).toBe(USERNAME_MAX_LENGTH)
+	await createAccountButton.click()
+	await expect(page.getByText(/username is too long/i)).not.toBeVisible()
+
+	// still unchecked 'terms of service' checkbox
+	await usernameInput.fill(
+		normalizeUsername(`U5er_name_0k_${faker.person.lastName()}`),
+	)
+	await createAccountButton.click()
+	await expect(
+		page.getByText(/must agree to the terms of service and privacy policy/i),
+	).toBeVisible()
+	await expect(page).toHaveURL(/\/onboarding\/github/)
+
+	// we are all set up and ...
+	await page
+		.getByLabel(/do you agree to our terms of service and privacy policy/i)
+		.check()
+	await createAccountButton.click()
+	await expect(createAccountButton.getByText('error')).not.toBeAttached()
+
+	// ... sign up is successful!
+	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 })
 
 test('login as existing user', async ({ page, insertNewUser }) => {

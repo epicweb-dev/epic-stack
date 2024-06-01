@@ -9,6 +9,10 @@ import { prisma } from '#app/utils/db.server.ts'
 import { ensurePrimary } from '#app/utils/litefs.server.ts'
 import { combineHeaders } from '#app/utils/misc.tsx'
 import {
+	normalizeEmail,
+	normalizeUsername,
+} from '#app/utils/providers/provider.ts'
+import {
 	destroyRedirectToHeader,
 	getRedirectCookieValue,
 } from '#app/utils/redirect-cookie.server.ts'
@@ -140,8 +144,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	verifySession.set(onboardingEmailSessionKey, profile.email)
 	verifySession.set(prefilledProfileKey, {
 		...profile,
-		email: profile.email.toLowerCase(),
-		username: profile.username?.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase(),
+		email: normalizeEmail(profile.email),
+		username:
+			typeof profile.username === 'string'
+				? normalizeUsername(profile.username)
+				: undefined,
 	})
 	verifySession.set(providerIdKey, profile.id)
 	const onboardingRedirect = [

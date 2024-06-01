@@ -65,7 +65,7 @@ function createGitHubUser(code?: string | null) {
 	}
 }
 
-type GitHubUser = ReturnType<typeof createGitHubUser>
+export type GitHubUser = ReturnType<typeof createGitHubUser>
 
 async function getGitHubUsers() {
 	try {
@@ -78,6 +78,14 @@ async function getGitHubUsers() {
 		console.error(error)
 		return []
 	}
+}
+
+export async function deleteGitHubUser(primaryEmail: string) {
+	const users = await getGitHubUsers()
+	const user = users.find(u => u.primaryEmail === primaryEmail)
+	if (!user) return null
+	await setGitHubUsers(users.filter(u => u.primaryEmail !== primaryEmail))
+	return user
 }
 
 export async function deleteGitHubUsers() {
