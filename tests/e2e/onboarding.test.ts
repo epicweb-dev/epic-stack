@@ -1,7 +1,6 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
-import { MOCK_CODE_GITHUB_HEADER } from '#app/utils/providers/constants'
 import {
 	normalizeEmail,
 	normalizeUsername,
@@ -10,7 +9,6 @@ import {
 	USERNAME_MAX_LENGTH,
 	USERNAME_MIN_LENGTH,
 } from '#app/utils/user-validation'
-import { deleteGitHubUser, insertGitHubUser } from '#tests/mocks/github'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -143,16 +141,9 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 
 test('completes onboarding after GitHub OAuth given valid user details', async ({
 	page,
-}, testInfo) => {
-	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
-		const headers = {
-			...request.headers(),
-			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
-		}
-		await route.continue({ headers })
-	})
-
-	const ghUser = await insertGitHubUser(testInfo.testId)!
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
 
 	// let's verify we do not have user with that email in our system:
 	expect(
@@ -191,34 +182,17 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	await expect(page).toHaveURL('/signup')
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 
-	// internally, a user is being created:
-	const newUser = await prisma.user.findUniqueOrThrow({
+	// internally, a user has been created:
+	await prisma.user.findUniqueOrThrow({
 		where: { email: normalizeEmail(ghUser.primaryEmail) },
 	})
-
-	// log out
-	await page.getByRole('link', { name: newUser.name as string }).click()
-	await page.getByRole('menuitem', { name: /logout/i }).click()
-	await expect(page).toHaveURL(`/`)
-
-	// clean up
-	await prisma.user.delete({ where: { username: newUser.username } })
-	await prisma.session.deleteMany({ where: { userId: newUser.id } })
-	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
 test('logs user in after GitHub OAuth if they are already registered', async ({
 	page,
-}, testInfo) => {
-	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
-		const headers = {
-			...request.headers(),
-			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
-		}
-		await route.continue({ headers })
-	})
-
-	const ghUser = await insertGitHubUser(testInfo.testId)!
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
 
 	// let's verify we do not have user with that email in our system ...
 	expect(
@@ -257,34 +231,17 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 		),
 	).toBeVisible()
 
-	// internally, a connection has been craeted:
+	// internally, a connection (rather than a new user) has been created:
 	await prisma.connection.findFirstOrThrow({
 		where: { providerName: 'github', userId: user.id },
 	})
-
-	// log out
-	await page.getByRole('link', { name }).click()
-	await page.getByRole('menuitem', { name: /logout/i }).click()
-	await expect(page).toHaveURL(`/`)
-
-	// clean up
-	await prisma.user.delete({ where: { id: user.id } })
-	await prisma.session.deleteMany({ where: { userId: user.id } })
-	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
 test('shows help texts on entering invalid details on onboarding page after GitHub OAuth', async ({
 	page,
-}, testInfo) => {
-	await page.route(/\/auth\/github(?!\/callback)/, async (route, request) => {
-		const headers = {
-			...request.headers(),
-			[MOCK_CODE_GITHUB_HEADER]: testInfo.testId,
-		}
-		await route.continue({ headers })
-	})
-
-	const ghUser = await insertGitHubUser(testInfo.testId)!
+	prepareGitHubUser,
+}) => {
+	const ghUser = await prepareGitHubUser()
 
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
@@ -365,20 +322,6 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 
 	// ... sign up is successful!
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
-
-	// log out
-	const user = await prisma.user.findUniqueOrThrow({
-		select: { id: true, name: true },
-		where: { email: normalizeEmail(ghUser.primaryEmail) },
-	})
-	await page.getByRole('link', { name: user.name as string }).click()
-	await page.getByRole('menuitem', { name: /logout/i }).click()
-	await expect(page).toHaveURL(`/`)
-
-	// clean up
-	await prisma.user.delete({ where: { id: user.id } })
-	await prisma.session.deleteMany({ where: { userId: user.id } })
-	await deleteGitHubUser(ghUser.primaryEmail)
 })
 
 test('login as existing user', async ({ page, insertNewUser }) => {

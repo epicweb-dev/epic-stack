@@ -65,7 +65,7 @@ function createGitHubUser(code?: string | null) {
 	}
 }
 
-type GitHubUser = ReturnType<typeof createGitHubUser>
+export type GitHubUser = ReturnType<typeof createGitHubUser>
 
 async function getGitHubUsers() {
 	try {
