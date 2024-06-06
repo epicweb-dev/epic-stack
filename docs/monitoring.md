@@ -42,12 +42,12 @@ recipient, similar to how RBAC works). Give it a name and add the scope for
 `Releases:Admin` and `Organization:Read`. Press Save, and then generate the auth token at the
 bottom of the page under "Tokens", and copy that to a secure location (this
 becomes `SENTRY_AUTH_TOKEN`). Then visit the organization general settings page and copy
-the organization slug (`SENTRY_ORG`), and the slug name for your project under Organization > Projects > Project > Name
+the organization slug (`SENTRY_ORG`), and the slug name for your project under `Organization > Projects > Project > Name`
 (`SENTRY_PROJECT`).
 
 In the 'build' section of the [Dockerfile](../other/Dockerfile), there is an
 example of how to pass `SENTRY_AUTH_TOKEN` secret, so it
-is available to Vite when `npm run build` is run. You may also uncomment and hard code your `SENTRY_ORG` and `SENTRY_PROJECT` values. Setup up your secrets in [GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).You can do the same for any other secret (environment
+is available to Vite when `npm run build` is run. You may also uncomment and hard code your `SENTRY_ORG` and `SENTRY_PROJECT` values. Setup up your secrets in [GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). You can do the same for any other secret (environment
 variable) you need at build time, just make sure those secrets (variables) are
 available on the CI runner: see the 'deploy' job from
 [`deploy`](../.github/workflows/deploy.yml) workflow. Note that these do not
