@@ -117,7 +117,7 @@ export const test = base.extend<{
 			ghUser = newGitHubUser
 			return newGitHubUser
 		})
-		
+
 		const user = await prisma.user.findUniqueOrThrow({
 			select: { id: true, name: true },
 			where: { email: normalizeEmail(ghUser!.primaryEmail) },

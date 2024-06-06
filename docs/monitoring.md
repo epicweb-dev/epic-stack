@@ -39,23 +39,27 @@ To generate the auth token, click
 [this](https://sentry.io/orgredirect/settings/:orgslug/developer-settings/new-internal/)
 to create an internal integration (which grants the selected capabilities to the
 recipient, similar to how RBAC works). Give it a name and add the scope for
-`Releases:Admin` and `Organization:Read`. Press Save, and then generate the auth token at the
-bottom of the page under "Tokens", and copy that to a secure location (this
-becomes `SENTRY_AUTH_TOKEN`). Then visit the organization general settings page and copy
-the organization slug (`SENTRY_ORG`), and the slug name for your project under `Organization > Projects > Project > Name`
+`Releases:Admin` and `Organization:Read`. Press Save, and then generate the auth
+token at the bottom of the page under "Tokens", and copy that to a secure
+location (this becomes `SENTRY_AUTH_TOKEN`). Then visit the organization general
+settings page and copy the organization slug (`SENTRY_ORG`), and the slug name
+for your project under `Organization > Projects > Project > Name`
 (`SENTRY_PROJECT`).
 
 In the 'build' section of the [Dockerfile](../other/Dockerfile), there is an
-example of how to pass `SENTRY_AUTH_TOKEN` secret, so it
-is available to Vite when `npm run build` is run. You may also uncomment and hard code your `SENTRY_ORG` and `SENTRY_PROJECT` values. Setup up your secrets in [GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). You can do the same for any other secret (environment
-variable) you need at build time, just make sure those secrets (variables) are
-available on the CI runner: see the 'deploy' job from
-[`deploy`](../.github/workflows/deploy.yml) workflow. Note that these do not
-need to be added to the [`env.server`](../app/utils/env.server.ts) env vars
-schema, as they are only used during the build and not the runtime.
+example of how to pass `SENTRY_AUTH_TOKEN` secret, so it is available to Vite
+when `npm run build` is run. You may also uncomment and hard code your
+`SENTRY_ORG` and `SENTRY_PROJECT` values. Setup up your secrets in
+[GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
+You can do the same for any other secret (environment variable) you need at
+build time, just make sure those secrets (variables) are available on the CI
+runner: see the 'deploy' job from [`deploy`](../.github/workflows/deploy.yml)
+workflow. Note that these do not need to be added to the
+[`env.server`](../app/utils/env.server.ts) env vars schema, as they are only
+used during the build and not the runtime.
 
 The Sentry Vite plugin in [`vite.config.ts`](../vite.config.ts) will create
 sentry releases for you and automatically associate commits during the vite
-build once the `SENTRY_AUTH_TOKEN` is set.
-In this setup we have utilized a simple strategy for naming releases of using
-the commit sha, passed in as a build arg via the GitHub action workflow.
+build once the `SENTRY_AUTH_TOKEN` is set. In this setup we have utilized a
+simple strategy for naming releases of using the commit sha, passed in as a
+build arg via the GitHub action workflow.
