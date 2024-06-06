@@ -30,14 +30,11 @@ RUN npm prune --omit=dev
 FROM base as build
 
 ARG COMMIT_SHA
-ARG SENTRY_AUTH_TOKEN
-ARG SENTRY_ORG
-ARG SENTRY_PROJECT
-
 ENV COMMIT_SHA=$COMMIT_SHA
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-ENV SENTRY_ORG=$SENTRY_ORG
-ENV SENTRY_PROJECT=$SENTRY_PROJECT
+
+# Use the following environment variables to configure Sentry
+# ENV SENTRY_ORG=
+# ENV SENTRY_PROJECT=
 
 
 WORKDIR /myapp
@@ -48,7 +45,11 @@ ADD prisma .
 RUN npx prisma generate
 
 ADD . .
-RUN npm run build
+
+# Mount the secret and set it as an environment variable and run the build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+  export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+  npm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
