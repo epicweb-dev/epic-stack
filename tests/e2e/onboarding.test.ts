@@ -156,7 +156,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	await page.getByRole('button', { name: /signup with github/i }).click()
 
 	await expect(page).toHaveURL(/\/onboarding\/github/)
-	expect(
+	await expect(
 		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
 	).toBeVisible()
 
@@ -222,7 +222,7 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 	await page.getByRole('button', { name: /signup with github/i }).click()
 
 	await expect(page).toHaveURL(`/`)
-	expect(
+	await expect(
 		page.getByText(
 			new RegExp(
 				`your "${ghUser!.profile.login}" github account has been connected`,
@@ -247,7 +247,7 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 	await page.getByRole('button', { name: /signup with github/i }).click()
 
 	await expect(page).toHaveURL(/\/onboarding\/github/)
-	expect(
+	await expect(
 		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
 	).toBeVisible()
 
@@ -257,15 +257,15 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 	const createAccountButton = page.getByRole('button', {
 		name: /create an account/i,
 	})
-	expect(createAccountButton.getByRole('status')).not.toBeVisible()
-	expect(createAccountButton.getByText('error')).not.toBeAttached()
+	await expect(createAccountButton.getByRole('status')).not.toBeVisible()
+	await expect(createAccountButton.getByText('error')).not.toBeAttached()
 
 	// invalid chars in username
 	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/user-validation.ts.
 	await createAccountButton.click()
 
 	await expect(createAccountButton.getByRole('status')).toBeVisible()
-	expect(createAccountButton.getByText('error')).toBeAttached()
+	await expect(createAccountButton.getByText('error')).toBeAttached()
 	await expect(
 		page.getByText(
 			/username can only include letters, numbers, and underscores/i,
