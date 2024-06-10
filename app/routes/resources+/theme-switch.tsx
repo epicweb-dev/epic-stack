@@ -2,7 +2,8 @@ import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { json, type ActionFunctionArgs } from '@remix-run/node'
-import { useFetcher, useFetchers } from '@remix-run/react'
+import { redirect, useFetcher, useFetchers } from '@remix-run/react'
+import { ServerOnly } from 'remix-utils/server-only'
 import { z } from 'zod'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { useHints } from '#app/utils/client-hints.tsx'
@@ -11,6 +12,8 @@ import { type Theme, setTheme } from '#app/utils/theme.server.ts'
 
 const ThemeFormSchema = z.object({
 	theme: z.enum(['system', 'light', 'dark']),
+	// this is useful for progressive enhancement
+	redirectTo: z.string().optional(),
 })
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -21,12 +24,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	invariantResponse(submission.status === 'success', 'Invalid theme received')
 
-	const { theme } = submission.value
+	const { theme, redirectTo } = submission.value
 
 	const responseInit = {
 		headers: { 'set-cookie': setTheme(theme) },
 	}
-	return json({ result: submission.reply() }, responseInit)
+	if (redirectTo) {
+		return redirect(redirectTo, responseInit)
+	} else {
+		return json({ result: submission.reply() }, responseInit)
+	}
 }
 
 export function ThemeSwitch({
@@ -35,6 +42,7 @@ export function ThemeSwitch({
 	userPreference?: Theme | null
 }) {
 	const fetcher = useFetcher<typeof action>()
+	const requestInfo = useRequestInfo()
 
 	const [form] = useForm({
 		id: 'theme-switch',
@@ -69,6 +77,11 @@ export function ThemeSwitch({
 			{...getFormProps(form)}
 			action="/resources/theme-switch"
 		>
+			<ServerOnly>
+				{() => (
+					<input type="hidden" name="redirectTo" value={requestInfo.path} />
+				)}
+			</ServerOnly>
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
 				<button
