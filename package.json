@@ -76,7 +76,6 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
-    "eslint-plugin-remix-react-routes": "^1.0.5",
     "execa": "^9.2.0",
     "express": "^4.19.2",
     "express-rate-limit": "^7.3.0",
