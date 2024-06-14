@@ -58,7 +58,7 @@ function createGitHubUser(code?: string | null) {
 			id: faker.string.uuid(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
-			emails: emails.map(e => e.email),
+			emails: emails.map((e) => e.email),
 		},
 		emails,
 		primaryEmail: primaryEmail.email,
@@ -82,9 +82,9 @@ async function getGitHubUsers() {
 
 export async function deleteGitHubUser(primaryEmail: string) {
 	const users = await getGitHubUsers()
-	const user = users.find(u => u.primaryEmail === primaryEmail)
+	const user = users.find((u) => u.primaryEmail === primaryEmail)
 	if (!user) return null
-	await setGitHubUsers(users.filter(u => u.primaryEmail !== primaryEmail))
+	await setGitHubUsers(users.filter((u) => u.primaryEmail !== primaryEmail))
 	return user
 }
 
@@ -98,7 +98,7 @@ async function setGitHubUsers(users: Array<GitHubUser>) {
 
 export async function insertGitHubUser(code?: string | null) {
 	const githubUsers = await getGitHubUsers()
-	let user = githubUsers.find(u => u.code === code)
+	let user = githubUsers.find((u) => u.code === code)
 	if (user) {
 		Object.assign(user, createGitHubUser(code))
 	} else {
@@ -117,7 +117,9 @@ async function getUser(request: Request) {
 	if (!accessToken) {
 		return new Response('Unauthorized', { status: 401 })
 	}
-	const user = (await getGitHubUsers()).find(u => u.accessToken === accessToken)
+	const user = (await getGitHubUsers()).find(
+		(u) => u.accessToken === accessToken,
+	)
 
 	if (!user) {
 		return new Response('Not Found', { status: 404 })
@@ -138,7 +140,7 @@ export const handlers: Array<HttpHandler> = [
 
 			const code = params.get('code')
 			const githubUsers = await getGitHubUsers()
-			let user = githubUsers.find(u => u.code === code)
+			let user = githubUsers.find((u) => u.code === code)
 			if (!user) {
 				user = await insertGitHubUser(code)
 			}
@@ -164,7 +166,7 @@ export const handlers: Array<HttpHandler> = [
 		if (passthroughGitHub) return passthrough()
 
 		const mockUser = (await getGitHubUsers()).find(
-			u => u.profile.id === params.id,
+			(u) => u.profile.id === params.id,
 		)
 		if (mockUser) return json(mockUser.profile)
 

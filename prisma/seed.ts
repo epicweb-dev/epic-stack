@@ -98,7 +98,7 @@ async function seed() {
 					},
 				},
 			})
-			.catch(e => {
+			.catch((e) => {
 				console.error('Error creating a user:', e)
 				return null
 			})
@@ -261,7 +261,7 @@ async function seed() {
 }
 
 seed()
-	.catch(e => {
+	.catch((e) => {
 		console.error(e)
 		process.exit(1)
 	})

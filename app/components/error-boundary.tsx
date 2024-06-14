@@ -19,7 +19,7 @@ export function GeneralErrorBoundary({
 		</p>
 	),
 	statusHandlers,
-	unexpectedErrorHandler = error => <p>{getErrorMessage(error)}</p>,
+	unexpectedErrorHandler = (error) => <p>{getErrorMessage(error)}</p>,
 }: {
 	defaultStatusHandler?: StatusHandler
 	statusHandlers?: Record<number, StatusHandler>

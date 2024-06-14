@@ -70,7 +70,7 @@ export const test = base.extend<{
 }>({
 	insertNewUser: async ({}, use) => {
 		let userId: string | undefined = undefined
-		await use(async options => {
+		await use(async (options) => {
 			const user = await getOrInsertUser(options)
 			userId = user.id
 			return user
@@ -79,7 +79,7 @@ export const test = base.extend<{
 	},
 	login: async ({ page }, use) => {
 		let userId: string | undefined = undefined
-		await use(async options => {
+		await use(async (options) => {
 			const user = await getOrInsertUser(options)
 			userId = user.id
 			const session = await prisma.session.create({
@@ -152,7 +152,7 @@ export async function waitFor<ReturnValue>(
 		} catch (e: unknown) {
 			lastError = e
 		}
-		await new Promise(r => setTimeout(r, 100))
+		await new Promise((r) => setTimeout(r, 100))
 	}
 	throw lastError
 }

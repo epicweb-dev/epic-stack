@@ -74,7 +74,7 @@ export default function UsersRoute() {
 								{ 'opacity-50': isPending },
 							)}
 						>
-							{data.users.map(user => (
+							{data.users.map((user) => (
 								<li key={user.id}>
 									<Link
 										to={user.username}

@@ -17,7 +17,8 @@ function TestComponent() {
 			<output>Default Prevented: {defaultPrevented}</output>
 			<button
 				{...dc.getButtonProps({
-					onClick: e => setDefaultPrevented(e.defaultPrevented ? 'yes' : 'no'),
+					onClick: (e) =>
+						setDefaultPrevented(e.defaultPrevented ? 'yes' : 'no'),
 				})}
 			>
 				{dc.doubleCheck ? 'You sure?' : 'Click me'}

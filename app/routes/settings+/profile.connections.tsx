@@ -132,7 +132,7 @@ export default function Connections() {
 				<div className="flex flex-col gap-2">
 					<p>Here are your current connections:</p>
 					<ul className="flex flex-col gap-4">
-						{data.connections.map(c => (
+						{data.connections.map((c) => (
 							<li key={c.id}>
 								<Connection
 									connection={c}
@@ -146,7 +146,7 @@ export default function Connections() {
 				<p>You don't have any connections yet.</p>
 			)}
 			<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
-				{providerNames.map(providerName => (
+				{providerNames.map((providerName) => (
 					<ProviderConnectionForm
 						key={providerName}
 						type="Connect"

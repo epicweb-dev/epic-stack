@@ -65,7 +65,7 @@ test('The user profile when logged in as self', async () => {
 		{
 			id: 'root',
 			path: '/',
-			loader: async args => {
+			loader: async (args) => {
 				// add the cookie header to the request
 				args.request.headers.set('cookie', cookieHeader)
 				return rootLoader(args)
@@ -74,7 +74,7 @@ test('The user profile when logged in as self', async () => {
 				{
 					path: 'users/:username',
 					Component: UsernameRoute,
-					loader: async args => {
+					loader: async (args) => {
 						// add the cookie header to the request
 						args.request.headers.set('cookie', cookieHeader)
 						return loader(args)

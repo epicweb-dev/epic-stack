@@ -70,7 +70,7 @@ export function getServerTimeHeader(timings?: Timings) {
 				}, 0)
 				.toFixed(1)
 			const desc = timingInfos
-				.map(t => t.desc)
+				.map((t) => t.desc)
 				.filter(Boolean)
 				.join(' & ')
 			return [
@@ -101,7 +101,7 @@ export function cachifiedTimingReporter<Value>(
 			`${key} cache retrieval`,
 		)
 		let getFreshValueTimer: ReturnType<typeof createTimer> | undefined
-		return event => {
+		return (event) => {
 			switch (event.name) {
 				case 'getFreshValueStart':
 					getFreshValueTimer = createTimer(

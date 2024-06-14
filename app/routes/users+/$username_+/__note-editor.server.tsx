@@ -54,7 +54,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			return {
 				...data,
 				imageUpdates: await Promise.all(
-					images.filter(imageHasId).map(async i => {
+					images.filter(imageHasId).map(async (i) => {
 						if (imageHasFile(i)) {
 							return {
 								id: i.id,
@@ -73,8 +73,8 @@ export async function action({ request }: ActionFunctionArgs) {
 				newImages: await Promise.all(
 					images
 						.filter(imageHasFile)
-						.filter(i => !i.id)
-						.map(async image => {
+						.filter((i) => !i.id)
+						.map(async (image) => {
 							return {
 								altText: image.altText,
 								contentType: image.file.type,
@@ -115,8 +115,8 @@ export async function action({ request }: ActionFunctionArgs) {
 			title,
 			content,
 			images: {
-				deleteMany: { id: { notIn: imageUpdates.map(i => i.id) } },
-				updateMany: imageUpdates.map(updates => ({
+				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
+				updateMany: imageUpdates.map((updates) => ({
 					where: { id: updates.id },
 					data: { ...updates, id: updates.blob ? cuid() : updates.id },
 				})),

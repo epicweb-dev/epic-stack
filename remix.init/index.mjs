@@ -8,11 +8,11 @@ import inquirer from 'inquirer'
 import open from 'open'
 import parseGitHubURL from 'parse-github-url'
 
-const escapeRegExp = string =>
+const escapeRegExp = (string) =>
 	// $& means the whole matched string
 	string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-const getRandomString = length => crypto.randomBytes(length).toString('hex')
+const getRandomString = (length) => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
 
 export default async function main({ rootDirectory }) {
@@ -84,7 +84,7 @@ export default async function main({ rootDirectory }) {
 	}
 
 	if (!process.env.SKIP_DEPLOYMENT) {
-		await setupDeployment({ rootDirectory }).catch(error => {
+		await setupDeployment({ rootDirectory }).catch((error) => {
 			console.error(error)
 
 			console.error(
@@ -307,7 +307,7 @@ async function getPreferredRegion() {
 			type: 'list',
 			default: defaultRegion,
 			message: `Which region would you like to deploy to? The closest to you is ${defaultRegion}.`,
-			choices: availableRegions.platform.regions.map(region => ({
+			choices: availableRegions.platform.regions.map((region) => ({
 				name: `${region.name} (${region.code})`,
 				value: region.code,
 			})),
@@ -329,6 +329,6 @@ async function makeFlyRequest({ query, variables }) {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${flyToken}`,
 		},
-	}).then(response => response.json())
+	}).then((response) => response.json())
 	return json.data
 }

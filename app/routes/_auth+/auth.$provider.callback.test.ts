@@ -26,7 +26,7 @@ afterEach(async () => {
 test('a new user goes to onboarding', async () => {
 	const request = await setupRequest()
 	const response = await loader({ request, params: PARAMS, context: {} }).catch(
-		e => e,
+		(e) => e,
 	)
 	expect(response).toHaveRedirect('/onboarding/github')
 })
@@ -40,7 +40,7 @@ test('when auth fails, send the user to login with a toast', async () => {
 	)
 	const request = await setupRequest()
 	const response = await loader({ request, params: PARAMS, context: {} }).catch(
-		e => e,
+		(e) => e,
 	)
 	invariant(response instanceof Response, 'response should be a Response')
 	expect(response).toHaveRedirect('/login')

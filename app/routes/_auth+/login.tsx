@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {
-		schema: intent =>
+		schema: (intent) =>
 			LoginFormSchema.transform(async (data, ctx) => {
 				if (intent !== null) return { ...data, session: null }
 
@@ -167,7 +167,7 @@ export default function LoginPage() {
 							</div>
 						</Form>
 						<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
-							{providerNames.map(providerName => (
+							{providerNames.map((providerName) => (
 								<li key={providerName}>
 									<ProviderConnectionForm
 										type="Login"

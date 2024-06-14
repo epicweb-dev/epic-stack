@@ -50,9 +50,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 						url: `${domain}/resources/user-images/${user.image.id}`,
 					}
 				: null,
-			notes: user.notes.map(note => ({
+			notes: user.notes.map((note) => ({
 				...note,
-				images: note.images.map(image => ({
+				images: note.images.map((image) => ({
 					...image,
 					url: `${domain}/resources/note-images/${image.id}`,
 				})),

@@ -36,7 +36,7 @@ export default function EditUserProfile() {
 	const user = useUser()
 	const matches = useMatches()
 	const breadcrumbs = matches
-		.map(m => {
+		.map((m) => {
 			const result = BreadcrumbHandleMatch.safeParse(m)
 			if (!result.success || !result.data.handle.breadcrumb) return null
 			return (

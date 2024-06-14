@@ -195,7 +195,7 @@ function App() {
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
-	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
+	const isOnSearchPage = matches.find((m) => m.id === 'routes/users+/index')
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 	const allowIndexing = data.ENV.ALLOW_INDEXING !== 'false'
 	useToast(data.toast)
@@ -277,7 +277,7 @@ function UserDropdown() {
 					<Link
 						to={`/users/${user.username}`}
 						// this is for progressive enhancement
-						onClick={e => e.preventDefault()}
+						onClick={(e) => e.preventDefault()}
 						className="flex items-center gap-2"
 					>
 						<img
@@ -310,7 +310,7 @@ function UserDropdown() {
 					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
-						onSelect={event => {
+						onSelect={(event) => {
 							event.preventDefault()
 							submit(formRef.current)
 						}}

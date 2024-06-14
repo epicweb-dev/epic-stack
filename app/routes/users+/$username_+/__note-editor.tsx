@@ -36,7 +36,7 @@ const ImageFieldsetSchema = z.object({
 	file: z
 		.instanceof(File)
 		.optional()
-		.refine(file => {
+		.refine((file) => {
 			return !file || file.size <= MAX_UPLOAD_SIZE
 		}, 'File size must be less than 3MB'),
 	altText: z.string().optional(),
@@ -215,7 +215,7 @@ function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
 							<input
 								aria-label="Image"
 								className="absolute left-0 top-0 z-0 h-32 w-32 cursor-pointer opacity-0"
-								onChange={event => {
+								onChange={(event) => {
 									const file = event.target.files?.[0]
 
 									if (file) {
@@ -240,7 +240,7 @@ function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
 				<div className="flex-1">
 					<Label htmlFor={fields.altText.id}>Alt Text</Label>
 					<Textarea
-						onChange={e => setAltText(e.currentTarget.value)}
+						onChange={(e) => setAltText(e.currentTarget.value)}
 						{...getTextareaProps(fields.altText)}
 					/>
 					<div className="min-h-[32px] px-4 pb-3 pt-1">

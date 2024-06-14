@@ -18,9 +18,9 @@ from the `@nasa-gcn/remix-seo` docs:
 // routes/blog/$blogslug.tsx
 
 export const handle: SEOHandle = {
-	getSitemapEntries: async request => {
+	getSitemapEntries: async (request) => {
 		const blogs = await db.blog.findMany()
-		return blogs.map(blog => {
+		return blogs.map((blog) => {
 			return { route: `/blog/${blog.slug}`, priority: 0.7 }
 		})
 	},

@@ -114,7 +114,7 @@ export default function NoteRoute() {
 			<h2 className="mb-2 pt-12 text-h2 lg:mb-6">{data.note.title}</h2>
 			<div className={`${displayBar ? 'pb-24' : 'pb-12'} overflow-y-auto`}>
 				<ul className="flex flex-wrap gap-5 py-5">
-					{data.note.images.map(image => (
+					{data.note.images.map((image) => (
 						<li key={image.id}>
 							<a href={getNoteImgSrc(image.id)}>
 								<img
@@ -190,7 +190,7 @@ export const meta: MetaFunction<
 	{ 'routes/users+/$username_+/notes': typeof notesLoader }
 > = ({ data, params, matches }) => {
 	const notesMatch = matches.find(
-		m => m.id === 'routes/users+/$username_+/notes',
+		(m) => m.id === 'routes/users+/$username_+/notes',
 	)
 	const displayName = notesMatch?.data?.owner.name ?? params.username
 	const noteTitle = data?.note.title ?? 'Note'

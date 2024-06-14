@@ -46,8 +46,11 @@ const NewImageSchema = z.object({
 	intent: z.literal('submit'),
 	photoFile: z
 		.instanceof(File)
-		.refine(file => file.size > 0, 'Image is required')
-		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 3MB'),
+		.refine((file) => file.size > 0, 'Image is required')
+		.refine(
+			(file) => file.size <= MAX_SIZE,
+			'Image size must be less than 3MB',
+		),
 })
 
 const PhotoFormSchema = z.discriminatedUnion('intent', [
@@ -78,7 +81,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	)
 
 	const submission = await parseWithZod(formData, {
-		schema: PhotoFormSchema.transform(async data => {
+		schema: PhotoFormSchema.transform(async (data) => {
 			if (data.intent === 'delete') return { intent: 'delete' }
 			if (data.photoFile.size <= 0) return z.NEVER
 			return {
@@ -106,7 +109,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		return redirect('/settings/profile')
 	}
 
-	await prisma.$transaction(async $prisma => {
+	await prisma.$transaction(async ($prisma) => {
 		await $prisma.userImage.deleteMany({ where: { userId } })
 		await $prisma.user.update({
 			where: { id: userId },
@@ -171,11 +174,11 @@ export default function PhotoRoute() {
 						className="peer sr-only"
 						required
 						tabIndex={newImageSrc ? -1 : 0}
-						onChange={e => {
+						onChange={(e) => {
 							const file = e.currentTarget.files?.[0]
 							if (file) {
 								const reader = new FileReader()
-								reader.onload = event => {
+								reader.onload = (event) => {
 									setNewImageSrc(event.target?.result?.toString() ?? null)
 								}
 								reader.readAsDataURL(file)

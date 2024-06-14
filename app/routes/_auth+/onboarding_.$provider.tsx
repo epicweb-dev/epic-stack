@@ -130,7 +130,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 				return
 			}
-		}).transform(async data => {
+		}).transform(async (data) => {
 			const session = await signupWithConnection({
 				...data,
 				email,
