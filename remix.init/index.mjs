@@ -37,12 +37,10 @@ export default async function main({ rootDirectory }) {
 		fs.readFile(PKG_PATH, 'utf-8'),
 	])
 
-	const newEnv = env
-		.replace(/^SESSION_SECRET=.*$/m, `SESSION_SECRET="${getRandomString(16)}"`)
-		.replace(
-			/^INTERNAL_COMMAND_TOKEN=.*$/m,
-			`INTERNAL_COMMAND_TOKEN="${getRandomString(16)}"`,
-		)
+	const newEnv = env.replace(
+		/^SESSION_SECRET=.*$/m,
+		`SESSION_SECRET="${getRandomString(16)}"`,
+	)
 
 	const newFlyTomlContent = flyTomlContent.replace(
 		new RegExp(appNameRegex, 'g'),
