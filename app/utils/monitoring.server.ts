@@ -6,6 +6,7 @@ export function init() {
 		dsn: ENV.SENTRY_DSN,
 		environment: ENV.MODE,
 		tracesSampleRate: ENV.MODE === 'production' ? 1 : 0,
+		autoInstrumentRemix: true,
 		denyUrls: [
 			/\/resources\/healthcheck/,
 			// TODO: be smarter about the public assets...

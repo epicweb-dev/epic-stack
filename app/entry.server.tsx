@@ -20,10 +20,6 @@ const ABORT_DELAY = 5000
 init()
 global.ENV = getEnv()
 
-if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
-	import('./utils/monitoring.server.ts').then(({ init }) => init())
-}
-
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
 export default async function handleRequest(...args: DocRequestArgs) {
@@ -103,7 +99,7 @@ export function handleError(
 	}
 	if (error instanceof Error) {
 		console.error(chalk.red(error.stack))
-		Sentry.captureRemixServerException(error, 'remix.server', request)
+		Sentry.captureRemixServerException(error, 'remix.server', request, true)
 	} else {
 		console.error(chalk.red(error))
 		Sentry.captureException(error)
