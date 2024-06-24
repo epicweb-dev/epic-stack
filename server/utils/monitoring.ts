@@ -3,9 +3,9 @@ import Sentry from '@sentry/remix'
 
 export function init() {
 	Sentry.init({
-		dsn: ENV.SENTRY_DSN,
-		environment: ENV.MODE,
-		tracesSampleRate: ENV.MODE === 'production' ? 1 : 0,
+		dsn: process.env.SENTRY_DSN,
+		environment: process.env.NODE_ENV,
+		tracesSampleRate: process.env.NODE_ENV === 'production' ? 1 : 0,
 		autoInstrumentRemix: true,
 		denyUrls: [
 			/\/resources\/healthcheck/,
