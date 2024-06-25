@@ -146,9 +146,14 @@ const rateLimitDefault = {
 	max: 1000 * maxMultiple,
 	standardHeaders: true,
 	legacyHeaders: false,
-	// Fly.io prevents spoofing of X-Forwarded-For
-	// so no need to validate the trustProxy config
 	validate: { trustProxy: false },
+	// Malicious users can spoof their IP address which means we should not deault
+	// to trusting req.ip when hosted on Fly.io. However, users cannot spoof Fly-Client-Ip.
+	// When sitting behind a CDN such as cloudflare, replace fly-client-ip with the CDN
+	// specific header such as cf-connecting-ip
+	keyGenerator: (req) => {
+		return req.get('fly-client-ip') ?? req.ip
+	},
 }
 
 const strongestRateLimit = rateLimit({
