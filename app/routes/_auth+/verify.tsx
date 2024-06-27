@@ -104,6 +104,7 @@ export default function VerifyRoute() {
 								inputProps={{
 									...getInputProps(fields[codeQueryParam], { type: 'text' }),
 									autoComplete: 'one-time-code',
+									autoFocus: true,
 								}}
 								errors={fields[codeQueryParam].errors}
 							/>
