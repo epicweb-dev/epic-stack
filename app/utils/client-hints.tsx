@@ -46,6 +46,7 @@ export function ClientHintCheck({ nonce }: { nonce: string }) {
 			dangerouslySetInnerHTML={{
 				__html: hintsUtils.getClientHintCheckScript(),
 			}}
+			suppressHydrationWarning
 		/>
 	)
 }
