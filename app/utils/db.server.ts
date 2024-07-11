@@ -31,6 +31,6 @@ export const prisma = remember('prisma', () => {
 		const dur = chalk[color](`${e.duration}ms`)
 		console.info(`prisma:query - ${dur} - ${e.query}`)
 	})
-	client.$connect()
+	void client.$connect()
 	return client
 })

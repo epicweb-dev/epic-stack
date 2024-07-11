@@ -98,7 +98,7 @@ test(`when a user is logged in and has already connected, it doesn't do anything
 	})
 	const response = await loader({ request, params: PARAMS, context: {} })
 	expect(response).toHaveRedirect('/settings/profile/connections')
-	expect(response).toSendToast(
+	await expect(response).toSendToast(
 		expect.objectContaining({
 			title: 'Already Connected',
 			description: expect.stringContaining(githubUser.profile.login),

@@ -163,8 +163,10 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	// fields are pre-populated for the user, so we only need to accept
 	// terms of service and hit the 'crete an account' button
 	const usernameInput = page.getByRole('textbox', { name: /username/i })
-	expect(usernameInput).toHaveValue(normalizeUsername(ghUser.profile.login))
-	expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
+	await expect(usernameInput).toHaveValue(
+		normalizeUsername(ghUser.profile.login),
+	)
+	await expect(page.getByRole('textbox', { name: /^name/i })).toHaveValue(
 		ghUser.profile.name,
 	)
 	const createAccountButton = page.getByRole('button', {
