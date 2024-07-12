@@ -94,10 +94,14 @@ export const test = base.extend<{
 			authSession.set(sessionKey, session.id)
 			const cookieConfig = setCookieParser.parseString(
 				await authSessionStorage.commitSession(authSession),
-			) as any
-			await page
-				.context()
-				.addCookies([{ ...cookieConfig, domain: 'localhost' }])
+			)
+			const newConfig = {
+				...cookieConfig,
+				domain: 'localhost',
+				expires: cookieConfig.expires?.getTime(),
+				sameSite: cookieConfig.sameSite as 'Strict' | 'Lax' | 'None',
+			}
+			await page.context().addCookies([newConfig])
 			return user
 		})
 		await prisma.user.deleteMany({ where: { id: userId } })
