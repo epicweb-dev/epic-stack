@@ -117,7 +117,7 @@ export const test = base.extend<{
 
 		let ghUser: GitHubUser | null = null
 		await use(async () => {
-			const newGitHubUser = await insertGitHubUser(testInfo.testId)
+			const newGitHubUser = await insertGitHubUser(testInfo.testId)!
 			ghUser = newGitHubUser
 			return newGitHubUser
 		})
