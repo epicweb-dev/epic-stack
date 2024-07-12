@@ -129,10 +129,9 @@ export async function cleanupDb(prisma: PrismaClient) {
 				prisma.$executeRawUnsafe(`DELETE from "${name}"`),
 			),
 		])
-		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON`)
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
-		// Ensure FK constraints are re-enabled
+	} finally {
 		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON`)
 	}
 }
