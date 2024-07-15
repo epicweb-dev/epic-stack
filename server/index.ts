@@ -115,7 +115,7 @@ app.use(
 			reportOnly: true,
 			directives: {
 				'connect-src': [
-					MODE === 'development' ? 'ws:' : null,
+					...(MODE === 'development' ? ['ws:', 'localhost:24678'] : []),
 					process.env.SENTRY_DSN ? '*.sentry.io' : null,
 					"'self'",
 				].filter(Boolean),
