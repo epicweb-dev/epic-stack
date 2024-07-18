@@ -14,7 +14,7 @@ installGlobals()
 afterEach(() => server.resetHandlers())
 afterEach(() => cleanup())
 
-export let consoleError: MockInstance<Parameters<(typeof console)['error']>>
+export let consoleError: MockInstance<(typeof console)['error']>
 
 beforeEach(() => {
 	const originalConsoleError = console.error
