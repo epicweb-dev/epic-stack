@@ -1,8 +1,8 @@
 import 'dotenv/config'
 // 👆 this needs to imported first
 
-import { styleText } from 'node:util'
 import * as fs from 'fs'
+import { styleText } from 'node:util'
 import closeWithGrace from 'close-with-grace'
 import sourceMapSupport from 'source-map-support'
 
