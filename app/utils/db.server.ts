@@ -1,6 +1,6 @@
+import { styleText } from 'node:util'
 import { remember } from '@epic-web/remember'
 import { PrismaClient } from '@prisma/client'
-import chalk from 'chalk'
 
 export const prisma = remember('prisma', () => {
 	// NOTE: if you change anything in this function you'll need to restart
@@ -28,7 +28,8 @@ export const prisma = remember('prisma', () => {
 						: e.duration < logThreshold * 1.4
 							? 'redBright'
 							: 'red'
-		const dur = chalk[color](`${e.duration}ms`)
+		const dur = styleText(color, `${e.duration}ms`)
+
 		console.info(`prisma:query - ${dur} - ${e.query}`)
 	})
 	void client.$connect()
