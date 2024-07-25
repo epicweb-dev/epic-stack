@@ -50,5 +50,5 @@ jobs:
           git config --local user.email "kody@epicweb.com"
           git config --local user.name "kody"
           git add package.json
-          git commit -m "Update epic-stack.head and epic-stack.date in package.json [skip ci]"
+          git commit -m "Update epic-stack version [skip ci]"
           git push
