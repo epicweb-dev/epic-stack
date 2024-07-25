@@ -48,6 +48,9 @@ peruse
 [the Epic Stack's commit history](https://github.com/epicweb-dev/epic-stack/commits/main)
 anytime you'd like to see what updates could be made to your project.
 
+Check the [epic-stack field in the package.json file](../package.json) to see
+what the date and commit hash were when you created your project.
+
 ## How to update NPM dependencies
 
 Another part of the Epic Stack is the dependencies of the project. These you

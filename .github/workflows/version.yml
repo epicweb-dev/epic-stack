@@ -26,22 +26,29 @@ jobs:
         id: get_head_hash
         run: echo "HEAD_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
+      - name: 📅 Get current date
+        id: get_date
+        run:
+          echo "CURRENT_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       - name: 📝 Update package.json
         run: |
           jq '
-            if .["epic-stack"] == true then
-              .["epic-stack"] = {"head": "${{ steps.get_head_hash.outputs.HEAD_HASH }}"}
-            elif .["epic-stack"] then
-              .["epic-stack"].head = "${{ steps.get_head_hash.outputs.HEAD_HASH }}"
+            if .["epic-stack"] then
+              .["epic-stack"].head = "${{ steps.get_head_hash.outputs.HEAD_HASH }}" |
+              .["epic-stack"].date = "${{ steps.get_date.outputs.CURRENT_DATE }}"
             else
-              .["epic-stack"] = {"head": "${{ steps.get_head_hash.outputs.HEAD_HASH }}"}
+              .["epic-stack"] = {
+                "head": "${{ steps.get_head_hash.outputs.HEAD_HASH }}",
+                "date": "${{ steps.get_date.outputs.CURRENT_DATE }}"
+              }
             end
           ' package.json > temp.json && mv temp.json package.json
 
       - name: 💾 Commit changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "kody@epicweb.com"
+          git config --local user.name "kody"
           git add package.json
-          git commit -m "Update epic-stack.head in package.json [skip ci]"
+          git commit -m "Update epic-stack.head and epic-stack.date in package.json [skip ci]"
           git push
