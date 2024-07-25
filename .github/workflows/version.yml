@@ -1,0 +1,48 @@
+name: 🔖 Version
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  version:
+    name: 🚀 Update Version
+    runs-on: ubuntu-22.04
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🔢 Get HEAD commit hash
+        id: get_head_hash
+        run: echo "HEAD_HASH=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update package.json
+        run: |
+          jq '
+            if .["epic-stack"] == true then
+              .["epic-stack"] = {"head": "${{ steps.get_head_hash.outputs.HEAD_HASH }}"}
+            elif .["epic-stack"] then
+              .["epic-stack"].head = "${{ steps.get_head_hash.outputs.HEAD_HASH }}"
+            else
+              .["epic-stack"] = {"head": "${{ steps.get_head_hash.outputs.HEAD_HASH }}"}
+            end
+          ' package.json > temp.json && mv temp.json package.json
+
+      - name: 💾 Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "Update epic-stack.head in package.json [skip ci]"
+          git push
