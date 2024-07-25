@@ -74,7 +74,7 @@ expect.extend({
 		}
 	},
 	async toHaveSessionForUser(response: Response, userId: string) {
-		const setCookies = getSetCookie(response.headers)
+		const setCookies = response.headers.getSetCookie()
 		const sessionSetCookie = setCookies.find(
 			(c) => setCookieParser.parseString(c).name === 'en_session',
 		)
@@ -115,7 +115,7 @@ expect.extend({
 		}
 	},
 	async toSendToast(response: Response, toast: ToastInput) {
-		const setCookies = getSetCookie(response.headers)
+		const setCookies = response.headers.getSetCookie()
 		const toastSetCookie = setCookies.find(
 			(c) => setCookieParser.parseString(c).name === 'en_toast',
 		)
@@ -163,12 +163,4 @@ interface CustomMatchers<R = unknown> {
 declare module 'vitest' {
 	interface Assertion<T = any> extends CustomMatchers<T> {}
 	interface AsymmetricMatchersContaining extends CustomMatchers {}
-}
-
-function getSetCookie(headers: Headers) {
-	// this is a sort of polyfill for headers.getSetCookie
-	// https://github.com/microsoft/TypeScript/issues/55270
-	// https://github.com/remix-run/remix/issues/7067
-	// @ts-expect-error see the two issues above
-	return headers.getAll('set-cookie') as Array<string>
 }
