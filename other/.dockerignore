@@ -1,9 +1,0 @@
-# This file is moved to the root directory before building the image
-
-/node_modules
-*.log
-.DS_Store
-.env
-/.cache
-/public/build
-/build
