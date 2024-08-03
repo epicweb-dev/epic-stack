@@ -47,7 +47,7 @@ jobs:
 
       - name: 💾 Commit changes
         run: |
-          git config --local user.email "kody@epicweb.com"
+          git config --local user.email "kody@epicweb.dev"
           git config --local user.name "kody"
           git add package.json
           git commit -m "Update epic-stack version [skip ci]"
