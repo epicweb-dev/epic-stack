@@ -3,7 +3,10 @@
   "private": true,
   "sideEffects": false,
   "license": "MIT",
-  "epic-stack": true,
+  "epic-stack": {
+    "head": "6c9d4d2b353e54d70f0378854af95c4cdfd6515e",
+    "date": "2024-08-03T00:02:41Z"
+  },
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "type": "module",
   "imports": {
