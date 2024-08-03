@@ -13,6 +13,10 @@ auto_rollback = true
 source = "data"
 destination = "/data"
 
+[build]
+dockerfile = "/other/Dockerfile"
+ignorefile = "/other/Dockerfile.dockerignore"
+
 [[services]]
 internal_port = 8080
 processes = [ "app" ]
