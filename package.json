@@ -66,6 +66,7 @@
     "@remix-run/react": "2.13.1",
     "@sentry/profiling-node": "^8.35.0",
     "@sentry/remix": "^8.35.0",
+    "@tusbar/cache-control": "1.0.2",
     "address": "^2.0.3",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.4.0",
