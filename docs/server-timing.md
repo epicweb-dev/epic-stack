@@ -74,6 +74,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	)
 }
 
+// We have a general headers handler to save you from boilerplating.
+// export const headers: HeadersFunction = pipeHeaders
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 	return {
 		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders), // <-- 4. Send headers
