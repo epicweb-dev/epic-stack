@@ -184,15 +184,6 @@ async function setupDeployment({ rootDirectory }) {
 	])
 	if (shouldDeploy) {
 		console.log(`🚀 Deploying apps...`)
-		console.log('  Moving Dockerfile and .dockerignore to root (temporarily)')
-		await fs.rename(
-			path.join(rootDirectory, 'other', 'Dockerfile'),
-			path.join(rootDirectory, 'Dockerfile'),
-		)
-		await fs.rename(
-			path.join(rootDirectory, 'other', '.dockerignore'),
-			path.join(rootDirectory, '.dockerignore'),
-		)
 		console.log(`  Starting with staging`)
 		await $I`fly deploy --app ${APP_NAME}-staging`
 		await open(`https://${APP_NAME}-staging.fly.dev/`)
@@ -201,15 +192,6 @@ async function setupDeployment({ rootDirectory }) {
 		await $I`fly deploy --app ${APP_NAME}`
 		await open(`https://${APP_NAME}.fly.dev/`)
 		console.log(`  Production deployed...`)
-		console.log('  Moving Dockerfile and .dockerignore back to other/')
-		await fs.rename(
-			path.join(rootDirectory, 'Dockerfile'),
-			path.join(rootDirectory, 'other', 'Dockerfile'),
-		)
-		await fs.rename(
-			path.join(rootDirectory, '.dockerignore'),
-			path.join(rootDirectory, 'other', '.dockerignore'),
-		)
 	}
 
 	const { shouldSetupGitHub } = await inquirer.prompt([
