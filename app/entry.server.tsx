@@ -1,3 +1,4 @@
+import { styleText } from 'node:util'
 import { PassThrough } from 'stream'
 import {
 	createReadableStreamFromReadable,
@@ -7,7 +8,6 @@ import {
 } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import * as Sentry from '@sentry/remix'
-import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 import { getEnv, init } from './utils/env.server.ts'
@@ -102,7 +102,7 @@ export function handleError(
 		return
 	}
 	if (error instanceof Error) {
-		console.error(chalk.red(error.stack))
+		console.error(styleText('red', String(error.stack)))
 		void Sentry.captureRemixServerException(
 			error,
 			'remix.server',
@@ -110,7 +110,7 @@ export function handleError(
 			true,
 		)
 	} else {
-		console.error(chalk.red(error))
+		console.error(styleText('red', String(error)))
 		Sentry.captureException(error)
 	}
 }
