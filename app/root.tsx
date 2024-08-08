@@ -179,6 +179,7 @@ function Document({
 					dangerouslySetInnerHTML={{
 						__html: `window.ENV = ${JSON.stringify(env)}`,
 					}}
+					suppressHydrationWarning
 				/>
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
