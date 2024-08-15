@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
 	redirect,
@@ -15,6 +16,10 @@ import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 
@@ -119,7 +124,7 @@ export default function ResetPasswordPage() {
 
 					<StatusButton
 						className="w-full"
-						status={isPending ? 'pending' : form.status ?? 'idle'}
+						status={isPending ? 'pending' : (form.status ?? 'idle')}
 						type="submit"
 						disabled={isPending}
 					>

@@ -3,6 +3,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { glob } from 'glob'
 import { flatRoutes } from 'remix-flat-routes'
 import { defineConfig } from 'vite'
+import { envOnlyMacros } from 'vite-env-only'
 
 const MODE = process.env.NODE_ENV
 
@@ -28,6 +29,7 @@ export default defineConfig({
 		},
 	},
 	plugins: [
+		envOnlyMacros(),
 		remix({
 			ignoredRouteFiles: ['**/*'],
 			serverModuleFormat: 'esm',

@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as E from '@react-email/components'
 import {
 	json,
@@ -18,6 +19,10 @@ import { sendEmail } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { EmailSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.server.ts'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([EmailSchema, UsernameSchema]),
@@ -163,7 +168,7 @@ export default function ForgotPasswordRoute() {
 								status={
 									forgotPassword.state === 'submitting'
 										? 'pending'
-										: form.status ?? 'idle'
+										: (form.status ?? 'idle')
 								}
 								type="submit"
 								disabled={forgotPassword.state !== 'idle'}

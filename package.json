@@ -106,6 +106,7 @@
     "tailwindcss": "^3.4.6",
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-radix": "^3.0.3",
+    "vite-env-only": "^3.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {

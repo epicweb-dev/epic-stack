@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as E from '@react-email/components'
 import {
 	json,
@@ -23,6 +24,10 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
 import { prepareVerification } from './verify.server.ts'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 const SignupSchema = z.object({
 	email: EmailSchema,
@@ -158,7 +163,7 @@ export default function SignupRoute() {
 					<ErrorList errors={form.errors} id={form.errorId} />
 					<StatusButton
 						className="w-full"
-						status={isPending ? 'pending' : form.status ?? 'idle'}
+						status={isPending ? 'pending' : (form.status ?? 'idle')}
 						type="submit"
 						disabled={isPending}
 					>
