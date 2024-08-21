@@ -130,25 +130,11 @@ Find instructions for this optional step in [the database docs](./database.md).
 
 ## Deploying locally using fly
 
-If you'd like to deploy locally you definitely can. You need to (temporarily)
-move the `Dockerfile` and the `.dockerignore` to the root of the project first.
-Then you can run the deploy command:
+If you'd like to deploy locally, just run fly's deploy command:
 
 ```
-mv ./other/Dockerfile Dockerfile
-mv ./other/.dockerignore .dockerignore
 fly deploy
 ```
-
-Once it's done, move the files back:
-
-```
-mv Dockerfile ./other/Dockerfile
-mv .dockerignore ./other/.dockerignore
-```
-
-You can keep the `Dockerfile` and `.dockerignore` in the root if you prefer,
-just make sure to remove the move step from the `.github/workflows/deploy.yml`.
 
 ## Deploying locally using docker/podman
 
