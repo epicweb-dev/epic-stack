@@ -56,7 +56,6 @@ export const links: LinksFunction = () => {
 	return [
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
-		{ rel: 'mask-icon', href: maskIconAssetUrl },
 		{
 			rel: 'alternate icon',
 			type: 'image/png',
