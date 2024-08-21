@@ -21,9 +21,7 @@ import { withSentry } from '@sentry/remix'
 import { useRef } from 'react'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import appleTouchIconAssetUrl from './assets/images/favicons/apple-touch-icon.png'
-import faviconAltAssetUrl from './assets/images/favicons/favicon-32x32.png'
 import faviconAssetUrl from './assets/images/favicons/favicon.svg'
-import maskIconAssetUrl from './assets/images/favicons/mask-icon.svg'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
@@ -57,17 +55,17 @@ export const links: LinksFunction = () => {
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
 		{
-			rel: 'alternate icon',
-			type: 'image/png',
-			href: faviconAltAssetUrl,
+			rel: 'icon',
+			href: '/favicon.ico',
+			sizes: '48x48',
 		},
+		{ rel: 'icon', type: 'image/svg+xml', href: faviconAssetUrl },
 		{ rel: 'apple-touch-icon', href: appleTouchIconAssetUrl },
 		{
 			rel: 'manifest',
 			href: '/site.webmanifest',
 			crossOrigin: 'use-credentials',
 		} as const, // necessary to make typescript happy
-		{ rel: 'icon', type: 'image/svg+xml', href: faviconAssetUrl },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
 	].filter(Boolean)
 }
