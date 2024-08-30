@@ -16,7 +16,7 @@ beforeAll(async () => {
 // before prisma is imported and initialized
 afterEach(async () => {
 	const { prisma } = await import('#app/utils/db.server.ts')
-	await cleanupDb(prisma)
+	await cleanupDb(prisma, false)
 })
 
 afterAll(async () => {

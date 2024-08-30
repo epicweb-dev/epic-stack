@@ -115,10 +115,17 @@ export async function img({
 	}
 }
 
-export async function cleanupDb(prisma: PrismaClient) {
-	const tables = await prisma.$queryRaw<
-		{ name: string }[]
-	>`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations';`
+export async function cleanupDb(prisma: PrismaClient, hard = true) {
+	let tables
+	if (hard) {
+		tables = await prisma.$queryRaw<
+			{ name: string }[]
+		>`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations';`
+	} else {
+		tables = await prisma.$queryRaw<
+			{ name: string }[]
+		>`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations' AND name NOT LIKE 'Role' AND name NOT LIKE 'Permission' AND name NOT LIKE '_PermissionToRole';`
+	}
 
 	try {
 		// Disable FK constraints to avoid relation conflicts during deletion
