@@ -39,7 +39,6 @@ app.set('trust proxy', true)
 // ensure HTTPS only (X-Forwarded-Proto comes from Fly)
 app.use((req, res, next) => {
 	if (req.method !== 'GET') return next()
-
 	const proto = req.get('X-Forwarded-Proto')
 	const host = getHost(req)
 	if (proto === 'http') {
