@@ -22,11 +22,11 @@ if (IS_PROD && process.env.SENTRY_DSN) {
 
 const viteDevServer = IS_PROD
 	? undefined
-	: await import('vite').then((vite) => {
-			return vite.createServer({
+	: await import('vite').then((vite) =>
+			vite.createServer({
 				server: { middlewareMode: true },
-			})
-		})
+			}),
+		)
 
 const app = express()
 
@@ -201,15 +201,15 @@ async function getBuild() {
 	try {
 		const build = viteDevServer
 			? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
-			// @ts-expect-error - the file might not exist yet but it will
-			// eslint-disable-next-line import/no-unresolved
-			: await import('../build/server/index.js')
-			
-		return build as unknown as ServerBuild
+			: // @ts-expect-error - the file might not exist yet but it will
+				// eslint-disable-next-line import/no-unresolved
+				await import('../build/server/index.js')
+
+		return { build: build as unknown as ServerBuild, error: null }
 	} catch (error) {
 		// Catch error and return null to make express happy and avoid an unrecoverable crash
 		console.error('Error creating build:', error)
-		return null
+		return { error: error, build: null as unknown as ServerBuild }
 	}
 }
 
@@ -222,22 +222,17 @@ if (!ALLOW_INDEXING) {
 
 app.all(
 	'*',
-	(req, res, next) => {
-		next()
-	},
 	createRequestHandler({
-		getLoadContext: (_: any, res: any) => {
-			return {
-				cspNonce: res.locals.cspNonce,
-				serverBuild: getBuild(),
-			}
-		},
+		getLoadContext: (_: any, res: any) => ({
+			cspNonce: res.locals.cspNonce,
+			serverBuild: getBuild(),
+		}),
 		mode: MODE,
 		build: async () => {
-			const build = await getBuild()
+			const { error, build } = await getBuild()
 			// gracefully "catch" the error
-			if (!build) {
-				throw new Error('Error creating build')
+			if (error) {
+				throw error
 			}
 			return build
 		},
@@ -286,9 +281,4 @@ closeWithGrace(async () => {
 	await new Promise((resolve, reject) => {
 		server.close((e) => (e ? reject(e) : resolve('ok')))
 	})
-})
-
-// Add a global error handler for the Express app
-app.use((err: any, req: any, res: any, next: any) => {
-	res.status(500).send('Internal Server Error')
 })
