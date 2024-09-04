@@ -22,11 +22,11 @@ if (IS_PROD && process.env.SENTRY_DSN) {
 
 const viteDevServer = IS_PROD
 	? undefined
-	: await import('vite').then((vite) =>
-			vite.createServer({
+	: await import('vite').then((vite) => {
+			return vite.createServer({
 				server: { middlewareMode: true },
-			}),
-		)
+			})
+		})
 
 const app = express()
 
@@ -39,7 +39,7 @@ app.set('trust proxy', true)
 // ensure HTTPS only (X-Forwarded-Proto comes from Fly)
 app.use((req, res, next) => {
 	if (req.method !== 'GET') return next()
-	
+
 	const proto = req.get('X-Forwarded-Proto')
 	const host = getHost(req)
 	if (proto === 'http') {
@@ -198,13 +198,19 @@ app.use((req, res, next) => {
 })
 
 async function getBuild() {
-	const build = viteDevServer
-		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
-		: // @ts-ignore this should exist before running the server
-			// but it may not exist just yet.
-			await import('../build/server/index.js')
-	// not sure how to make this happy 🤷‍♂️
-	return build as unknown as ServerBuild
+	try {
+		const build = viteDevServer
+			? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+			// @ts-expect-error - the file might not exist yet but it will
+			// eslint-disable-next-line import/no-unresolved
+			: await import('../build/server/index.js')
+			
+		return build as unknown as ServerBuild
+	} catch (error) {
+		// Catch error and return null to make express happy and avoid an unrecoverable crash
+		console.error('Error creating build:', error)
+		return null
+	}
 }
 
 if (!ALLOW_INDEXING) {
@@ -216,13 +222,25 @@ if (!ALLOW_INDEXING) {
 
 app.all(
 	'*',
+	(req, res, next) => {
+		next()
+	},
 	createRequestHandler({
-		getLoadContext: (_: any, res: any) => ({
-			cspNonce: res.locals.cspNonce,
-			serverBuild: getBuild(),
-		}),
+		getLoadContext: (_: any, res: any) => {
+			return {
+				cspNonce: res.locals.cspNonce,
+				serverBuild: getBuild(),
+			}
+		},
 		mode: MODE,
-		build: getBuild,
+		build: async () => {
+			const build = await getBuild()
+			// gracefully "catch" the error
+			if (!build) {
+				throw new Error('Error creating build')
+			}
+			return build
+		},
 	}),
 )
 
@@ -268,4 +286,9 @@ closeWithGrace(async () => {
 	await new Promise((resolve, reject) => {
 		server.close((e) => (e ? reject(e) : resolve('ok')))
 	})
+})
+
+// Add a global error handler for the Express app
+app.use((err: any, req: any, res: any, next: any) => {
+	res.status(500).send('Internal Server Error')
 })
