@@ -130,8 +130,8 @@ export async function cleanupDb(prisma: PrismaClient) {
 		const sql = fs
 			.readFileSync(path)
 			.toString()
-			.split(');')
-			.map((statement) => (statement += ');'))
+			.split(';')
+			.map((statement) => (statement += ';'))
 
 		// Remove empty last line
 		sql.pop()
