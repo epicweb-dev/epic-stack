@@ -45,3 +45,32 @@ You need to be manually regenerate the icon with `npm run build:icons`.
 See
 [the icons decision document](https://github.com/epicweb-dev/epic-stack/blob/main/docs/decisions/020-icons.md)
 for more information about icons.
+
+## Hydration Mismatch
+
+If you see this error in the console:
+
+> Warning: Hydration failed because the initial UI does not match
+> server-rendered HTML.
+
+Read [this article](https://www.jacobparis.com/content/remix-hydration-errors)
+for more information about hydration errors and how to fix them.
+
+If the article does not apply to you, there are a few other things to note.
+
+Often people think the issue is caused by the `nonce` prop being empty on the
+client ([like this](https://github.com/epicweb-dev/epic-stack/discussions/768)).
+This is not going to be the problem
+[unless you're running Firefox during development mode](https://github.com/epicweb-dev/epic-stack/discussions/768#discussioncomment-10456308)
+(if that's the case then you can safely ignore it because that's a firefox bug
+that only affects development). The browser strips the `nonce` from the DOM
+before executing any JavaScript for security reasons and React handles this
+fine.
+
+Browser extensions are notorious for causing hydration errors in the Epic Stack.
+This is because we're using React to hydrate the entire document and many
+browser extensions add content to the `<head>` which triggers a hydration error.
+
+In React 19, React will no longer have issues with differences in the `<head>`
+so if you upgrade to React 19, you'll likely no longer see hydration errors for
+this reason.
