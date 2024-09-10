@@ -16,11 +16,12 @@ instructions:
 
 ### Setup steps
 
-1.  Fork and clone the repo
-2.  Copy `.env.example` into `.env`
-3.  Run `npm install && npm run setup -s` to install dependencies and run
+1.  Fork repo
+2.  clone the repo
+3.  Copy `.env.example` into `.env`
+4.  Run `npm install && npm run setup -s` to install dependencies and run
     validation
-4.  Create a branch for your PR with `git checkout -b pr/your-branch-name`
+5.  Create a branch for your PR with `git checkout -b pr/your-branch-name`
 
 > Tip: Keep your `main` branch pointing at the original repository and make pull
 > requests from branches on your fork. To do this, run:
