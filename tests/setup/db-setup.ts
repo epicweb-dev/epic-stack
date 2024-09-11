@@ -11,8 +11,6 @@ beforeAll(async () => {
 	await fsExtra.copyFile(BASE_DATABASE_PATH, databasePath)
 })
 
-// we *must* use dynamic imports here so the process.env.DATABASE_URL is set
-// before prisma is imported and initialized
 afterEach(async () => {
 	await setup()
 })
