@@ -1,6 +1,6 @@
 import path from 'node:path'
+import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
-import { resetDb } from '#tests/db-utils.js'
 
 export const BASE_DATABASE_PATH = path.join(
 	process.cwd(),
@@ -22,5 +22,14 @@ export async function setup() {
 		}
 	}
 
-	await resetDb(BASE_DATABASE_PATH)
+	await execaCommand(
+		'npx prisma migrate reset --force --skip-seed --skip-generate',
+		{
+			stdio: 'inherit',
+			env: {
+				...process.env,
+				DATABASE_URL: `file:${BASE_DATABASE_PATH}`,
+			},
+		},
+	)
 }

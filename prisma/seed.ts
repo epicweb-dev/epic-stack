@@ -3,12 +3,12 @@ import { promiseHash } from 'remix-utils/promise'
 import { prisma } from '#app/utils/db.server.ts'
 import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
 import {
+	cleanupDb,
 	createPassword,
 	createUser,
 	getNoteImages,
 	getUserImages,
 	img,
-	resetDb,
 } from '#tests/db-utils.ts'
 import { insertGitHubUser } from '#tests/mocks/github.ts'
 
@@ -17,8 +17,49 @@ async function seed() {
 	console.time(`🌱 Database has been seeded`)
 
 	console.time('🧹 Cleaned up the database...')
-	await resetDb()
+	await cleanupDb(prisma)
 	console.timeEnd('🧹 Cleaned up the database...')
+
+	console.time('🔑 Created permissions...')
+	const entities = ['user', 'note']
+	const actions = ['create', 'read', 'update', 'delete']
+	const accesses = ['own', 'any'] as const
+
+	let permissionsToCreate = []
+	for (const entity of entities) {
+		for (const action of actions) {
+			for (const access of accesses) {
+				permissionsToCreate.push({ entity, action, access })
+			}
+		}
+	}
+	await prisma.permission.createMany({ data: permissionsToCreate })
+	console.timeEnd('🔑 Created permissions...')
+
+	console.time('👑 Created roles...')
+	await prisma.role.create({
+		data: {
+			name: 'admin',
+			permissions: {
+				connect: await prisma.permission.findMany({
+					select: { id: true },
+					where: { access: 'any' },
+				}),
+			},
+		},
+	})
+	await prisma.role.create({
+		data: {
+			name: 'user',
+			permissions: {
+				connect: await prisma.permission.findMany({
+					select: { id: true },
+					where: { access: 'own' },
+				}),
+			},
+		},
+	})
+	console.timeEnd('👑 Created roles...')
 
 	const totalUsers = 5
 	console.time(`👤 Created ${totalUsers} users...`)
