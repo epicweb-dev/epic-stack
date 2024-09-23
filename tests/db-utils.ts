@@ -1,9 +1,8 @@
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
-import { type PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { UniqueEnforcer } from 'enforce-unique'
-import { execaCommand } from 'execa'
 
 const uniqueUsernameEnforcer = new UniqueEnforcer()
 
@@ -119,10 +118,10 @@ export async function img({
 export async function resetDb(dbPath?: string) {
 	const databaseUrl = dbPath ? { DATABASE_URL: `file:${dbPath}` } : {}
 
-	await execaCommand(
-		'npx prisma migrate reset --force --skip-seed --skip-generate',
+	spawnSync(
+		'npx',
+		['prisma', 'migrate', 'reset', '--force', '--skip-seed', '--skip-generate'],
 		{
-			stdio: 'inherit',
 			env: {
 				...process.env,
 				...databaseUrl,
