@@ -1,6 +1,6 @@
-import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
+import { type PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { UniqueEnforcer } from 'enforce-unique'
 
@@ -115,17 +115,50 @@ export async function img({
 	}
 }
 
-export async function resetDb(dbPath?: string) {
-	const databaseUrl = dbPath ? { DATABASE_URL: `file:${dbPath}` } : {}
+export async function cleanupDb(prisma: PrismaClient) {
+	const tables = await prisma.$queryRaw<
+		{ name: string }[]
+	>`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations';`
 
-	spawnSync(
-		'npx',
-		['prisma', 'migrate', 'reset', '--force', '--skip-seed', '--skip-generate'],
-		{
-			env: {
-				...process.env,
-				...databaseUrl,
-			},
-		},
-	)
+	const migrationPaths = fs
+		.readdirSync('prisma/migrations')
+		.filter((dir) => dir !== 'migration_lock.toml')
+		.map((dir) => `prisma/migrations/${dir}/migration.sql`)
+
+	const migrations = migrationPaths.map((path) => {
+		// Parse the sql into individual statements
+		const sql = fs
+			.readFileSync(path)
+			.toString()
+			.split(';')
+			.map((statement) => (statement += ';'))
+
+		// Remove empty last line
+		sql.pop()
+
+		return sql
+	})
+
+	try {
+		// Disable FK constraints to avoid relation conflicts during deletion
+		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = OFF`)
+		await prisma.$transaction([
+			// Delete all tables except the ones that are excluded above
+			...tables.map(({ name }) =>
+				prisma.$executeRawUnsafe(`DROP TABLE "${name}"`),
+			),
+		])
+
+		// Run the migrations sequentially
+		for (const migration of migrations) {
+			await prisma.$transaction([
+				// Run each sql statement in the migration
+				...migration.map((sql) => prisma.$executeRawUnsafe(sql)),
+			])
+		}
+	} catch (error) {
+		console.error('Error cleaning up database:', error)
+	} finally {
+		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON`)
+	}
 }

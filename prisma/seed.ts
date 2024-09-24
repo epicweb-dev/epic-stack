@@ -3,12 +3,12 @@ import { promiseHash } from 'remix-utils/promise'
 import { prisma } from '#app/utils/db.server.ts'
 import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
 import {
+	cleanupDb,
 	createPassword,
 	createUser,
 	getNoteImages,
 	getUserImages,
 	img,
-	resetDb,
 } from '#tests/db-utils.ts'
 import { insertGitHubUser } from '#tests/mocks/github.ts'
 
@@ -17,7 +17,7 @@ async function seed() {
 	console.time(`🌱 Database has been seeded`)
 
 	console.time('🧹 Cleaned up the database...')
-	await resetDb()
+	await cleanupDb(prisma)
 	console.timeEnd('🧹 Cleaned up the database...')
 
 	const totalUsers = 5
