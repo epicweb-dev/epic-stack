@@ -131,9 +131,9 @@ export async function cleanupDb(prisma: PrismaClient) {
 			.readFileSync(path)
 			.toString()
 			.split(';')
-			.map(statement => statement.trim())
+			.map((statement) => statement.trim())
 			.filter(Boolean)
-			.map((statement) => `${statement};`))
+			.map((statement) => `${statement};`)
 
 		return sql
 	})
