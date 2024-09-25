@@ -120,40 +120,37 @@ export async function cleanupDb(prisma: PrismaClient) {
 		{ name: string }[]
 	>`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations';`
 
-	const migrationPaths = fs
-		.readdirSync('prisma/migrations')
-		.filter((dir) => dir !== 'migration_lock.toml')
-		.map((dir) => `prisma/migrations/${dir}/migration.sql`)
-
-	const migrations = migrationPaths.map((path) => {
-		// Parse the sql into individual statements
-		const sql = fs
-			.readFileSync(path)
-			.toString()
-			.split(';')
-			.map((statement) => statement.trim())
-			.filter(Boolean)
-			.map((statement) => `${statement};`)
-
-		return sql
-	})
-
 	try {
 		// Disable FK constraints to avoid relation conflicts during deletion
 		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = OFF`)
-		await prisma.$transaction([
-			// Delete all tables except the ones that are excluded above
-			...tables.map(({ name }) =>
-				prisma.$executeRawUnsafe(`DROP TABLE "${name}"`),
-			),
-		])
 
-		// Run the migrations sequentially
-		for (const migration of migrations) {
-			await prisma.$transaction([
-				// Run each sql statement in the migration
-				...migration.map((sql) => prisma.$executeRawUnsafe(sql)),
-			])
+		// Delete tables except the ones that are excluded above
+		for (const { name } of tables) {
+			await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS "${name}"`)
+		}
+
+		const migrationPaths = fs
+			.readdirSync('prisma/migrations')
+			.filter((dir) => dir !== 'migration_lock.toml')
+			.map((dir) => `prisma/migrations/${dir}/migration.sql`)
+
+		// Run each migration
+		for (const path of migrationPaths) {
+			const sql = fs.readFileSync(path, 'utf8')
+			const statements = sql
+				.split(';')
+				.map((statement) => statement.trim())
+				.filter(Boolean)
+
+			// Run each sql statement in the migration
+			for (const statement of statements) {
+				try {
+					await prisma.$executeRawUnsafe(`${statement};`)
+				} catch (error) {
+					console.warn(`Failed to execute statement: ${statement}`, error)
+					// Continue with the next statement
+				}
+			}
 		}
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
