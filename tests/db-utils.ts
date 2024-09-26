@@ -147,7 +147,6 @@ export async function cleanupDb(prisma: PrismaClient) {
 				try {
 					await prisma.$executeRawUnsafe(`${statement};`)
 				} catch (error) {
-					//trigger CI rerun
 					console.error(`Failed to execute statement: ${statement}`, error)
 					throw error
 				}
