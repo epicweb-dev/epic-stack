@@ -149,6 +149,7 @@ export async function cleanupDb(prisma: PrismaClient) {
 				} catch (error) {
 					//trigger CI rerun
 					console.error(`Failed to execute statement: ${statement}`, error)
+					throw error
 				}
 			}
 		}
