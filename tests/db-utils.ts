@@ -145,7 +145,6 @@ export async function cleanupDb(prisma: PrismaClient) {
 			// Run each sql statement in the migration
 			for (const statement of statements) {
 				try {
-					//trigger CI
 					await prisma.$executeRawUnsafe(`${statement};`)
 				} catch (error) {
 					console.warn(`Failed to execute statement: ${statement}`)
