@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
-import { type PrismaClient } from '@prisma/client'
+import { Prisma, type PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { UniqueEnforcer } from 'enforce-unique'
 
@@ -145,11 +145,16 @@ export async function cleanupDb(prisma: PrismaClient) {
 				.filter(Boolean)
 
 			// Run each sql statement in the migration
-			await prisma.$transaction([
-				...statements.map((statement) =>
-					prisma.$executeRawUnsafe(`${statement}`),
-				),
-			])
+			await prisma.$transaction(
+				[
+					...statements.map((statement) =>
+						prisma.$executeRawUnsafe(`${statement}`),
+					),
+				],
+				{
+					isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+				},
+			)
 		}
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
