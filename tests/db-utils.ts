@@ -125,9 +125,11 @@ export async function cleanupDb(prisma: PrismaClient) {
 		await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = OFF`)
 
 		// Delete tables except the ones that are excluded above
-		for (const { name } of tables) {
-			await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS "${name}"`)
-		}
+		await prisma.$transaction([
+			...tables.map(({ name }) =>
+				prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS "${name}"`),
+			),
+		])
 
 		const migrationPaths = fs
 			.readdirSync('prisma/migrations')
@@ -143,16 +145,11 @@ export async function cleanupDb(prisma: PrismaClient) {
 				.filter(Boolean)
 
 			// Run each sql statement in the migration
-			await prisma.$transaction(async (tx) => {
-				for (const statement of statements) {
-					try {
-						await tx.$executeRawUnsafe(`${statement}`)
-					} catch (error) {
-						console.warn(`Failed to execute statement: ${statement}`)
-						throw error
-					}
-				}
-			})
+			await prisma.$transaction([
+				...statements.map((statement) =>
+					prisma.$executeRawUnsafe(`${statement}`),
+				),
+			])
 		}
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
