@@ -144,6 +144,8 @@ export async function cleanupDb(prisma: PrismaClient) {
 				.map((statement) => statement.trim())
 				.filter(Boolean)
 
+			//trigger CI
+
 			// Run each sql statement in the migration
 			await prisma.$transaction(
 				[
