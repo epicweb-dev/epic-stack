@@ -143,14 +143,16 @@ export async function cleanupDb(prisma: PrismaClient) {
 				.filter(Boolean)
 
 			// Run each sql statement in the migration
-			for (const statement of statements) {
-				try {
-					await prisma.$executeRawUnsafe(`${statement};`)
-				} catch (error) {
-					console.warn(`Failed to execute statement: ${statement}`)
-					throw error
+			await prisma.$transaction(async (tx) => {
+				for (const statement of statements) {
+					try {
+						await tx.$executeRawUnsafe(`${statement}`)
+					} catch (error) {
+						console.warn(`Failed to execute statement: ${statement}`)
+						throw error
+					}
 				}
-			}
+			})
 		}
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
