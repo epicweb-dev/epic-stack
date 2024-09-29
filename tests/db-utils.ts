@@ -147,16 +147,11 @@ export async function cleanupDb(prisma: PrismaClient) {
 			//trigger
 
 			// Run each sql statement in the migration
-			await prisma.$transaction(
-				[
-					...statements.map((statement) =>
-						prisma.$executeRawUnsafe(`${statement}`),
-					),
-				],
-				{
-					isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-				},
-			)
+			await prisma.$transaction([
+				...statements.map((statement) =>
+					prisma.$executeRawUnsafe(`${statement}`),
+				),
+			])
 		}
 	} catch (error) {
 		console.error('Error cleaning up database:', error)
