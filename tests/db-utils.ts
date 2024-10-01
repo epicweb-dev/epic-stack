@@ -1,6 +1,5 @@
 import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
-import { type PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import Database from 'better-sqlite3'
 import { UniqueEnforcer } from 'enforce-unique'
