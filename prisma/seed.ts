@@ -17,7 +17,7 @@ async function seed() {
 	console.time(`🌱 Database has been seeded`)
 
 	console.time('🧹 Cleaned up the database...')
-	await cleanupDb(prisma)
+	await cleanupDb()
 	console.timeEnd('🧹 Cleaned up the database...')
 
 	const totalUsers = 5
