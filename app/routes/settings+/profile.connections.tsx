@@ -197,7 +197,7 @@ function Connection({
 									status={
 										deleteFetcher.state !== 'idle'
 											? 'pending'
-											: deleteFetcher.data?.status ?? 'idle'
+											: (deleteFetcher.data?.status ?? 'idle')
 									}
 								>
 									<Icon name="cross-1" />

@@ -172,7 +172,7 @@ export function DeleteNote({ id }: { id: string }) {
 				name="intent"
 				value="delete-note"
 				variant="destructive"
-				status={isPending ? 'pending' : form.status ?? 'idle'}
+				status={isPending ? 'pending' : (form.status ?? 'idle')}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>

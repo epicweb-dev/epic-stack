@@ -167,7 +167,7 @@ export default function ChangePasswordRoute() {
 				</Button>
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 				>
 					Change Password
 				</StatusButton>

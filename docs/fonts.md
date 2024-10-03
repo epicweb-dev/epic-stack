@@ -6,7 +6,8 @@ easy to do so.
 
 ## Using Custom Fonts
 
-You can use custom fonts by creating the `./public/fonts` directory (if it doesn't already exist) and adding them to it.
+You can use custom fonts by creating the `./public/fonts` directory (if it
+doesn't already exist) and adding them to it.
 [Google Fonts](https://fonts.google.com/) is a good place to find open source
 fonts. You will also need to add the `css` file for the font to the
 `./app/styles` directory, if your font doesn't come with one (Google Fonts
