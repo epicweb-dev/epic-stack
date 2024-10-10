@@ -18,14 +18,6 @@ sourceMapSupport.install({
 	},
 })
 
-closeWithGrace(async ({ err }) => {
-	if (err) {
-		console.error(chalk.red(err))
-		console.error(chalk.red(err.stack))
-		process.exit(1)
-	}
-})
-
 if (process.env.MOCKS === 'true') {
 	await import('./tests/mocks/index.ts')
 }
