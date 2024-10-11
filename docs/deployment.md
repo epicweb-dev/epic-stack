@@ -84,8 +84,8 @@ Prior to your first deployment, you'll need to do a few things:
    sure you change the `primary_region` in fly.toml as well):
 
    ```sh
-   fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]
-   fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]-staging
+   fly volumes create data --region sjc --size 1 --count 2 --app [YOUR_APP_NAME]
+   fly volumes create data --region sjc --size 1 --count 2 --app [YOUR_APP_NAME]-staging
    ```
 
 7. Attach Consul:
