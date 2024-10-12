@@ -3,16 +3,11 @@ import * as React from 'react'
 import { cn } from '#app/utils/misc.tsx'
 
 export interface InputProps
-	extends React.InputHTMLAttributes<HTMLInputElement> {}
+	extends React.InputHTMLAttributes<HTMLInputElement> {
+	ref?: React.RefObject<HTMLInputElement>
+}
 
-const Input = ({
-	ref,
-	className,
-	type,
-	...props
-}: InputProps & {
-	ref: React.RefObject<HTMLInputElement>
-}) => {
+const Input = ({ ref, className, type, ...props }: InputProps) => {
 	return (
 		<input
 			type={type}
