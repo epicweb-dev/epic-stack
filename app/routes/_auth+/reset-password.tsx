@@ -67,10 +67,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: 'Reset Password | Epic Notes' }]
-}
-
 export default function ResetPasswordPage() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
@@ -90,6 +86,7 @@ export default function ResetPasswordPage() {
 		<div className="container flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Password Reset</h1>
+				<title>Reset Password | Epic Notes</title>
 				<p className="mt-3 text-body-md text-muted-foreground">
 					Hi, {data.resetPasswordUsername}. No worries. It happens all the time.
 				</p>

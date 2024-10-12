@@ -118,10 +118,6 @@ function ForgotPasswordEmail({
 	)
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: 'Password Recovery for Epic Notes' }]
-}
-
 export default function ForgotPasswordRoute() {
 	const forgotPassword = useFetcher<typeof action>()
 
@@ -140,6 +136,7 @@ export default function ForgotPasswordRoute() {
 			<div className="flex flex-col justify-center">
 				<div className="text-center">
 					<h1 className="text-h1">Forgot Password</h1>
+					<title>Password Recovery for Epic Notes </title>
 					<p className="mt-3 text-body-md text-muted-foreground">
 						No worries, we'll send you reset instructions.
 					</p>
