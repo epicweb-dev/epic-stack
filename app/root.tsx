@@ -70,13 +70,6 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-	return [
-		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
-		{ name: 'description', content: `Your own captain's log` },
-	]
-}
-
 export async function loader({ request }: LoaderFunctionArgs) {
 	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
@@ -168,6 +161,7 @@ function Document({
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
+				<meta name="description" content="Your own captain's log" />
 				{allowIndexing ? null : (
 					<meta name="robots" content="noindex, nofollow" />
 				)}
@@ -194,7 +188,7 @@ function App() {
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
-	const isOnSearchPage = matches.find((m) => m.id === 'routes/users+/index')
+	const isOnSearchPage = matches.find(m => m.id === 'routes/users+/index')
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 	const allowIndexing = data.ENV.ALLOW_INDEXING !== 'false'
 	useToast(data.toast)
@@ -206,6 +200,8 @@ function App() {
 			allowIndexing={allowIndexing}
 			env={data.ENV}
 		>
+			<title>Epic Notes</title>
+
 			<div className="flex h-screen flex-col justify-between">
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
@@ -276,7 +272,7 @@ function UserDropdown() {
 					<Link
 						to={`/users/${user.username}`}
 						// this is for progressive enhancement
-						onClick={(e) => e.preventDefault()}
+						onClick={e => e.preventDefault()}
 						className="flex items-center gap-2"
 					>
 						<img
@@ -309,7 +305,7 @@ function UserDropdown() {
 					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
-						onSelect={(event) => {
+						onSelect={event => {
 							event.preventDefault()
 							submit(formRef.current)
 						}}
@@ -340,6 +336,7 @@ export function ErrorBoundary() {
 
 	return (
 		<Document nonce={nonce}>
+			<title>Error | Epic Notes</title>
 			<GeneralErrorBoundary />
 		</Document>
 	)

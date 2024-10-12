@@ -1,11 +1,36 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+import {
+	Link,
+	NavLink,
+	Outlet,
+	useLoaderData,
+	useParams,
+	useRouteLoaderData,
+} from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn, getUserImgSrc } from '#app/utils/misc.tsx'
 import { useOptionalUser } from '#app/utils/user.ts'
+
+export function useNotesMetadata() {
+	const params = useParams()
+	const notesLoaderData = useRouteLoaderData<typeof loader>(
+		'routes/users+/$username_+/notes',
+	)
+
+	if (notesLoaderData === undefined) {
+		throw new Error(
+			'useNoteMetadata must be used in a child of the "routes/users+/$username_+/notes" loader',
+		)
+	}
+
+	return {
+		displayName: notesLoaderData?.owner.name ?? params.username,
+		noteCount: notesLoaderData?.owner.notes.length ?? 0,
+	}
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const owner = await prisma.user.findFirst({
@@ -62,7 +87,7 @@ export default function NotesRoute() {
 									</NavLink>
 								</li>
 							) : null}
-							{data.owner.notes.map((note) => (
+							{data.owner.notes.map(note => (
 								<li key={note.id} className="p-1 pr-0">
 									<NavLink
 										to={note.id}

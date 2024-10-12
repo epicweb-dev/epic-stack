@@ -56,17 +56,6 @@
 			"}",
 		],
 	},
-	"meta": {
-		"prefix": "/meta",
-		"scope": "typescriptreact,javascriptreact,typescript,javascript",
-		"body": [
-			"import type { MetaFunction } from '@remix-run/node'",
-			"",
-			"export const meta: MetaFunction<typeof loader> = ({ data }) => [{",
-			"  title: 'Title',",
-			"}]",
-		],
-	},
 	"shouldRevalidate": {
 		"prefix": "/shouldRevalidate",
 		"scope": "typescriptreact,javascriptreact,typescript,javascript",

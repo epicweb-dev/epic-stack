@@ -69,7 +69,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {
-		schema: (intent) =>
+		schema: intent =>
 			SignupFormSchema.superRefine(async (data, ctx) => {
 				const existingUser = await prisma.user.findUnique({
 					where: { username: data.username },
@@ -83,7 +83,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					})
 					return
 				}
-			}).transform(async (data) => {
+			}).transform(async data => {
 				if (intent !== null) return { ...data, session: null }
 
 				const session = await signup({ ...data, email })
@@ -125,10 +125,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	)
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: 'Setup Epic Notes Account' }]
-}
-
 export default function OnboardingRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
@@ -152,6 +148,7 @@ export default function OnboardingRoute() {
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard {data.email}!</h1>
+					<title>Setup Epic Notes Account</title>
 					<p className="text-body-md text-muted-foreground">
 						Please enter your details.
 					</p>

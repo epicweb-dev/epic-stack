@@ -37,6 +37,11 @@ export default function ProfileRoute() {
 
 	return (
 		<div className="container mb-48 mt-36 flex flex-col items-center justify-center">
+			<title>{userDisplayName} | Epic Notes</title>
+			<meta
+				name="description"
+				content={`Profile of ${userDisplayName} on Epic Notes`}
+			/>
 			<Spacer size="4xs" />
 
 			<div className="container flex flex-col items-center rounded-3xl bg-muted p-12">
@@ -96,17 +101,6 @@ export default function ProfileRoute() {
 			</div>
 		</div>
 	)
-}
-
-export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
-	const displayName = data?.user.name ?? params.username
-	return [
-		{ title: `${displayName} | Epic Notes` },
-		{
-			name: 'description',
-			content: `Profile of ${displayName} on Epic Notes`,
-		},
-	]
 }
 
 export function ErrorBoundary() {
