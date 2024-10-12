@@ -10,10 +10,11 @@ export type CheckboxProps = Omit<
 	type?: string
 }
 
-const Checkbox = React.forwardRef<
-	React.ElementRef<typeof CheckboxPrimitive.Root>,
-	React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => (
+const Checkbox = ({
+	ref,
+	className,
+	...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Root>) => (
 	<CheckboxPrimitive.Root
 		ref={ref}
 		className={cn(
@@ -35,7 +36,7 @@ const Checkbox = React.forwardRef<
 			</svg>
 		</CheckboxPrimitive.Indicator>
 	</CheckboxPrimitive.Root>
-))
+)
 Checkbox.displayName = CheckboxPrimitive.Root.displayName
 
 export { Checkbox }
