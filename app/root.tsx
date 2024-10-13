@@ -1,5 +1,5 @@
 import {
-	json,
+	data as dataResponse,
 	type LoaderFunctionArgs,
 	type HeadersFunction,
 	type LinksFunction,
@@ -117,7 +117,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const { toast, headers: toastHeaders } = await getToast(request)
 	const honeyProps = honeypot.getInputProps()
 
-	return json(
+	return dataResponse(
 		{
 			user,
 			requestInfo: {
@@ -158,7 +158,7 @@ function Document({
 	children: React.ReactNode
 	nonce: string
 	theme?: Theme
-	env?: Record<string, string>
+	env?: Record<string, string | undefined>
 	allowIndexing?: boolean
 }) {
 	return (

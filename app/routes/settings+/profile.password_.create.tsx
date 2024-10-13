@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data as dataResponse,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -38,7 +38,7 @@ async function requireNoPassword(userId: string) {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	await requireNoPassword(userId)
-	return json({})
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: CreatePasswordForm,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return dataResponse(
 			{
 				result: submission.reply({
 					hideFields: ['password', 'confirmPassword'],

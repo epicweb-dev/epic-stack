@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data as dataResponse,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -73,7 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		issuer,
 	})
 	const qrCode = await QRCode.toDataURL(otpUri)
-	return json({ otpUri, qrCode })
+	return { otpUri, qrCode }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -102,7 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return dataResponse(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

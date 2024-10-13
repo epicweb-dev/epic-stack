@@ -2,7 +2,7 @@ import { parseWithZod } from '@conform-to/zod'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import {
 	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
-	json,
+	data as dataResponse,
 	unstable_parseMultipartFormData as parseMultipartFormData,
 	redirect,
 	type ActionFunctionArgs,
@@ -88,7 +88,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return dataResponse(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

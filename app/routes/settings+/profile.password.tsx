@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data as dataResponse,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -58,7 +58,7 @@ async function requirePassword(userId: string) {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	await requirePassword(userId)
-	return json({})
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -83,7 +83,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		),
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return dataResponse(
 			{
 				result: submission.reply({
 					hideFields: ['currentPassword', 'newPassword', 'confirmNewPassword'],

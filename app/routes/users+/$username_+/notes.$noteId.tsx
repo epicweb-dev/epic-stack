@@ -2,7 +2,7 @@ import { getFormProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import {
-	json,
+	data as dataResponse,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 } from '@remix-run/node'
@@ -52,10 +52,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	const date = new Date(note.updatedAt)
 	const timeAgo = formatDistanceToNow(date)
 
-	return json({
-		note,
-		timeAgo,
-	})
+	return { note, timeAgo }
 }
 
 const DeleteFormSchema = z.object({
@@ -70,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: DeleteFormSchema,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return dataResponse(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

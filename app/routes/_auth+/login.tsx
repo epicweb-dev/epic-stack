@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data as dataResponse,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 	type MetaFunction,
@@ -37,7 +37,7 @@ const LoginFormSchema = z.object({
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireAnonymous(request)
-	return json({})
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -64,7 +64,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success' || !submission.value.session) {
-		return json(
+		return dataResponse(
 			{ result: submission.reply({ hideFields: ['password'] }) },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
