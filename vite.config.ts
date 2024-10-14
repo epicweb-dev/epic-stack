@@ -1,4 +1,5 @@
 import { vitePlugin as remix } from '@remix-run/dev'
+import { installGlobals } from '@remix-run/node'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { glob } from 'glob'
 import { flatRoutes } from 'remix-flat-routes'
@@ -10,6 +11,8 @@ declare module '@remix-run/server-runtime' {
 		v3_singleFetch: true
 	}
 }
+
+installGlobals({ nativeFetch: true })
 
 const MODE = process.env.NODE_ENV
 

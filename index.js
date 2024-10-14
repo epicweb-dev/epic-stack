@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import * as fs from 'node:fs'
-import chalk from 'chalk'
-import closeWithGrace from 'close-with-grace'
+
 import sourceMapSupport from 'source-map-support'
 
 sourceMapSupport.install({
