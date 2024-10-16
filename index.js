@@ -1,7 +1,9 @@
 import 'dotenv/config'
 import * as fs from 'node:fs'
 
+//import { installGlobals } from '@remix-run/node'
 import sourceMapSupport from 'source-map-support'
+//installGlobals({ nativeFetch: true })
 
 sourceMapSupport.install({
 	retrieveSourceMap: function (source) {
