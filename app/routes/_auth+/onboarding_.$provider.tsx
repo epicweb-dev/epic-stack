@@ -7,7 +7,7 @@ import {
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import {
 	redirect,
-	data as dataResponse,
+	data,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 	type MetaFunction,
@@ -143,7 +143,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return dataResponse(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

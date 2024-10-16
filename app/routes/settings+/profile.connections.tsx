@@ -1,7 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	data as dataResponse,
+	data,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 	type SerializeFrom,
@@ -81,7 +81,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		})
 	}
 
-	return dataResponse(
+	return data(
 		{
 			connections,
 			canDeleteConnections: await userCanDeleteConnections(userId),
@@ -120,7 +120,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		title: 'Deleted',
 		description: 'Your connection has been deleted.',
 	})
-	return dataResponse({ status: 'success' } as const, { headers: toastHeaders })
+	return data({ status: 'success' } as const, { headers: toastHeaders })
 }
 
 export default function Connections() {

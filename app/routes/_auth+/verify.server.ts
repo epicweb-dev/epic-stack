@@ -1,6 +1,6 @@
 import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
-import { data as dataResponse } from '@remix-run/node'
+import { data } from '@remix-run/node'
 import { z } from 'zod'
 import { handleVerification as handleChangeEmailVerification } from '#app/routes/settings+/profile.change-email.server.tsx'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
@@ -161,7 +161,7 @@ export async function validateRequest(
 	})
 
 	if (submission.status !== 'success') {
-		return dataResponse(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

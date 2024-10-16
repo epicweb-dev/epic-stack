@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	data as dataResponse,
+	data,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: CreatePasswordForm,
 	})
 	if (submission.status !== 'success') {
-		return dataResponse(
+		return data(
 			{
 				result: submission.reply({
 					hideFields: ['password', 'confirmPassword'],

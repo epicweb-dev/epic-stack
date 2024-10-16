@@ -1,5 +1,5 @@
 import {
-	data as dataResponse,
+	data,
 	type LoaderFunctionArgs,
 	type HeadersFunction,
 	type LinksFunction,
@@ -117,7 +117,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const { toast, headers: toastHeaders } = await getToast(request)
 	const honeyProps = honeypot.getInputProps()
 
-	return dataResponse(
+	return data(
 		{
 			user,
 			requestInfo: {
