@@ -1,6 +1,5 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 } from '@remix-run/node'
@@ -22,7 +21,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireRecentVerification(request)
-	return json({})
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {

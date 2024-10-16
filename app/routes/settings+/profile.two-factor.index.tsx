@@ -1,6 +1,5 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -24,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		where: { target_type: { type: twoFAVerificationType, target: userId } },
 		select: { id: true },
 	})
-	return json({ is2FAEnabled: Boolean(verification) })
+	return { is2FAEnabled: Boolean(verification) }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
