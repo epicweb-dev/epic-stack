@@ -200,14 +200,14 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 		)
 	}
 
-	const data = submission.value
+	const { username, name } = submission.value
 
 	await prisma.user.update({
 		select: { username: true },
 		where: { id: userId },
 		data: {
-			name: data.name,
-			username: data.username,
+			name: name,
+			username: username,
 		},
 	})
 
