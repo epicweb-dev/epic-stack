@@ -47,9 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	if (!result.success) {
 		return dataResponse(
 			{ status: 'error', error: result.error.message } as const,
-			{
-				status: 400,
-			},
+			{ status: 400 },
 		)
 	}
 	return { status: 'idle', users: result.data } as const
