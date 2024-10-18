@@ -130,7 +130,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 				return
 			}
-		}).transform(async (data) => {
+		}).transform(async data => {
 			const session = await signupWithConnection({
 				...data,
 				email,
@@ -174,10 +174,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	)
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: 'Setup Epic Notes Account' }]
-}
-
 export default function OnboardingProviderRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
@@ -200,6 +196,7 @@ export default function OnboardingProviderRoute() {
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard {data.email}!</h1>
+					<title>Setup Epic Notes Account</title>
 					<p className="text-body-md text-muted-foreground">
 						Please enter your details.
 					</p>

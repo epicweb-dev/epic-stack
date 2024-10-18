@@ -10,14 +10,19 @@ import {
 	TooltipTrigger,
 } from './tooltip.tsx'
 
-export const StatusButton = React.forwardRef<
-	HTMLButtonElement,
-	ButtonProps & {
-		status: 'pending' | 'success' | 'error' | 'idle'
-		message?: string | null
-		spinDelay?: Parameters<typeof useSpinDelay>[1]
-	}
->(({ message, status, className, children, spinDelay, ...props }, ref) => {
+export const StatusButton = ({
+	ref,
+	message,
+	status,
+	className,
+	children,
+	spinDelay,
+	...props
+}: ButtonProps & {
+	status: 'pending' | 'success' | 'error' | 'idle'
+	message?: string | null
+	spinDelay?: Parameters<typeof useSpinDelay>[1]
+}) => {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
 		minDuration: 300,
@@ -74,5 +79,5 @@ export const StatusButton = React.forwardRef<
 			)}
 		</Button>
 	)
-})
+}
 StatusButton.displayName = 'Button'

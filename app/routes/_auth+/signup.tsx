@@ -116,10 +116,6 @@ export function SignupEmail({
 	)
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: 'Sign Up | Epic Notes' }]
-}
-
 export default function SignupRoute() {
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
@@ -141,6 +137,7 @@ export default function SignupRoute() {
 		<div className="container flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Let's start your journey!</h1>
+				<title>Sign Up | Epic Notes</title>
 				<p className="mt-3 text-body-md text-muted-foreground">
 					Please enter your email.
 				</p>
@@ -171,7 +168,7 @@ export default function SignupRoute() {
 					</StatusButton>
 				</Form>
 				<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
-					{providerNames.map((providerName) => (
+					{providerNames.map(providerName => (
 						<li key={providerName}>
 							<ProviderConnectionForm
 								type="Signup"
