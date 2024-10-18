@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data,
 	redirect,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
@@ -47,7 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		const params = new URLSearchParams({ redirectTo: request.url })
 		throw redirect(`/login?${params}`)
 	}
-	return json({ user })
+	return { user }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -70,7 +70,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
@@ -97,7 +97,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		})
 	} else {
-		return json(
+		return data(
 			{ result: submission.reply({ formErrors: [response.error.message] }) },
 			{ status: 500 },
 		)

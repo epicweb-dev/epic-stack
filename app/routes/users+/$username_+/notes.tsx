@@ -1,5 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -21,7 +21,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 	invariantResponse(owner, 'Owner not found', { status: 404 })
 
-	return json({ owner })
+	return { owner }
 }
 
 export default function NotesRoute() {

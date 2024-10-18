@@ -3,7 +3,7 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data,
 	redirect,
 	unstable_createMemoryUploadHandler,
 	unstable_parseMultipartFormData,
@@ -70,7 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		},
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
-	return json({ user })
+	return { user }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -96,7 +96,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
