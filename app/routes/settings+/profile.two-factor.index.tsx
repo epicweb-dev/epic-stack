@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
-	const { otp: _otp, ...config } = generateTOTP()
+	const { otp: _otp, ...config } = await generateTOTP()
 	const verificationData = {
 		...config,
 		type: twoFAVerifyVerificationType,

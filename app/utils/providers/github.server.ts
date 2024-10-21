@@ -38,7 +38,7 @@ export class GitHubProvider implements AuthProvider {
 					throw new Error('Email not found')
 				}
 				const username = profile.displayName
-				const imageUrl = profile.photos[0].value
+				const imageUrl = profile.photos[0]?.value
 				return {
 					email,
 					id: profile.id,

@@ -14,7 +14,6 @@ server.listen({
 		if (request.url.includes('.sentry.io')) {
 			return
 		}
-
 		// Print the regular MSW unhandled request warning otherwise.
 		print.warning()
 	},

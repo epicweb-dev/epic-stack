@@ -13,7 +13,10 @@ import { convertSetCookieToCookie } from '#tests/utils.ts'
 import '@testing-library/jest-dom/vitest'
 
 expect.extend({
-	toHaveRedirect(response: Response, redirectTo?: string) {
+	toHaveRedirect(response: unknown, redirectTo?: string) {
+		if (!(response instanceof Response)) {
+			throw new Error('toHaveRedirect must be called with a Response')
+		}
 		const location = response.headers.get('location')
 		const redirectToSupplied = redirectTo !== undefined
 		if (redirectToSupplied !== Boolean(location)) {
