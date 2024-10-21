@@ -1,4 +1,4 @@
-import { json, redirect, type ActionFunctionArgs } from '@remix-run/node'
+import { redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { z } from 'zod'
 import { cache } from '#app/utils/cache.server.ts'
 import {
@@ -54,5 +54,5 @@ export async function action({ request }: ActionFunctionArgs) {
 		// @ts-expect-error - we don't reliably know the type of cacheValue
 		await cache.set(key, cacheValue)
 	}
-	return json({ success: true })
+	return { success: true }
 }
