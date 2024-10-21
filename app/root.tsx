@@ -36,7 +36,11 @@ import {
 } from './components/ui/dropdown-menu.tsx'
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { EpicToaster } from './components/ui/sonner.tsx'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme-switch.tsx'
+import {
+	ThemeSwitch,
+	useOptionalTheme,
+	useTheme,
+} from './routes/resources+/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -153,14 +157,13 @@ function Document({
 	nonce,
 	theme = 'light',
 	env = {},
-	allowIndexing = true,
 }: {
 	children: React.ReactNode
 	nonce: string
 	theme?: Theme
 	env?: Record<string, string>
-	allowIndexing?: boolean
 }) {
+	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (
 		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
 			<head>
@@ -188,24 +191,29 @@ function Document({
 	)
 }
 
+export function Layout({ children }: { children: React.ReactNode }) {
+	// if there was an error running the loader, data could be missing
+	const data = useLoaderData<typeof loader | null>()
+	const nonce = useNonce()
+	const theme = useOptionalTheme()
+	return (
+		<Document nonce={nonce} theme={theme} env={data?.ENV}>
+			{children}
+		</Document>
+	)
+}
+
 function App() {
 	const data = useLoaderData<typeof loader>()
-	const nonce = useNonce()
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
 	const isOnSearchPage = matches.find((m) => m.id === 'routes/users+/index')
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
-	const allowIndexing = data.ENV.ALLOW_INDEXING !== 'false'
 	useToast(data.toast)
 
 	return (
-		<Document
-			nonce={nonce}
-			theme={theme}
-			allowIndexing={allowIndexing}
-			env={data.ENV}
-		>
+		<>
 			<div className="flex h-screen flex-col justify-between">
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
@@ -237,7 +245,7 @@ function App() {
 			</div>
 			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />
-		</Document>
+		</>
 	)
 }
 
@@ -326,21 +334,6 @@ function UserDropdown() {
 	)
 }
 
-export function ErrorBoundary() {
-	// the nonce doesn't rely on the loader so we can access that
-	const nonce = useNonce()
-
-	// NOTE: you cannot use useLoaderData in an ErrorBoundary because the loader
-	// likely failed to run so we have to do the best we can.
-	// We could probably do better than this (it's possible the loader did run).
-	// This would require a change in Remix.
-
-	// Just make sure your root route never errors out and you'll always be able
-	// to give the user a better UX.
-
-	return (
-		<Document nonce={nonce}>
-			<GeneralErrorBoundary />
-		</Document>
-	)
-}
+// this is a last resort error boundary. There's not much useful information we
+// can offer at this level.
+export const ErrorBoundary = GeneralErrorBoundary

@@ -6,8 +6,11 @@ import { redirect, useFetcher, useFetchers } from '@remix-run/react'
 import { ServerOnly } from 'remix-utils/server-only'
 import { z } from 'zod'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { useHints } from '#app/utils/client-hints.tsx'
-import { useRequestInfo } from '#app/utils/request-info.ts'
+import { useHints, useOptionalHints } from '#app/utils/client-hints.tsx'
+import {
+	useOptionalRequestInfo,
+	useRequestInfo,
+} from '#app/utils/request-info.ts'
 import { type Theme, setTheme } from '#app/utils/theme.server.ts'
 
 const ThemeFormSchema = z.object({
@@ -128,4 +131,14 @@ export function useTheme() {
 		return optimisticMode === 'system' ? hints.theme : optimisticMode
 	}
 	return requestInfo.userPrefs.theme ?? hints.theme
+}
+
+export function useOptionalTheme() {
+	const optionalHints = useOptionalHints()
+	const optionalRequestInfo = useOptionalRequestInfo()
+	const optimisticMode = useOptimisticThemeMode()
+	if (optimisticMode) {
+		return optimisticMode === 'system' ? optionalHints?.theme : optimisticMode
+	}
+	return optionalRequestInfo?.userPrefs.theme ?? optionalHints?.theme
 }
