@@ -23,7 +23,7 @@
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "setup": "npm run build && prisma generate && prisma migrate deploy && prisma db seed && playwright install",
+    "setup": "npm run build && prisma generate && prisma migrate reset && playwright install",
     "start": "cross-env NODE_ENV=production node .",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
     "test": "vitest",
