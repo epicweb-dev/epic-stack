@@ -15,7 +15,7 @@ FROM base as deps
 WORKDIR /myapp
 
 ADD package.json package-lock.json .npmrc ./
-RUN npm install --include=dev
+RUN npm ci --include=dev
 
 # Setup production node_modules
 FROM base as production-deps
