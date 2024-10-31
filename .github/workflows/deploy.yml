@@ -118,7 +118,7 @@ jobs:
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
-        run: npx prisma migrate reset
+        run: npx prisma migrate reset --force
 
       - name: 🏗 Build
         run: npm run build
