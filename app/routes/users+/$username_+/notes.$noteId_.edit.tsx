@@ -1,5 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -28,7 +28,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		},
 	})
 	invariantResponse(note, 'Not found', { status: 404 })
-	return json({ note: note })
+	return { note: note }
 }
 
 export default function NoteEdit() {

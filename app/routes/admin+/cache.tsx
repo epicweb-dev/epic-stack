@@ -1,7 +1,6 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -58,7 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	} else {
 		cacheKeys = await getAllCacheKeys(limit)
 	}
-	return json({ cacheKeys, instance, instances, currentInstanceInfo })
+	return { cacheKeys, instance, instances, currentInstanceInfo }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -87,7 +86,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			throw new Error(`Unknown cache type: ${type}`)
 		}
 	}
-	return json({ success: true })
+	return { success: true }
 }
 
 export default function CacheAdminRoute() {
