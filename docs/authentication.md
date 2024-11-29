@@ -100,7 +100,7 @@ Passwords) utility.
 
 You can read more about the decision to use TOTP in
 [the totp decision document](./decisions/014-totp.md). The secret and other
-pertinent information is stored in a `verification` model (check the Prisma
+pertinent information is stored in a `verification` model (check the Drizzle
 schema). This verification model is used as the basis for all TOTP secrets. This
 is used for non-expiring Two-Factor Authentication secrets as well as temporary
 TOTP codes which are emailed to verify a user's ownership of an email/account.

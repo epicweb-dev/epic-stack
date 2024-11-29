@@ -14,6 +14,7 @@ import {
 	type MetaFunction,
 } from '@remix-run/react'
 import { formatDistanceToNow } from 'date-fns'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
@@ -22,35 +23,37 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { userHasPermission, useOptionalUser } from '#app/utils/user.ts'
+import { Note } from '#drizzle/schema.ts'
 import { type loader as notesLoader } from './notes.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	const note = await prisma.note.findUnique({
-		where: { id: params.noteId },
-		select: {
+	const note = await drizzle.query.Note.findFirst({
+		columns: {
 			id: true,
 			title: true,
 			content: true,
 			ownerId: true,
 			updatedAt: true,
+		},
+		with: {
 			images: {
-				select: {
+				columns: {
 					id: true,
 					altText: true,
 				},
 			},
 		},
+		where: eq(Note.id, params.noteId ?? ''),
 	})
 
 	invariantResponse(note, 'Not found', { status: 404 })
 
-	const date = new Date(note.updatedAt)
-	const timeAgo = formatDistanceToNow(date)
+	const timeAgo = formatDistanceToNow(note.updatedAt)
 
 	return json({
 		note,
@@ -78,9 +81,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const { noteId } = submission.value
 
-	const note = await prisma.note.findFirst({
-		select: { id: true, ownerId: true, owner: { select: { username: true } } },
-		where: { id: noteId },
+	const note = await drizzle.query.Note.findFirst({
+		columns: { id: true, ownerId: true },
+		with: {
+			owner: {
+				columns: { username: true },
+			},
+		},
+		where: eq(Note.id, noteId),
 	})
 	invariantResponse(note, 'Not found', { status: 404 })
 
@@ -90,7 +98,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		isOwner ? `delete:note:own` : `delete:note:any`,
 	)
 
-	await prisma.note.delete({ where: { id: note.id } })
+	await drizzle.delete(Note).where(eq(Note.id, note.id))
 
 	return redirectWithToast(`/users/${note.owner.username}/notes`, {
 		type: 'success',

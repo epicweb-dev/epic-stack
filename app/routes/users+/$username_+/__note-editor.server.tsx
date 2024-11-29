@@ -1,5 +1,6 @@
 import { parseWithZod } from '@conform-to/zod'
-import { createId as cuid } from '@paralleldrive/cuid2'
+import { invariant } from '@epic-web/invariant'
+import { createId } from '@paralleldrive/cuid2'
 import {
 	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
 	json,
@@ -7,9 +8,11 @@ import {
 	redirect,
 	type ActionFunctionArgs,
 } from '@remix-run/node'
+import { and, eq, notInArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
+import { Note, NoteImage } from '#drizzle/schema'
 import {
 	MAX_UPLOAD_SIZE,
 	NoteEditorSchema,
@@ -40,9 +43,9 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: NoteEditorSchema.superRefine(async (data, ctx) => {
 			if (!data.id) return
 
-			const note = await prisma.note.findUnique({
-				select: { id: true },
-				where: { id: data.id, ownerId: userId },
+			const note = await drizzle.query.Note.findFirst({
+				columns: { id: true },
+				where: and(eq(Note.id, data.id ?? ''), eq(Note.ownerId, userId)),
 			})
 			if (!note) {
 				ctx.addIssue({
@@ -102,28 +105,80 @@ export async function action({ request }: ActionFunctionArgs) {
 		newImages = [],
 	} = submission.value
 
-	const updatedNote = await prisma.note.upsert({
-		select: { id: true, owner: { select: { username: true } } },
-		where: { id: noteId ?? '__new_note__' },
-		create: {
-			ownerId: userId,
-			title,
-			content,
-			images: { create: newImages },
-		},
-		update: {
-			title,
-			content,
-			images: {
-				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
-				updateMany: imageUpdates.map((updates) => ({
-					where: { id: updates.id },
-					data: { ...updates, id: updates.blob ? cuid() : updates.id },
+	const updatedNote = await drizzle.transaction(async (tx) => {
+		// Insert/update the note
+		const [note] = await tx
+			.insert(Note)
+			.values({
+				id: noteId ?? createId(),
+				ownerId: userId,
+				title,
+				content,
+			})
+			.onConflictDoUpdate({
+				target: Note.id,
+				set: {
+					title,
+					content,
+				},
+			})
+			.returning({
+				id: Note.id,
+				ownerId: Note.ownerId,
+			})
+		invariant(note, 'failed to insert/update note')
+
+		// Handle image updates and deletions
+		// Delete images not in the updates list
+		await tx.delete(NoteImage).where(
+			and(
+				eq(NoteImage.noteId, note.id),
+				notInArray(
+					NoteImage.id,
+					imageUpdates.map((i) => i.id),
+				),
+			),
+		)
+
+		// Update existing images
+		for (const update of imageUpdates) {
+			await tx
+				.update(NoteImage)
+				.set({
+					id: update.blob ? createId() : update.id,
+					noteId: note.id,
+					altText: update.altText,
+					...(update.blob
+						? {
+								contentType: update.contentType,
+								blob: update.blob,
+							}
+						: {}),
+				})
+				.where(eq(NoteImage.id, update.id))
+		}
+
+		// Insert new images
+		if (newImages.length) {
+			await tx.insert(NoteImage).values(
+				newImages.map((image) => ({
+					id: createId(),
+					noteId: note.id,
+					altText: image.altText,
+					contentType: image.contentType,
+					blob: image.blob,
 				})),
-				create: newImages,
-			},
-		},
+			)
+		}
+
+		return tx.query.Note.findFirst({
+			columns: { id: true },
+			with: { owner: { columns: { username: true } } },
+			where: eq(Note.id, note.id),
+		})
 	})
+
+	invariant(updatedNote, 'failed to insert/update note')
 
 	return redirect(
 		`/users/${updatedNote.owner.username}/notes/${updatedNote.id}`,

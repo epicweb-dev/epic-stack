@@ -4,7 +4,7 @@ import fsExtra from 'fs-extra'
 
 export const BASE_DATABASE_PATH = path.join(
 	process.cwd(),
-	`./tests/prisma/base.db`,
+	`./tests/drizzle/base.db`,
 )
 
 export async function setup() {
@@ -13,23 +13,21 @@ export async function setup() {
 	if (databaseExists) {
 		const databaseLastModifiedAt = (await fsExtra.stat(BASE_DATABASE_PATH))
 			.mtime
-		const prismaSchemaLastModifiedAt = (
-			await fsExtra.stat('./prisma/schema.prisma')
+		const drizzleSchemaLastModifiedAt = (
+			await fsExtra.stat('./drizzle/schema.ts')
 		).mtime
 
-		if (prismaSchemaLastModifiedAt < databaseLastModifiedAt) {
+		if (drizzleSchemaLastModifiedAt < databaseLastModifiedAt) {
 			return
 		}
 	}
 
-	await execaCommand(
-		'npx prisma migrate reset --force --skip-seed --skip-generate',
-		{
-			stdio: 'inherit',
-			env: {
-				...process.env,
-				DATABASE_URL: `file:${BASE_DATABASE_PATH}`,
-			},
+	await fsExtra.remove(BASE_DATABASE_PATH)
+	await execaCommand(`npm run db:migrate`, {
+		stdio: 'inherit',
+		env: {
+			...process.env,
+			TURSO_DATABASE_URL: `file:${BASE_DATABASE_PATH}`,
 		},
-	)
+	})
 }

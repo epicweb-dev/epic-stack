@@ -1,5 +1,5 @@
 {
-  "name": "epic-stack-template",
+  "name": "epic-stack-turso-drizzle-template",
   "private": true,
   "sideEffects": false,
   "license": "MIT",
@@ -11,7 +11,8 @@
   "type": "module",
   "imports": {
     "#app/*": "./app/*",
-    "#tests/*": "./tests/*"
+    "#tests/*": "./tests/*",
+    "#drizzle/*": "./drizzle/*"
   },
   "scripts": {
     "build": "run-s build:*",
@@ -20,10 +21,14 @@
     "build:server": "tsx ./other/build-server.ts",
     "predev": "npm run build:icons --silent",
     "dev": "node ./server/dev-server.js",
-    "prisma:studio": "prisma studio",
+    "db:dev": "turso dev --db-file ./drizzle/data.db",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx ./drizzle/seed.ts",
+    "db:studio": "drizzle-kit studio",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "setup": "npm run build && prisma generate && prisma migrate reset && playwright install",
+    "setup": "npm run build && npm run db:generate && npm run db:migrate && playwright install",
     "start": "cross-env NODE_ENV=production node .",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
     "test": "vitest",
@@ -51,6 +56,7 @@
     "@epic-web/invariant": "^1.0.0",
     "@epic-web/remember": "^1.1.0",
     "@epic-web/totp": "^2.0.0",
+    "@libsql/client": "^0.14.0",
     "@nasa-gcn/remix-seo": "^2.0.1",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.21.1",
@@ -79,6 +85,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.4",
     "execa": "^9.4.1",
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
@@ -140,6 +147,8 @@
     "@vitejs/plugin-react": "^4.3.3",
     "@vitest/coverage-v8": "^2.1.3",
     "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.28.1",
+    "drizzle-seed": "^0.1.2",
     "enforce-unique": "^1.3.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.13.0",
@@ -159,9 +168,6 @@
   },
   "engines": {
     "node": "20"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "prettier": "@epic-web/config/prettier"
 }

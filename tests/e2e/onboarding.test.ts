@@ -1,6 +1,7 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
-import { prisma } from '#app/utils/db.server.ts'
+import { and, eq } from 'drizzle-orm'
+import { drizzle } from '#app/utils/db.server.ts'
 import {
 	normalizeEmail,
 	normalizeUsername,
@@ -9,6 +10,7 @@ import {
 	USERNAME_MAX_LENGTH,
 	USERNAME_MIN_LENGTH,
 } from '#app/utils/user-validation'
+import { Connection, User } from '#drizzle/schema'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { createUser, expect, test as base } from '#tests/playwright-utils.ts'
 
@@ -36,7 +38,7 @@ const test = base.extend<{
 			}
 			return onboardingData
 		})
-		await prisma.user.deleteMany({ where: { username: userData.username } })
+		await drizzle.delete(User).where(eq(User.username, userData.username))
 	},
 })
 
@@ -147,10 +149,10 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 
 	// let's verify we do not have user with that email in our system:
 	expect(
-		await prisma.user.findUnique({
-			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		await drizzle.query.User.findFirst({
+			where: eq(User.email, normalizeEmail(ghUser.primaryEmail)),
 		}),
-	).toBeNull()
+	).toBeUndefined()
 
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
@@ -185,9 +187,11 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 
 	// internally, a user has been created:
-	await prisma.user.findUniqueOrThrow({
-		where: { email: normalizeEmail(ghUser.primaryEmail) },
-	})
+	expect(
+		await drizzle.query.User.findFirst({
+			where: eq(User.email, normalizeEmail(ghUser.primaryEmail)),
+		}),
+	).not.toBeUndefined()
 })
 
 test('logs user in after GitHub OAuth if they are already registered', async ({
@@ -198,27 +202,31 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 
 	// let's verify we do not have user with that email in our system ...
 	expect(
-		await prisma.user.findUnique({
-			where: { email: normalizeEmail(ghUser.primaryEmail) },
+		await drizzle.query.User.findFirst({
+			where: eq(User.email, normalizeEmail(ghUser.primaryEmail)),
 		}),
-	).toBeNull()
+	).toBeUndefined()
 	// ... and create one:
 	const name = faker.person.fullName()
-	const user = await prisma.user.create({
-		select: { id: true, name: true },
-		data: {
+	const [user] = await drizzle
+		.insert(User)
+		.values({
 			email: normalizeEmail(ghUser.primaryEmail),
 			username: normalizeUsername(ghUser.profile.login),
 			name,
-		},
-	})
+		})
+		.returning({ id: User.id, name: User.name })
+	invariant(user, 'User not found')
 
 	// let's verify there is no connection between the GitHub user
 	// and out app's user:
-	const connection = await prisma.connection.findFirst({
-		where: { providerName: 'github', userId: user.id },
+	const connection = await drizzle.query.Connection.findFirst({
+		where: and(
+			eq(Connection.providerName, 'github'),
+			eq(Connection.userId, user.id),
+		),
 	})
-	expect(connection).toBeNull()
+	expect(connection).toBeUndefined()
 
 	await page.goto('/signup')
 	await page.getByRole('button', { name: /signup with github/i }).click()
@@ -234,9 +242,14 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 	).toBeVisible()
 
 	// internally, a connection (rather than a new user) has been created:
-	await prisma.connection.findFirstOrThrow({
-		where: { providerName: 'github', userId: user.id },
-	})
+	expect(
+		await drizzle.query.Connection.findFirst({
+			where: and(
+				eq(Connection.providerName, 'github'),
+				eq(Connection.userId, user.id),
+			),
+		}),
+	).not.toBeUndefined()
 })
 
 test('shows help texts on entering invalid details on onboarding page after GitHub OAuth', async ({

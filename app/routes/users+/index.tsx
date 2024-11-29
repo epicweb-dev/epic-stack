@@ -1,51 +1,47 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
-import { z } from 'zod'
+import { desc, eq, like, or } from 'drizzle-orm'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { SearchBar } from '#app/components/search-bar.tsx'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
-
-const UserSearchResultSchema = z.object({
-	id: z.string(),
-	username: z.string(),
-	name: z.string().nullable(),
-	imageId: z.string().nullable(),
-})
-
-const UserSearchResultsSchema = z.array(UserSearchResultSchema)
+import { Note, UserImage, User } from '#drizzle/schema'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const searchTerm = new URL(request.url).searchParams.get('search')
-	if (searchTerm === '') {
-		return redirect('/users')
-	}
+	try {
+		const searchTerm = new URL(request.url).searchParams.get('search')
+		if (searchTerm === '') {
+			return redirect('/users')
+		}
 
-	const like = `%${searchTerm ?? ''}%`
-	const rawUsers = await prisma.$queryRaw`
-		SELECT User.id, User.username, User.name, UserImage.id AS imageId
-		FROM User
-		LEFT JOIN UserImage ON User.id = UserImage.userId
-		WHERE User.username LIKE ${like}
-		OR User.name LIKE ${like}
-		ORDER BY (
-			SELECT Note.updatedAt
-			FROM Note
-			WHERE Note.ownerId = User.id
-			ORDER BY Note.updatedAt DESC
-			LIMIT 1
-		) DESC
-		LIMIT 50
-	`
-
-	const result = UserSearchResultsSchema.safeParse(rawUsers)
-	if (!result.success) {
-		return json({ status: 'error', error: result.error.message } as const, {
-			status: 400,
-		})
+		const likeQuery = `%${searchTerm ?? ''}%`
+		const users = await drizzle
+			.select({
+				id: User.id,
+				username: User.username,
+				name: User.name,
+				imageId: UserImage.id,
+			})
+			.from(User)
+			.leftJoin(UserImage, eq(User.id, UserImage.userId))
+			.where(or(like(User.username, likeQuery), like(User.name, likeQuery)))
+			.orderBy(
+				desc(
+					drizzle
+						.select({ updatedAt: Note.updatedAt })
+						.from(Note)
+						.where(eq(Note.ownerId, User.id))
+						.orderBy(desc(Note.updatedAt))
+						.limit(1),
+				),
+			)
+			.limit(50)
+		return json({ status: 'idle', users } as const)
+	} catch (error) {
+		console.error(error)
+		return json({ status: 'error', error } as const)
 	}
-	return json({ status: 'idle', users: result.data } as const)
 }
 
 export default function UsersRoute() {

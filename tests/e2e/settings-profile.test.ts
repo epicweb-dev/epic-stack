@@ -1,7 +1,9 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
+import { eq } from 'drizzle-orm'
 import { verifyUserPassword } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
+import { User } from '#drizzle/schema'
 import { readEmail } from '#tests/mocks/utils.ts'
 import { expect, test, createUser, waitFor } from '#tests/playwright-utils.ts'
 
@@ -102,9 +104,9 @@ test('Users can change their email address', async ({ page, login }) => {
 	await page.getByRole('button', { name: /submit/i }).click()
 	await expect(page.getByText(/email changed/i)).toBeVisible()
 
-	const updatedUser = await prisma.user.findUnique({
-		where: { id: preUpdateUser.id },
-		select: { email: true },
+	const updatedUser = await drizzle.query.User.findFirst({
+		where: eq(User.id, preUpdateUser.id),
+		columns: { email: true },
 	})
 	invariant(updatedUser, 'Updated user not found')
 	expect(updatedUser.email).toBe(newEmailAddress)

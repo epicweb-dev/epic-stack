@@ -1,14 +1,16 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
+import { and, eq } from 'drizzle-orm'
 import { http } from 'msw'
 import { afterEach, expect, test } from 'vitest'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
 import { connectionSessionStorage } from '#app/utils/connections.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { generateTOTP } from '#app/utils/totp.server.ts'
+import { Connection, Session, User, Verification } from '#drizzle/schema.ts'
 import { createUser } from '#tests/db-utils.ts'
 import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
@@ -69,12 +71,12 @@ test('when a user is logged in, it creates the connection', async () => {
 			description: expect.stringContaining(githubUser.profile.login),
 		}),
 	)
-	const connection = await prisma.connection.findFirst({
-		select: { id: true },
-		where: {
-			userId: session.userId,
-			providerId: githubUser.profile.id.toString(),
-		},
+	const connection = await drizzle.query.Connection.findFirst({
+		columns: { id: true },
+		where: and(
+			eq(Connection.userId, session.userId),
+			eq(Connection.providerId, githubUser.profile.id.toString()),
+		),
 	})
 	expect(
 		connection,
@@ -85,12 +87,10 @@ test('when a user is logged in, it creates the connection', async () => {
 test(`when a user is logged in and has already connected, it doesn't do anything and just redirects the user back to the connections page`, async () => {
 	const session = await setupUser()
 	const githubUser = await insertGitHubUser()
-	await prisma.connection.create({
-		data: {
-			providerName: GITHUB_PROVIDER_NAME,
-			userId: session.userId,
-			providerId: githubUser.profile.id.toString(),
-		},
+	await drizzle.insert(Connection).values({
+		providerName: GITHUB_PROVIDER_NAME,
+		userId: session.userId,
+		providerId: githubUser.profile.id.toString(),
 	})
 	const request = await setupRequest({
 		sessionId: session.id,
@@ -122,12 +122,12 @@ test('when a user exists with the same email, create connection and make session
 		}),
 	)
 
-	const connection = await prisma.connection.findFirst({
-		select: { id: true },
-		where: {
-			userId: userId,
-			providerId: githubUser.profile.id.toString(),
-		},
+	const connection = await drizzle.query.Connection.findFirst({
+		columns: { id: true },
+		where: and(
+			eq(Connection.userId, userId),
+			eq(Connection.providerId, githubUser.profile.id.toString()),
+		),
 	})
 	expect(
 		connection,
@@ -139,16 +139,12 @@ test('when a user exists with the same email, create connection and make session
 
 test('gives an error if the account is already connected to another user', async () => {
 	const githubUser = await insertGitHubUser()
-	await prisma.user.create({
-		data: {
-			...createUser(),
-			connections: {
-				create: {
-					providerName: GITHUB_PROVIDER_NAME,
-					providerId: githubUser.profile.id.toString(),
-				},
-			},
-		},
+	const [user] = await drizzle.insert(User).values(createUser()).returning()
+	invariant(user, 'failed to insert user')
+	await drizzle.insert(Connection).values({
+		providerName: GITHUB_PROVIDER_NAME,
+		userId: user.id,
+		providerId: githubUser.profile.id.toString(),
 	})
 	const session = await setupUser()
 	const request = await setupRequest({
@@ -170,12 +166,10 @@ test('gives an error if the account is already connected to another user', async
 test('if a user is not logged in, but the connection exists, make a session', async () => {
 	const githubUser = await insertGitHubUser()
 	const { userId } = await setupUser()
-	await prisma.connection.create({
-		data: {
-			providerName: GITHUB_PROVIDER_NAME,
-			providerId: githubUser.profile.id.toString(),
-			userId,
-		},
+	await drizzle.insert(Connection).values({
+		providerName: GITHUB_PROVIDER_NAME,
+		providerId: githubUser.profile.id.toString(),
+		userId,
 	})
 	const request = await setupRequest({ code: githubUser.code })
 	const response = await loader({ request, params: PARAMS, context: {} })
@@ -186,20 +180,16 @@ test('if a user is not logged in, but the connection exists, make a session', as
 test('if a user is not logged in, but the connection exists and they have enabled 2FA, send them to verify their 2FA and do not make a session', async () => {
 	const githubUser = await insertGitHubUser()
 	const { userId } = await setupUser()
-	await prisma.connection.create({
-		data: {
-			providerName: GITHUB_PROVIDER_NAME,
-			providerId: githubUser.profile.id.toString(),
-			userId,
-		},
+	await drizzle.insert(Connection).values({
+		providerName: GITHUB_PROVIDER_NAME,
+		providerId: githubUser.profile.id.toString(),
+		userId,
 	})
 	const { otp: _otp, ...config } = await generateTOTP()
-	await prisma.verification.create({
-		data: {
-			type: twoFAVerificationType,
-			target: userId,
-			...config,
-		},
+	await drizzle.insert(Verification).values({
+		type: twoFAVerificationType,
+		target: userId,
+		...config,
 	})
 	const request = await setupRequest({ code: githubUser.code })
 	const response = await loader({ request, params: PARAMS, context: {} })
@@ -240,20 +230,19 @@ async function setupRequest({
 }
 
 async function setupUser(userData = createUser()) {
-	const session = await prisma.session.create({
-		data: {
+	const [user] = await drizzle.insert(User).values(userData).returning()
+	invariant(user, 'failed to insert user')
+	const [session] = await drizzle
+		.insert(Session)
+		.values({
 			expirationDate: getSessionExpirationDate(),
-			user: {
-				create: {
-					...userData,
-				},
-			},
-		},
-		select: {
-			id: true,
-			userId: true,
-		},
-	})
+			userId: user.id,
+		})
+		.returning({
+			id: Session.id,
+			userId: Session.userId,
+		})
+	invariant(session, 'failed to insert session')
 
 	return session
 }

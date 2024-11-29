@@ -1,7 +1,7 @@
 import * as setCookieParser from 'set-cookie-parser'
 import { expect } from 'vitest'
 import { sessionKey } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import {
 	type ToastInput,
@@ -11,6 +11,8 @@ import {
 import { convertSetCookieToCookie } from '#tests/utils.ts'
 
 import '@testing-library/jest-dom/vitest'
+import { Session } from '#drizzle/schema'
+import { and, eq } from 'drizzle-orm'
 
 expect.extend({
 	toHaveRedirect(response: unknown, redirectTo?: string) {
@@ -104,10 +106,10 @@ expect.extend({
 			}
 		}
 
-		const session = await prisma.session.findUnique({
-			select: { id: true },
-			where: { userId, id: sessionValue },
-		})
+		const session = await drizzle
+			.select()
+			.from(Session)
+			.where(and(eq(Session.userId, userId), eq(Session.id, sessionValue)))
 
 		return {
 			pass: Boolean(session),

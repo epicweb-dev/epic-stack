@@ -16,6 +16,7 @@ import {
 	useLoaderData,
 	useNavigation,
 } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { useState } from 'react'
 import { z } from 'zod'
 import { ErrorList } from '#app/components/forms.tsx'
@@ -23,12 +24,13 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import {
 	getUserImgSrc,
 	useDoubleCheck,
 	useIsPending,
 } from '#app/utils/misc.tsx'
+import { User, UserImage } from '#drizzle/schema.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -60,13 +62,19 @@ const PhotoFormSchema = z.discriminatedUnion('intent', [
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: {
+	const user = await drizzle.query.User.findFirst({
+		where: eq(User.id, userId),
+		columns: {
 			id: true,
 			name: true,
 			username: true,
-			image: { select: { id: true } },
+		},
+		with: {
+			image: {
+				columns: {
+					id: true,
+				},
+			},
 		},
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
@@ -105,15 +113,15 @@ export async function action({ request }: ActionFunctionArgs) {
 	const { image, intent } = submission.value
 
 	if (intent === 'delete') {
-		await prisma.userImage.deleteMany({ where: { userId } })
+		await drizzle.delete(UserImage).where(eq(UserImage.userId, userId))
 		return redirect('/settings/profile')
 	}
 
-	await prisma.$transaction(async ($prisma) => {
-		await $prisma.userImage.deleteMany({ where: { userId } })
-		await $prisma.user.update({
-			where: { id: userId },
-			data: { image: { create: image } },
+	await drizzle.transaction(async (tx) => {
+		await tx.delete(UserImage).where(eq(UserImage.userId, userId))
+		await tx.insert(UserImage).values({
+			userId,
+			...image!,
 		})
 	})
 

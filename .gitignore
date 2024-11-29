@@ -6,8 +6,8 @@ node_modules
 .env
 .cache
 
-/prisma/data.db
-/prisma/data.db-journal
+/prisma/data.db*
+/drizzle/data.db*
 /tests/prisma
 
 /test-results/

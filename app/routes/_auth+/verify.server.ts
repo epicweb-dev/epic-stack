@@ -1,14 +1,16 @@
 import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { json } from '@remix-run/node'
+import { and, eq, gt, isNull, or } from 'drizzle-orm'
 import { z } from 'zod'
 import { handleVerification as handleChangeEmailVerification } from '#app/routes/settings+/profile.change-email.server.tsx'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { generateTOTP, verifyTOTP } from '#app/utils/totp.server.ts'
+import { Verification } from '#drizzle/schema.ts'
 import { type twoFAVerifyVerificationType } from '../settings+/profile.two-factor.verify.tsx'
 import {
 	handleVerification as handleLoginTwoFactorVerification,
@@ -99,11 +101,13 @@ export async function prepareVerification({
 		...verificationConfig,
 		expiresAt: new Date(Date.now() + verificationConfig.period * 1000),
 	}
-	await prisma.verification.upsert({
-		where: { target_type: { target, type } },
-		create: verificationData,
-		update: verificationData,
-	})
+	await drizzle
+		.insert(Verification)
+		.values(verificationData)
+		.onConflictDoUpdate({
+			target: [Verification.target, Verification.type],
+			set: verificationData,
+		})
 
 	// add the otp to the url we'll email the user.
 	verifyUrl.searchParams.set(codeQueryParam, otp)
@@ -120,12 +124,16 @@ export async function isCodeValid({
 	type: VerificationTypes | typeof twoFAVerifyVerificationType
 	target: string
 }) {
-	const verification = await prisma.verification.findUnique({
-		where: {
-			target_type: { target, type },
-			OR: [{ expiresAt: { gt: new Date() } }, { expiresAt: null }],
-		},
-		select: { algorithm: true, secret: true, period: true, charSet: true },
+	const verification = await drizzle.query.Verification.findFirst({
+		where: and(
+			eq(Verification.target, target),
+			eq(Verification.type, type),
+			or(
+				gt(Verification.expiresAt, new Date()),
+				isNull(Verification.expiresAt),
+			),
+		),
+		columns: { algorithm: true, secret: true, period: true, charSet: true },
 	})
 	if (!verification) return false
 	const result = await verifyTOTP({
@@ -170,14 +178,14 @@ export async function validateRequest(
 	const { value: submissionValue } = submission
 
 	async function deleteVerification() {
-		await prisma.verification.delete({
-			where: {
-				target_type: {
-					type: submissionValue[typeQueryParam],
-					target: submissionValue[targetQueryParam],
-				},
-			},
-		})
+		await drizzle
+			.delete(Verification)
+			.where(
+				and(
+					eq(Verification.target, submissionValue[targetQueryParam]),
+					eq(Verification.type, submissionValue[typeQueryParam]),
+				),
+			)
 	}
 
 	switch (submissionValue[typeQueryParam]) {

@@ -13,6 +13,7 @@ import {
 	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
@@ -20,7 +21,7 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
@@ -31,6 +32,7 @@ import {
 	UsernameSchema,
 } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { User } from '#drizzle/schema'
 
 export const onboardingEmailSessionKey = 'onboardingEmail'
 
@@ -71,9 +73,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	const submission = await parseWithZod(formData, {
 		schema: (intent) =>
 			SignupFormSchema.superRefine(async (data, ctx) => {
-				const existingUser = await prisma.user.findUnique({
-					where: { username: data.username },
-					select: { id: true },
+				const existingUser = await drizzle.query.User.findFirst({
+					where: eq(User.username, data.username),
+					columns: { id: true },
 				})
 				if (existingUser) {
 					ctx.addIssue({

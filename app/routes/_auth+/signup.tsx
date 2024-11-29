@@ -9,6 +9,7 @@ import {
 	type MetaFunction,
 } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -18,11 +19,12 @@ import {
 	ProviderConnectionForm,
 	providerNames,
 } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
+import { User } from '#drizzle/schema.ts'
 import { prepareVerification } from './verify.server.ts'
 
 export const handle: SEOHandle = {
@@ -40,9 +42,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const submission = await parseWithZod(formData, {
 		schema: SignupSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { email: data.email },
-				select: { id: true },
+			const existingUser = await drizzle.query.User.findFirst({
+				where: eq(User.email, data.email),
+				columns: { id: true },
 			})
 			if (existingUser) {
 				ctx.addIssue({

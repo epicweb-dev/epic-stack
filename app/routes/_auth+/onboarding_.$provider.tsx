@@ -19,6 +19,7 @@ import {
 	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
@@ -32,12 +33,13 @@ import {
 } from '#app/utils/auth.server.ts'
 import { connectionSessionStorage } from '#app/utils/connections.server'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { User } from '#drizzle/schema'
 import { onboardingEmailSessionKey } from './onboarding'
 
 export const providerIdKey = 'providerId'
@@ -118,9 +120,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	const submission = await parseWithZod(formData, {
 		schema: SignupFormSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { username: data.username },
-				select: { id: true },
+			const existingUser = await drizzle.query.User.findFirst({
+				where: eq(User.username, data.username),
+				columns: { id: true },
 			})
 			if (existingUser) {
 				ctx.addIssue({

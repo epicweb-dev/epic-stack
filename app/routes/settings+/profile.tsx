@@ -2,13 +2,15 @@ import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useMatches } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
+import { User } from '#drizzle/schema'
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
 export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>
@@ -20,9 +22,9 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: { username: true },
+	const user = await drizzle.query.User.findFirst({
+		where: eq(User.id, userId),
+		columns: { username: true },
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
 	return json({})

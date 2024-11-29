@@ -1,13 +1,15 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import { prisma } from '#app/utils/db.server.ts'
+import { eq } from 'drizzle-orm'
+import { drizzle } from '#app/utils/db.server.ts'
+import { NoteImage } from '#drizzle/schema'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
-	const image = await prisma.noteImage.findUnique({
-		where: { id: params.imageId },
-		select: { contentType: true, blob: true },
-	})
+	const [image] = await drizzle
+		.select({ contentType: NoteImage.contentType, blob: NoteImage.blob })
+		.from(NoteImage)
+		.where(eq(NoteImage.id, params.imageId))
 
 	invariantResponse(image, 'Not found', { status: 404 })
 

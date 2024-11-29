@@ -1,10 +1,20 @@
-import { type Connection, type Password, type User } from '@prisma/client'
+import { invariant } from '@epic-web/invariant'
 import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
+import { gt, and, eq, sql, type InferSelectModel } from 'drizzle-orm'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
+import {
+	Connection,
+	Password,
+	Role,
+	RoleToUser,
+	Session,
+	User,
+	UserImage,
+} from '#drizzle/schema.ts'
 import { connectionSessionStorage, providers } from './connections.server.ts'
-import { prisma } from './db.server.ts'
+import { drizzle } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
@@ -29,9 +39,12 @@ export async function getUserId(request: Request) {
 	)
 	const sessionId = authSession.get(sessionKey)
 	if (!sessionId) return null
-	const session = await prisma.session.findUnique({
-		select: { user: { select: { id: true } } },
-		where: { id: sessionId, expirationDate: { gt: new Date() } },
+	const session = await drizzle.query.Session.findFirst({
+		with: { user: { columns: { id: true } } },
+		where: and(
+			eq(Session.id, sessionId),
+			gt(Session.expirationDate, new Date()),
+		),
 	})
 	if (!session?.user) {
 		throw redirect('/', {
@@ -74,18 +87,22 @@ export async function login({
 	username,
 	password,
 }: {
-	username: User['username']
+	username: InferSelectModel<typeof User>['username']
 	password: string
 }) {
 	const user = await verifyUserPassword({ username }, password)
 	if (!user) return null
-	const session = await prisma.session.create({
-		select: { id: true, expirationDate: true, userId: true },
-		data: {
+	const [session] = await drizzle
+		.insert(Session)
+		.values({
 			expirationDate: getSessionExpirationDate(),
 			userId: user.id,
-		},
-	})
+		})
+		.returning({
+			id: Session.id,
+			expirationDate: Session.expirationDate,
+			userId: Session.userId,
+		})
 	return session
 }
 
@@ -93,20 +110,15 @@ export async function resetUserPassword({
 	username,
 	password,
 }: {
-	username: User['username']
+	username: InferSelectModel<typeof User>['username']
 	password: string
 }) {
 	const hashedPassword = await getPasswordHash(password)
-	return prisma.user.update({
-		where: { username },
-		data: {
-			password: {
-				update: {
-					hash: hashedPassword,
-				},
-			},
-		},
-	})
+	return drizzle
+		.update(Password)
+		.set({ hash: hashedPassword })
+		.from(User)
+		.where(and(eq(User.username, username), eq(User.id, Password.userId)))
 }
 
 export async function signup({
@@ -115,34 +127,50 @@ export async function signup({
 	password,
 	name,
 }: {
-	email: User['email']
-	username: User['username']
-	name: User['name']
+	email: InferSelectModel<typeof User>['email']
+	username: InferSelectModel<typeof User>['username']
+	name: InferSelectModel<typeof User>['name']
 	password: string
 }) {
-	const hashedPassword = await getPasswordHash(password)
+	return await drizzle.transaction(async (tx) => {
+		const [user] = await tx
+			.insert(User)
+			.values({
+				email: email.toLowerCase(),
+				username: username.toLowerCase(),
+				name,
+			})
+			.returning()
 
-	const session = await prisma.session.create({
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			user: {
-				create: {
-					email: email.toLowerCase(),
-					username: username.toLowerCase(),
-					name,
-					roles: { connect: { name: 'user' } },
-					password: {
-						create: {
-							hash: hashedPassword,
-						},
-					},
-				},
-			},
-		},
-		select: { id: true, expirationDate: true },
+		invariant(user, 'failed to create user')
+
+		await tx.insert(Password).values({
+			hash: await getPasswordHash(password),
+			userId: user.id,
+		})
+
+		await tx.insert(RoleToUser).select(
+			tx
+				.select({
+					roleId: Role.id,
+					userId: sql.raw(`'${user.id}'`).as('userId'),
+				})
+				.from(Role)
+				.where(eq(Role.name, 'user')),
+		)
+
+		const [session] = await tx
+			.insert(Session)
+			.values({
+				expirationDate: getSessionExpirationDate(),
+				userId: user.id,
+			})
+			.returning()
+
+		invariant(session, 'failed to create session')
+
+		return session
 	})
-
-	return session
 }
 
 export async function signupWithConnection({
@@ -153,33 +181,60 @@ export async function signupWithConnection({
 	providerName,
 	imageUrl,
 }: {
-	email: User['email']
-	username: User['username']
-	name: User['name']
-	providerId: Connection['providerId']
-	providerName: Connection['providerName']
+	email: InferSelectModel<typeof User>['email']
+	username: InferSelectModel<typeof User>['username']
+	name: InferSelectModel<typeof User>['name']
+	providerId: InferSelectModel<typeof Connection>['providerId']
+	providerName: InferSelectModel<typeof Connection>['providerName']
 	imageUrl?: string
 }) {
-	const session = await prisma.session.create({
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			user: {
-				create: {
-					email: email.toLowerCase(),
-					username: username.toLowerCase(),
-					name,
-					roles: { connect: { name: 'user' } },
-					connections: { create: { providerId, providerName } },
-					image: imageUrl
-						? { create: await downloadFile(imageUrl) }
-						: undefined,
-				},
-			},
-		},
-		select: { id: true, expirationDate: true },
-	})
+	return await drizzle.transaction(async (tx) => {
+		const [user] = await tx
+			.insert(User)
+			.values({
+				email: email.toLowerCase(),
+				username: username.toLowerCase(),
+				name,
+			})
+			.returning()
 
-	return session
+		invariant(user, 'failed to create user')
+
+		await tx.insert(RoleToUser).select(
+			tx
+				.select({
+					roleId: Role.id,
+					userId: sql.raw(`'${user.id}'`).as('userId'),
+				})
+				.from(Role)
+				.where(eq(Role.name, 'user')),
+		)
+
+		await tx.insert(Connection).values({
+			providerId,
+			providerName,
+			userId: user.id,
+		})
+
+		if (imageUrl) {
+			await tx.insert(UserImage).values({
+				...(await downloadFile(imageUrl)),
+				userId: user.id,
+			})
+		}
+
+		const [session] = await tx
+			.insert(Session)
+			.values({
+				expirationDate: getSessionExpirationDate(),
+				userId: user.id,
+			})
+			.returning()
+
+		invariant(session, 'failed to create session')
+
+		return session
+	})
 }
 
 export async function logout(
@@ -200,8 +255,10 @@ export async function logout(
 	// and it doesn't do any harm staying in the db anyway.
 	if (sessionId) {
 		// the .catch is important because that's what triggers the query.
-		// learn more about PrismaPromise: https://www.prisma.io/docs/orm/reference/prisma-client-reference#prismapromise-behavior
-		void prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {})
+		void drizzle
+			.delete(Session)
+			.where(eq(Session.id, sessionId))
+			.catch(() => {})
 	}
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,
@@ -218,12 +275,17 @@ export async function getPasswordHash(password: string) {
 }
 
 export async function verifyUserPassword(
-	where: Pick<User, 'username'> | Pick<User, 'id'>,
-	password: Password['hash'],
+	where:
+		| Pick<InferSelectModel<typeof User>, 'username'>
+		| Pick<InferSelectModel<typeof User>, 'id'>,
+	password: InferSelectModel<typeof Password>['hash'],
 ) {
-	const userWithPassword = await prisma.user.findUnique({
-		where,
-		select: { id: true, password: { select: { hash: true } } },
+	const userWithPassword = await drizzle.query.User.findFirst({
+		where:
+			'username' in where
+				? eq(User.username, where.username)
+				: eq(User.id, where.id),
+		with: { password: { columns: { hash: true } } },
 	})
 
 	if (!userWithPassword || !userWithPassword.password) {

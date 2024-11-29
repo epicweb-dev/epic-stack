@@ -11,7 +11,10 @@ server.listen({
 		// Note: a request handler with passthrough is not suited with this type of url
 		//       until there is a more permissible url catching system
 		//       like requested at https://github.com/mswjs/msw/issues/1804
-		if (request.url.includes('.sentry.io')) {
+		if (
+			request.url.includes('.sentry.io') ||
+			request.url.includes(process.env.TURSO_DATABASE_URL)
+		) {
 			return
 		}
 		// Print the regular MSW unhandled request warning otherwise.

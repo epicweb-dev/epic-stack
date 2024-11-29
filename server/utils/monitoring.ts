@@ -17,11 +17,7 @@ export function init() {
 			/\/favicon.ico/,
 			/\/site\.webmanifest/,
 		],
-		integrations: [
-			Sentry.httpIntegration(),
-			Sentry.prismaIntegration(),
-			nodeProfilingIntegration(),
-		],
+		integrations: [Sentry.httpIntegration(), nodeProfilingIntegration()],
 		tracesSampler(samplingContext) {
 			// ignore healthcheck transactions by other services (consul, etc.)
 			if (samplingContext.request?.url?.includes('/resources/healthcheck')) {

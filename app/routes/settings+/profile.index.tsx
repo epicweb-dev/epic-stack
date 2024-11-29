@@ -1,6 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
@@ -8,17 +8,25 @@ import {
 	type ActionFunctionArgs,
 } from '@remix-run/node'
 import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { and, count, eq, gt, not } from 'drizzle-orm'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { drizzle } from '#app/utils/db.server.ts'
 import { getUserImgSrc, useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
+import {
+	Password,
+	Session,
+	User,
+	UserImage,
+	Verification,
+} from '#drizzle/schema.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 export const handle: SEOHandle = {
@@ -32,36 +40,34 @@ const ProfileFormSchema = z.object({
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: userId },
-		select: {
-			id: true,
-			name: true,
-			username: true,
-			email: true,
-			image: {
-				select: { id: true },
-			},
-			_count: {
-				select: {
-					sessions: {
-						where: {
-							expirationDate: { gt: new Date() },
-						},
-					},
-				},
-			},
-		},
+	const [user] = await drizzle
+		.select({
+			id: User.id,
+			name: User.name,
+			username: User.username,
+			email: User.email,
+			imageId: UserImage.id,
+			activeSessionCount: count(Session.id),
+		})
+		.from(User)
+		.leftJoin(UserImage, eq(User.id, UserImage.userId))
+		.leftJoin(Session, eq(User.id, Session.userId))
+		.where(and(eq(User.id, userId), gt(Session.expirationDate, new Date())))
+		.groupBy(User.id)
+
+	invariant(user, 'User not found')
+
+	const twoFactorVerification = await drizzle.query.Verification.findFirst({
+		columns: { id: true },
+		where: and(
+			eq(Verification.type, twoFAVerificationType),
+			eq(Verification.target, userId),
+		),
 	})
 
-	const twoFactorVerification = await prisma.verification.findUnique({
-		select: { id: true },
-		where: { target_type: { type: twoFAVerificationType, target: userId } },
-	})
-
-	const password = await prisma.password.findUnique({
-		select: { userId: true },
-		where: { userId },
+	const password = await drizzle.query.Password.findFirst({
+		columns: { userId: true },
+		where: eq(Password.userId, userId),
 	})
 
 	return json({
@@ -108,7 +114,7 @@ export default function EditUserProfile() {
 			<div className="flex justify-center">
 				<div className="relative h-52 w-52">
 					<img
-						src={getUserImgSrc(data.user.image?.id)}
+						src={getUserImgSrc(data.user.imageId)}
 						alt={data.user.username}
 						className="h-full w-full rounded-full object-cover"
 					/>
@@ -180,9 +186,9 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 	const submission = await parseWithZod(formData, {
 		async: true,
 		schema: ProfileFormSchema.superRefine(async ({ username }, ctx) => {
-			const existingUsername = await prisma.user.findUnique({
-				where: { username },
-				select: { id: true },
+			const existingUsername = await drizzle.query.User.findFirst({
+				columns: { id: true },
+				where: eq(User.username, username),
 			})
 			if (existingUsername && existingUsername.id !== userId) {
 				ctx.addIssue({
@@ -202,14 +208,13 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 
 	const data = submission.value
 
-	await prisma.user.update({
-		select: { username: true },
-		where: { id: userId },
-		data: {
+	await drizzle
+		.update(User)
+		.set({
 			name: data.name,
 			username: data.username,
-		},
-	})
+		})
+		.where(eq(User.id, userId))
 
 	return json({
 		result: submission.reply(),
@@ -282,12 +287,9 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 		sessionId,
 		'You must be authenticated to sign out of other sessions',
 	)
-	await prisma.session.deleteMany({
-		where: {
-			userId,
-			id: { not: sessionId },
-		},
-	})
+	await drizzle
+		.delete(Session)
+		.where(and(eq(Session.userId, userId), not(eq(Session.id, sessionId))))
 	return json({ status: 'success' } as const)
 }
 
@@ -296,7 +298,7 @@ function SignOutOfSessions() {
 	const dc = useDoubleCheck()
 
 	const fetcher = useFetcher<typeof signOutOfSessionsAction>()
-	const otherSessionsCount = data.user._count.sessions - 1
+	const otherSessionsCount = data.user.activeSessionCount - 1
 	return (
 		<div>
 			{otherSessionsCount ? (
@@ -329,7 +331,7 @@ function SignOutOfSessions() {
 }
 
 async function deleteDataAction({ userId }: ProfileActionArgs) {
-	await prisma.user.delete({ where: { id: userId } })
+	await drizzle.delete(User).where(eq(User.id, userId))
 	return redirectWithToast('/', {
 		type: 'success',
 		title: 'Data Deleted',
