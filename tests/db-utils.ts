@@ -14,7 +14,7 @@ export function createUser() {
 			return (
 				faker.string.alphanumeric({ length: 2 }) +
 				'_' +
-				faker.internet.userName({
+				faker.internet.username({
 					firstName: firstName.toLowerCase(),
 					lastName: lastName.toLowerCase(),
 				})

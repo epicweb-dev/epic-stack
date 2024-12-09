@@ -54,7 +54,7 @@ function createGitHubUser(code?: string | null) {
 		code,
 		accessToken: `${code}_mock_access_token`,
 		profile: {
-			login: faker.internet.userName(),
+			login: faker.internet.username(),
 			id: faker.string.uuid(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
