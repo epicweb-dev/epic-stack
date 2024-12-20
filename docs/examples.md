@@ -116,6 +116,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack Globe Animation](https://github.com/hakimLyon/epic-stack-github-globe)
   by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with a
   Globe animation as seen on GitHub's homepage.
+- [Epic Stack + Hono](https://github.com/hakimLyon/epic-stack-hono)
+  by [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with
+  Hono.
 
 ## How to contribute
 
