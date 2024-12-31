@@ -5,7 +5,6 @@ import {
 	data,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-	type SerializeFrom,
 	type HeadersFunction,
 	useFetcher,
 	useLoaderData,
@@ -158,6 +157,8 @@ export default function Connections() {
 		</div>
 	)
 }
+
+type SerializeFrom<T> = ReturnType<typeof useLoaderData<T>>
 
 function Connection({
 	connection,

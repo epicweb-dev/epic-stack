@@ -9,9 +9,8 @@ import {
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type Note, type NoteImage } from '@prisma/client'
-import { type SerializeFrom } from 'react-router';
-import { Form, useActionData } from 'react-router';
 import { useState } from 'react'
+import { Form, useActionData, type useLoaderData } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
@@ -43,6 +42,8 @@ const ImageFieldsetSchema = z.object({
 })
 
 export type ImageFieldset = z.infer<typeof ImageFieldsetSchema>
+
+type SerializeFrom<T> = ReturnType<typeof useLoaderData<T>>
 
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
