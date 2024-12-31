@@ -64,6 +64,7 @@
     "@react-email/components": "0.0.30",
     "@react-router/express": "^7.0.0",
     "@react-router/node": "^7.0.0",
+    "@react-router/remix-routes-option-adapter": "^7.1.1",
     "@sentry/profiling-node": "^8.42.0",
     "@sentry/remix": "^8.42.0",
     "address": "^2.0.3",
