@@ -9,8 +9,8 @@ import {
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type Note, type NoteImage } from '@prisma/client'
-import { type SerializeFrom } from '@remix-run/node'
-import { Form, useActionData } from '@remix-run/react'
+import { type SerializeFrom } from 'react-router';
+import { Form, useActionData } from 'react-router';
 import { useState } from 'react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'

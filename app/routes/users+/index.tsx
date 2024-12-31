@@ -1,5 +1,5 @@
-import { data, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { data, redirect, type LoaderFunctionArgs } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'

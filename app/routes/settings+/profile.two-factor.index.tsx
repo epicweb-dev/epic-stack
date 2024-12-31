@@ -1,10 +1,6 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import {
-	redirect,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-} from '@remix-run/node'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from 'react-router';
+import { Link, useFetcher, useLoaderData } from 'react-router';
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'

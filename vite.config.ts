@@ -1,14 +1,8 @@
-import { vitePlugin as remix } from '@remix-run/dev'
+import { reactRouter } from '@react-router/dev/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { flatRoutes } from 'remix-flat-routes'
 import { envOnlyMacros } from 'vite-env-only'
 import { type ViteUserConfig } from 'vitest/config'
-
-declare module '@remix-run/server-runtime' {
-	interface Future {
-		v3_singleFetch: true
-	}
-}
 
 const MODE = process.env.NODE_ENV
 
@@ -41,37 +35,7 @@ export default {
 		envOnlyMacros(),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		process.env.NODE_ENV === 'test'
-			? null
-			: remix({
-					ignoredRouteFiles: ['**/*'],
-					serverModuleFormat: 'esm',
-					future: {
-						unstable_optimizeDeps: true,
-						v3_fetcherPersist: true,
-						v3_lazyRouteDiscovery: true,
-						v3_relativeSplatPath: true,
-						v3_throwAbortReason: true,
-						v3_singleFetch: true,
-					},
-					routes: async (defineRoutes) => {
-						return flatRoutes('routes', defineRoutes, {
-							ignoredRouteFiles: [
-								'.*',
-								'**/*.css',
-								'**/*.test.{js,jsx,ts,tsx}',
-								'**/__*.*',
-								// This is for server-side utilities you want to colocate
-								// next to your routes without making an additional
-								// directory. If you need a route that includes "server" or
-								// "client" in the filename, use the escape brackets like:
-								// my-route.[server].tsx
-								'**/*.server.*',
-								'**/*.client.*',
-							],
-						})
-					},
-				}),
+		process.env.NODE_ENV === 'test' ? null : reactRouter(),
 		process.env.SENTRY_AUTH_TOKEN
 			? sentryVitePlugin({
 					disable: MODE !== 'production',

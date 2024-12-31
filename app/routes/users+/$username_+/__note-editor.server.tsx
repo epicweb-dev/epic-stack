@@ -6,7 +6,7 @@ import {
 	unstable_parseMultipartFormData as parseMultipartFormData,
 	redirect,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
+} from 'react-router'
 import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'

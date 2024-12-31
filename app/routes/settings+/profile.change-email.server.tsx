@@ -1,6 +1,6 @@
 import { invariant } from '@epic-web/invariant'
 import * as E from '@react-email/components'
-import { data } from '@remix-run/node'
+import { data } from 'react-router';
 import {
 	requireRecentVerification,
 	type VerifyFunctionArgs,

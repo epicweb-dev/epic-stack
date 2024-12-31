@@ -1,11 +1,13 @@
 import { PassThrough } from 'node:stream'
+import { createReadableStreamFromReadable } from '@react-router/node';
+
 import {
-	createReadableStreamFromReadable,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-	type HandleDocumentRequestFunction,
-} from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
+    type LoaderFunctionArgs,
+    type ActionFunctionArgs,
+    type HandleDocumentRequestFunction,
+} from 'react-router';
+
+import { ServerRouter } from 'react-router';
 import * as Sentry from '@sentry/remix'
 import chalk from 'chalk'
 import { isbot } from 'isbot'
@@ -27,7 +29,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		request,
 		responseStatusCode,
 		responseHeaders,
-		remixContext,
+		reactRouterContext,
 		loadContext,
 	] = args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
@@ -53,7 +55,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
-				<RemixServer nonce={nonce} context={remixContext} url={request.url} />
+				<ServerRouter nonce={nonce} context={reactRouterContext} url={request.url} />
 			</NonceProvider>,
 			{
 				[callbackName]: () => {
@@ -79,7 +81,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		)
 
 		setTimeout(abort, streamTimeout + 5000)
-	})
+	});
 }
 
 export async function handleDataRequest(response: Response) {
