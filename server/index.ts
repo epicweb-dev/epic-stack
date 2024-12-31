@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
-import { createRequestHandler } from '@react-router/express';
-import { type ServerBuild } from 'react-router';
-import Sentry from '@sentry/remix'
+import { createRequestHandler } from '@react-router/express'
+import Sentry from '@sentry/react'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -11,6 +10,9 @@ import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import { type ServerBuild } from 'react-router'
+
+console.log('Starting server from  index.ts...')
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
@@ -30,7 +32,7 @@ const viteDevServer = IS_PROD
 			}),
 		)
 
-const app = express()
+export const app = express()
 
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''

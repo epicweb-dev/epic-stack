@@ -1,6 +1,6 @@
 import { reactRouter } from '@react-router/dev/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
-import { flatRoutes } from 'remix-flat-routes'
+
 import { envOnlyMacros } from 'vite-env-only'
 import { type ViteUserConfig } from 'vitest/config'
 
@@ -8,6 +8,7 @@ const MODE = process.env.NODE_ENV
 
 export default {
 	build: {
+		target: 'es2022',
 		cssMinify: MODE === 'production',
 
 		rollupOptions: {

@@ -1,4 +1,4 @@
-import { withSentry } from '@sentry/remix'
+import { wrapUseRoutesV7 } from '@sentry/react'
 import { useRef } from 'react'
 import {
 	data,
@@ -270,7 +270,7 @@ function AppWithProviders() {
 	)
 }
 
-export default withSentry(AppWithProviders)
+export default wrapUseRoutesV7(AppWithProviders)
 
 function UserDropdown() {
 	const user = useUser()
