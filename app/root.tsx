@@ -316,9 +316,9 @@ function UserDropdown() {
 					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
-						onSelect={(event) => {
+						onSelect={async (event) => {
 							event.preventDefault()
-							submit(formRef.current)
+							await submit(formRef.current)
 						}}
 					>
 						<Form action="/logout" method="POST" ref={formRef}>
