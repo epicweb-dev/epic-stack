@@ -1,6 +1,11 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { type LoaderFunctionArgs } from 'react-router';
-import { Link, NavLink, Outlet, useLoaderData } from 'react-router';
+import {
+	type LoaderFunctionArgs,
+	Link,
+	NavLink,
+	Outlet,
+	useLoaderData,
+} from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { prisma } from '#app/utils/db.server.ts'

@@ -1,6 +1,9 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { type LoaderFunctionArgs, type ActionFunctionArgs } from 'react-router';
-import { useFetcher } from 'react-router';
+import {
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
+	useFetcher,
+} from 'react-router'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireRecentVerification } from '#app/routes/_auth+/verify.server.ts'

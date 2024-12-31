@@ -1,6 +1,11 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { type LoaderFunctionArgs } from 'react-router';
-import { Form, Link, useLoaderData, type MetaFunction } from 'react-router';
+import {
+	type LoaderFunctionArgs,
+	Form,
+	Link,
+	useLoaderData,
+	type MetaFunction,
+} from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'

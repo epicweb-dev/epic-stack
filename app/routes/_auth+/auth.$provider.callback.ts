@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from 'react-router';
+import { redirect, type LoaderFunctionArgs } from 'react-router'
 import {
 	authenticator,
 	getSessionExpirationDate,
@@ -39,14 +39,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const authResult = await authenticator
 		.authenticate(providerName, request, { throwOnError: true })
 		.then(
-			(data) => (({
-                success: true,
-                data
-            }) as const),
-			(error) => (({
-                success: false,
-                error
-            }) as const),
+			(data) =>
+				({
+					success: true,
+					data,
+				}) as const,
+			(error) =>
+				({
+					success: false,
+					error,
+				}) as const,
 		)
 
 	if (!authResult.success) {
