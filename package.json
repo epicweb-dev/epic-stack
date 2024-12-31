@@ -16,7 +16,7 @@
   "scripts": {
     "build": "run-s build:*",
     "build:icons": "tsx ./other/build-icons.ts",
-    "build:remix": "remix vite:build",
+    "build:remix": "react-router build",
     "build:server": "tsx ./other/build-server.ts",
     "predev": "npm run build:icons --silent",
     "dev": "cross-env NODE_ENV=development MOCKS=true node ./server/dev-server.js",
