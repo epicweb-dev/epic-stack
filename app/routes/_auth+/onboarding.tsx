@@ -1,7 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import {
-	json,
+	data,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
@@ -61,7 +61,7 @@ async function requireOnboardingEmail(request: Request) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const email = await requireOnboardingEmail(request)
-	return json({ email })
+	return { email }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -93,7 +93,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success' || !submission.value.session) {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

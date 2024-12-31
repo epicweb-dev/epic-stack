@@ -1,5 +1,5 @@
 import {
-	json,
+	data,
 	type LoaderFunctionArgs,
 	type HeadersFunction,
 	type LinksFunction,
@@ -121,7 +121,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const { toast, headers: toastHeaders } = await getToast(request)
 	const honeyProps = honeypot.getInputProps()
 
-	return json(
+	return data(
 		{
 			user,
 			requestInfo: {
@@ -161,7 +161,8 @@ function Document({
 	children: React.ReactNode
 	nonce: string
 	theme?: Theme
-	env?: Record<string, string>
+	env?: Record<string, string | undefined>
+	allowIndexing?: boolean
 }) {
 	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (

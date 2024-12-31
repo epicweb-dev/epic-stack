@@ -4,6 +4,12 @@ import { flatRoutes } from 'remix-flat-routes'
 import { envOnlyMacros } from 'vite-env-only'
 import { type ViteUserConfig } from 'vitest/config'
 
+declare module '@remix-run/server-runtime' {
+	interface Future {
+		v3_singleFetch: true
+	}
+}
+
 const MODE = process.env.NODE_ENV
 
 export default {
@@ -46,6 +52,7 @@ export default {
 						v3_lazyRouteDiscovery: true,
 						v3_relativeSplatPath: true,
 						v3_throwAbortReason: true,
+						v3_singleFetch: true,
 					},
 					routes: async (defineRoutes) => {
 						return flatRoutes('routes', defineRoutes, {
