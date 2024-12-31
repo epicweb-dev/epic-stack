@@ -1,13 +1,12 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
+import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useState } from 'react'
 import {
 	data,
 	redirect,
-	unstable_createMemoryUploadHandler,
-	unstable_parseMultipartFormData,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 	Form,
@@ -22,6 +21,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { uploadHandler } from '#app/utils/file-uploads.server.ts'
 import {
 	getUserImgSrc,
 	useDoubleCheck,
@@ -73,11 +73,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
-	const formData = await unstable_parseMultipartFormData(
-		request,
-		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
-	)
 
+	const formData = await parseFormData(
+		request,
+		async (file: FileUpload) => uploadHandler(file),
+		{ maxFileSize: MAX_SIZE },
+	)
 	const submission = await parseWithZod(formData, {
 		schema: PhotoFormSchema.transform(async (data) => {
 			if (data.intent === 'delete') return { intent: 'delete' }
