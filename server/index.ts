@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { createRequestHandler } from '@react-router/express'
-import Sentry from '@sentry/react'
+import * as Sentry from '@sentry/react'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -11,8 +11,6 @@ import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { type ServerBuild } from 'react-router'
-
-console.log('Starting server from  index.ts...')
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
@@ -32,7 +30,7 @@ const viteDevServer = IS_PROD
 			}),
 		)
 
-export const app = express()
+const app = express()
 
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
@@ -67,7 +65,7 @@ app.get('*', (req, res, next) => {
 
 app.use(compression())
 
-// http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
+// // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
 if (viteDevServer) {
