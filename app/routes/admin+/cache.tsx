@@ -98,7 +98,7 @@ export default function CacheAdminRoute() {
 	const handleFormChange = useDebounce(async (form: HTMLFormElement) => {
 		await submit(form)
 	}, 400)
-	2
+
 	return (
 		<div className="container">
 			<h1 className="text-h1">Cache Admin</h1>
