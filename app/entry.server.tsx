@@ -1,7 +1,7 @@
 import { PassThrough } from 'node:stream'
 import { createReadableStreamFromReadable } from '@react-router/node'
 
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/node'
 import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
