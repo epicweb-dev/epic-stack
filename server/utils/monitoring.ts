@@ -1,3 +1,4 @@
+import { prismaIntegration, httpIntegration } from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import * as Sentry from '@sentry/react'
 
@@ -17,11 +18,9 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			// TODO: Figure out if this is still needed, and if so, how to make it work
-			// Sentry.httpIntegration(),
-			// Sentry.prismaIntegration(),
+			prismaIntegration(),
+			httpIntegration(),
 			nodeProfilingIntegration(),
-			// https://docs.sentry.io/platforms/javascript/guides/react/features/react-router/v7/
 		],
 		tracesSampler(samplingContext) {
 			// ignore healthcheck transactions by other services (consul, etc.)

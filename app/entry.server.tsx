@@ -108,9 +108,7 @@ export function handleError(
 	}
 	if (error instanceof Error) {
 		console.error(chalk.red(error.stack))
-		void Sentry.captureException(error, {
-			level: 'fatal',
-		})
+		void Sentry.captureException(error)
 	} else {
 		console.error(error)
 		Sentry.captureException(error)

@@ -6,7 +6,7 @@ import {
 	useParams,
 	useRouteError,
 } from 'react-router'
-import { getErrorMessage } from '#app/utils/misc.tsx'
+import { getErrorMessage } from '#app/utils/misc'
 
 type StatusHandler = (info: {
 	error: ErrorResponse
@@ -27,7 +27,6 @@ export function GeneralErrorBoundary({
 	unexpectedErrorHandler?: (error: unknown) => ReactElement | null
 }) {
 	const error = useRouteError()
-
 	const params = useParams()
 
 	if (typeof document !== 'undefined') {
@@ -42,9 +41,9 @@ export function GeneralErrorBoundary({
 		<div className="container flex items-center justify-center p-20 text-h2">
 			{isRouteErrorResponse(error)
 				? (statusHandlers?.[error.status] ?? defaultStatusHandler)({
-						error,
-						params,
-					})
+					error,
+					params,
+				})
 				: unexpectedErrorHandler(error)}
 		</div>
 	)
