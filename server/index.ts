@@ -166,7 +166,7 @@ const strongestRateLimit = rateLimit({
 const strongRateLimit = rateLimit({
 	...rateLimitDefault,
 	windowMs: 60 * 1000,
-    limit: 100 * maxMultiple,
+	 limit: 100 * maxMultiple,
 })
 
 const generalRateLimit = rateLimit(rateLimitDefault)
