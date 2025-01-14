@@ -144,7 +144,7 @@ const maxMultiple =
 	!IS_PROD || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
 const rateLimitDefault = {
 	windowMs: 60 * 1000,
-	max: 1000 * maxMultiple,
+    limit: 1000 * maxMultiple,
 	standardHeaders: true,
 	legacyHeaders: false,
 	validate: { trustProxy: false },
@@ -160,13 +160,13 @@ const rateLimitDefault = {
 const strongestRateLimit = rateLimit({
 	...rateLimitDefault,
 	windowMs: 60 * 1000,
-	max: 10 * maxMultiple,
+	limit: 10 * maxMultiple,
 })
 
 const strongRateLimit = rateLimit({
 	...rateLimitDefault,
 	windowMs: 60 * 1000,
-	max: 100 * maxMultiple,
+    limit: 100 * maxMultiple,
 })
 
 const generalRateLimit = rateLimit(rateLimitDefault)
