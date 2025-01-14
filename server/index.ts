@@ -144,7 +144,7 @@ const maxMultiple =
 	!IS_PROD || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
 const rateLimitDefault = {
 	windowMs: 60 * 1000,
-    limit: 1000 * maxMultiple,
+	 limit: 1000 * maxMultiple,
 	standardHeaders: true,
 	legacyHeaders: false,
 	validate: { trustProxy: false },
