@@ -1,4 +1,4 @@
-import { Form } from 'react-router';
+import { Form } from 'react-router'
 import { z } from 'zod'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'

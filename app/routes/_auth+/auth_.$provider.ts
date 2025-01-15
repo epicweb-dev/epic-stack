@@ -1,4 +1,4 @@
-import { redirect, type ActionFunctionArgs } from 'react-router';
+import { redirect, type ActionFunctionArgs } from 'react-router'
 import { authenticator } from '#app/utils/auth.server.ts'
 import { handleMockAction } from '#app/utils/connections.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'

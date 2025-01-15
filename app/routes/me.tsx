@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from 'react-router';
+import { redirect, type LoaderFunctionArgs } from 'react-router'
 import { requireUserId, logout } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 

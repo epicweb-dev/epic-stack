@@ -1,4 +1,4 @@
-import { type MetaFunction } from 'react-router';
+import { type MetaFunction } from 'react-router'
 import {
 	Tooltip,
 	TooltipContent,

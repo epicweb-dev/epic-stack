@@ -1,5 +1,5 @@
 import { generateRobotsTxt } from '@nasa-gcn/remix-seo'
-import { type LoaderFunctionArgs } from 'react-router';
+import { type LoaderFunctionArgs } from 'react-router'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 
 export function loader({ request }: LoaderFunctionArgs) {
