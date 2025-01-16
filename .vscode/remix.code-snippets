@@ -17,7 +17,7 @@
 			"import { type Route } from \"./+types/${TM_FILENAME_BASE}.ts\"",
 			"",
 			"export async function action({ request }: Route.ActionArgs) {",
-			"  return {}",
+			"	return {}",
 			"}",
 		],
 	},
