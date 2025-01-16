@@ -1,4 +1,3 @@
-import { wrapUseRoutesV7 } from '@sentry/react'
 import { useRef } from 'react'
 import {
 	data,
@@ -270,7 +269,7 @@ function AppWithProviders() {
 	)
 }
 
-export default wrapUseRoutesV7(AppWithProviders)
+export default AppWithProviders
 
 function UserDropdown() {
 	const user = useUser()
