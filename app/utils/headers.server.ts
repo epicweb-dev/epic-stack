@@ -1,6 +1,14 @@
 import { type CacheControlValue, parse, format } from '@tusbar/cache-control'
 import { type HeadersArgs } from 'react-router'
 
+/**
+ * A utility for handling route headers, merging common use-case headers.
+ *
+ * This function combines headers by:
+ * 1. Forwarding headers from the route's loader or action.
+ * 2. Inheriting headers from the parent.
+ * 3. Falling back to parent headers (if any) when headers are missing.
+ */
 export function pipeHeaders({
 	parentHeaders,
 	loaderHeaders,
@@ -61,6 +69,9 @@ export function pipeHeaders({
 	return headers
 }
 
+/**
+ * Given multiple Cache-Control headers, merge them and get the most conservative one.
+ */
 export function getConservativeCacheControl(
 	...cacheControlHeaders: Array<string | null>
 ): string {
