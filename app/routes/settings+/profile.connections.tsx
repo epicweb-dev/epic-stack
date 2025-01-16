@@ -84,12 +84,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 	)
 }
 
-export const headers = (({ loaderHeaders }) => {
+export const headers: Route.HeadersFunction = ({ loaderHeaders }) => {
 	const headers = {
 		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
 	}
 	return headers
-}) satisfies Route.HeadersFunction
+}
 
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
