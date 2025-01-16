@@ -8,9 +8,8 @@ import {
 	type FieldMetadata,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { type Note, type NoteImage } from '@prisma/client'
 import { useState } from 'react'
-import { Form, useActionData, type useLoaderData } from 'react-router'
+import { Form } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
@@ -21,7 +20,7 @@ import { Label } from '#app/components/ui/label.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
 import { cn, getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
-import { type action } from './__note-editor.server'
+import { type Info } from './+types/notes.$noteId_.edit.ts'
 
 const titleMinLength = 1
 const titleMaxLength = 100
@@ -43,8 +42,6 @@ const ImageFieldsetSchema = z.object({
 
 export type ImageFieldset = z.infer<typeof ImageFieldsetSchema>
 
-type SerializeFrom<T> = ReturnType<typeof useLoaderData<T>>
-
 export const NoteEditorSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(titleMinLength).max(titleMaxLength),
@@ -54,14 +51,11 @@ export const NoteEditorSchema = z.object({
 
 export function NoteEditor({
 	note,
+	actionData,
 }: {
-	note?: SerializeFrom<
-		Pick<Note, 'id' | 'title' | 'content'> & {
-			images: Array<Pick<NoteImage, 'id' | 'altText'>>
-		}
-	>
+	note?: Info['loaderData']['note']
+	actionData?: Info['actionData']
 }) {
-	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
 
 	const [form, fields] = useForm({
