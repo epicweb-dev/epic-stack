@@ -3,11 +3,13 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
+	data,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+	Link,
+	useFetcher,
+	useLoaderData,
+} from 'react-router'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
@@ -64,11 +66,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		where: { userId },
 	})
 
-	return json({
+	return {
 		user,
 		hasPassword: Boolean(password),
 		isTwoFactorEnabled: Boolean(twoFactorVerification),
-	})
+	}
 }
 
 type ProfileActionArgs = {
@@ -194,26 +196,26 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 		}),
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
 
-	const data = submission.value
+	const { username, name } = submission.value
 
 	await prisma.user.update({
 		select: { username: true },
 		where: { id: userId },
 		data: {
-			name: data.name,
-			username: data.username,
+			name: name,
+			username: username,
 		},
 	})
 
-	return json({
+	return {
 		result: submission.reply(),
-	})
+	}
 }
 
 function UpdateProfile() {
@@ -288,7 +290,7 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 			id: { not: sessionId },
 		},
 	})
-	return json({ status: 'success' } as const)
+	return { status: 'success' } as const
 }
 
 function SignOutOfSessions() {

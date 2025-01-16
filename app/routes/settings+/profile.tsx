@@ -1,7 +1,6 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useMatches } from '@remix-run/react'
+import { type LoaderFunctionArgs, Link, Outlet, useMatches } from 'react-router'
 import { z } from 'zod'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -25,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		select: { username: true },
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
-	return json({})
+	return {}
 }
 
 const BreadcrumbHandleMatch = z.object({

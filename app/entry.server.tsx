@@ -1,21 +1,22 @@
 import { PassThrough } from 'node:stream'
-import {
-	createReadableStreamFromReadable,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-	type HandleDocumentRequestFunction,
-} from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
-import * as Sentry from '@sentry/remix'
+import { createReadableStreamFromReadable } from '@react-router/node'
+
+import * as Sentry from '@sentry/node'
 import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
+import {
+	ServerRouter,
+	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
+	type HandleDocumentRequestFunction,
+} from 'react-router'
 import { getEnv, init } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
 
-const ABORT_DELAY = 5000
+export const streamTimeout = 5000
 
 init()
 global.ENV = getEnv()
@@ -27,7 +28,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		request,
 		responseStatusCode,
 		responseHeaders,
-		remixContext,
+		reactRouterContext,
 		loadContext,
 	] = args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
@@ -53,7 +54,11 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
-				<RemixServer context={remixContext} url={request.url} />
+				<ServerRouter
+					nonce={nonce}
+					context={reactRouterContext}
+					url={request.url}
+				/>
 			</NonceProvider>,
 			{
 				[callbackName]: () => {
@@ -78,7 +83,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 			},
 		)
 
-		setTimeout(abort, ABORT_DELAY)
+		setTimeout(abort, streamTimeout + 5000)
 	})
 }
 
@@ -103,12 +108,7 @@ export function handleError(
 	}
 	if (error instanceof Error) {
 		console.error(chalk.red(error.stack))
-		void Sentry.captureRemixServerException(
-			error,
-			'remix.server',
-			request,
-			true,
-		)
+		void Sentry.captureException(error)
 	} else {
 		console.error(error)
 		Sentry.captureException(error)

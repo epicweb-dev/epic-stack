@@ -1,15 +1,11 @@
 import { parseWithZod } from '@conform-to/zod'
+import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
 import { createId as cuid } from '@paralleldrive/cuid2'
-import {
-	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
-	json,
-	unstable_parseMultipartFormData as parseMultipartFormData,
-	redirect,
-	type ActionFunctionArgs,
-} from '@remix-run/node'
+import { data, redirect, type ActionFunctionArgs } from 'react-router'
 import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { uploadHandler } from '#app/utils/file-uploads.server.ts'
 import {
 	MAX_UPLOAD_SIZE,
 	NoteEditorSchema,
@@ -31,9 +27,10 @@ function imageHasId(
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 
-	const formData = await parseMultipartFormData(
+	const formData = await parseFormData(
 		request,
-		createMemoryUploadHandler({ maxPartSize: MAX_UPLOAD_SIZE }),
+		async (file: FileUpload) => uploadHandler(file),
+		{ maxFileSize: MAX_UPLOAD_SIZE },
 	)
 
 	const submission = await parseWithZod(formData, {
@@ -88,7 +85,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

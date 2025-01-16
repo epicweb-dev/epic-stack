@@ -1,4 +1,4 @@
-import { useFormAction, useNavigation } from '@remix-run/react'
+import { useFormAction, useNavigation } from 'react-router'
 import { clsx, type ClassValue } from 'clsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'

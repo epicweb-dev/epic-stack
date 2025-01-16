@@ -1,19 +1,16 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
-import {
 	Form,
 	Link,
 	useFetcher,
 	useLoaderData,
 	useSearchParams,
 	useSubmit,
-} from '@remix-run/react'
+} from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary'
 import { Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
@@ -58,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	} else {
 		cacheKeys = await getAllCacheKeys(limit)
 	}
-	return json({ cacheKeys, instance, instances, currentInstanceInfo })
+	return { cacheKeys, instance, instances, currentInstanceInfo }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -87,7 +84,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			throw new Error(`Unknown cache type: ${type}`)
 		}
 	}
-	return json({ success: true })
+	return { success: true }
 }
 
 export default function CacheAdminRoute() {
@@ -98,8 +95,8 @@ export default function CacheAdminRoute() {
 	const limit = searchParams.get('limit') ?? '100'
 	const instance = searchParams.get('instance') ?? data.instance
 
-	const handleFormChange = useDebounce((form: HTMLFormElement) => {
-		submit(form)
+	const handleFormChange = useDebounce(async (form: HTMLFormElement) => {
+		await submit(form)
 	}, 400)
 
 	return (

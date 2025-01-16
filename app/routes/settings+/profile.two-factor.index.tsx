@@ -1,11 +1,12 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+	Link,
+	useFetcher,
+	useLoaderData,
+} from 'react-router'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -24,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		where: { target_type: { type: twoFAVerificationType, target: userId } },
 		select: { id: true },
 	})
-	return json({ is2FAEnabled: Boolean(verification) })
+	return { is2FAEnabled: Boolean(verification) }
 }
 
 export async function action({ request }: ActionFunctionArgs) {

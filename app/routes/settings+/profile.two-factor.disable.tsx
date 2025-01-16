@@ -1,10 +1,9 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
-	json,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
-import { useFetcher } from '@remix-run/react'
+	useFetcher,
+} from 'react-router'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireRecentVerification } from '#app/routes/_auth+/verify.server.ts'
@@ -22,7 +21,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireRecentVerification(request)
-	return json({})
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {

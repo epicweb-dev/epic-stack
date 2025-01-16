@@ -1,19 +1,17 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import * as QRCode from 'qrcode'
 import {
-	json,
+	data,
 	redirect,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
-} from '@remix-run/node'
-import {
 	Form,
 	useActionData,
 	useLoaderData,
 	useNavigation,
-} from '@remix-run/react'
-import * as QRCode from 'qrcode'
+} from 'react-router'
 import { z } from 'zod'
 import { ErrorList, OTPField } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -75,7 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		issuer,
 	})
 	const qrCode = await QRCode.toDataURL(otpUri)
-	return json({ otpUri, qrCode })
+	return { otpUri, qrCode }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -104,7 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

@@ -1,5 +1,5 @@
 import { invariant } from '@epic-web/invariant'
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { getUserId, sessionKey } from '#app/utils/auth.server.ts'
