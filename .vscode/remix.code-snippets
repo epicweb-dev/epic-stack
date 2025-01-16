@@ -40,7 +40,7 @@
 		"body": [
 			"import { type Route } from \"./+types/${TM_FILENAME_BASE}.ts\"",
 			"export const headers: Route.HeadersFunction = ({ loaderHeaders }) => ({",
-			"  'Cache-Control': loaderHeaders.get('Cache-Control') ?? '',",
+			"	'Cache-Control': loaderHeaders.get('Cache-Control') ?? '',",
 			"})",
 		],
 	},
