@@ -8,4 +8,7 @@ export default [
 		files: ['**/tests/**/*.ts'],
 		rules: { 'react-hooks/rules-of-hooks': 'off' },
 	},
+	{
+		ignores: ['.react-router/*'],
+	},
 ]
