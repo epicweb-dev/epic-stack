@@ -68,7 +68,7 @@ test('The user profile when logged in as self', async () => {
 			loader: async (args) => {
 				// add the cookie header to the request
 				args.request.headers.set('cookie', cookieHeader)
-				return rootLoader(args)
+				return rootLoader({ ...args, context: args.context })
 			},
 			children: [
 				{

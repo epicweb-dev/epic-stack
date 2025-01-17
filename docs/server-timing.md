@@ -32,8 +32,9 @@ import {
 	makeTimings,
 	time,
 } from '#app/utils/timing.server.ts'
+import { type Route } from './+types/notes.ts'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
 	const timings = makeTimings('notes loader') // <-- 1. Setup Timings
 	// 2. Time functions
 	const owner = await time(
@@ -75,8 +76,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 // We have a general headers handler to save you from boilerplating.
-// export const headers: HeadersFunction = pipeHeaders
-export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+export const headers: HeadersFunction = pipeHeaders
+// this is basically what it does though
+export const headers: Route.HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 	return {
 		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders), // <-- 4. Send headers
 	}
@@ -84,5 +86,4 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 ```
 
 You can
-[learn more about `headers` in the Remix docs](https://remix.run/docs/en/main/route/headers)
-(note, the Epic Stack has the v2 behavior enabled).
+[learn more about `headers` in the React Router docs](https://reactrouter.com/how-to/headers)

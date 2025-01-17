@@ -1,6 +1,5 @@
-import { prismaIntegration, httpIntegration } from '@sentry/node'
+import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
-import * as Sentry from '@sentry/react'
 
 export function init() {
 	Sentry.init({
@@ -18,8 +17,8 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			prismaIntegration(),
-			httpIntegration(),
+			Sentry.prismaIntegration(),
+			Sentry.httpIntegration(),
 			nodeProfilingIntegration(),
 		],
 		tracesSampler(samplingContext) {

@@ -30,10 +30,12 @@ env var during runtime:
 fly secrets set SENTRY_DSN=<your_dsn>
 ```
 
-See the guide for the remix
-[here](https://docs.sentry.io/platforms/javascript/guides/remix/). Run the
-installation wizard but note that some of the steps included already exist in
-this codebase so be sure to remove any duplication.
+See the guides for React Router v7
+[here(library)](https://docs.sentry.io/platforms/javascript/guides/react/features/react-router/v7/)
+and
+[here(framwork)](https://docs.sentry.io/platforms/javascript/guides/react-router/).
+Note that the dedicated SDK for React Router is under development and features
+are lacking.
 
 To generate the auth token, click
 [this](https://sentry.io/orgredirect/settings/:orgslug/developer-settings/new-internal/)

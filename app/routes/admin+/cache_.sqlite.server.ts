@@ -1,10 +1,11 @@
-import { redirect, type ActionFunctionArgs } from 'react-router'
+import { redirect } from 'react-router'
 import { z } from 'zod'
 import { cache } from '#app/utils/cache.server.ts'
 import {
 	getInstanceInfo,
 	getInternalInstanceDomain,
 } from '#app/utils/litefs.server'
+import { type Route } from './+types/cache_.sqlite.ts'
 
 export async function updatePrimaryCacheValue({
 	key,
@@ -31,7 +32,7 @@ export async function updatePrimaryCacheValue({
 	})
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
 	if (!currentIsPrimary) {
 		throw new Error(

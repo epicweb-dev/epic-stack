@@ -1,12 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import {
-	type ActionFunctionArgs,
-	Form,
-	useActionData,
-	useSearchParams,
-} from 'react-router'
+import { Form, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -15,6 +10,7 @@ import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
+import { type Route } from './+types/verify.ts'
 import { validateRequest } from './verify.server.ts'
 
 export const handle: SEOHandle = {
@@ -36,16 +32,15 @@ export const VerifySchema = z.object({
 	[redirectToQueryParam]: z.string().optional(),
 })
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	checkHoneypot(formData)
 	return validateRequest(request, formData)
 }
 
-export default function VerifyRoute() {
+export default function VerifyRoute({ actionData }: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 	const isPending = useIsPending()
-	const actionData = useActionData<typeof action>()
 	const parseWithZoddType = VerificationTypeSchema.safeParse(
 		searchParams.get(typeQueryParam),
 	)
