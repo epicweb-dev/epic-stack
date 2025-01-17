@@ -1,8 +1,8 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { type LoaderFunctionArgs } from 'react-router'
 import { prisma } from '#app/utils/db.server.ts'
+import { type Route } from './+types/user-images.$imageId.ts'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
 	const image = await prisma.userImage.findUnique({
 		where: { id: params.imageId },

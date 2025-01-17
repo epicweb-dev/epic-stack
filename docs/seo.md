@@ -39,8 +39,9 @@ build. Support for this is pre-configured in the `vite.config.ts` file.
 ```tsx
 // in your routes/url-that-doesnt-need-sitemap
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import { type Route } from './+types/sitemap[.]xml.ts'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	/**/
 }
 

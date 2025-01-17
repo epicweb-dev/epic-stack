@@ -1,17 +1,11 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import {
-	redirect,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-	Link,
-	useFetcher,
-	useLoaderData,
-} from 'react-router'
+import { redirect, Link, useFetcher } from 'react-router'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { generateTOTP } from '#app/utils/totp.server.ts'
+import { type Route } from './+types/profile.two-factor.index.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 import { twoFAVerifyVerificationType } from './profile.two-factor.verify.tsx'
 
@@ -19,7 +13,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const verification = await prisma.verification.findUnique({
 		where: { target_type: { type: twoFAVerificationType, target: userId } },
@@ -28,7 +22,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return { is2FAEnabled: Boolean(verification) }
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const { otp: _otp, ...config } = await generateTOTP()
 	const verificationData = {
@@ -46,13 +40,12 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect('/settings/profile/two-factor/verify')
 }
 
-export default function TwoFactorRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function TwoFactorRoute({ loaderData }: Route.ComponentProps) {
 	const enable2FAFetcher = useFetcher<typeof action>()
 
 	return (
 		<div className="flex flex-col gap-4">
-			{data.is2FAEnabled ? (
+			{loaderData.is2FAEnabled ? (
 				<>
 					<p className="text-lg">
 						<Icon name="check">

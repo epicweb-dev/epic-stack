@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from 'react-router'
+import { redirect } from 'react-router'
 import {
 	authenticator,
 	getSessionExpirationDate,
@@ -21,13 +21,14 @@ import {
 	redirectWithToast,
 } from '#app/utils/toast.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { type Route } from './+types/auth.$provider.callback.ts'
 import { handleNewSession } from './login.server.ts'
 import { onboardingEmailSessionKey } from './onboarding.tsx'
 import { prefilledProfileKey, providerIdKey } from './onboarding_.$provider.tsx'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	// this loader performs mutations, so we need to make sure we're on the
 	// primary instance to avoid writing to a read-only replica
 	await ensurePrimary()

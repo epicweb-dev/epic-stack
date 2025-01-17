@@ -2,16 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as QRCode from 'qrcode'
-import {
-	data,
-	redirect,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-	Form,
-	useActionData,
-	useLoaderData,
-	useNavigation,
-} from 'react-router'
+import { data, redirect, Form, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { ErrorList, OTPField } from '#app/components/forms.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -22,6 +13,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { getTOTPAuthUri } from '#app/utils/totp.server.ts'
+import { type Route } from './+types/profile.two-factor.verify.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
@@ -43,7 +35,7 @@ const ActionSchema = z.discriminatedUnion('intent', [
 
 export const twoFAVerifyVerificationType = '2fa-verify'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const verification = await prisma.verification.findUnique({
 		where: {
@@ -76,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return { otpUri, qrCode }
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 
@@ -131,9 +123,10 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function TwoFactorRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function TwoFactorRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const navigation = useNavigation()
 
 	const isPending = useIsPending()
@@ -152,7 +145,7 @@ export default function TwoFactorRoute() {
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
+				<img alt="qr code" src={loaderData.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -163,7 +156,7 @@ export default function TwoFactorRoute() {
 						className="whitespace-pre-wrap break-all text-sm"
 						aria-label="One-time Password URI"
 					>
-						{data.otpUri}
+						{loaderData.otpUri}
 					</pre>
 				</div>
 				<p className="text-sm">
