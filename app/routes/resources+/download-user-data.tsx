@@ -1,4 +1,4 @@
-import { data, type LoaderFunctionArgs } from 'react-router'
+import { type LoaderFunctionArgs } from 'react-router'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const domain = getDomainUrl(request)
 
-	return data({
+	return Response.json({
 		user: {
 			...user,
 			image: user.image
