@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useSubmit, Link, Form } from 'react-router'
+import { Link, Form } from 'react-router'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { Button } from './ui/button'
@@ -14,10 +14,9 @@ import { Icon } from './ui/icon'
 
 export function UserDropdown() {
 	const user = useUser()
-	const submit = useSubmit()
 	const formRef = useRef<HTMLFormElement>(null)
 	return (
-		<DropdownMenu modal={false}>
+		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button asChild variant="secondary">
 					<Link
@@ -53,20 +52,15 @@ export function UserDropdown() {
 							</Icon>
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem
-						asChild
-						// this prevents the menu from closing before the form submission is completed
-						onSelect={async (event) => {
-							event.preventDefault()
-							await submit(formRef.current)
-						}}
-					>
-						<Form action="/logout" method="POST" ref={formRef}>
-							<Icon className="text-body-md" name="exit">
-								<button type="submit">Logout</button>
-							</Icon>
-						</Form>
-					</DropdownMenuItem>
+					<Form action="/logout" method="POST" ref={formRef}>
+						<DropdownMenuItem asChild>
+							<button type="submit" className="w-full">
+								<Icon className="text-body-md" name="exit">
+									Logout
+								</Icon>
+							</button>
+						</DropdownMenuItem>
+					</Form>
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
