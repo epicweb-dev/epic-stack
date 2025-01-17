@@ -1,8 +1,8 @@
 // learn more: https://fly.io/docs/reference/configuration/#services-http_checks
-import { type LoaderFunctionArgs } from 'react-router'
 import { prisma } from '#app/utils/db.server.ts'
+import { type Route } from './+types/healthcheck.ts'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const host =
 		request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
 

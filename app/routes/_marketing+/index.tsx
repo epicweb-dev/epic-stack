@@ -1,4 +1,3 @@
-import { type MetaFunction } from 'react-router'
 import {
 	Tooltip,
 	TooltipContent,
@@ -6,9 +5,10 @@ import {
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
 import { cn } from '#app/utils/misc.tsx'
+import { type Route } from './+types/index.ts'
 import { logos } from './logos/logos.ts'
 
-export const meta: MetaFunction = () => [{ title: 'Epic Notes' }]
+export const meta: Route.MetaFunction = () => [{ title: 'Epic Notes' }]
 
 // Tailwind Grid cell classes lookup
 const columnClasses: Record<(typeof logos)[number]['column'], string> = {

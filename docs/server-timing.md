@@ -32,8 +32,9 @@ import {
 	makeTimings,
 	time,
 } from '#app/utils/timing.server.ts'
+import { type Route } from './+types/notes.ts'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
 	const timings = makeTimings('notes loader') // <-- 1. Setup Timings
 	// 2. Time functions
 	const owner = await time(
@@ -74,7 +75,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	)
 }
 
-export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+export const headers: Route.HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 	return {
 		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders), // <-- 4. Send headers
 	}
