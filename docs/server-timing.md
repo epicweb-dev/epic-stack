@@ -75,6 +75,9 @@ export async function loader({ params }: Route.LoaderArgs) {
 	)
 }
 
+// We have a general headers handler to save you from boilerplating.
+export const headers: HeadersFunction = pipeHeaders
+// this is basically what it does though
 export const headers: Route.HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 	return {
 		'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders), // <-- 4. Send headers
@@ -83,5 +86,4 @@ export const headers: Route.HeadersFunction = ({ loaderHeaders, parentHeaders })
 ```
 
 You can
-[learn more about `headers` in the Remix docs](https://remix.run/docs/en/main/route/headers)
-(note, the Epic Stack has the v2 behavior enabled).
+[learn more about `headers` in the React Router docs](https://reactrouter.com/how-to/headers)

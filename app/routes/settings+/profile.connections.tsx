@@ -20,6 +20,7 @@ import {
 	providerNames,
 } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
+import { pipeHeaders } from '#app/utils/headers.server.js'
 import { makeTimings } from '#app/utils/timing.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 import { type Info, type Route } from './+types/profile.connections.ts'
@@ -84,12 +85,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	)
 }
 
-export const headers: Route.HeadersFunction = ({ loaderHeaders }) => {
-	const headers = {
-		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
-	}
-	return headers
-}
+export const headers: Route.HeadersFunction = pipeHeaders
 
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
