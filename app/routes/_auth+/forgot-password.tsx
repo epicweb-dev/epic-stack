@@ -25,7 +25,7 @@ const ForgotPasswordSchema = z.object({
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {
 		schema: ForgotPasswordSchema.superRefine(async (data, ctx) => {
 			const user = await prisma.user.findFirst({
