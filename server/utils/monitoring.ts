@@ -17,7 +17,9 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			Sentry.prismaIntegration(),
+			// TODO: re-enable prisma integration when this is fixed:
+			// https://github.com/getsentry/sentry-javascript/issues/15063
+			// Sentry.prismaIntegration(),
 			Sentry.httpIntegration(),
 			nodeProfilingIntegration(),
 		],
