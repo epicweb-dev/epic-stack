@@ -51,6 +51,17 @@ app.use((req, res, next) => {
 	next()
 })
 
+// Ensure URL is properly encoded to prevent decoding errors and malformed requests
+app.use((req, res, next) => {
+	try {
+		decodeURIComponent(req.url); // Validate the URL
+		next();
+	} catch (err) {
+		console.error('Malformed URL detected:', req.url);
+		return res.status(400).send('Bad Request: Malformed URL');
+	}
+});
+
 // no ending slashes for SEO reasons
 // https://github.com/epicweb-dev/epic-stack/discussions/108
 app.get('*', (req, res, next) => {
