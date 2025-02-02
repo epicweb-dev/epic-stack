@@ -11,6 +11,6 @@
 	"aliases": {
 		"components": "#app/components",
 		"utils": "#app/utils/misc.tsx",
-		"ui": "#app/components/ui",
+		"ui": "#app/components/ui"
 	}
 }
