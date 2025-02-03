@@ -35,9 +35,7 @@ export function GeneralErrorBoundary({
 	}
 
 	useEffect(() => {
-		if (isResponse) {
-			return
-		}
+		if (isResponse) return
 
 		captureException(error)
 	}, [error, isResponse])
