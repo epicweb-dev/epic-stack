@@ -78,7 +78,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const user = userId
 		? await time(
 				() =>
-					prisma.user.findUniqueOrThrow({
+					prisma.user.findUnique({
 						select: {
 							id: true,
 							name: true,
