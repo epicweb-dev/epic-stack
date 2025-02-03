@@ -16,11 +16,15 @@ export const UsernameSchema = z
 export const PasswordSchema = z
 	.string({ required_error: 'Password is required' })
 	.min(6, { message: 'Password is too short' })
-	.max(100, { message: 'Password is too long' })
+	// NOTE: bcrypt has a limit of 72 characters (which should be plenty long)
+	// https://github.com/epicweb-dev/epic-stack/issues/918
+	.max(72, { message: 'Password is too long' })
+
 export const NameSchema = z
 	.string({ required_error: 'Name is required' })
 	.min(3, { message: 'Name is too short' })
 	.max(40, { message: 'Name is too long' })
+
 export const EmailSchema = z
 	.string({ required_error: 'Email is required' })
 	.email({ message: 'Email is invalid' })
