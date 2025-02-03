@@ -1,3 +1,4 @@
+import { PrismaInstrumentation } from '@prisma/instrumentation'
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 
@@ -17,9 +18,9 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			// TODO: re-enable prisma integration when this is fixed:
-			// https://github.com/getsentry/sentry-javascript/issues/15063
-			// Sentry.prismaIntegration(),
+			Sentry.prismaIntegration({
+				prismaInstrumentation: new PrismaInstrumentation(),
+			}),
 			Sentry.httpIntegration(),
 			nodeProfilingIntegration(),
 		],
