@@ -68,8 +68,8 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const formData = await parseFormData(
 		request,
-		async (file: FileUpload) => uploadHandler(file),
 		{ maxFileSize: MAX_SIZE },
+		async (file: FileUpload) => uploadHandler(file),
 	)
 	const submission = await parseWithZod(formData, {
 		schema: PhotoFormSchema.transform(async (data) => {
