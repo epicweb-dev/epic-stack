@@ -1,14 +1,16 @@
 import {
 	generateAuthenticationOptions,
 	verifyAuthenticationResponse,
-	type AuthenticationResponseJSON,
 } from '@simplewebauthn/server'
-import { z } from 'zod'
 import { getSessionExpirationDate } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { getWebAuthnConfig, passkeyCookie } from '#app/utils/webauthn.server.ts'
-import { type Route } from './+types/webauthn.authentication.ts'
-import { handleNewSession } from './login.server.ts'
+import { handleNewSession } from '../login.server.ts'
+import { type Route } from './+types/authentication.ts'
+import {
+	PasskeyLoginBodySchema,
+	getWebAuthnConfig,
+	passkeyCookie,
+} from './utils.server.ts'
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const config = getWebAuthnConfig(request)
@@ -24,27 +26,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 	return Response.json({ options }, { headers: { 'Set-Cookie': cookieHeader } })
 }
 
-const AuthenticationResponseSchema = z.object({
-	id: z.string(),
-	rawId: z.string(),
-	response: z.object({
-		clientDataJSON: z.string(),
-		authenticatorData: z.string(),
-		signature: z.string(),
-		userHandle: z.string().optional(),
-	}),
-	type: z.literal('public-key'),
-	clientExtensionResults: z.object({
-		appid: z.boolean().optional(),
-		credProps: z
-			.object({
-				rk: z.boolean().optional(),
-			})
-			.optional(),
-		hmacCreateSecret: z.boolean().optional(),
-	}),
-}) satisfies z.ZodType<AuthenticationResponseJSON>
-
 export async function action({ request }: Route.ActionArgs) {
 	const cookieHeader = request.headers.get('Cookie')
 	const cookie = await passkeyCookie.parse(cookieHeader)
@@ -55,13 +36,14 @@ export async function action({ request }: Route.ActionArgs) {
 		}
 
 		const body = await request.json()
-		const result = AuthenticationResponseSchema.safeParse(body)
+		const result = PasskeyLoginBodySchema.safeParse(body)
 		if (!result.success) {
 			throw new Error('Invalid authentication response')
 		}
+		const { authResponse, remember, redirectTo } = result.data
 
 		const passkey = await prisma.passkey.findUnique({
-			where: { id: result.data.id },
+			where: { id: authResponse.id },
 			include: { user: true },
 		})
 		if (!passkey) {
@@ -71,12 +53,12 @@ export async function action({ request }: Route.ActionArgs) {
 		const config = getWebAuthnConfig(request)
 
 		const verification = await verifyAuthenticationResponse({
-			response: result.data,
+			response: authResponse,
 			expectedChallenge: cookie.challenge,
 			expectedOrigin: config.origin,
 			expectedRPID: config.rpID,
 			credential: {
-				id: result.data.id,
+				id: authResponse.id,
 				publicKey: passkey.publicKey,
 				counter: Number(passkey.counter),
 			},
@@ -104,14 +86,19 @@ export async function action({ request }: Route.ActionArgs) {
 			{
 				request,
 				session,
-				// TODO: handle remember and redirectTo
-				remember: false,
-				redirectTo: '/',
+				remember,
+				redirectTo: redirectTo ?? undefined,
 			},
 			{ headers: { 'Set-Cookie': deletePasskeyCookie } },
 		)
 
-		return response
+		return Response.json(
+			{
+				status: 'success',
+				location: response.headers.get('Location'),
+			},
+			{ headers: response.headers },
+		)
 	} catch (error) {
 		if (error instanceof Response) throw error
 

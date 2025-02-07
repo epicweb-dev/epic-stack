@@ -5,14 +5,13 @@ import {
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, getErrorMessage } from '#app/utils/misc.tsx'
+import { type Route } from './+types/registration.ts'
 import {
 	PasskeyCookieSchema,
 	RegistrationResponseSchema,
-	parseAttestationObject,
 	passkeyCookie,
 	getWebAuthnConfig,
-} from '#app/utils/webauthn.server.js'
-import { type Route } from './+types/webauthn.registration.ts'
+} from './utils.server.ts'
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
@@ -63,12 +62,6 @@ export async function action({ request }: Route.ActionArgs) {
 		}
 
 		const data = result.data
-		let aaguid: string
-
-		const parsedAttestation = parseAttestationObject(
-			data.response.attestationObject,
-		)
-		aaguid = parsedAttestation.authData.aaguid
 
 		// Get challenge from cookie
 		const passkeyCookieData = await passkeyCookie.parse(
@@ -97,7 +90,7 @@ export async function action({ request }: Route.ActionArgs) {
 		if (!verified || !registrationInfo) {
 			throw new Error('Registration verification failed')
 		}
-		const { credential, credentialDeviceType, credentialBackedUp } =
+		const { credential, credentialDeviceType, credentialBackedUp, aaguid } =
 			registrationInfo
 
 		const existingPasskey = await prisma.passkey.findUnique({

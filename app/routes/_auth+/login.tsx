@@ -172,10 +172,15 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 								</StatusButton>
 							</div>
 						</Form>
-						<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
-							<PasskeyLogin />
+						<hr className="my-4" />
+						<div className="flex flex-col gap-5">
+							<PasskeyLogin
+								redirectTo={redirectTo}
+								remember={fields.remember.value === 'on'}
+							/>
 						</div>
-						<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+						<hr className="my-4" />
+						<ul className="flex flex-col gap-5">
 							{providerNames.map((providerName) => (
 								<li key={providerName}>
 									<ProviderConnectionForm
@@ -205,12 +210,24 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 	)
 }
 
-const VerificationResponseSchema = z.object({
-	status: z.enum(['success', 'error']),
-	error: z.string().optional(),
-})
+const VerificationResponseSchema = z.discriminatedUnion('status', [
+	z.object({
+		status: z.literal('success'),
+		location: z.string(),
+	}),
+	z.object({
+		status: z.literal('error'),
+		error: z.string(),
+	}),
+])
 
-function PasskeyLogin() {
+function PasskeyLogin({
+	redirectTo,
+	remember,
+}: {
+	redirectTo: string | null
+	remember: boolean
+}) {
 	const [isPending] = useTransition()
 	const [error, setError] = useState<string | null>(null)
 	const [passkeyMessage, setPasskeyMessage] = useOptimistic<string | null>(
@@ -234,21 +251,21 @@ function PasskeyLogin() {
 			const verificationResponse = await fetch('/webauthn/authentication', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(authResponse),
+				body: JSON.stringify({ authResponse, remember, redirectTo }),
 			})
 
-			if (
-				verificationResponse.headers.get('Content-Type') === 'application/json'
-			) {
-				const verificationJson = await verificationResponse.json()
-				const verification = VerificationResponseSchema.parse(verificationJson)
-				if (verification.status === 'error') {
-					throw new Error(verification.error)
-				}
+			if (!verificationResponse.ok) {
+				throw new Error('Failed to authenticate with passkey')
 			}
 
-			setPasskeyMessage("You're logged in! Navigating to your account page.")
-			await navigate(verificationResponse.headers.get('Location') ?? '/')
+			const verificationJson = await verificationResponse.json()
+			const verification = VerificationResponseSchema.parse(verificationJson)
+			if (verification.status === 'error') {
+				throw new Error(verification.error)
+			}
+
+			setPasskeyMessage("You're logged in! Navigating...")
+			await navigate(verification.location ?? '/')
 		} catch (e) {
 			setError(
 				e instanceof Error ? e.message : 'Failed to authenticate with passkey',
