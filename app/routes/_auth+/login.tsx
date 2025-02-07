@@ -1,12 +1,15 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { data, Form, Link, useSearchParams } from 'react-router'
+import { startAuthentication } from '@simplewebauthn/browser'
+import { useOptimistic, useState, useTransition } from 'react'
+import { data, Form, Link, useNavigate, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { login, requireAnonymous } from '#app/utils/auth.server.ts'
 import {
@@ -29,6 +32,10 @@ const LoginFormSchema = z.object({
 	redirectTo: z.string().optional(),
 	remember: z.boolean().optional(),
 })
+
+const AuthenticationOptionsSchema = z.object({
+	options: z.object({ challenge: z.string() }),
+}) satisfies z.ZodType<{ options: PublicKeyCredentialRequestOptionsJSON }>
 
 export async function loader({ request }: Route.LoaderArgs) {
 	await requireAnonymous(request)
@@ -165,6 +172,9 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 								</StatusButton>
 							</div>
 						</Form>
+						<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+							<PasskeyLogin />
+						</div>
 						<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
 							{providerNames.map((providerName) => (
 								<li key={providerName}>
@@ -192,6 +202,77 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 				</div>
 			</div>
 		</div>
+	)
+}
+
+const VerificationResponseSchema = z.object({
+	status: z.enum(['success', 'error']),
+	error: z.string().optional(),
+})
+
+function PasskeyLogin() {
+	const [isPending] = useTransition()
+	const [error, setError] = useState<string | null>(null)
+	const [passkeyMessage, setPasskeyMessage] = useOptimistic<string | null>(
+		'Login with a passkey',
+	)
+	const navigate = useNavigate()
+
+	async function handlePasskeyLogin() {
+		try {
+			setPasskeyMessage('Generating Authentication Options')
+			// Get authentication options from the server
+			const optionsResponse = await fetch('/webauthn/authentication')
+			const json = await optionsResponse.json()
+			const { options } = AuthenticationOptionsSchema.parse(json)
+
+			setPasskeyMessage('Requesting your authorization')
+			const authResponse = await startAuthentication({ optionsJSON: options })
+			setPasskeyMessage('Verifying your passkey')
+
+			// Verify the authentication with the server
+			const verificationResponse = await fetch('/webauthn/authentication', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(authResponse),
+			})
+
+			if (
+				verificationResponse.headers.get('Content-Type') === 'application/json'
+			) {
+				const verificationJson = await verificationResponse.json()
+				const verification = VerificationResponseSchema.parse(verificationJson)
+				if (verification.status === 'error') {
+					throw new Error(verification.error)
+				}
+			}
+
+			setPasskeyMessage("You're logged in! Navigating to your account page.")
+			await navigate(verificationResponse.headers.get('Location') ?? '/')
+		} catch (e) {
+			setError(
+				e instanceof Error ? e.message : 'Failed to authenticate with passkey',
+			)
+		}
+	}
+
+	return (
+		<form action={handlePasskeyLogin}>
+			<StatusButton
+				id="passkey-login-button"
+				aria-describedby="passkey-login-button-error"
+				className="w-full"
+				status={isPending ? 'pending' : error ? 'error' : 'idle'}
+				type="submit"
+				disabled={isPending}
+			>
+				<Icon name="passkey" className="text-body-md" />
+				<span>{passkeyMessage}</span>
+			</StatusButton>
+			<div className="mt-2">
+				<ErrorList errors={[error]} id="passkey-login-button-error" />
+			</div>
+		</form>
 	)
 }
 
