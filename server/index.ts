@@ -88,7 +88,13 @@ app.get(['/img/*', '/favicons/*'], (_req, res) => {
 	return res.status(404).send('Not found')
 })
 
-morgan.token('url', (req) => decodeURIComponent(req.url ?? ''))
+morgan.token('url', (req) => {
+	try {
+		return decodeURIComponent(req.url ?? '')
+	} catch {
+		return req.url ?? ''
+	}
+})
 app.use(
 	morgan('tiny', {
 		skip: (req, res) =>
