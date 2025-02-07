@@ -4,8 +4,8 @@
   "sideEffects": false,
   "license": "MIT",
   "epic-stack": {
-    "head": "ce8bc27d741ac700b902e54b1a11e52252ae22c1",
-    "date": "2025-02-04T21:51:09Z"
+    "head": "03b10d1dbe15619677487bafd91c029df38a90f1",
+    "date": "2025-02-07T20:28:18Z"
   },
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "type": "module",
