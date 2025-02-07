@@ -143,7 +143,6 @@ function Document({
 	nonce: string
 	theme?: Theme
 	env?: Record<string, string | undefined>
-	allowIndexing?: boolean
 }) {
 	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (
