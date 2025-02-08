@@ -16,7 +16,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const config = getWebAuthnConfig(request)
 	const options = await generateAuthenticationOptions({
 		rpID: config.rpID,
-		userVerification: config.authenticatorSelection.userVerification,
+		userVerification: 'preferred',
 	})
 
 	const cookieHeader = await passkeyCookie.serialize({

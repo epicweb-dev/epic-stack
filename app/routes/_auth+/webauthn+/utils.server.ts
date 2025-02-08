@@ -80,13 +80,10 @@ export const PasskeyLoginBodySchema = z.object({
 
 export function getWebAuthnConfig(request: Request) {
 	const url = new URL(getDomainUrl(request))
+
 	return {
 		rpName: url.hostname,
 		rpID: url.hostname,
 		origin: url.origin,
-		authenticatorSelection: {
-			residentKey: 'preferred',
-			userVerification: 'preferred',
-		},
 	} as const
 }

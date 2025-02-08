@@ -33,7 +33,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 		userDisplayName: user.name ?? user.email,
 		attestationType: 'none',
 		excludeCredentials: passkeys,
-		authenticatorSelection: config.authenticatorSelection,
+		authenticatorSelection: {
+			residentKey: 'preferred',
+			userVerification: 'preferred',
+		},
 	})
 
 	return Response.json(
