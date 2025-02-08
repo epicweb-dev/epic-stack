@@ -30,17 +30,17 @@ export async function getUserId(request: Request) {
 	const sessionId = authSession.get(sessionKey)
 	if (!sessionId) return null
 	const session = await prisma.session.findUnique({
-		select: { user: { select: { id: true } } },
+		select: { userId: true },
 		where: { id: sessionId, expirationDate: { gt: new Date() } },
 	})
-	if (!session?.user) {
+	if (!session?.userId) {
 		throw redirect('/', {
 			headers: {
 				'set-cookie': await authSessionStorage.destroySession(authSession),
 			},
 		})
 	}
-	return session.user.id
+	return session.userId
 }
 
 export async function requireUserId(
