@@ -15,6 +15,8 @@ import { getEnv, init } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
+import { combineHeaders } from './utils/misc.tsx'
+import { helmet } from './utils/helmet.server.ts'
 
 export const streamTimeout = 5000
 
@@ -65,9 +67,14 @@ export default async function handleRequest(...args: DocRequestArgs) {
 					const body = new PassThrough()
 					responseHeaders.set('Content-Type', 'text/html')
 					responseHeaders.append('Server-Timing', timings.toString())
+
+					const headers = combineHeaders(
+						responseHeaders,
+						helmet({ html: true, nonce }),
+					)
 					resolve(
 						new Response(createReadableStreamFromReadable(body), {
-							headers: responseHeaders,
+							headers,
 							status: didError ? 500 : responseStatusCode,
 						}),
 					)

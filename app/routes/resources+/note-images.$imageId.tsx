@@ -1,5 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { prisma } from '#app/utils/db.server.ts'
+import { helmet } from '#app/utils/helmet.server.ts'
+import { combineHeaders } from '#app/utils/misc.tsx'
 import { type Route } from './+types/note-images.$imageId.ts'
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -12,11 +14,14 @@ export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(image, 'Not found', { status: 404 })
 
 	return new Response(image.blob, {
-		headers: {
-			'Content-Type': image.contentType,
-			'Content-Length': Buffer.byteLength(image.blob).toString(),
-			'Content-Disposition': `inline; filename="${params.imageId}"`,
-			'Cache-Control': 'public, max-age=31536000, immutable',
-		},
+		headers: combineHeaders(
+			{
+				'Content-Type': image.contentType,
+				'Content-Length': Buffer.byteLength(image.blob).toString(),
+				'Content-Disposition': `inline; filename="${params.imageId}"`,
+				'Cache-Control': 'public, max-age=31536000, immutable',
+			},
+			helmet(),
+		),
 	})
 }

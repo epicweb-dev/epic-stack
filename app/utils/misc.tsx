@@ -288,3 +288,8 @@ export async function downloadFile(url: string, retries: number = 0) {
 		return downloadFile(url, retries + 1)
 	}
 }
+
+/**
+ * string type but keeps auto-completion
+ */
+export type SmartString = string & Record<never, never>
