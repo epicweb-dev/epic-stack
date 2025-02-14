@@ -267,6 +267,7 @@ function PasskeyLogin({
 			setPasskeyMessage("You're logged in! Navigating...")
 			await navigate(verification.location ?? '/')
 		} catch (e) {
+			console.error('ahhhhhhhhhhhhh error', e)
 			setError(
 				e instanceof Error ? e.message : 'Failed to authenticate with passkey',
 			)

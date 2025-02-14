@@ -130,10 +130,10 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 				</div>
 			) : null}
 
-			<div className="flex flex-col gap-4">
-				{loaderData.passkeys.length ? (
-					loaderData.passkeys.map((passkey) => (
-						<div
+			{loaderData.passkeys.length ? (
+				<ul className="flex flex-col gap-4" title="passkeys">
+					{loaderData.passkeys.map((passkey) => (
+						<li
 							key={passkey.id}
 							className="flex items-center justify-between gap-4 rounded-lg border border-muted-foreground p-4"
 						>
@@ -164,14 +164,14 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 									<Icon name="trash">Delete</Icon>
 								</Button>
 							</Form>
-						</div>
-					))
-				) : (
-					<div className="text-center text-muted-foreground">
-						No passkeys registered yet
-					</div>
-				)}
-			</div>
+						</li>
+					))}
+				</ul>
+			) : (
+				<div className="text-center text-muted-foreground">
+					No passkeys registered yet
+				</div>
+			)}
 		</div>
 	)
 }
