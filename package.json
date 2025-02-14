@@ -53,7 +53,7 @@
     "@epic-web/totp": "^3.0.0",
     "@mjackson/form-data-parser": "^0.7.0",
     "@nasa-gcn/remix-seo": "^2.0.1",
-    "@nichtsam/helmet": "0.2.0",
+    "@nichtsam/helmet": "0.3.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@paralleldrive/cuid2": "^2.2.2",

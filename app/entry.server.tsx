@@ -1,6 +1,6 @@
 import { PassThrough } from 'node:stream'
 import { styleText } from 'node:util'
-import { contentSecurity } from '@nichtsam/helmet/rules/content/index'
+import { contentSecurity } from '@nichtsam/helmet/content'
 import { createReadableStreamFromReadable } from '@react-router/node'
 import * as Sentry from '@sentry/node'
 import { isbot } from 'isbot'
