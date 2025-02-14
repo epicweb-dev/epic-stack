@@ -76,7 +76,6 @@
     "address": "^2.0.3",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.8.1",
-    "chalk": "^5.4.1",
     "class-variance-authority": "^0.7.1",
     "close-with-grace": "^2.2.0",
     "clsx": "^2.1.1",
