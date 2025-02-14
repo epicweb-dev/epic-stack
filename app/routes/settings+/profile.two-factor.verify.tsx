@@ -59,8 +59,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const issuer = new URL(getDomainUrl(request)).host
 	const otpUri = getTOTPAuthUri({
 		...verification,
-		// OTP clients break with the `-` in the algorithm name.
-		algorithm: verification.algorithm.replaceAll('-', ''),
 		accountName: user.email,
 		issuer,
 	})
