@@ -1,9 +1,9 @@
 import crypto from 'node:crypto'
+import { styleText } from 'node:util'
 import { helmet } from '@nichtsam/helmet/node-http'
 import { createRequestHandler } from '@react-router/express'
 import * as Sentry from '@sentry/node'
 import { ip as ipAddress } from 'address'
-import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import express from 'express'
@@ -230,9 +230,7 @@ if (!portAvailable && !IS_DEV) {
 const server = app.listen(portToUse, () => {
 	if (!portAvailable) {
 		console.warn(
-			chalk.yellow(
-				`⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`,
-			),
+			styleText('yellow', `⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`),
 		)
 	}
 	console.log(`🚀  We have liftoff!`)
@@ -248,9 +246,9 @@ const server = app.listen(portToUse, () => {
 
 	console.log(
 		`
-${chalk.bold('Local:')}            ${chalk.cyan(localUrl)}
-${lanUrl ? `${chalk.bold('On Your Network:')}  ${chalk.cyan(lanUrl)}` : ''}
-${chalk.bold('Press Ctrl+C to stop')}
+${styleText('bold', 'Local:')}            ${styleText('cyan', localUrl)}
+${lanUrl ? `${styleText('bold', 'On Your Network:')}  ${styleText('cyan', lanUrl)}` : ''}
+${styleText('bold', 'Press Ctrl+C to stop')}
 		`.trim(),
 	)
 })
@@ -260,8 +258,8 @@ closeWithGrace(async ({ err }) => {
 		server.close((e) => (e ? reject(e) : resolve('ok')))
 	})
 	if (err) {
-		console.error(chalk.red(err))
-		console.error(chalk.red(err.stack))
+		console.error(styleText('red', String(err)))
+		console.error(styleText('red', String(err.stack)))
 		if (SENTRY_ENABLED) {
 			Sentry.captureException(err)
 			await Sentry.flush(500)
