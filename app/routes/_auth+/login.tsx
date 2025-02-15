@@ -17,7 +17,7 @@ import {
 	providerNames,
 } from '#app/utils/connections.tsx'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { useIsPending } from '#app/utils/misc.tsx'
+import { getErrorMessage, useIsPending } from '#app/utils/misc.tsx'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { type Route } from './+types/login.ts'
 import { handleNewSession } from './login.server.ts'
@@ -267,10 +267,8 @@ function PasskeyLogin({
 			setPasskeyMessage("You're logged in! Navigating...")
 			await navigate(verification.location ?? '/')
 		} catch (e) {
-			console.error('ahhhhhhhhhhhhh error', e)
-			setError(
-				e instanceof Error ? e.message : 'Failed to authenticate with passkey',
-			)
+			const errorMessage = getErrorMessage(e)
+			setError(`Failed to authenticate with passkey: ${errorMessage}`)
 		}
 	}
 
