@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { type CDPSession } from '@playwright/test'
 import { expect, test } from '#tests/playwright-utils.ts'
 
 async function setupWebAuthn(page: any) {
@@ -19,42 +18,6 @@ async function setupWebAuthn(page: any) {
 	return { client, authenticatorId: result.authenticatorId }
 }
 
-async function waitOnce(
-	client: CDPSession,
-	event: Parameters<CDPSession['once']>[0],
-) {
-	let resolve: () => void
-	client.once(event, () => resolve())
-	return new Promise<void>((r) => {
-		resolve = r
-	})
-}
-
-async function simulateSuccessfulPasskeyInput(
-	client: CDPSession,
-	operationTrigger: () => Promise<void>,
-) {
-	// initialize event listeners to wait for a successful passkey input event
-	let resolve: () => void
-	const credentialAddedHandler = () => resolve()
-	const credentialAssertedHandler = () => resolve()
-	const operationCompleted = new Promise<void>((r) => {
-		resolve = r
-		client.on('WebAuthn.credentialAdded', credentialAddedHandler)
-		client.on('WebAuthn.credentialAsserted', credentialAssertedHandler)
-	})
-
-	// perform a user action that triggers passkey prompt
-	await operationTrigger()
-
-	// wait to receive the event that the passkey was successfully registered or verified
-	await operationCompleted
-
-	// clean up event listeners
-	client.off('WebAuthn.credentialAdded', credentialAddedHandler)
-	client.off('WebAuthn.credentialAsserted', credentialAssertedHandler)
-}
-
 test('Users can register and use passkeys', async ({ page, login }) => {
 	const user = await login()
 
@@ -70,7 +33,9 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 
 	await page.goto('/settings/profile/passkeys')
 
-	const passkeyRegisteredPromise = waitOnce(client, 'WebAuthn.credentialAdded')
+	const passkeyRegisteredPromise = new Promise<void>((resolve) => {
+		client.once('WebAuthn.credentialAdded', () => resolve())
+	})
 	await page.getByRole('button', { name: /register new passkey/i }).click()
 	await passkeyRegisteredPromise
 
@@ -96,7 +61,9 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 	await page.goto('/login')
 	const signCount1 = afterRegistrationCredentials.credentials[0].signCount
 
-	const passkeyAssertedPromise = waitOnce(client, 'WebAuthn.credentialAsserted')
+	const passkeyAssertedPromise = new Promise<void>((resolve) => {
+		client.once('WebAuthn.credentialAsserted', () => resolve())
+	})
 
 	await page.getByRole('button', { name: /login with a passkey/i }).click()
 
@@ -143,9 +110,13 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 
 	// Try logging in with the deleted passkey
 	await page.goto('/login')
-	await simulateSuccessfulPasskeyInput(client, async () => {
-		await page.getByRole('button', { name: /login with a passkey/i }).click()
+	const deletedPasskeyAssertedPromise = new Promise<void>((resolve) => {
+		client.once('WebAuthn.credentialAsserted', () => resolve())
 	})
+
+	await page.getByRole('button', { name: /login with a passkey/i }).click()
+
+	await deletedPasskeyAssertedPromise
 
 	// Verify error message appears
 	await expect(page.getByText(/passkey not found/i)).toBeVisible()
@@ -157,11 +128,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 test('Failed passkey verification shows error', async ({ page, login }) => {
 	const password = faker.internet.password()
 	await login({ password })
-
-	// Set up WebAuthn
 	const { client, authenticatorId } = await setupWebAuthn(page)
-
-	// Navigate to passkeys page
 	await page.goto('/settings/profile/passkeys')
 
 	// Try to register with failed verification
