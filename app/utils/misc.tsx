@@ -5,6 +5,10 @@ import { useSpinDelay } from 'spin-delay'
 import { extendTailwindMerge } from 'tailwind-merge'
 import { extendedTheme } from './extended-theme.ts'
 
+export function sleep(ms: number) {
+	return new Promise<void>((res) => setTimeout(() => res(), ms))
+}
+
 export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/user-images/${imageId}` : '/img/user.png'
 }

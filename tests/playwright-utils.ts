@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test'
+import { test as base, Locator } from '@playwright/test'
 import { type User as UserModel } from '@prisma/client'
 import * as setCookieParser from 'set-cookie-parser'
 import {
@@ -16,6 +16,7 @@ import {
 	deleteGitHubUser,
 	insertGitHubUser,
 } from './mocks/github.ts'
+import { sleep } from '#app/utils/misc.tsx'
 
 export * from './db-utils.ts'
 
@@ -159,4 +160,108 @@ export async function waitFor<ReturnValue>(
 		await new Promise((r) => setTimeout(r, 100))
 	}
 	throw lastError
+}
+
+type ActionFunction<T> = () => Promise<T>
+type VerifyFunction = () => Promise<boolean>
+
+interface RetryOptions {
+	maxAttempts?: number
+	actionInterval?: number
+	verifyInterval?: number
+	timeout?: number
+	actionName?: string
+}
+
+/**
+ * some actions seem to sometimes fail in reliably achieving the expected result under `fullyParallel` mode.
+ * This ensures it gets correctly done.
+ */
+async function reliableAction<T>(
+	action: ActionFunction<T>,
+	verify: VerifyFunction,
+	options: RetryOptions = {},
+) {
+	const {
+		maxAttempts = 3,
+		actionInterval = 100,
+		verifyInterval = 50,
+		timeout = 1000,
+		actionName = 'action',
+	} = options
+
+	for (let i = 0; i < maxAttempts; i++) {
+		const isLastAttempt = i === maxAttempts - 1
+
+		try {
+			console.debug(`attempt ${i + 1}`)
+			await action()
+
+			await new Promise((r) => setTimeout(r, 50))
+
+			const verifyPromise = new Promise<boolean>(async (resolve) => {
+				let timedout = false
+				setTimeout(() => {
+					timedout = true
+				}, timeout)
+
+				while (!timedout) {
+					if (await verify()) {
+						resolve(true)
+						return
+					}
+					await sleep(verifyInterval)
+				}
+				resolve(false)
+			})
+
+			if (await verifyPromise) {
+				return
+			}
+		} catch (e) {
+			if (isLastAttempt) throw e
+		}
+
+		if (!isLastAttempt) {
+			await sleep(actionInterval)
+		}
+	}
+
+	throw new Error(
+		`Failed to perform ${actionName} after ${maxAttempts} attempts`,
+	)
+}
+
+/**
+ * `locator.check` seems to sometimes fail in reliably changing the checkbox state under `fullyParallel` mode.
+ * This ensures it gets correctly updated to the “checked” state.
+ */
+export async function reliableCheck(locator: Locator, options?: RetryOptions) {
+	return reliableAction(
+		() => locator.check(),
+		() => locator.isChecked(),
+		{ actionName: 'check', ...options },
+	)
+}
+
+/**
+ * `locator.setInputFiles` seems to sometimes fail in reliably set the input files under `fullyParallel` mode.
+ * This ensures it gets correctly set.
+ */
+export async function reliableSetInputFiles(
+	locator: Locator,
+	files: string[],
+	options?: RetryOptions,
+) {
+	return reliableAction(
+		() => locator.setInputFiles(files),
+		async () => {
+			const count = await locator.evaluate((el) => {
+				const input = el as HTMLInputElement
+				return input.files?.length || 0
+			})
+			return count === files.length
+		},
+		{ actionName: 'file upload', ...options },
+	)
 }

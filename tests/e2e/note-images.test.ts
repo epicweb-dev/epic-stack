@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
 import { type NoteImage, type Note } from '@prisma/client'
 import { prisma } from '#app/utils/db.server.ts'
-import { expect, test } from '#tests/playwright-utils.ts'
+import { expect, reliableSetInputFiles, test } from '#tests/playwright-utils.ts'
 
 test('Users can create note with an image', async ({ page, login }) => {
 	const user = await login()
@@ -15,10 +15,10 @@ test('Users can create note with an image', async ({ page, login }) => {
 	// fill in form and submit
 	await page.getByRole('textbox', { name: 'title' }).fill(newNote.title)
 	await page.getByRole('textbox', { name: 'content' }).fill(newNote.content)
-	await page
-		.getByLabel('image')
-		.nth(0)
-		.setInputFiles('tests/fixtures/images/kody-notes/cute-koala.png')
+
+	await reliableSetInputFiles(page.getByLabel('image').nth(0), [
+		'tests/fixtures/images/kody-notes/cute-koala.png',
+	])
 	await page.getByRole('textbox', { name: 'alt text' }).fill(altText)
 
 	await page.getByRole('button', { name: 'submit' }).click()
@@ -39,17 +39,16 @@ test('Users can create note with multiple images', async ({ page, login }) => {
 	// fill in form and submit
 	await page.getByRole('textbox', { name: 'title' }).fill(newNote.title)
 	await page.getByRole('textbox', { name: 'content' }).fill(newNote.content)
-	await page
-		.getByLabel('image')
-		.nth(0)
-		.setInputFiles('tests/fixtures/images/kody-notes/cute-koala.png')
+
+	await reliableSetInputFiles(page.getByLabel('image').nth(0), [
+		'tests/fixtures/images/kody-notes/cute-koala.png',
+	])
 	await page.getByLabel('alt text').nth(0).fill(altText1)
 	await page.getByRole('button', { name: 'add image' }).click()
 
-	await page
-		.getByLabel('image')
-		.nth(1)
-		.setInputFiles('tests/fixtures/images/kody-notes/koala-coder.png')
+	await reliableSetInputFiles(page.getByLabel('image').nth(1), [
+		'tests/fixtures/images/kody-notes/koala-coder.png',
+	])
 	await page.getByLabel('alt text').nth(1).fill(altText2)
 
 	await page.getByRole('button', { name: 'submit' }).click()
@@ -77,7 +76,10 @@ test('Users can edit note image', async ({ page, login }) => {
 		altText: 'koala coder',
 		location: 'tests/fixtures/images/kody-notes/koala-coder.png',
 	}
-	await page.getByLabel('image').nth(0).setInputFiles(updatedImage.location)
+
+	await reliableSetInputFiles(page.getByLabel('image').nth(0), [
+		updatedImage.location,
+	])
 	await page.getByLabel('alt text').nth(0).fill(updatedImage.altText)
 	await page.getByRole('button', { name: 'submit' }).click()
 
