@@ -69,7 +69,7 @@ app.use(compression())
 app.disable('x-powered-by')
 
 app.use((_, res, next) => {
-	helmet(res)
+	helmet(res, { general: { referrerPolicy: false } })
 	next()
 })
 
