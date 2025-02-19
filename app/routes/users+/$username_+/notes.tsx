@@ -44,8 +44,8 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 								src={getUserImgSrc(loaderData.owner.image?.id)}
 								alt={ownerDisplayName}
 								className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
-								width={416}
-								height={416}
+								width={256}
+								height={256}
 							/>
 							<h1 className="text-center text-base font-bold md:text-lg lg:text-left lg:text-2xl">
 								{ownerDisplayName}'s Notes
