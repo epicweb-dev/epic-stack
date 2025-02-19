@@ -106,8 +106,8 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 						src={getUserImgSrc(loaderData.user.image?.id)}
 						alt={loaderData.user.username}
 						className="h-full w-full rounded-full object-cover"
-						width={823}
-						height={823}
+						width={832}
+						height={832}
 						isAboveFold
 					/>
 					<Button
