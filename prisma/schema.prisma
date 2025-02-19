@@ -25,6 +25,7 @@ model User {
   roles       Role[]
   sessions    Session[]
   connections Connection[]
+  passkey     Passkey[]
 }
 
 model Note {
@@ -166,4 +167,21 @@ model Connection {
   userId String
 
   @@unique([providerName, providerId])
+}
+
+model Passkey {
+  id             String   @id
+  aaguid         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  publicKey      Bytes
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  webauthnUserId String
+  counter        BigInt
+  deviceType     String // 'singleDevice' or 'multiDevice'
+  backedUp       Boolean
+  transports     String? // Stored as comma-separated values
+
+  @@index(userId)
 }
