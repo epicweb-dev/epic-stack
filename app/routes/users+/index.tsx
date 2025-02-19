@@ -1,5 +1,6 @@
 import { data, redirect, Link } from 'react-router'
 import { z } from 'zod'
+import { Img } from 'openimg/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { SearchBar } from '#app/components/search-bar.tsx'
@@ -79,10 +80,12 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 										to={user.username}
 										className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
 									>
-										<img
+										<Img
 											alt={user.name ?? user.username}
 											src={getUserImgSrc(user.imageId)}
 											className="h-16 w-16 rounded-full"
+											width={416}
+											height={416}
 										/>
 										{user.name ? (
 											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">

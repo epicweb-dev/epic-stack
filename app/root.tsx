@@ -10,6 +10,7 @@ import {
 	useMatches,
 } from 'react-router'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { OpenImgContextProvider } from 'openimg/react'
 import { type Route } from './+types/root.ts'
 import appleTouchIconAssetUrl from './assets/favicons/apple-touch-icon.png'
 import faviconAssetUrl from './assets/favicons/favicon.svg'
@@ -194,7 +195,7 @@ function App() {
 	useToast(data.toast)
 
 	return (
-		<>
+		<OpenImgContextProvider optimizerEndpoint="/resources/images">
 			<div className="flex min-h-screen flex-col justify-between">
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
@@ -226,7 +227,7 @@ function App() {
 			</div>
 			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />
-		</>
+		</OpenImgContextProvider>
 	)
 }
 

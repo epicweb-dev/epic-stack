@@ -4,6 +4,7 @@ import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, Link, useFetcher } from 'react-router'
 import { z } from 'zod'
+import { Img } from 'openimg/react'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -101,10 +102,12 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
 				<div className="relative h-52 w-52">
-					<img
+					<Img
 						src={getUserImgSrc(loaderData.user.image?.id)}
 						alt={loaderData.user.username}
 						className="h-full w-full rounded-full object-cover"
+						width={823}
+						height={823}
 					/>
 					<Button
 						asChild

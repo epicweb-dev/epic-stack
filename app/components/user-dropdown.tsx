@@ -11,6 +11,7 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { Icon } from './ui/icon'
+import { Img } from 'openimg/react'
 
 export function UserDropdown() {
 	const user = useUser()
@@ -25,10 +26,12 @@ export function UserDropdown() {
 						onClick={(e) => e.preventDefault()}
 						className="flex items-center gap-2"
 					>
-						<img
+						<Img
 							className="h-8 w-8 rounded-full object-cover"
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.id)}
+							width={416}
+							height={416}
 						/>
 						<span className="text-body-sm font-bold">
 							{user.name ?? user.username}

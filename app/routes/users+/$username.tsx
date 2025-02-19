@@ -5,6 +5,7 @@ import {
 	Link,
 	useLoaderData,
 } from 'react-router'
+import { Img } from 'openimg/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
@@ -48,10 +49,12 @@ export default function ProfileRoute() {
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
-							<img
+							<Img
 								src={getUserImgSrc(data.user.image?.id)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
+								width={823}
+								height={823}
 							/>
 						</div>
 					</div>

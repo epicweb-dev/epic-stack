@@ -18,6 +18,7 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { userHasPermission, useOptionalUser } from '#app/utils/user.ts'
 import { type Route, type Info } from './+types/notes.$noteId.ts'
 import { type Info as notesInfo } from './+types/notes.ts'
+import { Img } from 'openimg/react'
 
 export async function loader({ params }: Route.LoaderArgs) {
 	const note = await prisma.note.findUnique({
@@ -106,10 +107,12 @@ export default function NoteRoute({
 					{loaderData.note.images.map((image) => (
 						<li key={image.id}>
 							<a href={getNoteImgSrc(image.id)}>
-								<img
+								<Img
 									src={getNoteImgSrc(image.id)}
 									alt={image.altText ?? ''}
 									className="h-32 w-32 rounded-lg object-cover"
+									width={516}
+									height={516}
 								/>
 							</a>
 						</li>

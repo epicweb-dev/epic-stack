@@ -21,6 +21,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
 import { cn, getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
 import { type Info } from './+types/notes.$noteId_.edit.ts'
+import { Img } from 'openimg/react'
 
 const titleMinLength = 1
 const titleMaxLength = 100
@@ -188,10 +189,12 @@ function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
 						>
 							{previewImage ? (
 								<div className="relative">
-									<img
+									<Img
 										src={previewImage}
 										alt={altText ?? ''}
 										className="h-32 w-32 rounded-lg object-cover"
+										width={516}
+										height={516}
 									/>
 									{existingImage ? null : (
 										<div className="pointer-events-none absolute -right-0.5 -top-0.5 rotate-12 rounded-sm bg-secondary px-2 py-1 text-xs text-secondary-foreground shadow-md">
