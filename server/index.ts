@@ -69,6 +69,7 @@ app.use(compression())
 app.disable('x-powered-by')
 
 app.use((_, res, next) => {
+	// The referrerPolicy breaks our redirectTo logic
 	helmet(res, { general: { referrerPolicy: false } })
 	next()
 })
