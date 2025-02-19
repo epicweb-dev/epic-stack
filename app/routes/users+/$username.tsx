@@ -53,8 +53,8 @@ export default function ProfileRoute() {
 								src={getUserImgSrc(data.user.image?.id)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
-								width={823}
-								height={823}
+								width={832}
+								height={832}
 							/>
 						</div>
 					</div>
