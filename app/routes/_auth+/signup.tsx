@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { requireAnonymous } from '#app/utils/auth.server.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,
@@ -27,6 +28,11 @@ export const handle: SEOHandle = {
 const SignupSchema = z.object({
 	email: EmailSchema,
 })
+
+export async function loader({ request }: Route.LoaderArgs) {
+	await requireAnonymous(request)
+	return null
+}
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
