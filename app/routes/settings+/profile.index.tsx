@@ -108,6 +108,7 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 						className="h-full w-full rounded-full object-cover"
 						width={823}
 						height={823}
+						isAboveFold
 					/>
 					<Button
 						asChild
