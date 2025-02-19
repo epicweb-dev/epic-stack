@@ -72,6 +72,8 @@
     "@sentry/node": "^8.54.0",
     "@sentry/profiling-node": "^8.54.0",
     "@sentry/react": "^8.54.0",
+    "@simplewebauthn/browser": "^13.1.0",
+    "@simplewebauthn/server": "^13.1.1",
     "@tusbar/cache-control": "1.0.2",
     "address": "^2.0.3",
     "bcryptjs": "^2.4.3",

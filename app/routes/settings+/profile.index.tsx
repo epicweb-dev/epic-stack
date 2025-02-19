@@ -155,6 +155,11 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 					</Link>
 				</div>
 				<div>
+					<Link to="passkeys">
+						<Icon name="passkey">Manage passkeys</Icon>
+					</Link>
+				</div>
+				<div>
 					<Link
 						reloadDocument
 						download="my-epic-notes-data.json"
