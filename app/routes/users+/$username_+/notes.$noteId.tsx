@@ -111,8 +111,8 @@ export default function NoteRoute({
 									src={getNoteImgSrc(image.id)}
 									alt={image.altText ?? ''}
 									className="h-32 w-32 rounded-lg object-cover"
-									width={516}
-									height={516}
+									width={512}
+									height={512}
 								/>
 							</a>
 						</li>
