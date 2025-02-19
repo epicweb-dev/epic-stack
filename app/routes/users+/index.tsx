@@ -84,8 +84,8 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 											alt={user.name ?? user.username}
 											src={getUserImgSrc(user.imageId)}
 											className="h-16 w-16 rounded-full"
-											width={416}
-											height={416}
+											width={256}
+											height={256}
 										/>
 										{user.name ? (
 											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
