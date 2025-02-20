@@ -1,12 +1,15 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { data, Form, Link, useSearchParams } from 'react-router'
+import { startAuthentication } from '@simplewebauthn/browser'
+import { useOptimistic, useState, useTransition } from 'react'
+import { data, Form, Link, useNavigate, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { login, requireAnonymous } from '#app/utils/auth.server.ts'
 import {
@@ -14,7 +17,7 @@ import {
 	providerNames,
 } from '#app/utils/connections.tsx'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { useIsPending } from '#app/utils/misc.tsx'
+import { getErrorMessage, useIsPending } from '#app/utils/misc.tsx'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { type Route } from './+types/login.ts'
 import { handleNewSession } from './login.server.ts'
@@ -29,6 +32,10 @@ const LoginFormSchema = z.object({
 	redirectTo: z.string().optional(),
 	remember: z.boolean().optional(),
 })
+
+const AuthenticationOptionsSchema = z.object({
+	options: z.object({ challenge: z.string() }),
+}) satisfies z.ZodType<{ options: PublicKeyCredentialRequestOptionsJSON }>
 
 export async function loader({ request }: Route.LoaderArgs) {
 	await requireAnonymous(request)
@@ -165,7 +172,15 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 								</StatusButton>
 							</div>
 						</Form>
-						<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+						<hr className="my-4" />
+						<div className="flex flex-col gap-5">
+							<PasskeyLogin
+								redirectTo={redirectTo}
+								remember={fields.remember.value === 'on'}
+							/>
+						</div>
+						<hr className="my-4" />
+						<ul className="flex flex-col gap-5">
 							{providerNames.map((providerName) => (
 								<li key={providerName}>
 									<ProviderConnectionForm
@@ -192,6 +207,94 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 				</div>
 			</div>
 		</div>
+	)
+}
+
+const VerificationResponseSchema = z.discriminatedUnion('status', [
+	z.object({
+		status: z.literal('success'),
+		location: z.string(),
+	}),
+	z.object({
+		status: z.literal('error'),
+		error: z.string(),
+	}),
+])
+
+function PasskeyLogin({
+	redirectTo,
+	remember,
+}: {
+	redirectTo: string | null
+	remember: boolean
+}) {
+	const [isPending] = useTransition()
+	const [error, setError] = useState<string | null>(null)
+	const [passkeyMessage, setPasskeyMessage] = useOptimistic<string | null>(
+		'Login with a passkey',
+	)
+	const navigate = useNavigate()
+
+	async function handlePasskeyLogin() {
+		try {
+			setPasskeyMessage('Generating Authentication Options')
+			// Get authentication options from the server
+			const optionsResponse = await fetch('/webauthn/authentication')
+			const json = await optionsResponse.json()
+			const { options } = AuthenticationOptionsSchema.parse(json)
+
+			setPasskeyMessage('Requesting your authorization')
+			const authResponse = await startAuthentication({ optionsJSON: options })
+			setPasskeyMessage('Verifying your passkey')
+
+			// Verify the authentication with the server
+			const verificationResponse = await fetch('/webauthn/authentication', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ authResponse, remember, redirectTo }),
+			})
+
+			const verificationJson = await verificationResponse.json().catch(() => ({
+				status: 'error',
+				error: 'Unknown error',
+			}))
+
+			const parsedResult =
+				VerificationResponseSchema.safeParse(verificationJson)
+			if (!parsedResult.success) {
+				throw new Error(parsedResult.error.message)
+			} else if (parsedResult.data.status === 'error') {
+				throw new Error(parsedResult.data.error)
+			}
+			const { location } = parsedResult.data
+
+			setPasskeyMessage("You're logged in! Navigating...")
+			await navigate(location ?? '/')
+		} catch (e) {
+			const errorMessage = getErrorMessage(e)
+			setError(`Failed to authenticate with passkey: ${errorMessage}`)
+		}
+	}
+
+	return (
+		<form action={handlePasskeyLogin}>
+			<StatusButton
+				id="passkey-login-button"
+				aria-describedby="passkey-login-button-error"
+				className="w-full"
+				status={isPending ? 'pending' : error ? 'error' : 'idle'}
+				type="submit"
+				disabled={isPending}
+			>
+				<span className="inline-flex items-center gap-1.5">
+					<Icon name="passkey" />
+					<span>{passkeyMessage}</span>
+				</span>
+			</StatusButton>
+			<div className="mt-2">
+				<ErrorList errors={[error]} id="passkey-login-button-error" />
+			</div>
+		</form>
 	)
 }
 

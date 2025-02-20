@@ -66,7 +66,9 @@ export default function EditUserProfile() {
 								'text-muted-foreground': i < arr.length - 1,
 							})}
 						>
-							▶️ {breadcrumb}
+							<Icon name="arrow-right" size="sm">
+								{breadcrumb}
+							</Icon>
 						</li>
 					))}
 				</ul>

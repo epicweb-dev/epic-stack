@@ -106,6 +106,22 @@ CREATE TABLE "Connection" (
 );
 
 -- CreateTable
+CREATE TABLE "Passkey" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "aaguid" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    "publicKey" BLOB NOT NULL,
+    "userId" TEXT NOT NULL,
+    "webauthnUserId" TEXT NOT NULL,
+    "counter" BIGINT NOT NULL,
+    "deviceType" TEXT NOT NULL,
+    "backedUp" BOOLEAN NOT NULL,
+    "transports" TEXT,
+    CONSTRAINT "Passkey_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
 CREATE TABLE "_PermissionToRole" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
@@ -158,6 +174,9 @@ CREATE UNIQUE INDEX "Verification_target_type_key" ON "Verification"("target", "
 CREATE UNIQUE INDEX "Connection_providerName_providerId_key" ON "Connection"("providerName", "providerId");
 
 -- CreateIndex
+CREATE INDEX "Passkey_userId_idx" ON "Passkey"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "_PermissionToRole"("A", "B");
 
 -- CreateIndex
@@ -168,6 +187,7 @@ CREATE UNIQUE INDEX "_RoleToUser_AB_unique" ON "_RoleToUser"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_RoleToUser_B_index" ON "_RoleToUser"("B");
+
 
 --------------------------------- Manual Seeding --------------------------
 -- Hey there, Kent here! This is how you can reliably seed your database with
