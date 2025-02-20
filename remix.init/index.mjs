@@ -15,6 +15,22 @@ const escapeRegExp = (string) =>
 const getRandomString = (length) => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
 
+async function getEpicStackVersion() {
+	const response = await fetch(
+		'https://api.github.com/repos/epicweb-dev/epic-stack/commits/main',
+	)
+	if (!response.ok) {
+		throw new Error(
+			`Failed to fetch Epic Stack version: ${response.status} ${response.statusText}`,
+		)
+	}
+	const data = await response.json()
+	return {
+		head: data.sha,
+		date: data.commit.author.date,
+	}
+}
+
 export default async function main({ rootDirectory }) {
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
 	const EXAMPLE_ENV_PATH = path.join(rootDirectory, '.env.example')
@@ -52,6 +68,17 @@ export default async function main({ rootDirectory }) {
 	packageJson.name = APP_NAME
 	delete packageJson.author
 	delete packageJson.license
+
+	// Add Epic Stack version information
+	try {
+		const epicStackVersion = await getEpicStackVersion()
+		packageJson['epic-stack'] = epicStackVersion
+	} catch (error) {
+		console.warn(
+			'Failed to fetch Epic Stack version information. The package.json will not include version details.',
+			error,
+		)
+	}
 
 	const fileOperationPromises = [
 		fs.writeFile(FLY_TOML_PATH, newFlyTomlContent),
