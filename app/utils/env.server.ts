@@ -19,10 +19,11 @@ const schema = z.object({
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 
 	// Tigris Object Storage Configuration
-	STORAGE_ACCESS_KEY: z.string(),
-	STORAGE_SECRET_KEY: z.string(),
-	STORAGE_BUCKET: z.string(),
-	STORAGE_ENDPOINT: z.string().url(),
+	AWS_ACCESS_KEY_ID: z.string(),
+	AWS_SECRET_ACCESS_KEY: z.string(),
+	AWS_REGION: z.string(),
+	AWS_ENDPOINT_URL_S3: z.string().url(),
+	BUCKET_NAME: z.string(),
 })
 
 declare global {

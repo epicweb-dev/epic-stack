@@ -108,7 +108,9 @@ Prior to your first deployment, you'll need to do a few things:
 
    This will create a Tigris object storage bucket for both your production and
    staging environments. The bucket will be used for storing uploaded files and
-   other objects in your application.
+   other objects in your application. This will also automatically create the
+   necessary environment variables for your app. During local development, this
+   is completely mocked out so you don't need to worry about it.
 
 9. Commit!
 

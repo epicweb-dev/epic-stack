@@ -12,10 +12,10 @@ const __dirname = path.dirname(__filename)
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures')
 const MOCK_STORAGE_DIR = path.join(FIXTURES_DIR, 'uploaded')
 const FIXTURES_IMAGES_DIR = path.join(FIXTURES_DIR, 'images')
-const STORAGE_ENDPOINT = process.env.STORAGE_ENDPOINT
-const STORAGE_BUCKET = process.env.STORAGE_BUCKET
-const STORAGE_ACCESS_KEY = process.env.STORAGE_ACCESS_KEY
-const STORAGE_SECRET_KEY = process.env.STORAGE_SECRET_KEY
+const STORAGE_ENDPOINT = process.env.AWS_ENDPOINT_URL_S3
+const STORAGE_BUCKET = process.env.BUCKET_NAME
+const STORAGE_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID
+const STORAGE_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY
 
 function validateAuth(headers: Headers) {
 	const authHeader = headers.get('Authorization')
