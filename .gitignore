@@ -14,6 +14,7 @@ node_modules
 /playwright-report/
 /playwright/.cache/
 /tests/fixtures/email/
+/tests/fixtures/uploaded/
 /coverage
 
 /other/cache.db

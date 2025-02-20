@@ -200,6 +200,10 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly consul attach --app ${APP_NAME}-staging`
 	await $I`fly consul attach --app ${APP_NAME}`
 
+	console.log(`🗄️ Setting up Tigris object storage`)
+	await $I`fly storage create --app ${APP_NAME}-staging`
+	await $I`fly storage create --app ${APP_NAME}`
+
 	const { shouldDeploy } = await inquirer.prompt([
 		{
 			name: 'shouldDeploy',

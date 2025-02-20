@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { uploadHandler } from '#app/utils/file-uploads.server.ts'
+import { uploadNoteImage } from '#app/utils/storage.server.ts'
 import {
 	MAX_UPLOAD_SIZE,
 	NoteEditorSchema,
@@ -48,8 +49,10 @@ export async function action({ request }: ActionFunctionArgs) {
 				})
 			}
 		}).transform(async ({ images = [], ...data }) => {
+			const noteId = data.id ?? cuid()
 			return {
 				...data,
+				id: noteId,
 				imageUpdates: await Promise.all(
 					images.filter(imageHasId).map(async (i) => {
 						if (imageHasFile(i)) {
@@ -57,7 +60,7 @@ export async function action({ request }: ActionFunctionArgs) {
 								id: i.id,
 								altText: i.altText,
 								contentType: i.file.type,
-								blob: Buffer.from(await i.file.arrayBuffer()),
+								storageKey: await uploadNoteImage(userId, noteId, i.file),
 							}
 						} else {
 							return {
@@ -75,7 +78,7 @@ export async function action({ request }: ActionFunctionArgs) {
 							return {
 								altText: image.altText,
 								contentType: image.file.type,
-								blob: Buffer.from(await image.file.arrayBuffer()),
+								storageKey: await uploadNoteImage(userId, noteId, image.file),
 							}
 						}),
 				),
@@ -101,8 +104,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const updatedNote = await prisma.note.upsert({
 		select: { id: true, owner: { select: { username: true } } },
-		where: { id: noteId ?? '__new_note__' },
+		where: { id: noteId },
 		create: {
+			id: noteId,
 			ownerId: userId,
 			title,
 			content,
@@ -115,7 +119,11 @@ export async function action({ request }: ActionFunctionArgs) {
 				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
 				updateMany: imageUpdates.map((updates) => ({
 					where: { id: updates.id },
-					data: { ...updates, id: updates.blob ? cuid() : updates.id },
+					data: {
+						...updates,
+						// If the image is new, we need to generate a new ID to bust the cache.
+						id: updates.storageKey ? cuid() : updates.id,
+					},
 				})),
 				create: newImages,
 			},

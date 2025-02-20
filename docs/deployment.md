@@ -99,7 +99,18 @@ Prior to your first deployment, you'll need to do a few things:
   fly consul attach --app [YOUR_APP_NAME]-staging
   ```
 
-8. Commit!
+8. Set up Tigris object storage:
+
+   ```sh
+   fly storage create --app [YOUR_APP_NAME]
+   fly storage create --app [YOUR_APP_NAME]-staging
+   ```
+
+   This will create a Tigris object storage bucket for both your production and
+   staging environments. The bucket will be used for storing uploaded files and
+   other objects in your application.
+
+9. Commit!
 
    The Epic Stack comes with a GitHub Action that handles automatically
    deploying your app to production and staging environments.
