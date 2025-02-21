@@ -14,7 +14,7 @@ async function uploadToStorage(file: File | FileUpload, key: string) {
 	const uploadResponse = await fetch(url, {
 		method: 'PUT',
 		headers,
-		body: file instanceof File ? file : Buffer.from(await file.arrayBuffer()),
+		body: file instanceof File ? file : file.stream(),
 	})
 
 	if (!uploadResponse.ok) {
@@ -167,5 +167,17 @@ function getSignedPutRequestInfo(file: File | FileUpload, key: string) {
 			'Content-Type': file.type,
 			'X-Amz-Meta-Upload-Date': uploadDate,
 		},
+	}
+}
+
+export function getSignedGetRequestInfo(key: string) {
+	const { url, baseHeaders } = getBaseSignedRequestInfo({
+		method: 'GET',
+		key,
+	})
+
+	return {
+		url,
+		headers: baseHeaders,
 	}
 }

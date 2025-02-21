@@ -1,11 +1,10 @@
 import { parseWithZod } from '@conform-to/zod'
-import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
+import { parseFormData } from '@mjackson/form-data-parser'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { data, redirect, type ActionFunctionArgs } from 'react-router'
 import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { uploadHandler } from '#app/utils/file-uploads.server.ts'
 import { uploadNoteImage } from '#app/utils/storage.server.ts'
 import {
 	MAX_UPLOAD_SIZE,
@@ -21,18 +20,16 @@ function imageHasFile(
 
 function imageHasId(
 	image: ImageFieldset,
-): image is ImageFieldset & { id: NonNullable<ImageFieldset['id']> } {
-	return image.id != null
+): image is ImageFieldset & { id: string } {
+	return Boolean(image.id)
 }
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 
-	const formData = await parseFormData(
-		request,
-		{ maxFileSize: MAX_UPLOAD_SIZE },
-		async (file: FileUpload) => uploadHandler(file),
-	)
+	const formData = await parseFormData(request, {
+		maxFileSize: MAX_UPLOAD_SIZE,
+	})
 
 	const submission = await parseWithZod(formData, {
 		schema: NoteEditorSchema.superRefine(async (data, ctx) => {

@@ -1,7 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
-import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
+import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useState } from 'react'
 import { data, redirect, Form, useNavigation } from 'react-router'
@@ -12,7 +12,6 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { uploadHandler } from '#app/utils/file-uploads.server.ts'
 import {
 	getUserImgSrc,
 	useDoubleCheck,
@@ -67,11 +66,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 
-	const formData = await parseFormData(
-		request,
-		{ maxFileSize: MAX_SIZE },
-		async (file: FileUpload) => uploadHandler(file),
-	)
+	const formData = await parseFormData(request, { maxFileSize: MAX_SIZE })
 	const submission = await parseWithZod(formData, {
 		schema: PhotoFormSchema.transform(async (data) => {
 			if (data.intent === 'delete') return { intent: 'delete' }
