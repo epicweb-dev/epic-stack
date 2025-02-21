@@ -4,7 +4,6 @@ import { redirect } from 'react-router'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 import { cache, cachified } from '../cache.server.ts'
-import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
 import { MOCK_CODE_GITHUB_HEADER, MOCK_CODE_GITHUB } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
@@ -25,6 +24,20 @@ const shouldMock =
 	process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
 	process.env.NODE_ENV === 'test'
 
+type GitHubEmailsResponse = {
+	email: string
+	verified: boolean
+	primary: boolean
+	visibility: string | null
+}[]
+
+type GitHubUserResponse = {
+	login: string
+	id: string
+	name: string | undefined
+	avatar_url: string | undefined
+}
+
 export class GitHubProvider implements AuthProvider {
 	getAuthStrategy() {
 		return new GitHubStrategy(
@@ -34,26 +47,39 @@ export class GitHubProvider implements AuthProvider {
 				redirectURI: '/auth/github/callback',
 			},
 			async ({ tokens }) => {
-				const response = await fetch('https://api.github.com/user', {
+				// we need to fetch the user and the emails separately, this is a change in remix-auth-github
+				// from the previous version that supported fetching both in one call
+				const userResponse = await fetch('https://api.github.com/user', {
 					headers: {
 						Accept: 'application/vnd.github+json',
 						Authorization: `Bearer ${tokens.accessToken()}`,
 						'X-GitHub-Api-Version': '2022-11-28',
 					},
 				})
-				const profile = (await response.json()) as any
-				const email = profile.emails[0]?.trim().toLowerCase()
+				const user = (await userResponse.json()) as GitHubUserResponse
+
+				const emailsResponse = await fetch(
+					'https://api.github.com/user/emails',
+					{
+						headers: {
+							Accept: 'application/vnd.github+json',
+							Authorization: `Bearer ${tokens.accessToken()}`,
+							'X-GitHub-Api-Version': '2022-11-28',
+						},
+					},
+				)
+				const emails = (await emailsResponse.json()) as GitHubEmailsResponse
+				const email = emails.find((e) => e.primary)?.email
 				if (!email) {
 					throw new Error('Email not found')
 				}
-				// const username = profile.displayName
-				// const imageUrl = profile.photos[0]?.value
+
 				const returnValue = {
-					id: profile.id,
+					id: user.id,
 					email,
-					// username,
-					// name: profile.name,
-					// imageUrl,
+					name: user.name,
+					username: user.login,
+					imageUrl: user.avatar_url,
 				}
 				return returnValue
 			},
