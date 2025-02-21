@@ -49,10 +49,6 @@ export async function uploadNoteImage(
 	return uploadToStorage(file, key)
 }
 
-function getImageUrl(imageId: string) {
-	return `${STORAGE_ENDPOINT}/${STORAGE_BUCKET}/${imageId}`
-}
-
 function hmacSha256(key: string | Buffer, message: string) {
 	const hmac = createHmac('sha256', key)
 	hmac.update(message)
@@ -89,7 +85,7 @@ function getBaseSignedRequestInfo({
 	contentType?: string
 	uploadDate?: string
 }) {
-	const url = getImageUrl(key)
+	const url = `${STORAGE_ENDPOINT}/${STORAGE_BUCKET}/${key}`
 	const endpoint = new URL(url)
 
 	// Prepare date strings
