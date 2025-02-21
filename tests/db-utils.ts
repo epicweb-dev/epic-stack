@@ -42,44 +42,44 @@ export async function getNoteImages() {
 	noteImages = await Promise.all([
 		img({
 			altText: 'a nice country house',
-			storageKey: 'notes/0.png',
+			objectKey: 'notes/0.png',
 		}),
 		img({
 			altText: 'a city scape',
-			storageKey: 'notes/1.png',
+			objectKey: 'notes/1.png',
 		}),
 		img({
 			altText: 'a sunrise',
-			storageKey: 'notes/2.png',
+			objectKey: 'notes/2.png',
 		}),
 		img({
 			altText: 'a group of friends',
-			storageKey: 'notes/3.png',
+			objectKey: 'notes/3.png',
 		}),
 		img({
 			altText: 'friends being inclusive of someone who looks lonely',
-			storageKey: 'notes/4.png',
+			objectKey: 'notes/4.png',
 		}),
 		img({
 			altText: 'an illustration of a hot air balloon',
-			storageKey: 'notes/5.png',
+			objectKey: 'notes/5.png',
 		}),
 		img({
 			altText:
 				'an office full of laptops and other office equipment that look like it was abandoned in a rush out of the building in an emergency years ago.',
-			storageKey: 'notes/6.png',
+			objectKey: 'notes/6.png',
 		}),
 		img({
 			altText: 'a rusty lock',
-			storageKey: 'notes/7.png',
+			objectKey: 'notes/7.png',
 		}),
 		img({
 			altText: 'something very happy in nature',
-			storageKey: 'notes/8.png',
+			objectKey: 'notes/8.png',
 		}),
 		img({
 			altText: `someone at the end of a cry session who's starting to feel a little better.`,
-			storageKey: 'notes/9.png',
+			objectKey: 'notes/9.png',
 		}),
 	])
 
@@ -92,7 +92,7 @@ export async function getUserImages() {
 
 	userImages = await Promise.all(
 		Array.from({ length: 10 }, (_, index) =>
-			img({ storageKey: `user/${index}.jpg` }),
+			img({ objectKey: `user/${index}.jpg` }),
 		),
 	)
 
@@ -101,14 +101,14 @@ export async function getUserImages() {
 
 export async function img({
 	altText,
-	storageKey,
+	objectKey,
 }: {
 	altText?: string
-	storageKey: string
+	objectKey: string
 }) {
 	return {
 		altText,
-		storageKey,
-		contentType: storageKey.endsWith('.png') ? 'image/png' : 'image/jpeg',
+		objectKey,
+		contentType: objectKey.endsWith('.png') ? 'image/png' : 'image/jpeg',
 	}
 }

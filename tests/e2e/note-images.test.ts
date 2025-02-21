@@ -125,7 +125,7 @@ function createNoteWithImage() {
 			create: {
 				altText: 'cute koala',
 				contentType: 'image/png',
-				storageKey: 'kody-notes/cute-koala.png',
+				objectKey: 'kody-notes/cute-koala.png',
 			},
 		},
 	} satisfies Omit<
@@ -133,7 +133,7 @@ function createNoteWithImage() {
 		'id' | 'createdAt' | 'updatedAt' | 'type' | 'ownerId'
 	> & {
 		images: {
-			create: Pick<NoteImage, 'altText' | 'contentType' | 'storageKey'>
+			create: Pick<NoteImage, 'altText' | 'contentType' | 'objectKey'>
 		}
 	}
 }

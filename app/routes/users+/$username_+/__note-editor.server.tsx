@@ -57,7 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
 								id: i.id,
 								altText: i.altText,
 								contentType: i.file.type,
-								storageKey: await uploadNoteImage(userId, noteId, i.file),
+								objectKey: await uploadNoteImage(userId, noteId, i.file),
 							}
 						} else {
 							return {
@@ -75,7 +75,7 @@ export async function action({ request }: ActionFunctionArgs) {
 							return {
 								altText: image.altText,
 								contentType: image.file.type,
-								storageKey: await uploadNoteImage(userId, noteId, image.file),
+								objectKey: await uploadNoteImage(userId, noteId, image.file),
 							}
 						}),
 				),
@@ -119,7 +119,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					data: {
 						...updates,
 						// If the image is new, we need to generate a new ID to bust the cache.
-						id: updates.storageKey ? cuid() : updates.id,
+						id: updates.objectKey ? cuid() : updates.id,
 					},
 				})),
 				create: newImages,

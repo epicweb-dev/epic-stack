@@ -39,7 +39,7 @@ async function seed() {
 					userId: user.id,
 					contentType: userImage.contentType,
 					altText: userImage.altText,
-					storageKey: userImage.storageKey,
+					objectKey: userImage.objectKey,
 				},
 			})
 		}
@@ -67,7 +67,7 @@ async function seed() {
 							noteId: note.id,
 							contentType: noteImage.contentType,
 							altText: noteImage.altText,
-							storageKey: noteImage.storageKey,
+							objectKey: noteImage.objectKey,
 						},
 					})
 				}
@@ -79,35 +79,35 @@ async function seed() {
 	console.time(`🐨 Created admin user "kody"`)
 
 	const kodyImages = await promiseHash({
-		kodyUser: img({ storageKey: 'user/kody.png' }),
+		kodyUser: img({ objectKey: 'user/kody.png' }),
 		cuteKoala: img({
 			altText: 'an adorable koala cartoon illustration',
-			storageKey: 'kody-notes/cute-koala.png',
+			objectKey: 'kody-notes/cute-koala.png',
 		}),
 		koalaEating: img({
 			altText: 'a cartoon illustration of a koala in a tree eating',
-			storageKey: 'kody-notes/koala-eating.png',
+			objectKey: 'kody-notes/koala-eating.png',
 		}),
 		koalaCuddle: img({
 			altText: 'a cartoon illustration of koalas cuddling',
-			storageKey: 'kody-notes/koala-cuddle.png',
+			objectKey: 'kody-notes/koala-cuddle.png',
 		}),
 		mountain: img({
 			altText: 'a beautiful mountain covered in snow',
-			storageKey: 'kody-notes/mountain.png',
+			objectKey: 'kody-notes/mountain.png',
 		}),
 		koalaCoder: img({
 			altText: 'a koala coding at the computer',
-			storageKey: 'kody-notes/koala-coder.png',
+			objectKey: 'kody-notes/koala-coder.png',
 		}),
 		koalaMentor: img({
 			altText:
 				'a koala in a friendly and helpful posture. The Koala is standing next to and teaching a woman who is coding on a computer and shows positive signs of learning and understanding what is being explained.',
-			storageKey: 'kody-notes/koala-mentor.png',
+			objectKey: 'kody-notes/koala-mentor.png',
 		}),
 		koalaSoccer: img({
 			altText: 'a cute cartoon koala kicking a soccer ball on a soccer field ',
-			storageKey: 'kody-notes/koala-soccer.png',
+			objectKey: 'kody-notes/koala-soccer.png',
 		}),
 	})
 
@@ -132,7 +132,7 @@ async function seed() {
 			userId: kody.id,
 			contentType: kodyImages.kodyUser.contentType,
 			altText: kodyImages.kodyUser.altText,
-			storageKey: kodyImages.kodyUser.storageKey,
+			objectKey: kodyImages.kodyUser.objectKey,
 		},
 	})
 
@@ -241,7 +241,7 @@ async function seed() {
 					noteId: note.id,
 					contentType: image.contentType,
 					altText: image.altText,
-					storageKey: image.storageKey,
+					objectKey: image.objectKey,
 				},
 			})
 		}

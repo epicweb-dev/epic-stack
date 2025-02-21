@@ -7,11 +7,11 @@ export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
 	const noteImage = await prisma.noteImage.findUnique({
 		where: { id: params.imageId },
-		select: { storageKey: true },
+		select: { objectKey: true },
 	})
 	invariantResponse(noteImage, 'Note image not found', { status: 404 })
 
-	const { url, headers } = getSignedGetRequestInfo(noteImage.storageKey)
+	const { url, headers } = getSignedGetRequestInfo(noteImage.objectKey)
 	const response = await fetch(url, { headers })
 
 	const cacheHeaders = new Headers(response.headers)
