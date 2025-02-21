@@ -124,7 +124,6 @@ function createNoteWithImage() {
 		images: {
 			create: {
 				altText: 'cute koala',
-				contentType: 'image/png',
 				objectKey: 'kody-notes/cute-koala.png',
 			},
 		},
@@ -133,7 +132,7 @@ function createNoteWithImage() {
 		'id' | 'createdAt' | 'updatedAt' | 'type' | 'ownerId'
 	> & {
 		images: {
-			create: Pick<NoteImage, 'altText' | 'contentType' | 'objectKey'>
+			create: Pick<NoteImage, 'altText' | 'objectKey'>
 		}
 	}
 }

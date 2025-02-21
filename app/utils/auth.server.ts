@@ -179,7 +179,6 @@ export async function signupWithConnection({
 			data: {
 				image: {
 					create: {
-						contentType: imageFile.type,
 						objectKey: await uploadProfileImage(user.id, imageFile),
 					},
 				},

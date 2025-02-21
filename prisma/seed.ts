@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import { promiseHash } from 'remix-utils/promise'
 import { prisma } from '#app/utils/db.server.ts'
 import { MOCK_CODE_GITHUB } from '#app/utils/providers/constants'
 import {
@@ -7,7 +6,6 @@ import {
 	createUser,
 	getNoteImages,
 	getUserImages,
-	img,
 } from '#tests/db-utils.ts'
 import { insertGitHubUser } from '#tests/mocks/github.ts'
 
@@ -37,8 +35,6 @@ async function seed() {
 			await prisma.userImage.create({
 				data: {
 					userId: user.id,
-					contentType: userImage.contentType,
-					altText: userImage.altText,
 					objectKey: userImage.objectKey,
 				},
 			})
@@ -65,7 +61,6 @@ async function seed() {
 					await prisma.noteImage.create({
 						data: {
 							noteId: note.id,
-							contentType: noteImage.contentType,
 							altText: noteImage.altText,
 							objectKey: noteImage.objectKey,
 						},
@@ -78,38 +73,38 @@ async function seed() {
 
 	console.time(`🐨 Created admin user "kody"`)
 
-	const kodyImages = await promiseHash({
-		kodyUser: img({ objectKey: 'user/kody.png' }),
-		cuteKoala: img({
+	const kodyImages = {
+		kodyUser: { objectKey: 'user/kody.png' },
+		cuteKoala: {
 			altText: 'an adorable koala cartoon illustration',
 			objectKey: 'kody-notes/cute-koala.png',
-		}),
-		koalaEating: img({
+		},
+		koalaEating: {
 			altText: 'a cartoon illustration of a koala in a tree eating',
 			objectKey: 'kody-notes/koala-eating.png',
-		}),
-		koalaCuddle: img({
+		},
+		koalaCuddle: {
 			altText: 'a cartoon illustration of koalas cuddling',
 			objectKey: 'kody-notes/koala-cuddle.png',
-		}),
-		mountain: img({
+		},
+		mountain: {
 			altText: 'a beautiful mountain covered in snow',
 			objectKey: 'kody-notes/mountain.png',
-		}),
-		koalaCoder: img({
+		},
+		koalaCoder: {
 			altText: 'a koala coding at the computer',
 			objectKey: 'kody-notes/koala-coder.png',
-		}),
-		koalaMentor: img({
+		},
+		koalaMentor: {
 			altText:
 				'a koala in a friendly and helpful posture. The Koala is standing next to and teaching a woman who is coding on a computer and shows positive signs of learning and understanding what is being explained.',
 			objectKey: 'kody-notes/koala-mentor.png',
-		}),
-		koalaSoccer: img({
+		},
+		koalaSoccer: {
 			altText: 'a cute cartoon koala kicking a soccer ball on a soccer field ',
 			objectKey: 'kody-notes/koala-soccer.png',
-		}),
-	})
+		},
+	}
 
 	const githubUser = await insertGitHubUser(MOCK_CODE_GITHUB)
 
@@ -130,8 +125,6 @@ async function seed() {
 	await prisma.userImage.create({
 		data: {
 			userId: kody.id,
-			contentType: kodyImages.kodyUser.contentType,
-			altText: kodyImages.kodyUser.altText,
 			objectKey: kodyImages.kodyUser.objectKey,
 		},
 	})
@@ -239,7 +232,6 @@ async function seed() {
 			await prisma.noteImage.create({
 				data: {
 					noteId: note.id,
-					contentType: image.contentType,
 					altText: image.altText,
 					objectKey: image.objectKey,
 				},
