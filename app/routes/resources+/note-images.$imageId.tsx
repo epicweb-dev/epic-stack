@@ -12,5 +12,13 @@ export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(noteImage, 'Note image not found', { status: 404 })
 
 	const { url, headers } = getSignedGetRequestInfo(noteImage.storageKey)
-	return fetch(url, { headers })
+	const response = await fetch(url, { headers })
+
+	const cacheHeaders = new Headers(response.headers)
+	cacheHeaders.set('Cache-Control', 'public, max-age=31536000, immutable')
+
+	return new Response(response.body, {
+		status: response.status,
+		headers: cacheHeaders,
+	})
 }
