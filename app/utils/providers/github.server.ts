@@ -74,14 +74,13 @@ export class GitHubProvider implements AuthProvider {
 					throw new Error('Email not found')
 				}
 
-				const returnValue = {
+				return {
 					id: user.id,
 					email,
 					name: user.name,
 					username: user.login,
 					imageUrl: user.avatar_url,
 				}
-				return returnValue
 			},
 		)
 	}
