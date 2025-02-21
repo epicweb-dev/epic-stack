@@ -15,18 +15,21 @@ const FIXTURES_IMAGES_DIR = path.join(FIXTURES_DIR, 'images')
 const STORAGE_ENDPOINT = process.env.AWS_ENDPOINT_URL_S3
 const STORAGE_BUCKET = process.env.BUCKET_NAME
 const STORAGE_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID
-const STORAGE_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY
 
 function validateAuth(headers: Headers) {
 	const authHeader = headers.get('Authorization')
-	if (!authHeader) return false
+	const amzDate = headers.get('X-Amz-Date')
+	const amzContentSha256 = headers.get('X-Amz-Content-SHA256')
 
-	const [type, credentials] = authHeader.split(' ')
-	if (type !== 'Basic' || !credentials) return false
+	if (!authHeader || !amzDate || !amzContentSha256) return false
+	if (!authHeader.startsWith('AWS4-HMAC-SHA256')) return false
+	if (amzContentSha256 !== 'UNSIGNED-PAYLOAD') return false
 
-	const decodedCredentials = atob(credentials)
-	const [accessKey, secretKey] = decodedCredentials.split(':')
-	return accessKey === STORAGE_ACCESS_KEY && secretKey === STORAGE_SECRET_KEY
+	// For mocking purposes, we'll just verify the credential contains our access key
+	// A full validation would verify the signature, but that's complex and unnecessary for tests
+	if (authHeader.includes(`Credential=${STORAGE_ACCESS_KEY}/`)) return true
+
+	return false
 }
 
 function assertKey(key: any): asserts key is Array<string> {
