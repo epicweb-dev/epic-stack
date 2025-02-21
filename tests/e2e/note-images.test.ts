@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import { faker } from '@faker-js/faker'
 import { type NoteImage, type Note } from '@prisma/client'
 import { prisma } from '#app/utils/db.server.ts'
@@ -125,16 +124,15 @@ function createNoteWithImage() {
 		images: {
 			create: {
 				altText: 'cute koala',
-				contentType: 'image/png',
-				blob: fs.readFileSync(
-					'tests/fixtures/images/kody-notes/cute-koala.png',
-				),
+				objectKey: 'kody-notes/cute-koala.png',
 			},
 		},
 	} satisfies Omit<
 		Note,
 		'id' | 'createdAt' | 'updatedAt' | 'type' | 'ownerId'
 	> & {
-		images: { create: Pick<NoteImage, 'altText' | 'blob' | 'contentType'> }
+		images: {
+			create: Pick<NoteImage, 'altText' | 'objectKey'>
+		}
 	}
 }

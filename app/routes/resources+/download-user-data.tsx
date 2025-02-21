@@ -18,7 +18,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 					id: true,
 					createdAt: true,
 					updatedAt: true,
-					contentType: true,
+					objectKey: true,
 				},
 			},
 			notes: {
@@ -28,7 +28,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 							id: true,
 							createdAt: true,
 							updatedAt: true,
-							contentType: true,
+							objectKey: true,
 						},
 					},
 				},

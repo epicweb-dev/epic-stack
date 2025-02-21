@@ -23,8 +23,7 @@ CREATE TABLE "Note" (
 CREATE TABLE "NoteImage" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "altText" TEXT,
-    "contentType" TEXT NOT NULL,
-    "blob" BLOB NOT NULL,
+    "objectKey" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "noteId" TEXT NOT NULL,
@@ -35,8 +34,7 @@ CREATE TABLE "NoteImage" (
 CREATE TABLE "UserImage" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "altText" TEXT,
-    "contentType" TEXT NOT NULL,
-    "blob" BLOB NOT NULL,
+    "objectKey" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "userId" TEXT NOT NULL,
@@ -187,7 +185,6 @@ CREATE UNIQUE INDEX "_RoleToUser_AB_unique" ON "_RoleToUser"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_RoleToUser_B_index" ON "_RoleToUser"("B");
-
 
 --------------------------------- Manual Seeding --------------------------
 -- Hey there, Kent here! This is how you can reliably seed your database with

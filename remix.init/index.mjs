@@ -189,16 +189,18 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} ALLOW_INDEXING=false --app ${APP_NAME}-staging`
 	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
 
-	console.log(
-		`🔊 Creating volumes. Answer "yes" when it warns you about downtime. You can add more volumes later (when you actually start getting paying customers �).`,
-	)
-	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}-staging`
-	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}`
+	console.log(`🔊 Creating volumes.`)
+	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}-staging`
+	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}`
 
 	// attach consul
 	console.log(`🔗 Attaching consul`)
 	await $I`fly consul attach --app ${APP_NAME}-staging`
 	await $I`fly consul attach --app ${APP_NAME}`
+
+	console.log(`🗄️ Setting up Tigris object storage`)
+	await $I`fly storage create --yes --app ${APP_NAME}-staging`
+	await $I`fly storage create --yes --app ${APP_NAME}`
 
 	const { shouldDeploy } = await inquirer.prompt([
 		{
