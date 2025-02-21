@@ -1,10 +1,10 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
+import { SetCookie } from '@mjackson/headers'
 import { http } from 'msw'
 import { afterEach, expect, test } from 'vitest'
 import { twoFAVerificationType } from '#app/routes/settings+/profile.two-factor.tsx'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
-import { connectionSessionStorage } from '#app/utils/connections.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
@@ -219,19 +219,25 @@ async function setupRequest({
 	const state = faker.string.uuid()
 	url.searchParams.set('state', state)
 	url.searchParams.set('code', code)
-	const connectionSession = await connectionSessionStorage.getSession()
-	connectionSession.set('oauth2:state', state)
 	const authSession = await authSessionStorage.getSession()
 	if (sessionId) authSession.set(sessionKey, sessionId)
 	const setSessionCookieHeader =
 		await authSessionStorage.commitSession(authSession)
-	const setConnectionSessionCookieHeader =
-		await connectionSessionStorage.commitSession(connectionSession)
+	const searchParams = new URLSearchParams({ code, state })
+	let authCookie = new SetCookie({
+		name: 'github',
+		value: searchParams.toString(),
+		path: '/',
+		sameSite: 'Lax',
+		httpOnly: true,
+		maxAge: 60 * 10,
+		secure: process.env.NODE_ENV === 'production' || undefined,
+	})
 	const request = new Request(url.toString(), {
 		method: 'GET',
 		headers: {
 			cookie: [
-				convertSetCookieToCookie(setConnectionSessionCookieHeader),
+				authCookie.toString(),
 				convertSetCookieToCookie(setSessionCookieHeader),
 			].join('; '),
 		},
