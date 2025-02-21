@@ -74,7 +74,6 @@ export async function action({ request }: Route.ActionArgs) {
 			return {
 				intent: data.intent,
 				image: {
-					contentType: data.photoFile.type,
 					objectKey: await uploadProfileImage(userId, data.photoFile),
 				},
 			}

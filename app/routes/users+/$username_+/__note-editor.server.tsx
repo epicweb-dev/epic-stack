@@ -56,7 +56,6 @@ export async function action({ request }: ActionFunctionArgs) {
 							return {
 								id: i.id,
 								altText: i.altText,
-								contentType: i.file.type,
 								objectKey: await uploadNoteImage(userId, noteId, i.file),
 							}
 						} else {
@@ -74,7 +73,6 @@ export async function action({ request }: ActionFunctionArgs) {
 						.map(async (image) => {
 							return {
 								altText: image.altText,
-								contentType: image.file.type,
 								objectKey: await uploadNoteImage(userId, noteId, image.file),
 							}
 						}),
