@@ -42,7 +42,6 @@ model UserImage {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   objectKey   String   // Reference to the image in Tigris
-  contentType String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -54,7 +53,6 @@ model NoteImage {
   noteId      String
   note        Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
   objectKey   String   // Reference to the image in Tigris
-  contentType String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
