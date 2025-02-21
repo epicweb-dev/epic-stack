@@ -38,7 +38,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const label = providerLabels[providerName]
 
 	const authResult = await authenticator
-		.authenticate(providerName, request, { throwOnError: true })
+		.authenticate(providerName, request)
 		.then(
 			(data) =>
 				({

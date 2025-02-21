@@ -112,7 +112,7 @@ export async function insertGitHubUser(code?: string | null) {
 async function getUser(request: Request) {
 	const accessToken = request.headers
 		.get('authorization')
-		?.slice('token '.length)
+		?.slice('Bearer '.length)
 
 	if (!accessToken) {
 		return new Response('Unauthorized', { status: 401 })
@@ -145,11 +145,11 @@ export const handlers: Array<HttpHandler> = [
 				user = await insertGitHubUser(code)
 			}
 
-			return new Response(
-				new URLSearchParams({
+			return json(
+				{
 					access_token: user.accessToken,
 					token_type: '__MOCK_TOKEN_TYPE__',
-				}).toString(),
+				},
 				{ headers: { 'content-type': 'application/x-www-form-urlencoded' } },
 			)
 		},
