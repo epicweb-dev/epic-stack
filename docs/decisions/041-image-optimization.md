@@ -34,10 +34,6 @@ Introduce an image optimization endpoint using the
 [openimg package](https://github.com/andrelandgraf/openimg). We can then use the
 `Img` component to query for optimized images and iterate from there.
 
-In the future, we may decide to look into [unpic-img](https://unpic.pics/img/)
-for futher enhancements on the client side and/or look into creating blurred
-placeholder images using openimg/node and openimg/vite or alternative solutions.
-
 ## Consequences
 
 Serving newly added images will now lead to an image optimization step whenever

@@ -8,8 +8,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 	return getImgResponse(request, {
 		headers,
-		allowlistedOrigins: [domain],
-		cacheFolder: process.env.NODE_ENV === 'production' ? '/data/images' : './data/images',
+		allowlistedOrigins: [domain, process.env.AWS_ENDPOINT_URL_S3],
+		cacheFolder:
+			process.env.NODE_ENV === 'production' ? '/data/images' : './data/images',
 		getImgSource: ({ params }) => {
 			if (params.src.startsWith('/resources')) {
 				// Fetch image from resource endpoint
