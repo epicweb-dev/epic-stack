@@ -35,7 +35,7 @@ const GitHubEmailsResponseSchema = z.array(GitHubEmailSchema)
 
 const GitHubUserResponseSchema = z.object({
 	login: z.string(),
-	id: z.string(),
+	id: z.number().or(z.string()),
 	name: z.string().optional(),
 	avatar_url: z.string().optional(),
 })
