@@ -1,9 +1,9 @@
 # Image Storage
 
-The Epic Stack uses [Tigris](https://www.tigrisdata.com), an S3-compatible object
-storage service, for storing and serving uploaded images. Tigris is integrated
-tightly with Fly.io, so you don't need to worry about setting up an account or
-configuring any credentials.
+The Epic Stack uses [Tigris](https://www.tigrisdata.com), an S3-compatible
+object storage service, for storing and serving uploaded images. Tigris is
+integrated tightly with Fly.io, so you don't need to worry about setting up an
+account or configuring any credentials.
 
 ## Configuration
 
@@ -73,5 +73,4 @@ model NoteImage {
 For more details on customization, see the source code in:
 
 - `app/utils/storage.server.ts`
-- `app/routes/resources+/note-images.$imageId.tsx`
-- `app/routes/resources+/user-images.$imageId.tsx`
+- `app/routes/resources+/images.tsx`
