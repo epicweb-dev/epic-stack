@@ -116,7 +116,10 @@ async function seed() {
 			name: 'Kody',
 			password: { create: createPassword('kodylovesyou') },
 			connections: {
-				create: { providerName: 'github', providerId: githubUser.profile.id },
+				create: {
+					providerName: 'github',
+					providerId: String(githubUser.profile.id),
+				},
 			},
 			roles: { connect: [{ name: 'admin' }, { name: 'user' }] },
 		},
