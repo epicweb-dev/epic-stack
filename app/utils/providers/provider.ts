@@ -3,7 +3,7 @@ import { type Timings } from '../timing.server.ts'
 
 // Define a user type for cleaner typing
 export type ProviderUser = {
-	id: string
+	id: string | number
 	email: string
 	username?: string
 	name?: string

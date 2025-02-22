@@ -70,7 +70,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const existingConnection = await prisma.connection.findUnique({
 		select: { userId: true },
 		where: {
-			providerName_providerId: { providerName, providerId: profile.id },
+			providerName_providerId: {
+				providerName,
+				providerId: String(profile.id),
+			},
 		},
 	})
 
@@ -103,7 +106,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		await prisma.connection.create({
 			data: {
 				providerName,
-				providerId: profile.id,
+				providerId: String(profile.id),
 				userId,
 			},
 		})
@@ -133,7 +136,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		await prisma.connection.create({
 			data: {
 				providerName,
-				providerId: profile.id,
+				providerId: String(profile.id),
 				userId: user.id,
 			},
 		})
