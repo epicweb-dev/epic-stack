@@ -11,7 +11,7 @@ export type ProviderUser = {
 }
 
 export interface AuthProvider {
-	getAuthStrategy(): Strategy<ProviderUser, any>
+	getAuthStrategy(): Strategy<ProviderUser, any> | null
 	handleMockAction(request: Request): Promise<void>
 	resolveConnectionData(
 		providerId: string,

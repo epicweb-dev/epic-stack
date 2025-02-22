@@ -19,7 +19,10 @@ export const sessionKey = 'sessionId'
 export const authenticator = new Authenticator<ProviderUser>()
 
 for (const [providerName, provider] of Object.entries(providers)) {
-	authenticator.use(provider.getAuthStrategy(), providerName)
+	const strategy = provider.getAuthStrategy()
+	if (strategy) {
+		authenticator.use(strategy, providerName)
+	}
 }
 
 export async function getUserId(request: Request) {
