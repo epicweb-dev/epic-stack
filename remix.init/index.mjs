@@ -218,11 +218,9 @@ async function setupDeployment({ rootDirectory }) {
 	console.log(`🗄️ Setting up Tigris object storage`)
 	const $S = $({ stdio: ['inherit', 'ignore', 'inherit'], cwd: rootDirectory })
 	if (shouldSetupStaging) {
-		await $S`fly storage create --yes --app ${APP_NAME}-staging --name ${APP_NAME}-staging-epic-stack`
-		console.log(`  ✅ Created storage for staging`)
+		await $S`fly storage create --yes --app ${APP_NAME}-staging --name epic-stack-${APP_NAME}-staging`
 	}
-	await $S`fly storage create --yes --app ${APP_NAME} --name ${APP_NAME}-epic-stack`
-	console.log(`  ✅ Created storage for production`)
+	await $S`fly storage create --yes --app ${APP_NAME} --name epic-stack-${APP_NAME}`
 
 	const { shouldDeploy } = await inquirer.prompt([
 		{
@@ -230,11 +228,11 @@ async function setupDeployment({ rootDirectory }) {
 			type: 'confirm',
 			default: true,
 			message:
-				'Would you like to deploy right now? (This will take a while, and you can always wait until you push to GitHub instead).',
+				'Would you like to deploy right now? (This will take a while. You can wait until you push to GitHub instead).',
 		},
 	])
 	if (shouldDeploy) {
-		console.log(`🚀 Deploying apps...`)
+		console.log(`🚀 Deploying`)
 		if (shouldSetupStaging) {
 			console.log(`  Starting with staging`)
 			await $I`fly deploy --app ${APP_NAME}-staging`
