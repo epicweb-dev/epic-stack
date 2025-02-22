@@ -35,7 +35,7 @@ test('when auth fails, send the user to login with a toast', async () => {
 	consoleError.mockImplementation(() => {})
 	server.use(
 		http.post('https://github.com/login/oauth/access_token', async () => {
-			return new Response('error', { status: 400 })
+			return new Response(null, { status: 400 })
 		}),
 	)
 	const request = await setupRequest()
