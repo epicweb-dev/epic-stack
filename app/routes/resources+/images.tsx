@@ -1,5 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { getImgResponse } from 'openimg/node'
+import { getImgResponse, ImgSource } from 'openimg/node'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
@@ -60,7 +60,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	})
 }
 
-async function handleUserImage(userImageId: string) {
+async function handleUserImage(userImageId: string): Promise<ImgSource> {
 	const userImage = await prisma.userImage.findUnique({
 		where: { id: userImageId },
 		select: { objectKey: true },
@@ -75,7 +75,7 @@ async function handleUserImage(userImageId: string) {
 	}
 }
 
-async function handleNoteImage(noteImageId: string) {
+async function handleNoteImage(noteImageId: string): Promise<ImgSource> {
 	const noteImage = await prisma.noteImage.findUnique({
 		where: { id: noteImageId },
 		select: { objectKey: true },
