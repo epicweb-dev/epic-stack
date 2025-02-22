@@ -55,7 +55,7 @@ function createGitHubUser(code?: string | null) {
 		accessToken: `${code}_mock_access_token`,
 		profile: {
 			login: faker.internet.username(),
-			id: faker.string.uuid(),
+			id: faker.number.int(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
 			emails: emails.map((e) => e.email),
@@ -166,7 +166,7 @@ export const handlers: Array<HttpHandler> = [
 		if (passthroughGitHub) return passthrough()
 
 		const mockUser = (await getGitHubUsers()).find(
-			(u) => u.profile.id === params.id,
+			(u) => u.profile.id === Number(params.id),
 		)
 		if (mockUser) return json(mockUser.profile)
 
