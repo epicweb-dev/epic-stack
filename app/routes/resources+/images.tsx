@@ -1,6 +1,6 @@
 import { getImgResponse } from 'openimg/node'
-import { type Route } from './+types/images.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
+import { type Route } from './+types/images.ts'
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const domain = getDomainUrl(request)
@@ -8,9 +8,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 	return getImgResponse(request, {
 		headers,
-		allowlistedOrigins: [domain, process.env.AWS_ENDPOINT_URL_S3],
+		allowlistedOrigins: [domain, process.env.AWS_ENDPOINT_URL_S3].filter(
+			Boolean,
+		),
 		cacheFolder:
-			process.env.NODE_ENV === 'production' ? '/data/images' : './data/images',
+			process.env.NODE_ENV === 'production'
+				? '/data/images'
+				: './tests/fixtures/openimg',
 		getImgSource: ({ params }) => {
 			if (params.src.startsWith('/resources')) {
 				// Fetch image from resource endpoint
