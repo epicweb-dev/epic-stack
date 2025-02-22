@@ -9,6 +9,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	return getImgResponse(request, {
 		headers,
 		allowlistedOrigins: [domain],
+		cacheFolder: process.env.NODE_ENV === 'production' ? '/data/images' : './data/images',
 		getImgSource: ({ params }) => {
 			if (params.src.startsWith('/resources')) {
 				// Fetch image from resource endpoint
