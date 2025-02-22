@@ -10,8 +10,9 @@ The [/resources/images](../app/routes/resources+/images.tsx) endpoint accepts
 the search parameters `src`, `w` (width), `h` (height), `format`, and `fit` to
 perform image transformations and serve optimized variants. The transformations
 are performed with `sharp`, and the optimized images are cached in
-`./data/images` on the filesystem and via HTTP caching. All transformations happen
-via stream processing, so images are never loaded fully into memory at once.
+`./data/images` on the filesystem and via HTTP caching. All transformations
+happen via stream processing, so images are never loaded fully into memory at
+once.
 
 ## Client Part
 
@@ -26,7 +27,7 @@ images that should load immediately.
 
 ## Image Sources
 
-If you want to add a new image storage location, like an S3 bucket, update the
+If you want to add a new image storage location, update the
 [/resources/images](../app/routes/resources+/images.tsx) endpoint and modify
 `getSource` and `allowlistedOrigins` to instruct openimg on how to retrieve the
 source images from the new location. Currently, the endpoint uses fetch requests
