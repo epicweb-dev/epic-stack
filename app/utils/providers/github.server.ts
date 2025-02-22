@@ -1,9 +1,9 @@
+import { SetCookie } from '@mjackson/headers'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { redirect } from 'react-router'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 import { cache, cachified } from '../cache.server.ts'
-import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
 import { MOCK_CODE_GITHUB_HEADER, MOCK_CODE_GITHUB } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
@@ -24,27 +24,62 @@ const shouldMock =
 	process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
 	process.env.NODE_ENV === 'test'
 
+type GitHubEmailsResponse = {
+	email: string
+	verified: boolean
+	primary: boolean
+	visibility: string | null
+}[]
+
+type GitHubUserResponse = {
+	login: string
+	id: string
+	name: string | undefined
+	avatar_url: string | undefined
+}
+
 export class GitHubProvider implements AuthProvider {
 	getAuthStrategy() {
 		return new GitHubStrategy(
 			{
-				clientID: process.env.GITHUB_CLIENT_ID,
+				clientId: process.env.GITHUB_CLIENT_ID,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET,
-				callbackURL: '/auth/github/callback',
+				redirectURI: '/auth/github/callback',
 			},
-			async ({ profile }) => {
-				const email = profile.emails[0]?.value.trim().toLowerCase()
+			async ({ tokens }) => {
+				// we need to fetch the user and the emails separately, this is a change in remix-auth-github
+				// from the previous version that supported fetching both in one call
+				const userResponse = await fetch('https://api.github.com/user', {
+					headers: {
+						Accept: 'application/vnd.github+json',
+						Authorization: `Bearer ${tokens.accessToken()}`,
+						'X-GitHub-Api-Version': '2022-11-28',
+					},
+				})
+				const user = (await userResponse.json()) as GitHubUserResponse
+
+				const emailsResponse = await fetch(
+					'https://api.github.com/user/emails',
+					{
+						headers: {
+							Accept: 'application/vnd.github+json',
+							Authorization: `Bearer ${tokens.accessToken()}`,
+							'X-GitHub-Api-Version': '2022-11-28',
+						},
+					},
+				)
+				const emails = (await emailsResponse.json()) as GitHubEmailsResponse
+				const email = emails.find((e) => e.primary)?.email
 				if (!email) {
 					throw new Error('Email not found')
 				}
-				const username = profile.displayName
-				const imageUrl = profile.photos[0]?.value
+
 				return {
+					id: user.id,
 					email,
-					id: profile.id,
-					username,
-					name: profile.name.givenName,
-					imageUrl,
+					name: user.name,
+					username: user.login,
+					imageUrl: user.avatar_url,
 				}
 			},
 		)
@@ -85,21 +120,24 @@ export class GitHubProvider implements AuthProvider {
 	async handleMockAction(request: Request) {
 		if (!shouldMock) return
 
-		const connectionSession = await connectionSessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
 		const state = cuid()
-		connectionSession.set('oauth2:state', state)
-
 		// allows us to inject a code when running e2e tests,
 		// but falls back to a pre-defined 🐨 constant
 		const code =
 			request.headers.get(MOCK_CODE_GITHUB_HEADER) || MOCK_CODE_GITHUB
 		const searchParams = new URLSearchParams({ code, state })
+		let cookie = new SetCookie({
+			name: 'github',
+			value: searchParams.toString(),
+			path: '/',
+			sameSite: 'Lax',
+			httpOnly: true,
+			maxAge: 60 * 10,
+			secure: process.env.NODE_ENV === 'production' || undefined,
+		})
 		throw redirect(`/auth/github/callback?${searchParams}`, {
 			headers: {
-				'set-cookie':
-					await connectionSessionStorage.commitSession(connectionSession),
+				'Set-Cookie': cookie.toString(),
 			},
 		})
 	}
