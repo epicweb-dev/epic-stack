@@ -180,26 +180,49 @@ async function setupDeployment({ rootDirectory }) {
 
 	const { app: APP_NAME } = flyConfig
 
-	console.log(`🥪 Creating app ${APP_NAME} and ${APP_NAME}-staging...`)
-	await $I`fly apps create ${APP_NAME}-staging`
+	const { shouldSetupStaging } = await inquirer.prompt([
+		{
+			name: 'shouldSetupStaging',
+			type: 'confirm',
+			default: true,
+			message: 'Would you like to set up a staging environment?',
+		},
+	])
+
+	console.log(
+		`🥪 Creating app ${APP_NAME}${shouldSetupStaging ? ' and staging...' : '...'}`,
+	)
+	if (shouldSetupStaging) {
+		await $I`fly apps create ${APP_NAME}-staging`
+	}
 	await $I`fly apps create ${APP_NAME}`
 
 	console.log(`🤫 Setting secrets in apps`)
-	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} ALLOW_INDEXING=false --app ${APP_NAME}-staging`
+	if (shouldSetupStaging) {
+		await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} ALLOW_INDEXING=false --app ${APP_NAME}-staging`
+	}
 	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
 
 	console.log(`🔊 Creating volumes.`)
-	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}-staging`
+	if (shouldSetupStaging) {
+		await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}-staging`
+	}
 	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}`
 
-	// attach consul
 	console.log(`🔗 Attaching consul`)
-	await $I`fly consul attach --app ${APP_NAME}-staging`
+	if (shouldSetupStaging) {
+		await $I`fly consul attach --app ${APP_NAME}-staging`
+	}
 	await $I`fly consul attach --app ${APP_NAME}`
 
 	console.log(`🗄️ Setting up Tigris object storage`)
-	await $I`fly storage create --yes --app ${APP_NAME}-staging`
-	await $I`fly storage create --yes --app ${APP_NAME}`
+	const $S = $({ stdio: ['inherit', 'ignore', 'inherit'], cwd: rootDirectory })
+	if (shouldSetupStaging) {
+		await $S`fly storage create --yes --app ${APP_NAME}-staging`
+		console.log(`  ✅ Created storage for staging`)
+	}
+	await $S`fly storage create --yes --app ${APP_NAME}`
+	console.log(`  ✅ Created storage for production`)
 
 	const { shouldDeploy } = await inquirer.prompt([
 		{
@@ -212,11 +235,12 @@ async function setupDeployment({ rootDirectory }) {
 	])
 	if (shouldDeploy) {
 		console.log(`🚀 Deploying apps...`)
-		console.log(`  Starting with staging`)
-		await $I`fly deploy --app ${APP_NAME}-staging`
-		await open(`https://${APP_NAME}-staging.fly.dev/`)
-
-		console.log(`  Staging deployed... Deploying production...`)
+		if (shouldSetupStaging) {
+			console.log(`  Starting with staging`)
+			await $I`fly deploy --app ${APP_NAME}-staging`
+			await open(`https://${APP_NAME}-staging.fly.dev/`)
+			console.log(`  Staging deployed... Deploying production...`)
+		}
 		await $I`fly deploy --app ${APP_NAME}`
 		await open(`https://${APP_NAME}.fly.dev/`)
 		console.log(`  Production deployed...`)
