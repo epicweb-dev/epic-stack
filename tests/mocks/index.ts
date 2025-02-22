@@ -19,10 +19,6 @@ server.listen({
 		if (request.url.includes('.sentry.io')) {
 			return
 		}
-		// Do not print warnings on unhandled requests to ourselves
-		if (request.url.includes(`localhost:${process.env.PORT}`)) {
-			return
-		}
 		// Print the regular MSW unhandled request warning otherwise.
 		print.warning()
 	},

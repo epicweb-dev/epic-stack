@@ -1,5 +1,8 @@
+import { invariantResponse } from '@epic-web/invariant'
 import { getImgResponse } from 'openimg/node'
+import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
+import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
 import { type Route } from './+types/images.ts'
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -17,6 +20,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 				: './tests/fixtures/openimg',
 		getImgSource: ({ params }) => {
 			if (params.src.startsWith('/resources')) {
+				const searchParams = new URLSearchParams(params.src.split('?')[1])
+				const userImageId = searchParams.get('userImageId')
+				if (userImageId) {
+					return handleUserImage(userImageId)
+				}
+				const noteImageId = searchParams.get('noteImageId')
+				if (noteImageId) {
+					return handleNoteImage(noteImageId)
+				}
+
 				// Fetch image from resource endpoint
 				return {
 					type: 'fetch',
@@ -45,4 +58,34 @@ export async function loader({ request }: Route.LoaderArgs) {
 			}
 		},
 	})
+}
+
+async function handleUserImage(userImageId: string) {
+	const userImage = await prisma.userImage.findUnique({
+		where: { id: userImageId },
+		select: { objectKey: true },
+	})
+	invariantResponse(userImage, 'User image not found', { status: 404 })
+
+	const { url, headers } = getSignedGetRequestInfo(userImage.objectKey)
+	return {
+		type: 'fetch',
+		url,
+		headers,
+	}
+}
+
+async function handleNoteImage(noteImageId: string) {
+	const noteImage = await prisma.noteImage.findUnique({
+		where: { id: noteImageId },
+		select: { objectKey: true },
+	})
+	invariantResponse(noteImage, 'Note image not found', { status: 404 })
+
+	const { url, headers } = getSignedGetRequestInfo(noteImage.objectKey)
+	return {
+		type: 'fetch',
+		url,
+		headers,
+	}
 }
