@@ -6,7 +6,7 @@ Here are a few things you get today:
 - [Fly app deployment](https://fly.io/) with [Docker](https://www.docker.com/)
 - Multi-region, distributed, production-ready
   [SQLite Database](https://sqlite.org/) with
-  [LiteFS](https://fly.io/docs/litefs/).
+  [LiteFS](https://fly.io/docs/litefs/)
 - Healthcheck endpoint for
   [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
 - [Grafana](https://grafana.com/) Dashboards of the running app
@@ -21,7 +21,7 @@ Here are a few things you get today:
   [Conform](https://conform.guide/)
 - Database ORM with [Prisma](https://prisma.io/)
 - Role-based User Permissions.
-- Custom built image hosting
+- Image storage and serving with [Tigris](https://www.tigrisdata.com/)
 - Caching via [cachified](https://npm.im/@epic-web/cachified): Both in-memory
   and SQLite-based (with
   [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))
