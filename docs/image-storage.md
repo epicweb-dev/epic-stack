@@ -1,6 +1,6 @@
 # Image Storage
 
-The Epic Stack uses [Tigris](https://www.tigris.com), an S3-compatible object
+The Epic Stack uses [Tigris](https://www.tigrisdata.com), an S3-compatible object
 storage service, for storing and serving uploaded images. Tigris is integrated
 tightly with Fly.io, so you don't need to worry about setting up an account or
 configuring any credentials.

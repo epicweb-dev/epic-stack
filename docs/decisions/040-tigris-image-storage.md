@@ -63,5 +63,5 @@ The implementation involves:
 
 ## References
 
-- [Tigris Documentation](https://www.tigris.com/docs)
+- [Tigris Documentation](https://www.tigrisdata.com/docs)
 - Previous image handling: [018-images.md](docs/decisions/018-images.md)
