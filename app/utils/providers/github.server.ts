@@ -24,19 +24,21 @@ const shouldMock =
 	process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
 	process.env.NODE_ENV === 'test'
 
-type GitHubEmailsResponse = {
-	email: string
-	verified: boolean
-	primary: boolean
-	visibility: string | null
-}[]
+const GitHubEmailSchema = z.object({
+	email: z.string(),
+	verified: z.boolean(),
+	primary: z.boolean(),
+	visibility: z.string().nullable(),
+})
 
-type GitHubUserResponse = {
-	login: string
-	id: string
-	name: string | undefined
-	avatar_url: string | undefined
-}
+const GitHubEmailsResponseSchema = z.array(GitHubEmailSchema)
+
+const GitHubUserResponseSchema = z.object({
+	login: z.string(),
+	id: z.string(),
+	name: z.string().optional(),
+	avatar_url: z.string().optional(),
+})
 
 export class GitHubProvider implements AuthProvider {
 	getAuthStrategy() {
@@ -44,7 +46,7 @@ export class GitHubProvider implements AuthProvider {
 			{
 				clientId: process.env.GITHUB_CLIENT_ID,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET,
-				redirectURI: 'https://www.epicstack.dev/auth/github/callback',
+				redirectURI: process.env.GITHUB_REDIRECT_URI,
 			},
 			async ({ tokens }) => {
 				// we need to fetch the user and the emails separately, this is a change in remix-auth-github
@@ -56,7 +58,8 @@ export class GitHubProvider implements AuthProvider {
 						'X-GitHub-Api-Version': '2022-11-28',
 					},
 				})
-				const user = (await userResponse.json()) as GitHubUserResponse
+				const rawUser = await userResponse.json()
+				const user = GitHubUserResponseSchema.parse(rawUser)
 
 				const emailsResponse = await fetch(
 					'https://api.github.com/user/emails',
@@ -68,7 +71,8 @@ export class GitHubProvider implements AuthProvider {
 						},
 					},
 				)
-				const emails = (await emailsResponse.json()) as GitHubEmailsResponse
+				const rawEmails = await emailsResponse.json()
+				const emails = GitHubEmailsResponseSchema.parse(rawEmails)
 				const email = emails.find((e) => e.primary)?.email
 				if (!email) {
 					throw new Error('Email not found')

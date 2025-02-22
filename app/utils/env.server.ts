@@ -15,6 +15,7 @@ const schema = z.object({
 	// If you plan to use GitHub auth, remove the default:
 	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
 	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
+	GITHUB_REDIRECT_URI: z.string().default('MOCK_GITHUB_REDIRECT_URI'),
 	GITHUB_TOKEN: z.string().default('MOCK_GITHUB_TOKEN'),
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 
