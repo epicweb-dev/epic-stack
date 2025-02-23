@@ -25,7 +25,6 @@ export function getImgSrc({
 	if (src.startsWith(optimizerEndpoint)) {
 		const [endpoint, query] = src.split('?')
 		const searchParams = new URLSearchParams(query)
-		searchParams.set('src', 'bucket')
 		searchParams.set('h', height.toString())
 		searchParams.set('w', width.toString())
 		if (fit) {
