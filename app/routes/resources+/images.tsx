@@ -1,27 +1,11 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { getImgResponse, ImgSource, Fit, Format } from 'openimg/node'
+import { getImgResponse, ImgSource } from 'openimg/node'
 import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
 import { type Route } from './+types/images'
 
-function isFitValue(fit: string | undefined): fit is Fit | undefined {
-	if (fit === undefined) {
-		return true
-	}
-	return ['cover', 'contain'].includes(fit)
-}
-
-function isFormatValue(
-	format: string | undefined,
-): format is Format | undefined {
-	if (format === undefined) {
-		return true
-	}
-	return ['webp', 'avif', 'jpg', 'jpeg', 'png'].includes(format)
-}
-
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const url = new URL(request.url)
 	const searchParams = url.searchParams
 
@@ -45,25 +29,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 			process.env.NODE_ENV === 'production'
 				? '/data/images'
 				: './tests/fixtures/openimg',
-		getImgParams: () => {
-			const w = searchParams.get('w')
-			const width = w ? parseInt(w, 10) : undefined
-			const h = searchParams.get('h')
-			const height = h ? parseInt(h, 10) : undefined
-
-			const fit = searchParams.get('fit') || undefined
-			invariantResponse(isFitValue(fit), 'Invalid fit', { status: 400 })
-
-			const format = searchParams.get('format') || undefined
-			invariantResponse(isFormatValue(format), 'Invalid format', {
-				status: 400,
-			})
-
-			const src = bucketImgId || searchParams.get('src')
-			invariantResponse(src, 'Image source not provided', { status: 400 })
-			return { src, width, height, fit, format }
-		},
-		getImgSource: ({ params }) => {
+		getImgSource: () => {
 			if (bucketImgId) {
 				if (userImageId) {
 					return handleUserImage(userImageId)
@@ -72,25 +38,27 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 					return handleNoteImage(noteImageId)
 				}
 			}
-			if (URL.canParse(params.src)) {
+			const src = searchParams.get('src')
+			invariantResponse(src, 'src query parameter is required', { status: 400 })
+			if (URL.canParse(src)) {
 				// Fetch image from external URL; will be matched against allowlist
 				return {
 					type: 'fetch',
-					url: params.src,
+					url: src,
 				}
 			}
 			// Retrieve image from filesystem (public folder)
-			if (params.src.startsWith('/assets')) {
+			if (src.startsWith('/assets')) {
 				// Files managed by Vite
 				return {
 					type: 'fs',
-					path: '.' + params.src,
+					path: '.' + src,
 				}
 			}
 			// Fallback to files in public folder
 			return {
 				type: 'fs',
-				path: './public' + params.src,
+				path: './public' + src,
 			}
 		},
 	})
