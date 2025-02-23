@@ -22,52 +22,52 @@ function isFormatValue(
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const domain = getDomainUrl(request)
+	const url = new URL(request.url)
+	const searchParams = url.searchParams
+
 	const headers = new Headers()
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+
+	const userImageId = searchParams.get('userImageId')
+	const noteImageId = searchParams.get('noteImageId')
+	const bucketImgId = userImageId || noteImageId
+	if (bucketImgId) {
+		headers.set('Content-Disposition', 'inline')
+	}
+
 	return getImgResponse(request, {
 		headers,
-		allowlistedOrigins: [domain, process.env.AWS_ENDPOINT_URL_S3].filter(
-			Boolean,
-		),
+		allowlistedOrigins: [
+			getDomainUrl(request),
+			process.env.AWS_ENDPOINT_URL_S3,
+		].filter(Boolean),
 		cacheFolder:
 			process.env.NODE_ENV === 'production'
 				? '/data/images'
 				: './tests/fixtures/openimg',
-		getImgParams: ({ request }) => {
-			const url = new URL(request.url)
-			const w = url.searchParams.get('w')
+		getImgParams: () => {
+			const w = searchParams.get('w')
 			const width = w ? parseInt(w, 10) : undefined
-			const h = url.searchParams.get('h')
+			const h = searchParams.get('h')
 			const height = h ? parseInt(h, 10) : undefined
 
-			const fit = url.searchParams.get('fit') || undefined
+			const fit = searchParams.get('fit') || undefined
 			invariantResponse(isFitValue(fit), 'Invalid fit', { status: 400 })
 
-			const format = url.searchParams.get('format') || undefined
+			const format = searchParams.get('format') || undefined
 			invariantResponse(isFormatValue(format), 'Invalid format', {
 				status: 400,
 			})
 
-			let src = url.searchParams.get('src')
-			if (!src) {
-				const userImageId = url.searchParams.get('userImageId')
-				const noteImageId = url.searchParams.get('noteImageId')
-				if (userImageId || noteImageId) {
-					src = 'bucket'
-				}
-			}
+			const src = bucketImgId || searchParams.get('src')
 			invariantResponse(src, 'Image source not provided', { status: 400 })
 			return { src, width, height, fit, format }
 		},
-		getImgSource: ({ params, request }) => {
-			if (params.src === 'bucket') {
-				const url = new URL(request.url)
-				const userImageId = url.searchParams.get('userImageId')
+		getImgSource: ({ params }) => {
+			if (bucketImgId) {
 				if (userImageId) {
 					return handleUserImage(userImageId)
 				}
-				const noteImageId = url.searchParams.get('noteImageId')
 				if (noteImageId) {
 					return handleNoteImage(noteImageId)
 				}
