@@ -18,22 +18,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 			process.env.NODE_ENV === 'production'
 				? '/data/images'
 				: './tests/fixtures/openimg',
-		getImgSource: ({ params }) => {
-			if (params.src.startsWith('/resources')) {
-				const searchParams = new URLSearchParams(params.src.split('?')[1])
-				const userImageId = searchParams.get('userImageId')
+		getImgSource: ({ params, request }) => {
+			if (params.src === 'bucket') {
+				const url = new URL(request.url)
+				const userImageId = url.searchParams.get('userImageId')
 				if (userImageId) {
 					return handleUserImage(userImageId)
 				}
-				const noteImageId = searchParams.get('noteImageId')
+				const noteImageId = url.searchParams.get('noteImageId')
 				if (noteImageId) {
 					return handleNoteImage(noteImageId)
-				}
-
-				// Fetch image from resource endpoint
-				return {
-					type: 'fetch',
-					url: domain + params.src,
 				}
 			}
 			if (URL.canParse(params.src)) {

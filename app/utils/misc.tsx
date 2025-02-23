@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from 'clsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFormAction, useNavigation } from 'react-router'
 import { useSpinDelay } from 'spin-delay'
+import { GetSrcArgs, defaultGetSrc } from 'openimg/react'
 import { extendTailwindMerge } from 'tailwind-merge'
 import { extendedTheme } from './extended-theme.ts'
 
@@ -11,6 +12,31 @@ export function getUserImgSrc(imageId?: string | null) {
 
 export function getNoteImgSrc(imageId: string) {
 	return `/resources/images?noteImageId=${imageId}`
+}
+
+export function getImgSrc({
+	height,
+	optimizerEndpoint,
+	src,
+	width,
+	fit,
+	format,
+}: GetSrcArgs) {
+	if (src.startsWith(optimizerEndpoint)) {
+		const [endpoint, query] = src.split('?')
+		const searchParams = new URLSearchParams(query)
+		searchParams.set('src', 'bucket')
+		searchParams.set('h', height.toString())
+		searchParams.set('w', width.toString())
+		if (fit) {
+			searchParams.set('fit', fit)
+		}
+		if (format) {
+			searchParams.set('format', format)
+		}
+		return `${endpoint}?${searchParams.toString()}`
+	}
+	return defaultGetSrc({ height, optimizerEndpoint, src, width, fit, format })
 }
 
 export function getErrorMessage(error: unknown) {
