@@ -1,3 +1,4 @@
+import { OpenImgContextProvider } from 'openimg/react'
 import {
 	data,
 	Link,
@@ -33,7 +34,7 @@ import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { pipeHeaders } from './utils/headers.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
-import { combineHeaders, getDomainUrl } from './utils/misc.tsx'
+import { combineHeaders, getDomainUrl, getImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { type Theme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
@@ -83,7 +84,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 							id: true,
 							name: true,
 							username: true,
-							image: { select: { id: true } },
+							image: { select: { objectKey: true } },
 							roles: {
 								select: {
 									name: true,
@@ -194,7 +195,10 @@ function App() {
 	useToast(data.toast)
 
 	return (
-		<>
+		<OpenImgContextProvider
+			optimizerEndpoint="/resources/images"
+			getSrc={getImgSrc}
+		>
 			<div className="flex min-h-screen flex-col justify-between">
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
@@ -226,7 +230,7 @@ function App() {
 			</div>
 			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />
-		</>
+		</OpenImgContextProvider>
 	)
 }
 

@@ -1,3 +1,4 @@
+import { Img } from 'openimg/react'
 import { useRef } from 'react'
 import { Link, Form } from 'react-router'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
@@ -25,10 +26,12 @@ export function UserDropdown() {
 						onClick={(e) => e.preventDefault()}
 						className="flex items-center gap-2"
 					>
-						<img
+						<Img
 							className="h-8 w-8 rounded-full object-cover"
 							alt={user.name ?? user.username}
-							src={getUserImgSrc(user.image?.id)}
+							src={getUserImgSrc(user.image?.objectKey)}
+							width={256}
+							height={256}
 						/>
 						<span className="text-body-sm font-bold">
 							{user.name ?? user.username}

@@ -56,7 +56,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			id: true,
 			name: true,
 			username: true,
-			image: { select: { id: true } },
+			image: { select: { objectKey: true } },
 		},
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
@@ -142,7 +142,9 @@ export default function PhotoRoute({
 				<img
 					src={
 						newImageSrc ??
-						(loaderData.user ? getUserImgSrc(loaderData.user.image?.id) : '')
+						(loaderData.user
+							? getUserImgSrc(loaderData.user.image?.objectKey)
+							: '')
 					}
 					className="h-52 w-52 rounded-full object-cover"
 					alt={loaderData.user?.name ?? loaderData.user?.username}
@@ -202,7 +204,7 @@ export default function PhotoRoute({
 					>
 						<Icon name="trash">Reset</Icon>
 					</Button>
-					{loaderData.user.image?.id ? (
+					{loaderData.user.image ? (
 						<StatusButton
 							className="peer-valid:hidden"
 							variant="destructive"

@@ -15,6 +15,7 @@ node_modules
 /playwright/.cache/
 /tests/fixtures/email/
 /tests/fixtures/uploaded/
+/tests/fixtures/openimg/
 /coverage
 
 /other/cache.db

@@ -1,4 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
+import { Img } from 'openimg/react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -13,7 +14,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 			id: true,
 			name: true,
 			username: true,
-			image: { select: { id: true } },
+			image: { select: { objectKey: true } },
 			notes: { select: { id: true, title: true } },
 		},
 		where: { username: params.username },
@@ -39,10 +40,12 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 							to={`/users/${loaderData.owner.username}`}
 							className="flex flex-col items-center justify-center gap-2 bg-muted pb-4 pl-8 pr-4 pt-12 lg:flex-row lg:justify-start lg:gap-4"
 						>
-							<img
-								src={getUserImgSrc(loaderData.owner.image?.id)}
+							<Img
+								src={getUserImgSrc(loaderData.owner.image?.objectKey)}
 								alt={ownerDisplayName}
 								className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
+								width={256}
+								height={256}
 							/>
 							<h1 className="text-center text-base font-bold md:text-lg lg:text-left lg:text-2xl">
 								{ownerDisplayName}'s Notes

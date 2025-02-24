@@ -1,3 +1,4 @@
+import { Img } from 'openimg/react'
 import { data, redirect, Link } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -12,6 +13,7 @@ const UserSearchResultSchema = z.object({
 	username: z.string(),
 	name: z.string().nullable(),
 	imageId: z.string().nullable(),
+	imageObjectKey: z.string().nullable(),
 })
 
 const UserSearchResultsSchema = z.array(UserSearchResultSchema)
@@ -24,7 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	const like = `%${searchTerm ?? ''}%`
 	const rawUsers = await prisma.$queryRaw`
-		SELECT User.id, User.username, User.name, UserImage.id AS imageId
+		SELECT User.id, User.username, User.name, UserImage.id AS imageId, UserImage.objectKey AS imageObjectKey
 		FROM User
 		LEFT JOIN UserImage ON User.id = UserImage.userId
 		WHERE User.username LIKE ${like}
@@ -79,10 +81,12 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 										to={user.username}
 										className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
 									>
-										<img
+										<Img
 											alt={user.name ?? user.username}
-											src={getUserImgSrc(user.imageId)}
+											src={getUserImgSrc(user.imageObjectKey)}
 											className="h-16 w-16 rounded-full"
+											width={256}
+											height={256}
 										/>
 										{user.name ? (
 											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
