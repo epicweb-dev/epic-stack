@@ -1,8 +1,29 @@
+import { promises as fs } from 'node:fs'
 import { invariantResponse } from '@epic-web/invariant'
 import { getImgResponse } from 'openimg/node'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
 import { type Route } from './+types/images'
+
+let cacheDir: string | null = null
+
+async function getCacheDir() {
+	if (cacheDir) return cacheDir
+
+	let dir = './tests/fixtures/openimg'
+	if (process.env.NODE_ENV === 'production') {
+		const exists = await fs
+			.access('/data')
+			.then(() => true)
+			.catch(() => false)
+
+		if (exists) {
+			dir = '/data/images'
+		}
+	}
+
+	return (cacheDir = dir)
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const url = new URL(request.url)
@@ -19,10 +40,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			getDomainUrl(request),
 			process.env.AWS_ENDPOINT_URL_S3,
 		].filter(Boolean),
-		cacheFolder:
-			process.env.NODE_ENV === 'production'
-				? '/data/images'
-				: './tests/fixtures/openimg',
+		cacheFolder: await getCacheDir(),
 		getImgSource: () => {
 			if (objectKey) {
 				const { url: signedUrl, headers: signedHeaders } =

@@ -3,6 +3,7 @@ import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { formatDistanceToNow } from 'date-fns'
 import { Img } from 'openimg/react'
+import { useRef, useEffect } from 'react'
 import { data, Form, Link } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -99,9 +100,26 @@ export default function NoteRoute({
 	)
 	const displayBar = canDelete || isOwner
 
+	// Add ref for auto-focusing
+	const sectionRef = useRef<HTMLElement>(null)
+
+	// Focus the section when the note ID changes
+	useEffect(() => {
+		if (sectionRef.current) {
+			sectionRef.current.focus()
+		}
+	}, [loaderData.note.id])
+
 	return (
-		<div className="absolute inset-0 flex flex-col px-10">
-			<h2 className="mb-2 pt-12 text-h2 lg:mb-6">{loaderData.note.title}</h2>
+		<section
+			ref={sectionRef}
+			className="absolute inset-0 flex flex-col px-10"
+			aria-labelledby="note-title"
+			tabIndex={-1} // Make the section focusable without keyboard navigation
+		>
+			<h2 id="note-title" className="mb-2 pt-12 text-h2 lg:mb-6">
+				{loaderData.note.title}
+			</h2>
 			<div className={`${displayBar ? 'pb-24' : 'pb-12'} overflow-y-auto`}>
 				<ul className="flex flex-wrap gap-5 py-5">
 					{loaderData.note.images.map((image) => (
@@ -146,7 +164,7 @@ export default function NoteRoute({
 					</div>
 				</div>
 			) : null}
-		</div>
+		</section>
 	)
 }
 

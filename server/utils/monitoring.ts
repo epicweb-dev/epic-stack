@@ -28,8 +28,6 @@ export function init() {
 			Sentry.httpIntegration(),
 			nodeProfilingIntegration(),
 		],
-		// https://github.com/getsentry/sentry-javascript/issues/12996
-		registerEsmLoaderHooks: { onlyIncludeInstrumentedModules: true },
 		tracesSampler(samplingContext) {
 			// ignore healthcheck transactions by other services (consul, etc.)
 			if (samplingContext.request?.url?.includes('/resources/healthcheck')) {

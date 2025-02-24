@@ -23,7 +23,9 @@ test('Users can create note with an image', async ({ page, login }) => {
 	await page.getByRole('button', { name: 'submit' }).click()
 	await expect(page).toHaveURL(new RegExp(`/users/${user.username}/notes/.*`))
 	await expect(page.getByRole('heading', { name: newNote.title })).toBeVisible()
-	await expect(page.getByAltText(altText)).toBeVisible()
+	await expect(
+		page.getByRole('region', { name: newNote.title }).getByAltText(altText),
+	).toBeVisible()
 })
 
 test('Users can create note with multiple images', async ({ page, login }) => {
@@ -97,19 +99,17 @@ test('Users can delete note image', async ({ page, login }) => {
 	await page.goto(`/users/${user.username}/notes/${note.id}`)
 
 	await expect(page.getByRole('heading', { name: note.title })).toBeVisible()
-	// find image tags
 	const images = page
-		.getByRole('main')
+		.getByRole('region', { name: note.title })
 		.getByRole('list')
 		.getByRole('listitem')
 		.getByRole('img')
-	const countBefore = await images.count()
+	await expect(images).toHaveCount(1)
 	await page.getByRole('link', { name: 'Edit', exact: true }).click()
 	await page.getByRole('button', { name: 'remove image' }).click()
 	await page.getByRole('button', { name: 'submit' }).click()
 	await expect(page).toHaveURL(`/users/${user.username}/notes/${note.id}`)
-	const countAfter = await images.count()
-	expect(countAfter).toEqual(countBefore - 1)
+	await expect(images).toHaveCount(0)
 })
 
 function createNote() {
