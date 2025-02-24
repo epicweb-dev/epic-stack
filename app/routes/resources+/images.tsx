@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs'
+import { promises as fs, constants } from 'node:fs'
 import { invariantResponse } from '@epic-web/invariant'
 import { getImgResponse } from 'openimg/node'
 import { getDomainUrl } from '#app/utils/misc.tsx'
@@ -12,12 +12,12 @@ async function getCacheDir() {
 
 	let dir = './tests/fixtures/openimg'
 	if (process.env.NODE_ENV === 'production') {
-		const exists = await fs
-			.access('/data')
+		const isAccessible = await fs
+			.access('/data', constants.W_OK)
 			.then(() => true)
 			.catch(() => false)
 
-		if (exists) {
+		if (isAccessible) {
 			dir = '/data/images'
 		}
 	}
