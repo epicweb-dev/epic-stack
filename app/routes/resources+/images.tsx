@@ -12,9 +12,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 
 	const objectKey = searchParams.get('objectKey')
-	if (objectKey) {
-		headers.set('Content-Disposition', 'inline')
-	}
 
 	return getImgResponse(request, {
 		headers,
