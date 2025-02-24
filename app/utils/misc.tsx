@@ -24,6 +24,10 @@ export function getImgSrc({
 	fit,
 	format,
 }: GetSrcArgs) {
+	// We customize getImgSrc so our src looks nice like this:
+	// /resources/images?objectKey=...&h=...&w=...&fit=...&format=...
+	// instead of this:
+	// /resources/images?src=%2Fresources%2Fimages%3FobjectKey%3Dusers%252Fcm7jgfjyw0021dnx9p8iqid8b%252Fprofile-images%252F1740425641961-sg997qzx186e84e8klhqs9we.png&w=...&h=...
 	if (src.startsWith(optimizerEndpoint)) {
 		const [endpoint, query] = src.split('?')
 		const searchParams = new URLSearchParams(query)
