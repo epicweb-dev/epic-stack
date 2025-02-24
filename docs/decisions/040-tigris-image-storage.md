@@ -1,4 +1,4 @@
-# Title: Switch to Tigris for Image Storage
+# Switch to Tigris for Image Storage
 
 Date: 2025-02-20
 
