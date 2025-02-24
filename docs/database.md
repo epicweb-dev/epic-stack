@@ -59,7 +59,7 @@ you can utilize Fly's `ssh` and `proxy` commands.
 
 - Run in one terminal the command to start Prisma Studio on your desired Fly app
   ```sh
-  fly ssh console -C "npm run prisma:studio" --app [YOUR_APP_NAME]
+  fly ssh console -C "npx prisma studio" --app [YOUR_APP_NAME]
   ```
 - Run in a second terminal the command to proxy your local port 5556 to Prisma
   Studio
@@ -68,7 +68,8 @@ you can utilize Fly's `ssh` and `proxy` commands.
   ```
 
 If you have multiple instances of your app running, and you'd like to make edits
-to your database, you will need to run `prisma:studio` on the primary instance.
+to your database, you will need to run `npx prisma studio` on the primary
+instance.
 
 - Get a list of your app instances, the `ROLE` column will show which instance
   is `primary`
@@ -77,7 +78,7 @@ to your database, you will need to run `prisma:studio` on the primary instance.
   ```
 - Run the console command with the `-s` select flag
   ```sh
-  fly ssh console -C "npm run prisma:studio" -s --app [YOUR_APP_NAME]
+  fly ssh console -C "npx prisma studio" -s --app [YOUR_APP_NAME]
   ```
 - Use your arrow keys to select the primary instance
 

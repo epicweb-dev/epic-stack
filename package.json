@@ -17,7 +17,6 @@
     "predev": "npm run build:icons --silent",
     "dev": "cross-env NODE_ENV=development MOCKS=true node ./server/dev-server.js",
     "dev:no-mocks": "cross-env NODE_ENV=development node ./server/dev-server.js",
-    "prisma:studio": "prisma studio",
     "format": "prettier --write .",
     "lint": "eslint .",
     "setup": "npm run build && prisma generate && prisma migrate reset --force && playwright install",
