@@ -1,17 +1,19 @@
 import { clsx, type ClassValue } from 'clsx'
+import { type GetSrcArgs, defaultGetSrc } from 'openimg/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFormAction, useNavigation } from 'react-router'
 import { useSpinDelay } from 'spin-delay'
-import { GetSrcArgs, defaultGetSrc } from 'openimg/react'
 import { extendTailwindMerge } from 'tailwind-merge'
 import { extendedTheme } from './extended-theme.ts'
 
-export function getUserImgSrc(imageId?: string | null) {
-	return imageId ? `/resources/images?userImageId=${imageId}` : '/img/user.png'
+export function getUserImgSrc(objectKey?: string | null) {
+	return objectKey
+		? `/resources/images?objectKey=${encodeURIComponent(objectKey)}`
+		: '/img/user.png'
 }
 
-export function getNoteImgSrc(imageId: string) {
-	return `/resources/images?noteImageId=${imageId}`
+export function getNoteImgSrc(objectKey: string) {
+	return `/resources/images?objectKey=${encodeURIComponent(objectKey)}`
 }
 
 export function getImgSrc({

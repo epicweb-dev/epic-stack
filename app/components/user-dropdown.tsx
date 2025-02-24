@@ -1,3 +1,4 @@
+import { Img } from 'openimg/react'
 import { useRef } from 'react'
 import { Link, Form } from 'react-router'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
@@ -11,7 +12,6 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { Icon } from './ui/icon'
-import { Img } from 'openimg/react'
 
 export function UserDropdown() {
 	const user = useUser()
@@ -29,7 +29,7 @@ export function UserDropdown() {
 						<Img
 							className="h-8 w-8 rounded-full object-cover"
 							alt={user.name ?? user.username}
-							src={getUserImgSrc(user.image?.id)}
+							src={getUserImgSrc(user.image?.objectKey)}
 							width={256}
 							height={256}
 						/>

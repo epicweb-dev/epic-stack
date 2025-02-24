@@ -1,3 +1,4 @@
+import { OpenImgContextProvider } from 'openimg/react'
 import {
 	data,
 	Link,
@@ -10,7 +11,6 @@ import {
 	useMatches,
 } from 'react-router'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
-import { OpenImgContextProvider } from 'openimg/react'
 import { type Route } from './+types/root.ts'
 import appleTouchIconAssetUrl from './assets/favicons/apple-touch-icon.png'
 import faviconAssetUrl from './assets/favicons/favicon.svg'
@@ -84,7 +84,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 							id: true,
 							name: true,
 							username: true,
-							image: { select: { id: true } },
+							image: { select: { objectKey: true } },
 							roles: {
 								select: {
 									name: true,

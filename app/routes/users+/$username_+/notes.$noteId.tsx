@@ -2,6 +2,7 @@ import { getFormProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { formatDistanceToNow } from 'date-fns'
+import { Img } from 'openimg/react'
 import { data, Form, Link } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -18,7 +19,6 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { userHasPermission, useOptionalUser } from '#app/utils/user.ts'
 import { type Route, type Info } from './+types/notes.$noteId.ts'
 import { type Info as notesInfo } from './+types/notes.ts'
-import { Img } from 'openimg/react'
 
 export async function loader({ params }: Route.LoaderArgs) {
 	const note = await prisma.note.findUnique({
@@ -31,8 +31,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 			updatedAt: true,
 			images: {
 				select: {
-					id: true,
 					altText: true,
+					objectKey: true,
 				},
 			},
 		},
@@ -105,10 +105,10 @@ export default function NoteRoute({
 			<div className={`${displayBar ? 'pb-24' : 'pb-12'} overflow-y-auto`}>
 				<ul className="flex flex-wrap gap-5 py-5">
 					{loaderData.note.images.map((image) => (
-						<li key={image.id}>
-							<a href={getNoteImgSrc(image.id)}>
+						<li key={image.objectKey}>
+							<a href={getNoteImgSrc(image.objectKey)}>
 								<Img
-									src={getNoteImgSrc(image.id)}
+									src={getNoteImgSrc(image.objectKey)}
 									alt={image.altText ?? ''}
 									className="h-32 w-32 rounded-lg object-cover"
 									width={512}

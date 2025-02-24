@@ -1,11 +1,11 @@
 import { invariantResponse } from '@epic-web/invariant'
+import { Img } from 'openimg/react'
 import {
 	type LoaderFunctionArgs,
 	Form,
 	Link,
 	useLoaderData,
 } from 'react-router'
-import { Img } from 'openimg/react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
@@ -22,7 +22,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			name: true,
 			username: true,
 			createdAt: true,
-			image: { select: { id: true } },
+			image: { select: { id: true, objectKey: true } },
 		},
 		where: {
 			username: params.username,
@@ -50,7 +50,7 @@ export default function ProfileRoute() {
 					<div className="absolute -top-40">
 						<div className="relative">
 							<Img
-								src={getUserImgSrc(data.user.image?.id)}
+								src={getUserImgSrc(data.user.image?.objectKey)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
 								width={832}

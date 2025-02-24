@@ -47,14 +47,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 			image: user.image
 				? {
 						...user.image,
-						url: domain + getUserImgSrc(user.image.id),
+						url: domain + getUserImgSrc(user.image.objectKey),
 					}
 				: null,
 			notes: user.notes.map((note) => ({
 				...note,
 				images: note.images.map((image) => ({
 					...image,
-					url: domain + getNoteImgSrc(image.id),
+					url: domain + getNoteImgSrc(image.objectKey),
 				})),
 			})),
 		},

@@ -1,6 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
-import { getImgResponse, ImgSource } from 'openimg/node'
-import { prisma } from '#app/utils/db.server.ts'
+import { getImgResponse } from 'openimg/node'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
 import { type Route } from './+types/images'
@@ -12,10 +11,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const headers = new Headers()
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 
-	const userImageId = searchParams.get('userImageId')
-	const noteImageId = searchParams.get('noteImageId')
-	const bucketImgId = userImageId || noteImageId
-	if (bucketImgId) {
+	const objectKey = searchParams.get('objectKey')
+	if (objectKey) {
 		headers.set('Content-Disposition', 'inline')
 	}
 
@@ -30,16 +27,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 				? '/data/images'
 				: './tests/fixtures/openimg',
 		getImgSource: () => {
-			if (bucketImgId) {
-				if (userImageId) {
-					return handleUserImage(userImageId)
-				}
-				if (noteImageId) {
-					return handleNoteImage(noteImageId)
+			if (objectKey) {
+				const { url: signedUrl, headers: signedHeaders } =
+					getSignedGetRequestInfo(objectKey)
+				return {
+					type: 'fetch',
+					url: signedUrl,
+					headers: signedHeaders,
 				}
 			}
+
 			const src = searchParams.get('src')
 			invariantResponse(src, 'src query parameter is required', { status: 400 })
+
 			if (URL.canParse(src)) {
 				// Fetch image from external URL; will be matched against allowlist
 				return {
@@ -62,34 +62,4 @@ export async function loader({ request }: Route.LoaderArgs) {
 			}
 		},
 	})
-}
-
-async function handleUserImage(userImageId: string): Promise<ImgSource> {
-	const userImage = await prisma.userImage.findUnique({
-		where: { id: userImageId },
-		select: { objectKey: true },
-	})
-	invariantResponse(userImage, 'User image not found', { status: 404 })
-
-	const { url, headers } = getSignedGetRequestInfo(userImage.objectKey)
-	return {
-		type: 'fetch',
-		url,
-		headers,
-	}
-}
-
-async function handleNoteImage(noteImageId: string): Promise<ImgSource> {
-	const noteImage = await prisma.noteImage.findUnique({
-		where: { id: noteImageId },
-		select: { objectKey: true },
-	})
-	invariantResponse(noteImage, 'Note image not found', { status: 404 })
-
-	const { url, headers } = getSignedGetRequestInfo(noteImage.objectKey)
-	return {
-		type: 'fetch',
-		url,
-		headers,
-	}
 }
