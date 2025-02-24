@@ -37,7 +37,7 @@ jobs:
         run: npm run build:icons
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+        run: npx prisma migrate deploy && npx prisma generate
 
       - name: 🔬 Lint
         run: npm run lint
@@ -64,7 +64,7 @@ jobs:
         run: npm run build:icons
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+        run: npx prisma migrate deploy && npx prisma generate
 
       - name: 🔎 Type check
         run: npm run typecheck --if-present
@@ -91,7 +91,7 @@ jobs:
         run: npm run build:icons
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+        run: npx prisma migrate deploy && npx prisma generate
 
       - name: ⚡ Run vitest
         run: npm run test -- --coverage
@@ -119,7 +119,7 @@ jobs:
         run: npm run test:e2e:install
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+        run: npx prisma migrate deploy && npx prisma generate
 
       - name: 🏦 Cache Database
         id: db-cache
