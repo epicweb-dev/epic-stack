@@ -40,4 +40,7 @@ exec:
   - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
+  # Generate Typed SQL files
+  - cmd: npx prisma generate --sql
+
   - cmd: npm start
