@@ -36,8 +36,8 @@ jobs:
       - name: 🖼 Build icons
         run: npm run build:icons
 
-      - name: 🧬 Generate Prisma client Typed SQL queries
-        run: npx prisma generate --sql
+      - name: 🛠 Setup Database
+        run: npx prisma migrate deploy
 
       - name: 🔬 Lint
         run: npm run lint
@@ -63,8 +63,8 @@ jobs:
       - name: 🖼 Build icons
         run: npm run build:icons
 
-      - name: 🧬 Generate Prisma client Typed SQL queries
-        run: npx prisma generate --sql
+      - name: 🛠 Setup Database
+        run: npx prisma migrate deploy
 
       - name: 🔎 Type check
         run: npm run typecheck --if-present
@@ -90,8 +90,8 @@ jobs:
       - name: 🖼 Build icons
         run: npm run build:icons
 
-      - name: 🧬 Generate Prisma client Typed SQL queries
-        run: npx prisma generate --sql
+      - name: 🛠 Setup Database
+        run: npx prisma migrate deploy
 
       - name: ⚡ Run vitest
         run: npm run test -- --coverage
