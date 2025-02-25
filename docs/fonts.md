@@ -31,6 +31,8 @@ Now you've added your font, there's a few places you need to update to use it.
    }
    ```
 
+<!-- FIXME: update this to tailwind v4 -->
+
 2. Import the default theme and add your font to the `fontFamily` property.
 
    ```ts

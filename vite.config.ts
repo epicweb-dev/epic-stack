@@ -1,5 +1,6 @@
 import { reactRouter } from '@react-router/dev/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import tailwindcss from '@tailwindcss/vite'
 
 import { envOnlyMacros } from 'vite-env-only'
 import { type ViteUserConfig } from 'vitest/config'
@@ -57,6 +58,7 @@ export default {
 					},
 				})
 			: null,
+		tailwindcss(),
 	],
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],

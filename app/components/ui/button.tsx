@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '#app/utils/misc.tsx'
 
 const buttonVariants = cva(
-	'inline-flex items-center justify-center rounded-md text-sm font-medium outline-none ring-ring ring-offset-2 ring-offset-background transition-colors focus-within:ring-2 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50',
+	'inline-flex items-center justify-center rounded-md text-sm font-medium outline-hidden ring-ring ring-offset-2 ring-offset-background transition-colors focus-within:ring-2 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50',
 	{
 		variants: {
 			variant: {
