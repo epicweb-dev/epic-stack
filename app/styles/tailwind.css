@@ -4,48 +4,12 @@
 @plugin "tailwindcss-radix";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant aria-invalid (&[aria-invalid]);
 
 @theme {
 	--font-sans:
 		'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
 		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-
-	--animate-roll-reveal: roll-reveal 0.4s cubic-bezier(0.22, 1.28, 0.54, 0.99);
-	--animate-slide-left: slide-left 0.3s ease-out;
-	--animate-slide-top: slide-top 0.3s ease-out;
-
-	@keyframes roll-reveal {
-		from {
-			opacity: 0;
-			transform: rotate(12deg) scale(0);
-		}
-		to {
-			opacity: 1;
-			transform: rotate(0deg) scale(1);
-		}
-	}
-
-	@keyframes slide-left {
-		from {
-			opacity: 0;
-			transform: translateX(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateX(0px);
-		}
-	}
-
-	@keyframes slide-top {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0px);
-		}
-	}
 }
 
 html,
