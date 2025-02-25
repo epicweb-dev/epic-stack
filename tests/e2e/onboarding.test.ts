@@ -89,6 +89,8 @@ test('onboarding with link', async ({ page, getOnboardingData }) => {
 
 	await page.getByLabel(/^confirm password/i).fill(onboardingData.password)
 
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
+
 	await page.getByLabel(/terms/i).check()
 
 	await page.getByLabel(/remember me/i).check()
@@ -167,6 +169,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 		name: /create an account/i,
 	})
 
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
 	await page
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
@@ -307,6 +310,8 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// we are all set up and ...
+
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
 	await page
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
