@@ -1,9 +1,10 @@
 import { Img } from 'openimg/react'
 import { useRef } from 'react'
 import { Link, Form } from 'react-router'
+import { Button } from '#app/components/ui/button.tsx'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
-import { Button } from './ui/button'
+
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,

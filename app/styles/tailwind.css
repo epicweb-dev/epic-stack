@@ -129,6 +129,43 @@ body {
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+
+	--animate-roll-reveal: roll-reveal 0.4s cubic-bezier(0.22, 1.28, 0.54, 0.99);
+	--animate-slide-left: slide-left 0.3s ease-out;
+	--animate-slide-top: slide-top 0.3s ease-out;
+
+	@keyframes roll-reveal {
+		from {
+			transform: rotate(12deg) scale(0);
+			opacity: 0;
+		}
+		to {
+			transform: rotate(0deg) scale(1);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slide-left {
+		from {
+			transform: translateX(20px);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0px);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slide-top {
+		from {
+			transform: translateY(20px);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0px);
+			opacity: 1;
+		}
+	}
 }
 
 @layer base {
@@ -138,4 +175,9 @@ body {
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+@utility container {
+	margin-inline: auto;
+	padding-inline: 2rem;
 }
