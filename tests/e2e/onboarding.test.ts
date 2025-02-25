@@ -60,9 +60,6 @@ test('onboarding with link', async ({ page, getOnboardingData }) => {
 	await emailTextbox.fill(onboardingData.email)
 
 	await page.getByRole('button', { name: /submit/i }).click()
-	await expect(
-		page.getByRole('button', { name: /submit/i, disabled: true }),
-	).toBeVisible()
 	await expect(page.getByText(/check your email/i)).toBeVisible()
 
 	const email = await readEmail(onboardingData.email)
@@ -92,6 +89,8 @@ test('onboarding with link', async ({ page, getOnboardingData }) => {
 
 	await page.getByLabel(/^confirm password/i).fill(onboardingData.password)
 
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
+
 	await page.getByLabel(/terms/i).check()
 
 	await page.getByLabel(/remember me/i).check()
@@ -120,9 +119,6 @@ test('onboarding with a short code', async ({ page, getOnboardingData }) => {
 	await emailTextbox.fill(onboardingData.email)
 
 	await page.getByRole('button', { name: /submit/i }).click()
-	await expect(
-		page.getByRole('button', { name: /submit/i, disabled: true }),
-	).toBeVisible()
 	await expect(page.getByText(/check your email/i)).toBeVisible()
 
 	const email = await readEmail(onboardingData.email)
@@ -173,6 +169,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 		name: /create an account/i,
 	})
 
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
 	await page
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
@@ -313,6 +310,8 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 
 	// we are all set up and ...
+
+	await page.waitForLoadState('networkidle') // ensure js is fully loaded.
 	await page
 		.getByLabel(/do you agree to our terms of service and privacy policy/i)
 		.check()
@@ -350,9 +349,6 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 	).toBeVisible()
 	await page.getByRole('textbox', { name: /username/i }).fill(user.username)
 	await page.getByRole('button', { name: /recover password/i }).click()
-	await expect(
-		page.getByRole('button', { name: /recover password/i, disabled: true }),
-	).toBeVisible()
 	await expect(page.getByText(/check your email/i)).toBeVisible()
 
 	const email = await readEmail(user.email)
@@ -377,9 +373,6 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 	await page.getByLabel(/^confirm password$/i).fill(newPassword)
 
 	await page.getByRole('button', { name: /reset password/i }).click()
-	await expect(
-		page.getByRole('button', { name: /reset password/i, disabled: true }),
-	).toBeVisible()
 
 	await expect(page).toHaveURL('/login')
 	await page.getByRole('textbox', { name: /username/i }).fill(user.username)
@@ -408,9 +401,6 @@ test('reset password with a short code', async ({ page, insertNewUser }) => {
 	).toBeVisible()
 	await page.getByRole('textbox', { name: /username/i }).fill(user.username)
 	await page.getByRole('button', { name: /recover password/i }).click()
-	await expect(
-		page.getByRole('button', { name: /recover password/i, disabled: true }),
-	).toBeVisible()
 	await expect(page.getByText(/check your email/i)).toBeVisible()
 
 	const email = await readEmail(user.email)

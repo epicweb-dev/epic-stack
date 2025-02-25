@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { faker } from '@faker-js/faker'
 import fsExtra from 'fs-extra'
 import { HttpResponse, passthrough, http, type HttpHandler } from 'msw'
+import { USERNAME_MAX_LENGTH } from '#app/utils/user-validation.ts'
 
 const { json } = HttpResponse
 
@@ -54,7 +55,7 @@ function createGitHubUser(code?: string | null) {
 		code,
 		accessToken: `${code}_mock_access_token`,
 		profile: {
-			login: faker.internet.username(),
+			login: faker.internet.username().slice(0, USERNAME_MAX_LENGTH),
 			id: faker.number.int(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
