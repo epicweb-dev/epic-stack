@@ -26,6 +26,7 @@ test('The user profile when not logged in as self', async () => {
 			path: '/users/:username',
 			Component: UsernameRoute,
 			loader,
+			HydrateFallback: () => <div>Loading...</div>,
 		},
 	])
 
@@ -70,6 +71,7 @@ test('The user profile when logged in as self', async () => {
 				args.request.headers.set('cookie', cookieHeader)
 				return rootLoader({ ...args, context: args.context })
 			},
+			HydrateFallback: () => <div>Loading...</div>,
 			children: [
 				{
 					path: 'users/:username',
@@ -85,7 +87,7 @@ test('The user profile when logged in as self', async () => {
 	])
 
 	const routeUrl = `/users/${user.username}`
-	await render(<App initialEntries={[routeUrl]} />)
+	render(<App initialEntries={[routeUrl]} />)
 
 	await screen.findByRole('heading', { level: 1, name: user.name! })
 	await screen.findByRole('img', { name: user.name! })

@@ -18,6 +18,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 				select: {
 					id: true,
 					altText: true,
+					objectKey: true,
 				},
 			},
 		},

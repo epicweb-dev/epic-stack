@@ -1,8 +1,9 @@
 # Images
 
-Date: 2023-06-23
+Date: 2023-06-23 Updated: 2024-03-19
 
-Status: accepted (for now)
+Status: superseded by
+[040-tigris-image-storage.md](./040-tigris-image-storage.md)
 
 ## Context
 

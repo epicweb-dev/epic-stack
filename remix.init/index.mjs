@@ -15,6 +15,22 @@ const escapeRegExp = (string) =>
 const getRandomString = (length) => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
 
+async function getEpicStackVersion() {
+	const response = await fetch(
+		'https://api.github.com/repos/epicweb-dev/epic-stack/commits/main',
+	)
+	if (!response.ok) {
+		throw new Error(
+			`Failed to fetch Epic Stack version: ${response.status} ${response.statusText}`,
+		)
+	}
+	const data = await response.json()
+	return {
+		head: data.sha,
+		date: data.commit.author.date,
+	}
+}
+
 export default async function main({ rootDirectory }) {
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
 	const EXAMPLE_ENV_PATH = path.join(rootDirectory, '.env.example')
@@ -53,10 +69,21 @@ export default async function main({ rootDirectory }) {
 	delete packageJson.author
 	delete packageJson.license
 
+	// Add Epic Stack version information
+	try {
+		const epicStackVersion = await getEpicStackVersion()
+		packageJson['epic-stack'] = epicStackVersion
+	} catch (error) {
+		console.warn(
+			'Failed to fetch Epic Stack version information. The package.json will not include version details.',
+			error,
+		)
+	}
+
 	const fileOperationPromises = [
 		fs.writeFile(FLY_TOML_PATH, newFlyTomlContent),
 		fs.writeFile(ENV_PATH, newEnv),
-		fs.writeFile(PKG_PATH, JSON.stringify(packageJson, null, 2)),
+		fs.writeFile(PKG_PATH, JSON.stringify(packageJson, null, 2) + '\n'),
 		fs.copyFile(
 			path.join(rootDirectory, 'remix.init', 'gitignore'),
 			path.join(rootDirectory, '.gitignore'),
@@ -66,7 +93,6 @@ export default async function main({ rootDirectory }) {
 		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/notes.test.ts')),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/search.test.ts')),
-		fs.rm(path.join(rootDirectory, '.github/workflows/version.yml')),
 	]
 
 	await Promise.all(fileOperationPromises)
@@ -154,24 +180,47 @@ async function setupDeployment({ rootDirectory }) {
 
 	const { app: APP_NAME } = flyConfig
 
-	console.log(`🥪 Creating app ${APP_NAME} and ${APP_NAME}-staging...`)
-	await $I`fly apps create ${APP_NAME}-staging`
+	const { shouldSetupStaging } = await inquirer.prompt([
+		{
+			name: 'shouldSetupStaging',
+			type: 'confirm',
+			default: true,
+			message: 'Would you like to set up a staging environment?',
+		},
+	])
+
+	console.log(
+		`🥪 Creating app ${APP_NAME}${shouldSetupStaging ? ' and staging...' : '...'}`,
+	)
+	if (shouldSetupStaging) {
+		await $I`fly apps create ${APP_NAME}-staging`
+	}
 	await $I`fly apps create ${APP_NAME}`
 
 	console.log(`🤫 Setting secrets in apps`)
-	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} ALLOW_INDEXING=false --app ${APP_NAME}-staging`
+	if (shouldSetupStaging) {
+		await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} ALLOW_INDEXING=false --app ${APP_NAME}-staging`
+	}
 	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
 
-	console.log(
-		`🔊 Creating volumes. Answer "yes" when it warns you about downtime. You can add more volumes later (when you actually start getting paying customers �).`,
-	)
-	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}-staging`
-	await $I`fly volumes create data --region ${primaryRegion} --size 1 --app ${APP_NAME}`
+	console.log(`🔊 Creating volumes.`)
+	if (shouldSetupStaging) {
+		await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}-staging`
+	}
+	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}`
 
-	// attach consul
 	console.log(`🔗 Attaching consul`)
-	await $I`fly consul attach --app ${APP_NAME}-staging`
+	if (shouldSetupStaging) {
+		await $I`fly consul attach --app ${APP_NAME}-staging`
+	}
 	await $I`fly consul attach --app ${APP_NAME}`
+
+	console.log(`🗄️ Setting up Tigris object storage`)
+	const $S = $({ stdio: ['inherit', 'ignore', 'inherit'], cwd: rootDirectory })
+	if (shouldSetupStaging) {
+		await $S`fly storage create --yes --app ${APP_NAME}-staging --name epic-stack-${APP_NAME}-staging`
+	}
+	await $S`fly storage create --yes --app ${APP_NAME} --name epic-stack-${APP_NAME}`
 
 	const { shouldDeploy } = await inquirer.prompt([
 		{
@@ -179,16 +228,17 @@ async function setupDeployment({ rootDirectory }) {
 			type: 'confirm',
 			default: true,
 			message:
-				'Would you like to deploy right now? (This will take a while, and you can always wait until you push to GitHub instead).',
+				'Would you like to deploy right now? (This will take a while. You can wait until you push to GitHub instead).',
 		},
 	])
 	if (shouldDeploy) {
-		console.log(`🚀 Deploying apps...`)
-		console.log(`  Starting with staging`)
-		await $I`fly deploy --app ${APP_NAME}-staging`
-		await open(`https://${APP_NAME}-staging.fly.dev/`)
-
-		console.log(`  Staging deployed... Deploying production...`)
+		console.log(`🚀 Deploying`)
+		if (shouldSetupStaging) {
+			console.log(`  Starting with staging`)
+			await $I`fly deploy --app ${APP_NAME}-staging`
+			await open(`https://${APP_NAME}-staging.fly.dev/`)
+			console.log(`  Staging deployed... Deploying production...`)
+		}
 		await $I`fly deploy --app ${APP_NAME}`
 		await open(`https://${APP_NAME}.fly.dev/`)
 		console.log(`  Production deployed...`)

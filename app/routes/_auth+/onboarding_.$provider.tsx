@@ -18,12 +18,10 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
-	authenticator,
 	sessionKey,
 	signupWithConnection,
 	requireAnonymous,
 } from '#app/utils/auth.server.ts'
-import { connectionSessionStorage } from '#app/utils/connections.server'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -65,7 +63,7 @@ async function requireData({
 		.object({
 			email: z.string(),
 			providerName: ProviderNameSchema,
-			providerId: z.string(),
+			providerId: z.string().or(z.number()),
 		})
 		.safeParse({ email, providerName: params.provider, providerId })
 	if (result.success) {
@@ -78,24 +76,17 @@ async function requireData({
 
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const { email } = await requireData({ request, params })
-	const connectionSession = await connectionSessionStorage.getSession(
-		request.headers.get('cookie'),
-	)
+
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const prefilledProfile = verifySession.get(prefilledProfileKey)
 
-	const formError = connectionSession.get(authenticator.sessionErrorKey)
-	const hasError = typeof formError === 'string'
-
 	return {
 		email,
 		status: 'idle',
 		submission: {
-			status: hasError ? 'error' : undefined,
 			initialValue: prefilledProfile ?? {},
-			error: { '': hasError ? [formError] : [] },
 		} as SubmissionResult,
 	}
 }
@@ -128,7 +119,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 			const session = await signupWithConnection({
 				...data,
 				email,
-				providerId,
+				providerId: String(providerId),
 				providerName,
 			})
 			return { ...data, session }

@@ -26,7 +26,7 @@ lease:
 
   consul:
     url: '${FLY_CONSUL_URL}'
-    key: 'epic-stack-litefs_20250220/${FLY_APP_NAME}'
+    key: 'epic-stack-litefs_20250222/${FLY_APP_NAME}'
 
 exec:
   - cmd: npx prisma migrate deploy
@@ -39,5 +39,8 @@ exec:
   # Set the journal mode for the cache to WAL. This reduces concurrency deadlock issues
   - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
+
+  # Generate Typed SQL files
+  - cmd: npx prisma generate --sql
 
   - cmd: npm start

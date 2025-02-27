@@ -1,4 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
+import { Img } from 'openimg/react'
 import {
 	type LoaderFunctionArgs,
 	Form,
@@ -21,7 +22,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			name: true,
 			username: true,
 			createdAt: true,
-			image: { select: { id: true } },
+			image: { select: { id: true, objectKey: true } },
 		},
 		where: {
 			username: params.username,
@@ -48,10 +49,12 @@ export default function ProfileRoute() {
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
-							<img
-								src={getUserImgSrc(data.user.image?.id)}
+							<Img
+								src={getUserImgSrc(data.user.image?.objectKey)}
 								alt={userDisplayName}
 								className="h-52 w-52 rounded-full object-cover"
+								width={832}
+								height={832}
 							/>
 						</div>
 					</div>

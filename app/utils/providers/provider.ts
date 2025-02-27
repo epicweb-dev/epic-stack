@@ -1,9 +1,9 @@
-import { type Strategy } from 'remix-auth'
+import { type Strategy } from 'remix-auth/strategy'
 import { type Timings } from '../timing.server.ts'
 
 // Define a user type for cleaner typing
 export type ProviderUser = {
-	id: string
+	id: string | number
 	email: string
 	username?: string
 	name?: string
@@ -11,7 +11,7 @@ export type ProviderUser = {
 }
 
 export interface AuthProvider {
-	getAuthStrategy(): Strategy<ProviderUser, any>
+	getAuthStrategy(): Strategy<ProviderUser, any> | null
 	handleMockAction(request: Request): Promise<void>
 	resolveConnectionData(
 		providerId: string,
