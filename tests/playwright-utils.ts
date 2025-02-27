@@ -122,12 +122,14 @@ export const test = base.extend<{
 			return newGitHubUser
 		})
 
-		const user = await prisma.user.findUniqueOrThrow({
+		const user = await prisma.user.findUnique({
 			select: { id: true, name: true },
 			where: { email: normalizeEmail(ghUser!.primaryEmail) },
 		})
-		await prisma.user.delete({ where: { id: user.id } })
-		await prisma.session.deleteMany({ where: { userId: user.id } })
+		if (user) {
+			await prisma.user.delete({ where: { id: user.id } })
+			await prisma.session.deleteMany({ where: { userId: user.id } })
+		}
 		await deleteGitHubUser(ghUser!.primaryEmail)
 	},
 })

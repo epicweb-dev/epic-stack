@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["typedSql"]
 }
 
 datasource db {
@@ -48,10 +49,9 @@ model Note {
 }
 
 model NoteImage {
-  id          String  @id @default(cuid())
-  altText     String?
-  contentType String
-  blob        Bytes
+  id        String  @id @default(cuid())
+  altText   String?
+  objectKey String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,10 +64,9 @@ model NoteImage {
 }
 
 model UserImage {
-  id          String  @id @default(cuid())
-  altText     String?
-  contentType String
-  blob        Bytes
+  id        String  @id @default(cuid())
+  altText   String?
+  objectKey String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

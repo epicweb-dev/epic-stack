@@ -8,15 +8,24 @@ const schema = z.object({
 	INTERNAL_COMMAND_TOKEN: z.string(),
 	HONEYPOT_SECRET: z.string(),
 	CACHE_DATABASE_PATH: z.string(),
-	// If you plan on using Sentry, uncomment this line
-	// SENTRY_DSN: z.string(),
-	// If you plan to use Resend, uncomment this line
-	// RESEND_API_KEY: z.string(),
-	// If you plan to use GitHub auth, remove the default:
-	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
-	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
-	GITHUB_TOKEN: z.string().default('MOCK_GITHUB_TOKEN'),
+	// If you plan on using Sentry, remove the .optional()
+	SENTRY_DSN: z.string().optional(),
+	// If you plan to use Resend, remove the .optional()
+	RESEND_API_KEY: z.string().optional(),
+	// If you plan to use GitHub auth, remove the .optional()
+	GITHUB_CLIENT_ID: z.string().optional(),
+	GITHUB_CLIENT_SECRET: z.string().optional(),
+	GITHUB_REDIRECT_URI: z.string().optional(),
+	GITHUB_TOKEN: z.string().optional(),
+
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
+
+	// Tigris Object Storage Configuration
+	AWS_ACCESS_KEY_ID: z.string(),
+	AWS_SECRET_ACCESS_KEY: z.string(),
+	AWS_REGION: z.string(),
+	AWS_ENDPOINT_URL_S3: z.string().url(),
+	BUCKET_NAME: z.string(),
 })
 
 declare global {

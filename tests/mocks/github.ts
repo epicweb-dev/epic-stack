@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { faker } from '@faker-js/faker'
 import fsExtra from 'fs-extra'
 import { HttpResponse, passthrough, http, type HttpHandler } from 'msw'
+import { USERNAME_MAX_LENGTH } from '#app/utils/user-validation.ts'
 
 const { json } = HttpResponse
 
@@ -54,8 +55,8 @@ function createGitHubUser(code?: string | null) {
 		code,
 		accessToken: `${code}_mock_access_token`,
 		profile: {
-			login: faker.internet.username(),
-			id: faker.string.uuid(),
+			login: faker.internet.username().slice(0, USERNAME_MAX_LENGTH),
+			id: faker.number.int(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
 			emails: emails.map((e) => e.email),
@@ -112,7 +113,7 @@ export async function insertGitHubUser(code?: string | null) {
 async function getUser(request: Request) {
 	const accessToken = request.headers
 		.get('authorization')
-		?.slice('token '.length)
+		?.slice('Bearer '.length)
 
 	if (!accessToken) {
 		return new Response('Unauthorized', { status: 401 })
@@ -128,7 +129,7 @@ async function getUser(request: Request) {
 }
 
 const passthroughGitHub =
-	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') &&
+	!process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') &&
 	process.env.NODE_ENV !== 'test'
 
 export const handlers: Array<HttpHandler> = [
@@ -145,11 +146,11 @@ export const handlers: Array<HttpHandler> = [
 				user = await insertGitHubUser(code)
 			}
 
-			return new Response(
-				new URLSearchParams({
+			return json(
+				{
 					access_token: user.accessToken,
 					token_type: '__MOCK_TOKEN_TYPE__',
-				}).toString(),
+				},
 				{ headers: { 'content-type': 'application/x-www-form-urlencoded' } },
 			)
 		},
@@ -166,7 +167,7 @@ export const handlers: Array<HttpHandler> = [
 		if (passthroughGitHub) return passthrough()
 
 		const mockUser = (await getGitHubUsers()).find(
-			(u) => u.profile.id === params.id,
+			(u) => u.profile.id === Number(params.id),
 		)
 		if (mockUser) return json(mockUser.profile)
 

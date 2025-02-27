@@ -6,7 +6,7 @@ Here are a few things you get today:
 - [Fly app deployment](https://fly.io/) with [Docker](https://www.docker.com/)
 - Multi-region, distributed, production-ready
   [SQLite Database](https://sqlite.org/) with
-  [LiteFS](https://fly.io/docs/litefs/).
+  [LiteFS](https://fly.io/docs/litefs/)
 - Healthcheck endpoint for
   [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
 - [Grafana](https://grafana.com/) Dashboards of the running app
@@ -14,14 +14,14 @@ Here are a few things you get today:
   on merge for both production and staging environments
 - Email/Password Authentication with
   [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
-- Two-Factor Authentication (2fa) with support for authenticator apps.
+- Two-Factor Authentication (2fa) with support for authenticator apps
 - Transactional email with [Resend](https://resend.com/) and forgot
-  password/password reset support.
+  password/password reset support
 - Progressively Enhanced and fully type safe forms with
   [Conform](https://conform.guide/)
 - Database ORM with [Prisma](https://prisma.io/)
-- Role-based User Permissions.
-- Custom built image hosting
+- Role-based User Permissions
+- Image storage and serving with [Tigris](https://www.tigrisdata.com/)
 - Caching via [cachified](https://npm.im/@epic-web/cachified): Both in-memory
   and SQLite-based (with
   [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))

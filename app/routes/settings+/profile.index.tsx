@@ -2,6 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import { Img } from 'openimg/react'
 import { data, Link, useFetcher } from 'react-router'
 import { z } from 'zod'
 import { ErrorList, Field } from '#app/components/forms.tsx'
@@ -36,7 +37,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			username: true,
 			email: true,
 			image: {
-				select: { id: true },
+				select: { objectKey: true },
 			},
 			_count: {
 				select: {
@@ -101,10 +102,13 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
 				<div className="relative h-52 w-52">
-					<img
-						src={getUserImgSrc(loaderData.user.image?.id)}
+					<Img
+						src={getUserImgSrc(loaderData.user.image?.objectKey)}
 						alt={loaderData.user.username}
 						className="h-full w-full rounded-full object-cover"
+						width={832}
+						height={832}
+						isAboveFold
 					/>
 					<Button
 						asChild
