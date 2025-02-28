@@ -184,7 +184,7 @@ function ImageChooser({
 	const [altText, setAltText] = useState(fields.altText.initialValue ?? '')
 
 	return (
-		<fieldset {...getFieldsetProps(meta)}>
+		<fieldset {...getFieldsetProps(meta)} key={meta.id}>
 			<div className="flex gap-3">
 				<div className="w-32">
 					<div className="relative h-32 w-32">
@@ -225,7 +225,10 @@ function ImageChooser({
 								</div>
 							)}
 							{existingImage ? (
-								<input {...getInputProps(fields.id, { type: 'hidden' })} />
+								<input
+									{...getInputProps(fields.id, { type: 'hidden' })}
+									key={fields.id.id}
+								/>
 							) : null}
 							<input
 								aria-label="Image"
@@ -245,6 +248,7 @@ function ImageChooser({
 								}}
 								accept="image/*"
 								{...getInputProps(fields.file, { type: 'file' })}
+								key={fields.file.id}
 							/>
 						</label>
 					</div>
@@ -257,6 +261,7 @@ function ImageChooser({
 					<Textarea
 						onChange={(e) => setAltText(e.currentTarget.value)}
 						{...getTextareaProps(fields.altText)}
+						key={fields.altText.id}
 					/>
 					<div className="min-h-[32px] px-4 pb-3 pt-1">
 						<ErrorList
