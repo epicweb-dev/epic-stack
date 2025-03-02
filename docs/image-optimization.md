@@ -2,7 +2,7 @@
 
 The Epic Stack uses [openimg](https://github.com/andrelandgraf/openimg) to
 optimize images on demand, introduced via
-[this decision doc](./decisions/039-image-optimization.md).
+[this decision doc](./decisions/041-image-optimization.md).
 
 ## Server Part
 
