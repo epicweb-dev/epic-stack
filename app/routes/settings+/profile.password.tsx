@@ -8,6 +8,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
+	checkCommonPassword,
 	getPasswordHash,
 	requireUserId,
 	verifyUserPassword,
@@ -71,6 +72,14 @@ export async function action({ request }: Route.ActionArgs) {
 							path: ['currentPassword'],
 							code: z.ZodIssueCode.custom,
 							message: 'Incorrect password.',
+						})
+					}
+					const isCommonPassword = await checkCommonPassword(newPassword)
+					if (isCommonPassword) {
+						ctx.addIssue({
+							path: ['newPassword'],
+							code: 'custom',
+							message: 'Password is too common',
 						})
 					}
 				}
