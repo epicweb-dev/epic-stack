@@ -280,7 +280,7 @@ export async function checkCommonPassword(password: string) {
 		const data = await res.text()
 		return data.split('/\r?\n/').some((line) => line.includes(suffix))
 	} catch (error) {
-		if (error instanceof DOMException && error.name === 'AbortError') {
+		if (error instanceof Error && error.name === 'AbortError') {
 			console.warn('Password check timed out')
 		}
 		console.warn('unknow error during password check', error)
