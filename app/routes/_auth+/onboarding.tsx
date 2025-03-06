@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { data, redirect, Form, useSearchParams } from 'react-router'
@@ -8,7 +7,12 @@ import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { requireAnonymous, sessionKey, signup } from '#app/utils/auth.server.ts'
+import {
+	checkCommonPassword,
+	requireAnonymous,
+	sessionKey,
+	signup,
+} from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -73,21 +77,8 @@ export async function action({ request }: Route.ActionArgs) {
 					})
 					return
 				}
-				const hash = crypto
-					.createHash('sha1')
-					.update(data.password, 'utf8')
-					.digest('hex')
-					.toUpperCase()
-				const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
-				const res = await fetch(
-					`https://api.pwnedpasswords.com/range/${prefix}`,
-				)
-				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-				const text = await res.text()
-				const matches = text
-					.split('/\r?\n/')
-					.filter((line) => line.includes(suffix))
-				if (matches.length) {
+				const isCommonPassword = await checkCommonPassword(data.password)
+				if (isCommonPassword) {
 					ctx.addIssue({
 						path: ['password'],
 						code: 'custom',

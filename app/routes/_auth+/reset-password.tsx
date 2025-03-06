@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -6,7 +5,11 @@ import { data, redirect, Form } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
+import {
+	checkCommonPassword,
+	requireAnonymous,
+	resetUserPassword,
+} from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -44,19 +47,8 @@ export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	const submission = await parseWithZod(formData, {
 		schema: ResetPasswordSchema.superRefine(async ({ password }, ctx) => {
-			const hash = crypto
-				.createHash('sha1')
-				.update(password, 'utf8')
-				.digest('hex')
-				.toUpperCase()
-			const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
-			const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`)
-			if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-			const data = await res.text()
-			const matches = data
-				.split('/\r?\n/')
-				.filter((line) => line.includes(suffix))
-			if (matches.length) {
+			const isCommonPassword = await checkCommonPassword(password)
+			if (isCommonPassword) {
 				ctx.addIssue({
 					path: ['password'],
 					code: 'custom',
