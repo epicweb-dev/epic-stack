@@ -283,6 +283,7 @@ export async function checkCommonPassword(password: string) {
 		if (error instanceof DOMException && error.name === 'AbortError') {
 			console.warn('Password check timed out')
 		}
+		console.warn('unknow error during password check', error)
 		return false
 	}
 }
