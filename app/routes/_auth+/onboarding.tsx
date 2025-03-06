@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { data, redirect, Form, useSearchParams } from 'react-router'
@@ -71,6 +72,27 @@ export async function action({ request }: Route.ActionArgs) {
 						message: 'A user already exists with this username',
 					})
 					return
+				}
+				const hash = crypto
+					.createHash('sha1')
+					.update(data.password, 'utf8')
+					.digest('hex')
+					.toUpperCase()
+				const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
+				const res = await fetch(
+					`https://api.pwnedpasswords.com/range/${prefix}`,
+				)
+				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+				const text = await res.text()
+				const matches = text
+					.split('/\r?\n/')
+					.filter((line) => line.includes(suffix))
+				if (matches.length) {
+					ctx.addIssue({
+						path: ['password'],
+						code: 'custom',
+						message: 'Password is too common',
+					})
 				}
 			}).transform(async (data) => {
 				if (intent !== null) return { ...data, session: null }

@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -41,8 +42,29 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const resetPasswordUsername = await requireResetPasswordUsername(request)
 	const formData = await request.formData()
-	const submission = parseWithZod(formData, {
-		schema: ResetPasswordSchema,
+	const submission = await parseWithZod(formData, {
+		schema: ResetPasswordSchema.superRefine(async ({ password }, ctx) => {
+			const hash = crypto
+				.createHash('sha1')
+				.update(password, 'utf8')
+				.digest('hex')
+				.toUpperCase()
+			const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
+			const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`)
+			if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+			const data = await res.text()
+			const matches = data
+				.split('/\r?\n/')
+				.filter((line) => line.includes(suffix))
+			if (matches.length) {
+				ctx.addIssue({
+					path: ['password'],
+					code: 'custom',
+					message: 'Password is too common',
+				})
+			}
+		}),
+		async: true,
 	})
 	if (submission.status !== 'success') {
 		return data(
