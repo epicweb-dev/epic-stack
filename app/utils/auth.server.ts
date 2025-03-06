@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { type Connection, type Password, type User } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'react-router'
@@ -254,4 +255,35 @@ export async function verifyUserPassword(
 	}
 
 	return { id: userWithPassword.id }
+}
+
+export async function checkCommonPassword(password: string) {
+	const hash = crypto
+		.createHash('sha1')
+		.update(password, 'utf8')
+		.digest('hex')
+		.toUpperCase()
+
+	const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
+
+	const controller = new AbortController()
+
+	try {
+		const timeoutId = setTimeout(() => controller.abort(), 1000)
+
+		const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`)
+
+		clearTimeout(timeoutId)
+
+		if (!res.ok) false
+
+		const data = await res.text()
+		return data.split('/\r?\n/').some((line) => line.includes(suffix))
+	} catch (error) {
+		if (error instanceof Error && error.name === 'AbortError') {
+			console.warn('Password check timed out')
+		}
+		console.warn('unknow error during password check', error)
+		return false
+	}
 }

@@ -5,7 +5,11 @@ import { data, redirect, Form } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
+import {
+	checkCommonPassword,
+	requireAnonymous,
+	resetUserPassword,
+} from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -41,8 +45,18 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const resetPasswordUsername = await requireResetPasswordUsername(request)
 	const formData = await request.formData()
-	const submission = parseWithZod(formData, {
-		schema: ResetPasswordSchema,
+	const submission = await parseWithZod(formData, {
+		schema: ResetPasswordSchema.superRefine(async ({ password }, ctx) => {
+			const isCommonPassword = await checkCommonPassword(password)
+			if (isCommonPassword) {
+				ctx.addIssue({
+					path: ['password'],
+					code: 'custom',
+					message: 'Password is too common',
+				})
+			}
+		}),
+		async: true,
 	})
 	if (submission.status !== 'success') {
 		return data(
