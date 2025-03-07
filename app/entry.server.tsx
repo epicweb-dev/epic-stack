@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { PassThrough } from 'node:stream'
 import { styleText } from 'node:util'
 import { contentSecurity } from '@nichtsam/helmet/content'
@@ -26,13 +27,8 @@ const MODE = process.env.NODE_ENV ?? 'development'
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
 export default async function handleRequest(...args: DocRequestArgs) {
-	const [
-		request,
-		responseStatusCode,
-		responseHeaders,
-		reactRouterContext,
-		loadContext,
-	] = args
+	const [request, responseStatusCode, responseHeaders, reactRouterContext] =
+		args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
 	responseHeaders.set('fly-region', process.env.FLY_REGION ?? 'unknown')
 	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
@@ -47,7 +43,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		? 'onAllReady'
 		: 'onShellReady'
 
-	const nonce = loadContext.cspNonce?.toString() ?? ''
+	const nonce = crypto.randomBytes(16).toString('hex')
 	return new Promise(async (resolve, reject) => {
 		let didError = false
 		// NOTE: this timing will only include things that are rendered in the shell

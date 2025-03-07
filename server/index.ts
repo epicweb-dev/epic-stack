@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import { styleText } from 'node:util'
 import { helmet } from '@nichtsam/helmet/node-http'
 import { createRequestHandler } from '@react-router/express'
@@ -110,11 +109,6 @@ app.use(
 	}),
 )
 
-app.use((_, res, next) => {
-	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
-	next()
-})
-
 // When running tests or running in development, we want to effectively disable
 // rate limiting because playwright tests are very fast and we don't want to
 // have to wait for the rate limit to reset between tests.
@@ -201,10 +195,7 @@ if (!ALLOW_INDEXING) {
 app.all(
 	'*',
 	createRequestHandler({
-		getLoadContext: (_: any, res: any) => ({
-			cspNonce: res.locals.cspNonce,
-			serverBuild: getBuild(),
-		}),
+		getLoadContext: () => ({ serverBuild: getBuild() }),
 		mode: MODE,
 		build: async () => {
 			const { error, build } = await getBuild()
