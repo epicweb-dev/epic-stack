@@ -1,11 +1,4 @@
-import * as Sentry from '@sentry/react'
-import React from 'react'
-import {
-	createRoutesFromChildren,
-	matchRoutes,
-	useLocation,
-	useNavigationType,
-} from 'react-router'
+import * as Sentry from '@sentry/react-router'
 
 export function init() {
 	Sentry.init({
@@ -27,13 +20,6 @@ export function init() {
 		integrations: [
 			Sentry.replayIntegration(),
 			Sentry.browserProfilingIntegration(),
-			Sentry.reactRouterV7BrowserTracingIntegration({
-				useEffect: React.useEffect,
-				useLocation,
-				useNavigationType,
-				createRoutesFromChildren,
-				matchRoutes,
-			}),
 		],
 
 		// Set tracesSampleRate to 1.0 to capture 100%
