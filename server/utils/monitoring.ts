@@ -1,6 +1,6 @@
 import prismaInstrumentation from '@prisma/instrumentation'
-import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import * as Sentry from '@sentry/react-router'
 
 // prisma's exports are wrong...
 // https://github.com/prisma/prisma/issues/23410
