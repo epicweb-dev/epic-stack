@@ -39,7 +39,7 @@ export default defineConfig((config) => ({
 		envOnlyMacros(),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		MODE === 'test' ? null : reactRouter(),
+		reactRouter(),
 		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
