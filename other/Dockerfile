@@ -69,6 +69,8 @@ ENV PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
 
 # add shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
+# and one for the cache database
+RUN echo "#!/bin/sh\nset -x\nsqlite3 \$CACHE_DATABASE_URL" > /usr/local/bin/cache-database-cli && chmod +x /usr/local/bin/cache-database-cli
 
 WORKDIR /myapp
 
