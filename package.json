@@ -117,7 +117,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@epic-web/config": "^1.17.0",
+    "@epic-web/config": "^1.17.2",
     "@faker-js/faker": "^9.5.0",
     "@playwright/test": "^1.50.1",
     "@react-router/dev": "^7.2.0",
