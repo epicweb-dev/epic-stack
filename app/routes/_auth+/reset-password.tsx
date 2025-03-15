@@ -6,7 +6,7 @@ import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
-	checkCommonPassword,
+	checkIsCommonPassword,
 	requireAnonymous,
 	resetUserPassword,
 } from '#app/utils/auth.server.ts'
@@ -47,7 +47,7 @@ export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	const submission = await parseWithZod(formData, {
 		schema: ResetPasswordSchema.superRefine(async ({ password }, ctx) => {
-			const isCommonPassword = await checkCommonPassword(password)
+			const isCommonPassword = await checkIsCommonPassword(password)
 			if (isCommonPassword) {
 				ctx.addIssue({
 					path: ['password'],

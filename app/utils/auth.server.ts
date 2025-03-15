@@ -257,33 +257,40 @@ export async function verifyUserPassword(
 	return { id: userWithPassword.id }
 }
 
-export async function checkCommonPassword(password: string) {
+export function getPasswordHashParts(password: string) {
 	const hash = crypto
 		.createHash('sha1')
 		.update(password, 'utf8')
 		.digest('hex')
 		.toUpperCase()
+	return [hash.slice(0, 5), hash.slice(5)] as const
+}
 
-	const [prefix, suffix] = [hash.slice(0, 5), hash.slice(5)]
-
-	const controller = new AbortController()
+export async function checkIsCommonPassword(password: string) {
+	const [prefix, suffix] = getPasswordHashParts(password)
 
 	try {
-		const timeoutId = setTimeout(() => controller.abort(), 1000)
+		const response = await fetch(
+			`https://api.pwnedpasswords.com/range/${prefix}`,
+			{
+				signal: AbortSignal.timeout(1000),
+			},
+		)
 
-		const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`)
+		if (!response.ok) return false
 
-		clearTimeout(timeoutId)
-
-		if (!res.ok) false
-
-		const data = await res.text()
-		return data.split('/\r?\n/').some((line) => line.includes(suffix))
+		const data = await response.text()
+		return data.split(/\r?\n/).some((line) => {
+			const [hashSuffix, ignoredPrevalenceCount] = line.split(':')
+			return hashSuffix === suffix
+		})
 	} catch (error) {
-		if (error instanceof Error && error.name === 'AbortError') {
+		if (error instanceof DOMException && error.name === 'TimeoutError') {
 			console.warn('Password check timed out')
+			return false
 		}
-		console.warn('unknow error during password check', error)
+
+		console.warn('Unknown error during password check', error)
 		return false
 	}
 }

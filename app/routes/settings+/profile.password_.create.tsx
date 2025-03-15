@@ -7,7 +7,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
-	checkCommonPassword,
+	checkIsCommonPassword,
 	getPasswordHash,
 	requireUserId,
 } from '#app/utils/auth.server.ts'
@@ -47,7 +47,7 @@ export async function action({ request }: Route.ActionArgs) {
 	const submission = await parseWithZod(formData, {
 		async: true,
 		schema: CreatePasswordForm.superRefine(async ({ password }, ctx) => {
-			const isCommonPassword = await checkCommonPassword(password)
+			const isCommonPassword = await checkIsCommonPassword(password)
 			if (isCommonPassword) {
 				ctx.addIssue({
 					path: ['password'],
