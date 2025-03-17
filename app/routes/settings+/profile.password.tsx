@@ -8,7 +8,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
-	checkCommonPassword,
+	checkIsCommonPassword,
 	getPasswordHash,
 	requireUserId,
 	verifyUserPassword,
@@ -74,7 +74,7 @@ export async function action({ request }: Route.ActionArgs) {
 							message: 'Incorrect password.',
 						})
 					}
-					const isCommonPassword = await checkCommonPassword(newPassword)
+					const isCommonPassword = await checkIsCommonPassword(newPassword)
 					if (isCommonPassword) {
 						ctx.addIssue({
 							path: ['newPassword'],
