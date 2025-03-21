@@ -22,9 +22,9 @@ test('retains boolean directive', () => {
 		getConservativeCacheControl('private', 'no-cache,no-store'),
 	)
 
-	expect(result.private).toEqual(true)
-	expect(result.noCache).toEqual(true)
-	expect(result.noStore).toEqual(true)
+	expect(result.private).toBe(true)
+	expect(result.noCache).toBe(true)
+	expect(result.noStore).toBe(true)
 })
 test('gets smallest number directive', () => {
 	const result = parse(
@@ -34,6 +34,6 @@ test('gets smallest number directive', () => {
 		),
 	)
 
-	expect(result.maxAge).toEqual(10)
-	expect(result.sharedMaxAge).toEqual(300)
+	expect(result.maxAge).toBe(10)
+	expect(result.sharedMaxAge).toBe(300)
 })
