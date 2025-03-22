@@ -1,7 +1,7 @@
 import { styleText } from 'node:util'
 import { helmet } from '@nichtsam/helmet/node-http'
 import { createRequestHandler } from '@react-router/express'
-import * as Sentry from '@sentry/node'
+import * as Sentry from '@sentry/react-router'
 import { ip as ipAddress } from 'address'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'

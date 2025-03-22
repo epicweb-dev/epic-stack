@@ -8,7 +8,7 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
-	checkCommonPassword,
+	checkIsCommonPassword,
 	requireAnonymous,
 	sessionKey,
 	signup,
@@ -77,7 +77,7 @@ export async function action({ request }: Route.ActionArgs) {
 					})
 					return
 				}
-				const isCommonPassword = await checkCommonPassword(data.password)
+				const isCommonPassword = await checkIsCommonPassword(data.password)
 				if (isCommonPassword) {
 					ctx.addIssue({
 						path: ['password'],
