@@ -11,21 +11,17 @@ import {
 	type CreateReporter,
 } from '@epic-web/cachified'
 import { remember } from '@epic-web/remember'
-import Database from 'better-sqlite3'
 import { LRUCache } from 'lru-cache'
+import { DatabaseSync } from 'node:sqlite'
 import { z } from 'zod'
-import { updatePrimaryCacheValue } from '#app/routes/admin+/cache_.sqlite.server.ts'
-import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 
 const cacheDb = remember('cacheDb', createDatabase)
 
-function createDatabase(tryAgain = true): Database.Database {
-	const db = new Database(CACHE_DATABASE_PATH)
-	const { currentIsPrimary } = getInstanceInfoSync()
-	if (!currentIsPrimary) return db
+function createDatabase(tryAgain = true): DatabaseSync {
+	const db = new DatabaseSync(CACHE_DATABASE_PATH)
 
 	try {
 		// create cache table with metadata JSON column and value JSON column if it does not exist already
@@ -46,6 +42,7 @@ function createDatabase(tryAgain = true): Database.Database {
 		}
 		throw error
 	}
+
 	return db
 }
 
@@ -68,6 +65,31 @@ export const lruCache = {
 	delete: (key) => lru.delete(key),
 } satisfies Cache
 
+const isBuffer = (obj: unknown): obj is Buffer =>
+	Buffer.isBuffer(obj) || obj instanceof Uint8Array
+
+function bufferReplacer(_key: string, value: unknown) {
+	if (isBuffer(value)) {
+		return {
+			__isBuffer: true,
+			data: value.toString('base64'),
+		}
+	}
+	return value
+}
+
+function bufferReviver(_key: string, value: unknown) {
+	if (
+		value &&
+		typeof value === 'object' &&
+		'__isBuffer' in value &&
+		(value as any).data
+	) {
+		return Buffer.from((value as any).data, 'base64')
+	}
+	return value
+}
+
 const cacheEntrySchema = z.object({
 	metadata: z.object({
 		createdTime: z.number(),
@@ -81,18 +103,28 @@ const cacheQueryResultSchema = z.object({
 	value: z.string(),
 })
 
+const getStatement = cacheDb.prepare(
+	'SELECT value, metadata FROM cache WHERE key = ?',
+)
+const setStatement = cacheDb.prepare(
+	'INSERT OR REPLACE INTO cache (key, value, metadata) VALUES (?, ?, ?)',
+)
+const deleteStatement = cacheDb.prepare('DELETE FROM cache WHERE key = ?')
+const getAllKeysStatement = cacheDb.prepare('SELECT key FROM cache LIMIT ?')
+const searchKeysStatement = cacheDb.prepare(
+	'SELECT key FROM cache WHERE key LIKE ? LIMIT ?',
+)
+
 export const cache: CachifiedCache = {
 	name: 'SQLite cache',
-	get(key) {
-		const result = cacheDb
-			.prepare('SELECT value, metadata FROM cache WHERE key = ?')
-			.get(key)
+	async get(key) {
+		const result = getStatement.get(key)
 		const parseResult = cacheQueryResultSchema.safeParse(result)
 		if (!parseResult.success) return null
 
 		const parsedEntry = cacheEntrySchema.safeParse({
 			metadata: JSON.parse(parseResult.data.metadata),
-			value: JSON.parse(parseResult.data.value),
+			value: JSON.parse(parseResult.data.value, bufferReviver),
 		})
 		if (!parsedEntry.success) return null
 		const { metadata, value } = parsedEntry.data
@@ -100,56 +132,17 @@ export const cache: CachifiedCache = {
 		return { metadata, value }
 	},
 	async set(key, entry) {
-		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
-		if (currentIsPrimary) {
-			cacheDb
-				.prepare(
-					'INSERT OR REPLACE INTO cache (key, value, metadata) VALUES (@key, @value, @metadata)',
-				)
-				.run({
-					key,
-					value: JSON.stringify(entry.value),
-					metadata: JSON.stringify(entry.metadata),
-				})
-		} else {
-			// fire-and-forget cache update
-			void updatePrimaryCacheValue({
-				key,
-				cacheValue: entry,
-			}).then((response) => {
-				if (!response.ok) {
-					console.error(
-						`Error updating cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
-						{ entry },
-					)
-				}
-			})
-		}
+		const value = JSON.stringify(entry.value, bufferReplacer)
+		setStatement.run(key, value, JSON.stringify(entry.metadata))
 	},
 	async delete(key) {
-		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
-		if (currentIsPrimary) {
-			cacheDb.prepare('DELETE FROM cache WHERE key = ?').run(key)
-		} else {
-			// fire-and-forget cache update
-			void updatePrimaryCacheValue({
-				key,
-				cacheValue: undefined,
-			}).then((response) => {
-				if (!response.ok) {
-					console.error(
-						`Error deleting cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
-					)
-				}
-			})
-		}
+		deleteStatement.run(key)
 	},
 }
 
 export async function getAllCacheKeys(limit: number) {
 	return {
-		sqlite: cacheDb
-			.prepare('SELECT key FROM cache LIMIT ?')
+		sqlite: getAllKeysStatement
 			.all(limit)
 			.map((row) => (row as { key: string }).key),
 		lru: [...lru.keys()],
@@ -158,8 +151,7 @@ export async function getAllCacheKeys(limit: number) {
 
 export async function searchCacheKeys(search: string, limit: number) {
 	return {
-		sqlite: cacheDb
-			.prepare('SELECT key FROM cache WHERE key LIKE ? LIMIT ?')
+		sqlite: searchKeysStatement
 			.all(`%${search}%`, limit)
 			.map((row) => (row as { key: string }).key),
 		lru: [...lru.keys()].filter((key) => key.includes(search)),
