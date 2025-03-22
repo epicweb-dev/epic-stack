@@ -32,7 +32,7 @@ export function init() {
 			if (samplingContext.request?.url?.includes('/resources/healthcheck')) {
 				return 0
 			}
-			return 1
+			return process.env.NODE_ENV === 'production' ? 1 : 0
 		},
 		beforeSendTransaction(event) {
 			// ignore all healthcheck related transactions
