@@ -12,6 +12,7 @@ afterEach(() => server.resetHandlers())
 afterEach(() => cleanup())
 
 export let consoleError: MockInstance<(typeof console)['error']>
+export let consoleWarn: MockInstance<(typeof console)['warn']>
 
 beforeEach(() => {
 	const originalConsoleError = console.error
@@ -24,4 +25,13 @@ beforeEach(() => {
 			)
 		},
 	)
+
+	const originalConsoleWarn = console.warn
+	consoleWarn = vi.spyOn(console, 'warn')
+	consoleWarn.mockImplementation((...args: Parameters<typeof console.warn>) => {
+		originalConsoleWarn(...args)
+		throw new Error(
+			'Console warn was called. Call consoleWarn.mockImplementation(() => {}) if this is expected.',
+		)
+	})
 })

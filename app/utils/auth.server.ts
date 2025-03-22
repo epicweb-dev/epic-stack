@@ -272,9 +272,7 @@ export async function checkIsCommonPassword(password: string) {
 	try {
 		const response = await fetch(
 			`https://api.pwnedpasswords.com/range/${prefix}`,
-			{
-				signal: AbortSignal.timeout(1000),
-			},
+			{ signal: AbortSignal.timeout(1000) },
 		)
 
 		if (!response.ok) return false

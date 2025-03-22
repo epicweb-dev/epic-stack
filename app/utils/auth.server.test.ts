@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { server } from '#tests/mocks'
+import { consoleWarn } from '#tests/setup/setup-test-env.ts'
 import { checkIsCommonPassword, getPasswordHashParts } from './auth.server.ts'
 
 test('checkIsCommonPassword returns true when password is found in breach database', async () => {
@@ -55,28 +56,8 @@ test('checkIsCommonPassword returns false when API returns 500', async () => {
 	expect(result).toBe(false)
 })
 
-test('checkIsCommonPassword times out after 1 second', async () => {
-	const consoleWarnSpy = vi.spyOn(console, 'warn')
-	server.use(
-		http.get('https://api.pwnedpasswords.com/range/:prefix', async () => {
-			const twoSecondDelay = 2000
-			await new Promise((resolve) => setTimeout(resolve, twoSecondDelay))
-			return new HttpResponse(
-				'1234567890123456789012345678901234A:1\n' +
-					'1234567890123456789012345678901234B:2',
-				{ status: 200 },
-			)
-		}),
-	)
-
-	const result = await checkIsCommonPassword('testpassword')
-	expect(result).toBe(false)
-	expect(consoleWarnSpy).toHaveBeenCalledWith('Password check timed out')
-	consoleWarnSpy.mockRestore()
-})
-
 test('checkIsCommonPassword returns false when response has invalid format', async () => {
-	const consoleWarnSpy = vi.spyOn(console, 'warn')
+	consoleWarn.mockImplementation(() => {})
 	const password = 'testpassword'
 	const [prefix] = getPasswordHashParts(password)
 
@@ -93,9 +74,36 @@ test('checkIsCommonPassword returns false when response has invalid format', asy
 
 	const result = await checkIsCommonPassword(password)
 	expect(result).toBe(false)
-	expect(consoleWarnSpy).toHaveBeenCalledWith(
+	expect(consoleWarn).toHaveBeenCalledWith(
 		'Unknown error during password check',
 		expect.any(TypeError),
 	)
-	consoleWarnSpy.mockRestore()
+})
+
+describe('timeout handling', () => {
+	// normally we'd use fake timers for a test like this, but there's an issue
+	// with AbortSignal.timeout() and fake timers: https://github.com/sinonjs/fake-timers/issues/418
+	// beforeEach(() => vi.useFakeTimers())
+	// afterEach(() => vi.useRealTimers())
+
+	test('checkIsCommonPassword times out after 1 second', async () => {
+		consoleWarn.mockImplementation(() => {})
+		server.use(
+			http.get('https://api.pwnedpasswords.com/range/:prefix', async () => {
+				const twoSecondDelay = 2000
+				await new Promise((resolve) => setTimeout(resolve, twoSecondDelay))
+				// swap to this when we can use fake timers:
+				// await vi.advanceTimersByTimeAsync(twoSecondDelay)
+				return new HttpResponse(
+					'1234567890123456789012345678901234A:1\n' +
+						'1234567890123456789012345678901234B:2',
+					{ status: 200 },
+				)
+			}),
+		)
+
+		const result = await checkIsCommonPassword('testpassword')
+		expect(result).toBe(false)
+		expect(consoleWarn).toHaveBeenCalledWith('Password check timed out')
+	})
 })
