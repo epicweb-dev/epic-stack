@@ -10,7 +10,6 @@ export function init() {
 	Sentry.init({
 		dsn: process.env.SENTRY_DSN,
 		environment: process.env.NODE_ENV,
-		tracesSampleRate: process.env.NODE_ENV === 'production' ? 1 : 0,
 		denyUrls: [
 			/\/resources\/healthcheck/,
 			// TODO: be smarter about the public assets...
@@ -33,7 +32,7 @@ export function init() {
 			if (samplingContext.request?.url?.includes('/resources/healthcheck')) {
 				return 0
 			}
-			return 1
+			return process.env.NODE_ENV === 'production' ? 1 : 0
 		},
 		beforeSendTransaction(event) {
 			// ignore all healthcheck related transactions
