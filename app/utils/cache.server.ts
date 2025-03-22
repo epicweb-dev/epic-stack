@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import path from 'node:path'
 import {
 	cachified as baseCachified,
 	verboseReporter,
@@ -21,6 +22,9 @@ const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
 const cacheDb = remember('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): DatabaseSync {
+	const parentDir = path.dirname(CACHE_DATABASE_PATH)
+	fs.mkdirSync(parentDir, { recursive: true })
+
 	const db = new DatabaseSync(CACHE_DATABASE_PATH)
 
 	try {
