@@ -15,13 +15,15 @@ export const StatusButton = ({
 	className,
 	children,
 	spinDelay,
+	size,
 	variant,
 	...props
 }: React.ComponentProps<'button'> & {
 	status: 'pending' | 'success' | 'error' | 'idle'
 	message?: string | null
 	spinDelay?: Parameters<typeof useSpinDelay>[1]
-	variant: ButtonVariant['variant']
+	size?: ButtonVariant['size']
+	variant?: ButtonVariant['variant']
 }) => {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
@@ -64,6 +66,7 @@ export const StatusButton = ({
 		<Button
 			className={cn('flex justify-center gap-4', className)}
 			variant={variant}
+			size={size}
 			{...props}
 		>
 			<div>{children}</div>
