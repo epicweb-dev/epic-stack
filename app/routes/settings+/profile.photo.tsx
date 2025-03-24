@@ -146,7 +146,7 @@ export default function PhotoRoute({
 							? getUserImgSrc(loaderData.user.image?.objectKey)
 							: '')
 					}
-					className="h-52 w-52 rounded-full object-cover"
+					className="size-52 rounded-full object-cover"
 					alt={loaderData.user?.name ?? loaderData.user?.username}
 				/>
 				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />

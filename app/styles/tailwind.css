@@ -1,80 +1,203 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import "tw-animate-css";
 
-@layer base {
-	:root {
-		/* --font-sans: here if you have one */
-		/* --font-mono: here if you got it... */
+@custom-variant dark (&:is(.dark *));
 
-		/* prefixed with foreground because it should look good on the background */
-		--foreground-destructive: 345 82.7% 40.8%;
+:root {
+	--radius: 0.5rem;
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.129 0.042 264.695);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.129 0.042 264.695);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.129 0.042 264.695);
+	--primary: oklch(0.208 0.042 265.755);
+	--primary-foreground: oklch(0.984 0.003 247.858);
+	--secondary: oklch(0.968 0.007 247.896);
+	--secondary-foreground: oklch(0.208 0.042 265.755);
+	--muted: oklch(0.968 0.007 247.896);
+	--muted-foreground: oklch(0.554 0.046 257.417);
+	--accent: oklch(0.968 0.007 247.896);
+	--accent-foreground: oklch(0.208 0.042 265.755);
+	--destructive: oklch(0.577 0.245 27.325);
+	--border: oklch(0.929 0.013 255.508);
+	--input: oklch(0.929 0.013 255.508);
+	--ring: oklch(0.704 0.04 256.788);
 
-		--background: 0 0% 100%;
-		--foreground: 222.2 84% 4.9%;
 
-		--muted: 210 40% 93%;
-		--muted-foreground: 215.4 16.3% 30%;
+	--foreground-destructive: oklch(51.46% 0.1979 16.57);
+	--input-invalid: oklch(63.68% 0.2078 25.33);
+	--destructive-foreground: oklch(98.38% 0.0035 247.86)
+}
 
-		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 84% 4.9%;
+.dark {
+	--background: oklch(0.129 0.042 264.695);
+	--foreground: oklch(0.984 0.003 247.858);
+	--card: oklch(0.208 0.042 265.755);
+	--card-foreground: oklch(0.984 0.003 247.858);
+	--popover: oklch(0.208 0.042 265.755);
+	--popover-foreground: oklch(0.984 0.003 247.858);
+	--primary: oklch(0.929 0.013 255.508);
+	--primary-foreground: oklch(0.208 0.042 265.755);
+	--secondary: oklch(0.279 0.041 260.031);
+	--secondary-foreground: oklch(0.984 0.003 247.858);
+	--muted: oklch(0.279 0.041 260.031);
+	--muted-foreground: oklch(0.704 0.04 256.788);
+	--accent: oklch(0.279 0.041 260.031);
+	--accent-foreground: oklch(0.984 0.003 247.858);
+	--destructive: oklch(0.704 0.191 22.216);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
+	--ring: oklch(0.551 0.027 264.364);
 
-		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 4.9%;
+	/* prefixed with foreground because it should look good on the background */
+	--foreground-destructive: oklch(63.72% 0.2071 21.89);
+	--input-invalid: oklch(39.59% 0.1331 25.72);
+	--destructive-foreground: oklch(97.1% 0.0127 17.38);
+}
 
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
-		--input-invalid: 0 84.2% 60.2%;
+@theme inline {
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+}
 
-		--primary: 222.2 47.4% 11.2%;
-		--primary-foreground: 210 40% 98%;
+@theme {
+	--text-mega: 5rem;
+	--text-mega--line-height: 5.25rem;
+	--text-mega--font-weight: 700;
+	--text-h1: 3.5rem;
+	--text-h1--line-height: 3.875rem;
+	--text-h1--font-weight: 700;
+	--text-h2: 2.5rem;
+	--text-h2--line-height: 3rem;
+	--text-h2--font-weight: 700;
+	--text-h3: 2rem;
+	--text-h3--line-height: 2.25rem;
+	--text-h3--font-weight: 700;
+	--text-h4: 1.75rem;
+	--text-h4--line-height: 2.25rem;
+	--text-h4--font-weight: 700;
+	--text-h5: 1.5rem;
+	--text-h5--line-height: 2rem;
+	--text-h5--font-weight: 700;
+	--text-h6: 1rem;
+	--text-h6--line-height: 1.25rem;
+	--text-h6--font-weight: 700;
+	--text-body-2xl: 2rem;
+	--text-body-2xl--line-height: 2.25rem;
+	--text-body-xl: 1.75rem;
+	--text-body-xl--line-height: 2.25rem;
+	--text-body-lg: 1.5rem;
+	--text-body-lg--line-height: 2rem;
+	--text-body-md: 1.25rem;
+	--text-body-md--line-height: 1.75rem;
+	--text-body-sm: 1rem;
+	--text-body-sm--line-height: 1.25rem;
+	--text-body-xs: 0.875rem;
+	--text-body-xs--line-height: 1.125rem;
+	--text-body-2xs: 0.75rem;
+	--text-body-2xs--line-height: 1rem;
+	--text-caption: 1.125rem;
+	--text-caption--line-height: 1.5rem;
+	--text-caption--font-weight: 600;
+	--text-button: 0.75rem;
+	--text-button--line-height: 1rem;
+	--text-button--font-weight: 700;
+	--animate-roll-reveal: roll-reveal 0.4s cubic-bezier(.22, 1.28, .54, .99);
+	--animate-slide-left: slide-left 0.3s ease-out;
+	--animate-slide-top: slide-top 0.3s ease-out;
+	--animate-caret-blink: caret-blink 1.25s ease-out infinite;
 
-		--secondary: 210 20% 83%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
+	@keyframes roll-reveal {
+		from {
+			transform: rotate(12deg) scale(0);
+			opacity: 0;
+		}
 
-		--accent: 210 40% 90%;
-		--accent-foreground: 222.2 47.4% 11.2%;
-
-		--destructive: 0 70% 50%;
-		--destructive-foreground: 210 40% 98%;
-
-		--ring: 215 20.2% 65.1%;
-
-		--radius: 0.5rem;
+		to {
+			transform: rotate(0deg) scale(1);
+			opacity: 1;
+		}
 	}
 
-	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 210 40% 98%;
+	@keyframes slide-left {
+		from {
+			transform: translateX(20px);
+			opacity: 0;
+		}
 
-		/* prefixed with foreground because it should look good on the background */
-		--foreground-destructive: -4 84% 60%;
+		to {
+			transform: translateX(0px);
+			opacity: 1;
+		}
+	}
 
-		--muted: 217.2 32.6% 12%;
-		--muted-foreground: 215 20.2% 65.1%;
+	@keyframes slide-top {
+		from {
+			transform: translateY(20px);
+			opacity: 0;
+		}
 
-		--popover: 222.2 84% 4.9%;
-		--popover-foreground: 210 40% 98%;
+		to {
+			transform: translateY(0px);
+			opacity: 1;
+		}
+	}
 
-		--card: 222.2 84% 4.9%;
-		--card-foreground: 210 40% 98%;
+	@keyframes caret-blink {
 
-		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 17.5%;
-		--input-invalid: 0 62.8% 30.6%;
+		0%,
+		70%,
+		100% {
+			opacity: 1;
+		}
 
-		--primary: 210 40% 98%;
-		--primary-foreground: 222.2 47.4% 11.2%;
+		20%,
+		50% {
+			opacity: 0;
+		}
+	}
+}
 
-		--secondary: 217.2 20% 24%;
-		--secondary-foreground: 210 40% 98%;
+@utility container {
+	margin-inline: center;
+	padding-inline: 2rem;
 
-		--accent: 217.2 32.6% 10%;
-		--accent-foreground: 210 40% 98%;
+	@media(width >=1400px) {
+		& {
+			max-width: 1400px;
+		}
+	}
+}
 
-		--destructive: 0 60% 40%;
-		--destructive-foreground: 0 85.7% 97.3%;
 
-		--ring: 217.2 32.6% 60%;
+@layer base {
+
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: hsl(var(--border));
 	}
 }

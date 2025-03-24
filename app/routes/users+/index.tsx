@@ -26,7 +26,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 	})
 
 	return (
-		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
+		<div className="container mt-36 mb-48 flex flex-col items-center justify-center gap-6">
 			<h1 className="text-h1">Epic Notes Users</h1>
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={loaderData.status} autoFocus autoSubmit />
@@ -44,21 +44,21 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 								<li key={user.id}>
 									<Link
 										to={user.username}
-										className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
+										className="bg-muted flex h-36 w-44 flex-col items-center justify-center rounded-lg px-5 py-3"
 									>
 										<Img
 											alt={user.name ?? user.username}
 											src={getUserImgSrc(user.imageObjectKey)}
-											className="h-16 w-16 rounded-full"
+											className="size-16 rounded-full"
 											width={256}
 											height={256}
 										/>
 										{user.name ? (
-											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
+											<span className="text-body-md w-full overflow-hidden text-center text-ellipsis whitespace-nowrap">
 												{user.name}
 											</span>
 										) : null}
-										<span className="w-full overflow-hidden text-ellipsis text-center text-body-sm text-muted-foreground">
+										<span className="text-body-sm text-muted-foreground w-full overflow-hidden text-center text-ellipsis">
 											{user.username}
 										</span>
 									</Link>
