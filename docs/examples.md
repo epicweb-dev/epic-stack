@@ -7,6 +7,10 @@ template.
 
 This page links to examples of how to implement some things with the Epic Stack.
 
+- [Epic Stack with Stripe](https://github.com/epicweb-dev/epic-stack-with-stripe)
+  by [@epicweb-dev](https://github.com/epicweb-dev): An example of the Epic
+  Stack with Stripe. Uses Subscriptions, Stripe Links, and focused on
+  simplicity.
 - [Framer Motion](https://github.com/kentcdodds/epic-stack-with-framer-motion)
   by [@kentcdodds](https://github.com/kentcdodds): Using client hints to avoid
   content layout shift with `prefers-reduced-motion` and framer motion
@@ -35,9 +39,6 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Tailwind CSS Plugin](https://github.com/hakimLyon/epic-stack-with-tailwind-css-plugin)
   by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
   with Tailwind CSS Plugin.
-- [Epic Stack + GitHub Auth](https://github.com/kentcdodds/epic-github-auth) by
-  [@kentcdodds](https://github.com/kentcdodds): An example of the Epic Stack
-  with GitHub Auth.
 - [Epic Stack + MongoDB as the Database](https://github.com/hakimLyon/epic-stack-with-prisma-mongodb)
   by [@hakimLyon](https://github.com/hakimLyon): An example of the Epic Stack
   with Prisma using MongoDB as the database.
@@ -66,11 +67,6 @@ This page links to examples of how to implement some things with the Epic Stack.
   example of using [Nx](https://nx.dev) in an Epic Stack app
 - [Epic Stack monorepo with pnpm + turbo](https://github.com/abetoots/epic-stack-turborepo):
   An example of the Epic Stack in a monorepo setup
-- [Epic Stack + passkeys/webauthn](https://github.com/rperon/epic-stack-with-passkeys/)
-  by [@rperon](https://github.com/rperon): An example of the Epic Stack with
-  passkeys using
-  [remix-auth-webauthn](https://github.com/alexanderson1993/remix-auth-webauthn)
-  and [remix-auth](https://npm.im/remix-auth).
 - [Epic Stack with jsx-email](https://github.com/djhi/epic-stack-jsx-email): An
   example of the Epic Stack that uses [jsx-email](https://jsx.email/) instead of
   [react-email](https://react.email/)
