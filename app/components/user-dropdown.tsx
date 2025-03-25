@@ -27,7 +27,7 @@ export function UserDropdown() {
 						className="flex items-center gap-2"
 					>
 						<Img
-							className="h-8 w-8 rounded-full object-cover"
+							className="size-8 rounded-full object-cover"
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.objectKey)}
 							width={256}

@@ -101,7 +101,7 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 	return (
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
-				<div className="relative h-52 w-52">
+				<div className="relative size-52">
 					<Img
 						src={getUserImgSrc(loaderData.user.image?.objectKey)}
 						alt={loaderData.user.username}
@@ -113,7 +113,7 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 					<Button
 						asChild
 						variant="outline"
-						className="absolute -right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full p-0"
+						className="absolute top-3 -right-3 flex size-10 items-center justify-center rounded-full p-0"
 					>
 						<Link
 							preventScrollReset
@@ -121,14 +121,14 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 							title="Change profile photo"
 							aria-label="Change profile photo"
 						>
-							<Icon name="camera" className="h-4 w-4" />
+							<Icon name="camera" className="size-4" />
 						</Link>
 					</Button>
 				</div>
 			</div>
 			<UpdateProfile loaderData={loaderData} />
 
-			<div className="col-span-6 my-6 h-1 border-b-[1.5px] border-foreground" />
+			<div className="border-foreground col-span-6 my-6 h-1 border-b-[1.5px]" />
 			<div className="col-span-full flex flex-col gap-6">
 				<div>
 					<Link to="change-email">

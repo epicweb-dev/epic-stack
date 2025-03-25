@@ -32,12 +32,12 @@ function EpicProgress() {
 			role="progressbar"
 			aria-hidden={delayedPending ? undefined : true}
 			aria-valuetext={delayedPending ? 'Loading' : undefined}
-			className="fixed inset-x-0 left-0 top-0 z-50 h-[0.20rem] animate-pulse"
+			className="fixed inset-x-0 top-0 z-50 h-[0.20rem] animate-pulse"
 		>
 			<div
 				ref={ref}
 				className={cn(
-					'h-full w-0 bg-foreground duration-500 ease-in-out',
+					'bg-foreground h-full w-0 duration-500 ease-in-out',
 					transition.state === 'idle' &&
 						(animationComplete
 							? 'transition-none'
@@ -51,7 +51,7 @@ function EpicProgress() {
 					<Icon
 						name="update"
 						size="md"
-						className="m-1 animate-spin text-foreground"
+						className="text-foreground m-1 animate-spin"
 						aria-hidden
 					/>
 				</div>

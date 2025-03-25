@@ -33,17 +33,17 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
 	return (
 		<main className="container flex min-h-[400px] flex-1 px-0 pb-12 md:px-8">
-			<div className="grid w-full grid-cols-4 bg-muted pl-2 md:container md:rounded-3xl md:pr-0">
+			<div className="bg-muted grid w-full grid-cols-4 pl-2 md:container md:rounded-3xl md:pr-0">
 				<div className="relative col-span-1">
 					<div className="absolute inset-0 flex flex-col">
 						<Link
 							to={`/users/${loaderData.owner.username}`}
-							className="flex flex-col items-center justify-center gap-2 bg-muted pb-4 pl-8 pr-4 pt-12 lg:flex-row lg:justify-start lg:gap-4"
+							className="bg-muted flex flex-col items-center justify-center gap-2 pt-12 pr-4 pb-4 pl-8 lg:flex-row lg:justify-start lg:gap-4"
 						>
 							<Img
 								src={getUserImgSrc(loaderData.owner.image?.objectKey)}
 								alt={ownerDisplayName}
-								className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
+								className="size-16 rounded-full object-cover lg:h-24 lg:w-24"
 								width={256}
 								height={256}
 							/>
@@ -51,7 +51,7 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 								{ownerDisplayName}'s Notes
 							</h1>
 						</Link>
-						<ul className="overflow-y-auto overflow-x-hidden pb-12">
+						<ul className="overflow-x-hidden overflow-y-auto pb-12">
 							{isOwner ? (
 								<li className="p-1 pr-0">
 									<NavLink
@@ -81,7 +81,7 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 						</ul>
 					</div>
 				</div>
-				<div className="relative col-span-3 bg-accent md:rounded-r-3xl">
+				<div className="bg-accent relative col-span-3 md:rounded-r-3xl">
 					<Outlet />
 				</div>
 			</div>

@@ -117,7 +117,7 @@ export default function NoteRoute({
 			aria-labelledby="note-title"
 			tabIndex={-1} // Make the section focusable without keyboard navigation
 		>
-			<h2 id="note-title" className="mb-2 pt-12 text-h2 lg:mb-6">
+			<h2 id="note-title" className="text-h2 mb-2 pt-12 lg:mb-6">
 				{loaderData.note.title}
 			</h2>
 			<div className={`${displayBar ? 'pb-24' : 'pb-12'} overflow-y-auto`}>
@@ -128,7 +128,7 @@ export default function NoteRoute({
 								<Img
 									src={getNoteImgSrc(image.objectKey)}
 									alt={image.altText ?? ''}
-									className="h-32 w-32 rounded-lg object-cover"
+									className="size-32 rounded-lg object-cover"
 									width={512}
 									height={512}
 								/>
@@ -136,13 +136,13 @@ export default function NoteRoute({
 						</li>
 					))}
 				</ul>
-				<p className="whitespace-break-spaces text-sm md:text-lg">
+				<p className="text-sm whitespace-break-spaces md:text-lg">
 					{loaderData.note.content}
 				</p>
 			</div>
 			{displayBar ? (
 				<div className={floatingToolbarClassName}>
-					<span className="text-sm text-foreground/90 max-[524px]:hidden">
+					<span className="text-foreground/90 text-sm max-[524px]:hidden">
 						<Icon name="clock" className="scale-125">
 							{loaderData.timeAgo} ago
 						</Icon>
