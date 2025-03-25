@@ -15,16 +15,13 @@ export const StatusButton = ({
 	className,
 	children,
 	spinDelay,
-	size,
-	variant,
 	...props
-}: React.ComponentProps<'button'> & {
-	status: 'pending' | 'success' | 'error' | 'idle'
-	message?: string | null
-	spinDelay?: Parameters<typeof useSpinDelay>[1]
-	size?: ButtonVariant['size']
-	variant?: ButtonVariant['variant']
-}) => {
+}: React.ComponentProps<'button'> &
+	ButtonVariant & {
+		status: 'pending' | 'success' | 'error' | 'idle'
+		message?: string | null
+		spinDelay?: Parameters<typeof useSpinDelay>[1]
+	}) => {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
 		minDuration: 300,
@@ -63,12 +60,7 @@ export const StatusButton = ({
 	}[status]
 
 	return (
-		<Button
-			className={cn('flex justify-center gap-4', className)}
-			variant={variant}
-			size={size}
-			{...props}
-		>
+		<Button className={cn('flex justify-center gap-4', className)} {...props}>
 			<div>{children}</div>
 			{message ? (
 				<TooltipProvider>

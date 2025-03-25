@@ -5,55 +5,72 @@
 
 :root {
 	--radius: 0.5rem;
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.129 0.042 264.695);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.129 0.042 264.695);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.129 0.042 264.695);
-	--primary: oklch(0.208 0.042 265.755);
-	--primary-foreground: oklch(0.984 0.003 247.858);
-	--secondary: oklch(0.968 0.007 247.896);
-	--secondary-foreground: oklch(0.208 0.042 265.755);
-	--muted: oklch(0.968 0.007 247.896);
-	--muted-foreground: oklch(0.554 0.046 257.417);
-	--accent: oklch(0.968 0.007 247.896);
-	--accent-foreground: oklch(0.208 0.042 265.755);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.929 0.013 255.508);
-	--input: oklch(0.929 0.013 255.508);
-	--ring: oklch(0.704 0.04 256.788);
 
+	--background: oklch(100% 0 0);
+	--foreground: oklch(13.71% 0.036 258.53);
 
-	--foreground-destructive: oklch(51.46% 0.1979 16.57);
+	--card: oklch(100% 0 0);
+	--card-foreground: oklch(13.71% 0.036 258.53);
+
+	--popover: oklch(100% 0 0);
+	--popover-foreground: oklch(13.71% 0.036 258.53);
+
+	--primary: oklch(20.79% 0.0399 265.73);
+	--primary-foreground: oklch(98.38% 0.0035 247.86);
+
+	--secondary: oklch(86.48% 0.0153 248);
+	--secondary-foreground: oklch(20.79% 0.0399 265.73);
+
+	--muted: oklch(94.32% 0.0123 247.96);
+	--muted-foreground: oklch(40.68% 0.0281 257.44);
+
+	--accent: oklch(91.87% 0.01770618193703561 248.02064625050508);
+	--accent-foreground: oklch(20.79% 0.0399 265.73);
+
+	--border: oklch(92.9% 0.0126 255.53);
+	--input: oklch(92.56% 0.0133 255.54);
 	--input-invalid: oklch(63.68% 0.2078 25.33);
-	--destructive-foreground: oklch(98.38% 0.0035 247.86)
+
+	--destructive: oklch(57.14% 0.2121 27.25);
+	--destructive-foreground: oklch(98.38% 0.0035 247.86);
+	/* prefixed with foreground because it should look good on the background */
+	--foreground-destructive: oklch(51.46% 0.1979 16.57);
+
+	--ring: oklch(71.07% 0.0351 256.79);
 }
 
 .dark {
-	--background: oklch(0.129 0.042 264.695);
-	--foreground: oklch(0.984 0.003 247.858);
-	--card: oklch(0.208 0.042 265.755);
-	--card-foreground: oklch(0.984 0.003 247.858);
-	--popover: oklch(0.208 0.042 265.755);
-	--popover-foreground: oklch(0.984 0.003 247.858);
-	--primary: oklch(0.929 0.013 255.508);
-	--primary-foreground: oklch(0.208 0.042 265.755);
-	--secondary: oklch(0.279 0.041 260.031);
-	--secondary-foreground: oklch(0.984 0.003 247.858);
-	--muted: oklch(0.279 0.041 260.031);
-	--muted-foreground: oklch(0.704 0.04 256.788);
-	--accent: oklch(0.279 0.041 260.031);
-	--accent-foreground: oklch(0.984 0.003 247.858);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.551 0.027 264.364);
+	--background: oklch(13.71% 0.036 258.53);
+	--foreground: oklch(98.38% 0.0035 247.86);
 
+	--card: oklch(13.71% 0.036 258.53);
+	--card-foreground: oklch(98.38% 0.0035 247.86);
+
+	--popover: oklch(13.71% 0.036 258.53);
+	--popover-foreground: oklch(98.38% 0.0035 247.86);
+
+	--primary: oklch(98.38% 0.0035 247.86);
+	--primary-foreground: oklch(20.79% 0.0399 265.73);
+
+	--secondary: oklch(34.74% 0.0295 260.13);
+	--secondary-foreground: oklch(98.38% 0.0035 247.86);
+
+	--muted: oklch(22.6% 0.0267 260.02);
+	--muted-foreground: oklch(71.07% 0.0351 256.79);
+
+	--accent: oklch(20.56% 0.022816 260.0464);
+	--accent-foreground: oklch(98.38% 0.0035 247.86);
+
+	--border: oklch(28% 0.0369 259.97);
+	--input: oklch(28% 0.0369 259.97);
+	--input-invalid: oklch(39.59% 0.1331 25.72);
+
+	--destructive: oklch(47.6% 0.159 25.64);
+	--destructive-foreground: oklch(97.1% 0.0127 17.38);
 	/* prefixed with foreground because it should look good on the background */
 	--foreground-destructive: oklch(63.72% 0.2071 21.89);
-	--input-invalid: oklch(39.59% 0.1331 25.72);
-	--destructive-foreground: oklch(97.1% 0.0127 17.38);
+
+	--ring: oklch(65.28% 0.0684 260.07);
 }
 
 @theme inline {
@@ -79,6 +96,9 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--color-input-invalid: var(--input-invalid);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-foreground-destructive: var(--foreground-destructive);
 }
 
 @theme {
@@ -180,7 +200,7 @@
 }
 
 @utility container {
-	margin-inline: center;
+	margin-inline: auto;
 	padding-inline: 2rem;
 
 	@media(width >=1400px) {
