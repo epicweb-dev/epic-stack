@@ -9,7 +9,7 @@ of the app. Specifically "hybrid routes."
 
 We'll defer to the `remix-flat-routes` documentation for specifics, but an
 important thing for you to know as you get used to this convention is you can
-always run `npx remix routes` from the root of the app and it will output the
+always run `npx react-router routes` from the root of the app and it will output the
 routes of your application in a JSX-like output that will reveal the routes that
 will be generated based on your current file structure. Here's an example of the
 Epic Stack routes at the time of this writing:
