@@ -1,6 +1,6 @@
 # PwnedPasswords Integration
 
-Date: 2024-03-22
+Date: 2025-03-22
 
 Status: accepted
 
