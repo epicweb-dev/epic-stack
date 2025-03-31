@@ -2,7 +2,7 @@
 
 The Epic Stack is a [Remix Stack](https://remix.run/stacks). To start your Epic
 Stack, run the following [`npx`](https://docs.npmjs.com/cli/v9/commands/npx)
-command:
+command using the current LTS version of Node.js:
 
 ```sh
 npx create-epic-app@latest
