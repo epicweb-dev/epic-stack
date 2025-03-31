@@ -280,7 +280,7 @@ async function setupDeployment({ rootDirectory }) {
 		console.log(
 			`Opening Fly Tokens Dashboard and GitHub Action Secrets pages. Please create a new token on Fly and set it as the value for a new secret called FLY_API_TOKEN on GitHub.`,
 		)
-		await open(`https://web.fly.io/user/personal_access_tokens/new`)
+		await open(`https://fly.io/tokens/create`)
 		await open(`${repoURL}/settings/secrets/actions/new`)
 
 		console.log(
