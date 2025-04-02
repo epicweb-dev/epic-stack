@@ -3,6 +3,7 @@ import {
 	sentryReactRouter,
 	type SentryReactRouterBuildOptions,
 } from '@sentry/react-router'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
 
@@ -37,6 +38,7 @@ export default defineConfig((config) => ({
 	sentryConfig,
 	plugins: [
 		envOnlyMacros(),
+		tailwindcss(),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
 		MODE === 'test' ? null : reactRouter(),

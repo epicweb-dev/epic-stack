@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '#app/utils/misc.tsx'
-import { Button, type ButtonProps } from './button.tsx'
+import { Button, type ButtonVariant } from './button.tsx'
 import { Icon } from './icon.tsx'
 import {
 	Tooltip,
@@ -10,14 +9,19 @@ import {
 	TooltipTrigger,
 } from './tooltip.tsx'
 
-export const StatusButton = React.forwardRef<
-	HTMLButtonElement,
-	ButtonProps & {
+export const StatusButton = ({
+	message,
+	status,
+	className,
+	children,
+	spinDelay,
+	...props
+}: React.ComponentProps<'button'> &
+	ButtonVariant & {
 		status: 'pending' | 'success' | 'error' | 'idle'
 		message?: string | null
 		spinDelay?: Parameters<typeof useSpinDelay>[1]
-	}
->(({ message, status, className, children, spinDelay, ...props }, ref) => {
+	}) => {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
 		minDuration: 300,
@@ -27,7 +31,7 @@ export const StatusButton = React.forwardRef<
 		pending: delayedPending ? (
 			<div
 				role="status"
-				className="inline-flex h-6 w-6 items-center justify-center"
+				className="inline-flex size-6 items-center justify-center"
 			>
 				<Icon name="update" className="animate-spin" title="loading" />
 			</div>
@@ -35,7 +39,7 @@ export const StatusButton = React.forwardRef<
 		success: (
 			<div
 				role="status"
-				className="inline-flex h-6 w-6 items-center justify-center"
+				className="inline-flex size-6 items-center justify-center"
 			>
 				<Icon name="check" title="success" />
 			</div>
@@ -43,7 +47,7 @@ export const StatusButton = React.forwardRef<
 		error: (
 			<div
 				role="status"
-				className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-destructive"
+				className="bg-destructive inline-flex size-6 items-center justify-center rounded-full"
 			>
 				<Icon
 					name="cross-1"
@@ -56,11 +60,7 @@ export const StatusButton = React.forwardRef<
 	}[status]
 
 	return (
-		<Button
-			ref={ref}
-			className={cn('flex justify-center gap-4', className)}
-			{...props}
-		>
+		<Button className={cn('flex justify-center gap-4', className)} {...props}>
 			<div>{children}</div>
 			{message ? (
 				<TooltipProvider>
@@ -74,5 +74,5 @@ export const StatusButton = React.forwardRef<
 			)}
 		</Button>
 	)
-})
+}
 StatusButton.displayName = 'Button'

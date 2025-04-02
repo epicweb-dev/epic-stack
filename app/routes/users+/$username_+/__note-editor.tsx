@@ -79,7 +79,7 @@ export function NoteEditor({
 			<FormProvider context={form.context}>
 				<Form
 					method="POST"
-					className="flex h-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden px-10 pb-28 pt-12"
+					className="flex h-full flex-col gap-y-4 overflow-x-hidden overflow-y-auto px-10 pt-12 pb-28"
 					{...getFormProps(form)}
 					encType="multipart/form-data"
 				>
@@ -114,10 +114,10 @@ export function NoteEditor({
 									return (
 										<li
 											key={imageMeta.key}
-											className="relative border-b-2 border-muted-foreground"
+											className="border-muted-foreground relative border-b-2"
 										>
 											<button
-												className="absolute right-0 top-0 text-foreground-destructive"
+												className="text-foreground-destructive absolute top-0 right-0"
 												{...form.remove.getButtonProps({
 													name: fields.images.name,
 													index,
@@ -187,10 +187,10 @@ function ImageChooser({
 		<fieldset {...getFieldsetProps(meta)}>
 			<div className="flex gap-3">
 				<div className="w-32">
-					<div className="relative h-32 w-32">
+					<div className="relative size-32">
 						<label
 							htmlFor={fields.file.id}
-							className={cn('group absolute h-32 w-32 rounded-lg', {
+							className={cn('group absolute size-32 rounded-lg', {
 								'bg-accent opacity-40 focus-within:opacity-100 hover:opacity-100':
 									!previewImage,
 								'cursor-pointer focus-within:ring-2': !existingImage,
@@ -202,7 +202,7 @@ function ImageChooser({
 										<Img
 											src={previewImage}
 											alt={altText ?? ''}
-											className="h-32 w-32 rounded-lg object-cover"
+											className="size-32 rounded-lg object-cover"
 											width={512}
 											height={512}
 										/>
@@ -210,17 +210,17 @@ function ImageChooser({
 										<img
 											src={previewImage}
 											alt={altText ?? ''}
-											className="h-32 w-32 rounded-lg object-cover"
+											className="size-32 rounded-lg object-cover"
 										/>
 									)}
 									{existingImage ? null : (
-										<div className="pointer-events-none absolute -right-0.5 -top-0.5 rotate-12 rounded-sm bg-secondary px-2 py-1 text-xs text-secondary-foreground shadow-md">
+										<div className="bg-secondary text-secondary-foreground pointer-events-none absolute -top-0.5 -right-0.5 rotate-12 rounded-sm px-2 py-1 text-xs shadow-md">
 											new
 										</div>
 									)}
 								</div>
 							) : (
-								<div className="flex h-32 w-32 items-center justify-center rounded-lg border border-muted-foreground text-4xl text-muted-foreground">
+								<div className="border-muted-foreground text-muted-foreground flex size-32 items-center justify-center rounded-lg border text-4xl">
 									<Icon name="plus" />
 								</div>
 							)}
@@ -229,7 +229,7 @@ function ImageChooser({
 							) : null}
 							<input
 								aria-label="Image"
-								className="absolute left-0 top-0 z-0 h-32 w-32 cursor-pointer opacity-0"
+								className="absolute top-0 left-0 z-0 size-32 cursor-pointer opacity-0"
 								onChange={(event) => {
 									const file = event.target.files?.[0]
 
@@ -248,7 +248,7 @@ function ImageChooser({
 							/>
 						</label>
 					</div>
-					<div className="min-h-[32px] px-4 pb-3 pt-1">
+					<div className="min-h-[32px] px-4 pt-1 pb-3">
 						<ErrorList id={fields.file.errorId} errors={fields.file.errors} />
 					</div>
 				</div>
@@ -258,7 +258,7 @@ function ImageChooser({
 						onChange={(e) => setAltText(e.currentTarget.value)}
 						{...getTextareaProps(fields.altText)}
 					/>
-					<div className="min-h-[32px] px-4 pb-3 pt-1">
+					<div className="min-h-[32px] px-4 pt-1 pb-3">
 						<ErrorList
 							id={fields.altText.errorId}
 							errors={fields.altText.errors}
@@ -266,7 +266,7 @@ function ImageChooser({
 					</div>
 				</div>
 			</div>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-[32px] px-4 pt-1 pb-3">
 				<ErrorList id={meta.errorId} errors={meta.errors} />
 			</div>
 		</fieldset>

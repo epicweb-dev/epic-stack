@@ -182,7 +182,7 @@ export default function OnboardingProviderRoute({
 	})
 
 	return (
-		<div className="container flex min-h-full flex-col justify-center pb-32 pt-20">
+		<div className="container flex min-h-full flex-col justify-center pt-20 pb-32">
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard {loaderData.email}!</h1>
@@ -193,7 +193,7 @@ export default function OnboardingProviderRoute({
 				<Spacer size="xs" />
 				<Form
 					method="POST"
-					className="mx-auto min-w-full max-w-sm sm:min-w-[368px]"
+					className="mx-auto max-w-sm min-w-full sm:min-w-[368px]"
 					{...getFormProps(form)}
 				>
 					{fields.imageUrl.initialValue ? (
@@ -201,7 +201,7 @@ export default function OnboardingProviderRoute({
 							<img
 								src={fields.imageUrl.initialValue}
 								alt="Profile"
-								className="h-24 w-24 rounded-full"
+								className="size-24 rounded-full"
 							/>
 							<p className="text-body-sm text-muted-foreground">
 								You can change your photo later
