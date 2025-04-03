@@ -5,7 +5,7 @@ Stack, run the following [`npx`](https://docs.npmjs.com/cli/v9/commands/npx)
 command using the current LTS version of Node.js:
 
 ```sh
-npx create-epic-app@latest
+npx epicli new <project-name>
 ```
 
 This will prompt you for a project name (the name of the directory to put your
@@ -28,13 +28,13 @@ environment variables when you run the script:
 So, if you enabled all of these it would be:
 
 ```sh
-SKIP_SETUP=true SKIP_FORMAT=true SKIP_DEPLOYMENT=true npx create-epic-app@latest
+SKIP_SETUP=true SKIP_FORMAT=true SKIP_DEPLOYMENT=true npx epicli new
 ```
 
 Or, on windows:
 
 ```
-set SKIP_SETUP=true && set SKIP_FORMAT=true && set SKIP_DEPLOYMENT=true && npx create-epic-app@latest
+set SKIP_SETUP=true && set SKIP_FORMAT=true && set SKIP_DEPLOYMENT=true && npx epicli new
 ```
 
 ## Development
