@@ -52,8 +52,14 @@ cp .env.example .env
 # Install deps
 npm install
 
-# setup database
-npx prisma migrate reset --force
+# Run the build
+npm run build
+
+# setup the database
+npx prisma migrate deploy
+
+# generate the prisma client
+npx prisma generate --sql
 
 # Install playwright browsers
 npm run test:e2e:install
