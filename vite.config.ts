@@ -1,11 +1,12 @@
 import { reactRouter } from '@react-router/dev/vite'
 import {
-	sentryReactRouter,
 	type SentryReactRouterBuildOptions,
+	sentryReactRouter,
 } from '@sentry/react-router'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
+import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 
 const MODE = process.env.NODE_ENV
 
@@ -20,7 +21,6 @@ export default defineConfig((config) => ({
 
 		assetsInlineLimit: (source: string) => {
 			if (
-				source.endsWith('sprite.svg') ||
 				source.endsWith('favicon.svg') ||
 				source.endsWith('apple-touch-icon.png')
 			) {
@@ -39,6 +39,13 @@ export default defineConfig((config) => ({
 	plugins: [
 		envOnlyMacros(),
 		tailwindcss(),
+		iconsSpritesheet({
+			inputDir: './other/svg-icons',
+			outputDir: './app/components/ui/icons',
+			fileName: 'sprite.svg',
+			withTypes: true,
+			iconNameTransformer: (name) => name,
+		}),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
 		MODE === 'test' ? null : reactRouter(),
