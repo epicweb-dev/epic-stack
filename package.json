@@ -11,10 +11,8 @@
   },
   "scripts": {
     "build": "run-s build:*",
-    "build:icons": "tsx ./other/build-icons.ts",
     "build:remix": "react-router build",
     "build:server": "tsx ./other/build-server.ts",
-    "predev": "npm run build:icons --silent",
     "dev": "cross-env NODE_ENV=development MOCKS=true node ./server/dev-server.js",
     "dev:no-mocks": "cross-env NODE_ENV=development node ./server/dev-server.js",
     "format": "prettier --write .",
@@ -147,7 +145,6 @@
     "fs-extra": "^11.3.0",
     "jsdom": "^25.0.1",
     "msw": "^2.7.3",
-    "node-html-parser": "^7.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.5.3",
     "prettier-plugin-sql": "^0.18.1",
@@ -157,6 +154,7 @@
     "tw-animate-css": "^1.2.4",
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
+    "vite-plugin-icons-spritesheet": "^3.0.1",
     "vitest": "^3.0.9"
   },
   "engines": {
