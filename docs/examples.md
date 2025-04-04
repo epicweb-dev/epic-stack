@@ -7,6 +7,10 @@ template.
 
 This page links to examples of how to implement some things with the Epic Stack.
 
+- [Epic Stack with MCP](https://github.com/epicweb-dev/epic-mcp) by
+  [@epicweb-dev](https://github.com/epicweb-dev): An example of the Epic Stack
+  with an `/mcp` endpoint that can be used to interact with your app through the
+  Model Context Protocol with your favorite MCP client (Claude, Cursor, etc.).
 - [Epic Stack with Stripe](https://github.com/epicweb-dev/epic-stack-with-stripe)
   by [@epicweb-dev](https://github.com/epicweb-dev): An example of the Epic
   Stack with Stripe. Uses Subscriptions, Stripe Links, and focused on
