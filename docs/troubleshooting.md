@@ -40,7 +40,7 @@ error like this during local development:
 
 > X [ERROR] Could not resolve "#app/components/ui/icon.tsx"
 
-You need to be manually regenerate the icon with `npm run build:icons`.
+You need to be manually regenerate the icon with `npm run build`.
 
 See
 [the icons decision document](https://github.com/epicweb-dev/epic-stack/blob/main/docs/decisions/020-icons.md)

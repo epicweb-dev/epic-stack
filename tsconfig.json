@@ -8,7 +8,10 @@
 		"paths": {
 			"#app/*": ["./app/*"],
 			"#tests/*": ["./tests/*"],
-			"@/icon-name": ["./app/components/ui/icons/types.ts", "./types/types.ts"]
+			"@/icon-name": [
+				"./app/components/ui/icons/types.ts",
+				"./types/icon-name.d.ts"
+			]
 		}
 	}
 }
