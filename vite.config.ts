@@ -28,7 +28,7 @@ export default defineConfig((config) => ({
 			}
 		},
 
-		sourcemap: true,
+		sourcemap: 'hidden',
 	},
 	server: {
 		watch: {
