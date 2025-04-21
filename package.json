@@ -38,8 +38,8 @@
     "/server-build"
   ],
   "dependencies": {
-    "@conform-to/react": "^1.2.2",
-    "@conform-to/zod": "^1.2.2",
+    "@conform-to/react": "^1.4.0",
+    "@conform-to/zod": "^1.4.0",
     "@epic-web/cachified": "^5.5.1",
     "@epic-web/client-hints": "^1.3.5",
     "@epic-web/invariant": "^1.0.0",
