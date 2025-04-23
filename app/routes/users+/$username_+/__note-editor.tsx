@@ -225,7 +225,10 @@ function ImageChooser({
 								</div>
 							)}
 							{existingImage ? (
-								<input {...getInputProps(fields.id, { type: 'hidden' })} />
+								<input
+									{...getInputProps(fields.id, { type: 'hidden' })}
+									key={fields.id.key}
+								/>
 							) : null}
 							<input
 								aria-label="Image"
@@ -245,6 +248,7 @@ function ImageChooser({
 								}}
 								accept="image/*"
 								{...getInputProps(fields.file, { type: 'file' })}
+								key={fields.file.key}
 							/>
 						</label>
 					</div>
@@ -257,6 +261,7 @@ function ImageChooser({
 					<Textarea
 						onChange={(e) => setAltText(e.currentTarget.value)}
 						{...getTextareaProps(fields.altText)}
+						key={fields.altText.key}
 					/>
 					<div className="min-h-[32px] px-4 pt-1 pb-3">
 						<ErrorList
