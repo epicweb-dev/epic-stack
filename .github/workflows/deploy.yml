@@ -31,7 +31,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: 🏄 Copy test env vars
-        run: cp .env.example .env 
+        run: cp .env.example .env
 
       - name: 🛠 Setup Database
         run: npx prisma migrate deploy && npx prisma generate --sql
@@ -58,7 +58,7 @@ jobs:
         run: npm run build
 
       - name: 🏄 Copy test env vars
-        run: cp .env.example .env 
+        run: cp .env.example .env
 
       - name: 🛠 Setup Database
         run: npx prisma migrate deploy && npx prisma generate --sql
@@ -82,7 +82,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: 🏄 Copy test env vars
-        run: cp .env.example .env 
+        run: cp .env.example .env
 
       - name: 🛠 Setup Database
         run: npx prisma migrate deploy && npx prisma generate --sql
@@ -143,13 +143,57 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+  container:
+    name: 📦 Prepare Container
+    runs-on: ubuntu-24.04
+    # only prepare container on pushes
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: 👀 Read app name
+        uses: SebRollen/toml-action@v1.2.0
+        id: app_name
+        with:
+          file: 'fly.toml'
+          field: 'app'
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 📦 Build Staging Container
+        if: ${{ github.ref == 'refs/heads/dev' }}
+        run: |
+          flyctl deploy \
+            --build-only \
+            --push \
+            --image-label ${{ github.sha }} \
+            --build-arg COMMIT_SHA=${{ github.sha }} \
+            --app ${{ steps.app_name.outputs.value }}-staging
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 📦 Build Production Container
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          flyctl deploy \
+            --build-only \
+            --push \
+            --image-label ${{ github.sha }} \
+            --build-arg COMMIT_SHA=${{ github.sha }} \
+            --app ${{ steps.app_name.outputs.value }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
   deploy:
     name: 🚀 Deploy
-    runs-on: ubuntu-22.04
-    needs: [lint, typecheck, vitest, playwright]
-    # only build/deploy branches on pushes
+    runs-on: ubuntu-24.04
+    needs: [lint, typecheck, vitest, playwright, container]
+    # only deploy on pushes
     if: ${{ github.event_name == 'push' }}
-
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -168,16 +212,17 @@ jobs:
 
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
-        run:
-          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
-          --app ${{ steps.app_name.outputs.value }}-staging
+        run: |
+          IMAGE="registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}"
+          flyctl deploy --image $IMAGE --app ${{ steps.app_name.outputs.value }}-staging
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
-        run:
-          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
-          --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          IMAGE="registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
+          flyctl deploy --image $IMAGE \
+            --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
