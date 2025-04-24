@@ -110,7 +110,10 @@ export function NoteEditor({
 							<Label>Images</Label>
 							<ul className="flex flex-col gap-4">
 								{imageList.map((imageMeta, index) => {
-									const image = note?.images[index]
+									const imageMetaId = imageMeta.getFieldset().id.value
+									const image = note?.images.find(
+										({ id }) => id === imageMetaId,
+									)
 									return (
 										<li
 											key={imageMeta.key}
