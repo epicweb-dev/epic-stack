@@ -295,7 +295,7 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 		}),
 	)
 	// we are truncating the user's input
-	expect((await usernameInput.inputValue()).length).toBe(USERNAME_MAX_LENGTH)
+	expect(await usernameInput.inputValue()).toHaveLength(USERNAME_MAX_LENGTH)
 	await createAccountButton.click()
 	await expect(page.getByText(/username is too long/i)).not.toBeVisible()
 
