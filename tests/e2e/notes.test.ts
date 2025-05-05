@@ -62,7 +62,7 @@ test('Users can delete notes', async ({ page, login }) => {
 		page.getByText('Your note has been deleted.', { exact: true }),
 	).toBeVisible()
 	await expect(page).toHaveURL(`/users/${user.username}/notes`)
-	await expect(noteLinks).toHaveCount(countBefore)
+	await expect(noteLinks).toHaveCount(countBefore - 1)
 })
 
 function createNote() {
