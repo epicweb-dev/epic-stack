@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -143,7 +143,7 @@
 	--text-button: 0.75rem;
 	--text-button--line-height: 1rem;
 	--text-button--font-weight: 700;
-	--animate-roll-reveal: roll-reveal 0.4s cubic-bezier(.22, 1.28, .54, .99);
+	--animate-roll-reveal: roll-reveal 0.4s cubic-bezier(0.22, 1.28, 0.54, 0.99);
 	--animate-slide-left: slide-left 0.3s ease-out;
 	--animate-slide-top: slide-top 0.3s ease-out;
 	--animate-caret-blink: caret-blink 1.25s ease-out infinite;
@@ -185,7 +185,6 @@
 	}
 
 	@keyframes caret-blink {
-
 		0%,
 		70%,
 		100% {
@@ -203,16 +202,14 @@
 	margin-inline: auto;
 	padding-inline: 2rem;
 
-	@media(width >=1400px) {
+	@media (width >=1400px) {
 		& {
 			max-width: 1400px;
 		}
 	}
 }
 
-
 @layer base {
-
 	*,
 	::after,
 	::before,

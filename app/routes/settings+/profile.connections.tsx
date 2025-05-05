@@ -133,7 +133,7 @@ export default function Connections({ loaderData }: Route.ComponentProps) {
 			) : (
 				<p>You don't have any connections yet.</p>
 			)}
-			<div className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+			<div className="border-border mt-5 flex flex-col gap-5 border-t-2 border-b-2 py-3">
 				{providerNames.map((providerName) => (
 					<ProviderConnectionForm
 						key={providerName}

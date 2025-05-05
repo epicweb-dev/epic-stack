@@ -122,7 +122,7 @@ export default function CacheAdminRoute({ loaderData }: Route.ComponentProps) {
 								defaultValue: query,
 							}}
 						/>
-						<div className="flex h-16 w-14 items-center text-lg font-medium text-muted-foreground">
+						<div className="text-muted-foreground flex h-16 w-14 items-center text-lg font-medium">
 							<span title="Total results shown">
 								{loaderData.cacheKeys.sqlite.length +
 									loaderData.cacheKeys.lru.length}

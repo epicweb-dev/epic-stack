@@ -139,7 +139,7 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 			</div>
 
 			{error ? (
-				<div className="rounded-lg bg-destructive/15 p-4 text-destructive">
+				<div className="bg-destructive/15 text-destructive rounded-lg p-4">
 					{error}
 				</div>
 			) : null}
@@ -149,7 +149,7 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 					{loaderData.passkeys.map((passkey) => (
 						<li
 							key={passkey.id}
-							className="flex items-center justify-between gap-4 rounded-lg border border-muted-foreground p-4"
+							className="border-muted-foreground flex items-center justify-between gap-4 rounded-lg border p-4"
 						>
 							<div className="flex flex-col gap-2">
 								<div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 											: 'Security Key'}
 									</span>
 								</div>
-								<div className="text-sm text-muted-foreground">
+								<div className="text-muted-foreground text-sm">
 									Registered {formatDistanceToNow(new Date(passkey.createdAt))}{' '}
 									ago
 								</div>
@@ -182,7 +182,7 @@ export default function Passkeys({ loaderData }: Route.ComponentProps) {
 					))}
 				</ul>
 			) : (
-				<div className="text-center text-muted-foreground">
+				<div className="text-muted-foreground text-center">
 					No passkeys registered yet
 				</div>
 			)}

@@ -131,15 +131,15 @@ export default function ForgotPasswordRoute() {
 	})
 
 	return (
-		<div className="container pb-32 pt-20">
+		<div className="container pt-20 pb-32">
 			<div className="flex flex-col justify-center">
 				<div className="text-center">
 					<h1 className="text-h1">Forgot Password</h1>
-					<p className="mt-3 text-body-md text-muted-foreground">
+					<p className="text-body-md text-muted-foreground mt-3">
 						No worries, we'll send you reset instructions.
 					</p>
 				</div>
-				<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
+				<div className="mx-auto mt-16 max-w-sm min-w-full sm:min-w-[368px]">
 					<forgotPassword.Form method="POST" {...getFormProps(form)}>
 						<HoneypotInputs />
 						<div>
@@ -174,7 +174,7 @@ export default function ForgotPasswordRoute() {
 					</forgotPassword.Form>
 					<Link
 						to="/login"
-						className="mt-11 text-center text-body-sm font-bold"
+						className="text-body-sm mt-11 text-center font-bold"
 					>
 						Back to Login
 					</Link>

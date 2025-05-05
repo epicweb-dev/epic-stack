@@ -9,7 +9,8 @@ Here are a few things you get today:
   [LiteFS](https://fly.io/docs/litefs/)
 - Healthcheck endpoint for
   [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
-- [Grafana](https://fly-metrics.net/) dashboards of the running app via Fly Metrics
+- [Grafana](https://fly-metrics.net/) dashboards of the running app via Fly
+  Metrics
 - [GitHub Actions](https://github.com/features/actions) with testing and deploy
   on merge for both production and staging environments
 - Email/Password Authentication with
