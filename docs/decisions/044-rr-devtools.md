@@ -31,9 +31,9 @@ information about the data being loaded and the actions being dispatched.
 
 ## Decision
 
-We will add the React Router DevTools to the Epic Stack. The DevTools will be
-added to the project as a development dependency. The DevTools will be used in
-development mode only. 
+We will add the React Router DevTools to the Epic Stack. The DevTools 
+will be added to the project as a development dependency. The DevTools 
+will be used in development mode only. 
 
 The DevTools will be used to enhance the following:
 
