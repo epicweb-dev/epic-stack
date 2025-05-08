@@ -21,24 +21,12 @@ if (SENTRY_ENABLED) {
 	void import('./utils/monitoring.js').then(({ init }) => init())
 }
 
-const desiredPort = Number(process.env.PORT || 3000)
-const portToUse = await getPort({
-	port: portNumbers(desiredPort, desiredPort + 100),
-})
-const portAvailable = desiredPort === portToUse
-if (!portAvailable && !IS_DEV) {
-	console.log(`⚠️ Port ${desiredPort} is not available.`)
-	process.exit(1)
-}
-
 const viteDevServer = IS_PROD
 	? undefined
 	: await import('vite').then((vite) =>
 			vite.createServer({
 				server: {
 					middlewareMode: true,
-					// We tell Vite on what port we're running our dev server
-					port: portToUse,
 				},
 				// We tell Vite we are running a custom app instead of 
 				// the SPA default so it doesn't run HTML middleware
@@ -224,6 +212,16 @@ app.all(
 		},
 	}),
 )
+
+const desiredPort = Number(process.env.PORT || 3000)
+const portToUse = await getPort({
+	port: portNumbers(desiredPort, desiredPort + 100),
+})
+const portAvailable = desiredPort === portToUse
+if (!portAvailable && !IS_DEV) {
+	console.log(`⚠️ Port ${desiredPort} is not available.`)
+	process.exit(1)
+}
 
 const server = app.listen(portToUse, () => {
 	if (!portAvailable) {
