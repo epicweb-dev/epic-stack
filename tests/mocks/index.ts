@@ -22,7 +22,7 @@ server.listen({
 			return
 		}
 		// React-router-devtools send custom requests internally to handle some functionality, we ignore those
-		if (request.url.includes('react-router-devtools-request')) {
+		if (request.url.includes('__rrdt')) {
 			return
 		}
 		// Print the regular MSW unhandled request warning otherwise.
