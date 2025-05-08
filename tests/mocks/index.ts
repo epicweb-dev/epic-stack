@@ -21,6 +21,10 @@ server.listen({
 		if (request.url.includes('.sentry.io')) {
 			return
 		}
+		// React-router-devtools send custom requests internally to handle some functionality, we ignore those
+		if (request.url.includes('react-router-devtools-request')) {
+			return
+		}
 		// Print the regular MSW unhandled request warning otherwise.
 		print.warning()
 	},
