@@ -104,7 +104,7 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 				<div className="relative size-52">
 					<Img
 						src={getUserImgSrc(loaderData.user.image?.objectKey)}
-						alt={loaderData.user.username}
+						alt={loaderData.user.name ?? loaderData.user.username}
 						className="h-full w-full rounded-full object-cover"
 						width={832}
 						height={832}
