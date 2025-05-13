@@ -57,6 +57,7 @@ test('Users can update their profile photo', async ({ page, login }) => {
 	await page.goto('/settings/profile')
 
 	const beforeSrc = await page
+		.getByRole('main')
 		.getByRole('img', { name: user.name ?? user.username })
 		.getAttribute('src')
 
@@ -76,6 +77,7 @@ test('Users can update their profile photo', async ({ page, login }) => {
 	).toHaveURL(`/settings/profile`)
 
 	const afterSrc = await page
+		.getByRole('main')
 		.getByRole('img', { name: user.name ?? user.username })
 		.getAttribute('src')
 
