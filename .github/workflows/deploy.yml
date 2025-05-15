@@ -184,6 +184,7 @@ jobs:
             --push \
             --image-label ${{ github.sha }} \
             --build-arg COMMIT_SHA=${{ github.sha }} \
+            --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
             --app ${{ steps.app_name.outputs.value }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -213,16 +214,16 @@ jobs:
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
-          IMAGE="registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}"
-          flyctl deploy --image $IMAGE --app ${{ steps.app_name.outputs.value }}-staging
+          flyctl deploy \
+            --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
+            --app ${{ steps.app_name.outputs.value }}-staging
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          IMAGE="registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
-          flyctl deploy --image $IMAGE \
-            --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+          flyctl deploy \
+            --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
