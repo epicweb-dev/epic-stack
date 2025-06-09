@@ -1,6 +1,5 @@
-import crypto from 'node:crypto'
+import crypto from 'crypto'
 import { type Connection, type Password, type User } from '@prisma/client'
-import bcrypt from 'bcryptjs'
 import { redirect } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
@@ -10,6 +9,14 @@ import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
 import { uploadProfileImage } from './storage.server.ts'
+
+const SCRYPT_PARAMS = {
+	N: 2 ** 14,
+	r: 16,
+	p: 1,
+	keyLength: 64,
+	saltLength: 16,
+}
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30
 export const getSessionExpirationDate = () =>
@@ -231,8 +238,9 @@ export async function logout(
 }
 
 export async function getPasswordHash(password: string) {
-	const hash = await bcrypt.hash(password, 10)
-	return hash
+	const salt = crypto.randomBytes(SCRYPT_PARAMS.saltLength).toString('hex')
+	const hash = await generateKey(password, salt)
+	return `${salt}:${hash.toString('hex')}`
 }
 
 export async function verifyUserPassword(
@@ -244,11 +252,16 @@ export async function verifyUserPassword(
 		select: { id: true, password: { select: { hash: true } } },
 	})
 
-	if (!userWithPassword || !userWithPassword.password) {
-		return null
-	}
+	if (!userWithPassword || !userWithPassword.password) return null
 
-	const isValid = await bcrypt.compare(password, userWithPassword.password.hash)
+	const [salt, key] = userWithPassword.password.hash.split(':')
+
+	if (!key || !salt) return null
+
+	const isValid = crypto.timingSafeEqual(
+		Buffer.from(key, 'hex'),
+		await generateKey(password, salt),
+	)
 
 	if (!isValid) {
 		return null
@@ -291,4 +304,26 @@ export async function checkIsCommonPassword(password: string) {
 		console.warn('Unknown error during password check', error)
 		return false
 	}
+}
+
+async function generateKey(
+	password: string,
+	salt: string,
+): Promise<Buffer<ArrayBufferLike>> {
+	return new Promise<Buffer<ArrayBufferLike>>((resolve, reject) => {
+		crypto.scrypt(
+			password.normalize('NFKC'),
+			salt,
+			SCRYPT_PARAMS.keyLength,
+			{
+				N: SCRYPT_PARAMS.N,
+				r: SCRYPT_PARAMS.r,
+				p: SCRYPT_PARAMS.p,
+			},
+			(err, key) => {
+				if (err) reject(err)
+				else resolve(key)
+			},
+		)
+	})
 }

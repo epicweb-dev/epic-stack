@@ -1,5 +1,5 @@
+import crypto from 'crypto'
 import { faker } from '@faker-js/faker'
-import bcrypt from 'bcryptjs'
 import { UniqueEnforcer } from 'enforce-unique'
 
 const uniqueUsernameEnforcer = new UniqueEnforcer()
@@ -30,8 +30,14 @@ export function createUser() {
 }
 
 export function createPassword(password: string = faker.internet.password()) {
+	const salt = crypto.randomBytes(16).toString('hex')
+	const hash = crypto.scryptSync(password, salt, 64, {
+		N: 2 ** 14,
+		r: 16,
+		p: 1,
+	})
 	return {
-		hash: bcrypt.hashSync(password, 10),
+		hash: `${salt}:${hash.toString('hex')}`,
 	}
 }
 
