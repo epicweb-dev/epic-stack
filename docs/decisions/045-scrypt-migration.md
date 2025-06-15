@@ -43,11 +43,11 @@ These parameters were chosen to:
 - Maintain acceptable performance characteristics
 
 The actual scrypt options object includes an additional `maxmem` parameter set
-to `128 * N * r * 2`, which is approximately 64MiB for our parameters. This is
-explicitly set because Node.js has an internal default memory limit of 32 MiB.
-By setting this parameter, we're telling Node.js that twice the estimated memory
-(64 MiB) is allowed for this operation, ensuring optimal performance while
-maintaining security.
+to `128 * N * r * p * 2`, which is approximately 64MiB for our parameters. This
+is explicitly set because Node.js has an internal default memory limit of 32
+MiB. By setting this parameter, we're telling Node.js that twice the estimated
+memory (64 MiB) is allowed for this operation, ensuring optimal performance
+while maintaining security.
 
 ## Implementation Changes
 

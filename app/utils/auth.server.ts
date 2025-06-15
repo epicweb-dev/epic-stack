@@ -319,7 +319,7 @@ async function generateKey(
 				N: SCRYPT_PARAMS.N,
 				r: SCRYPT_PARAMS.r,
 				p: SCRYPT_PARAMS.p,
-				maxmem: 128 * SCRYPT_PARAMS.N * SCRYPT_PARAMS.r * 2,
+				maxmem: 128 * SCRYPT_PARAMS.N * SCRYPT_PARAMS.r * SCRYPT_PARAMS.p * 2,
 			},
 			(err, key) => {
 				if (err) reject(err)

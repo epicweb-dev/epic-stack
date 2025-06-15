@@ -35,7 +35,7 @@ export function createPassword(password: string = faker.internet.password()) {
 		N: 2 ** 14,
 		r: 16,
 		p: 1,
-		maxmem: 128 * 2 ** 14 * 16 * 2,
+		maxmem: 128 * 2 ** 14 * 16 * 1 * 2,
 	})
 	return {
 		hash: `${salt}:${hash.toString('hex')}`,
