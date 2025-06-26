@@ -89,7 +89,7 @@
     "input-otp": "^1.4.2",
     "intl-parse-accept-language": "^1.0.0",
     "isbot": "^5.1.27",
-    "litefs-js": "^1.1.2",
+    "litefs-js": "^2.0.1",
     "lru-cache": "^11.1.0",
     "mime-types": "^3.0.1",
     "morgan": "^1.10.0",
