@@ -21,7 +21,7 @@ import { Label } from '#app/components/ui/label.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
 import { cn, getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
-import { type Info } from './+types/notes.$noteId_.edit.ts'
+import { type Route } from './+types/notes.$noteId_.edit.ts'
 
 const titleMinLength = 1
 const titleMaxLength = 100
@@ -54,8 +54,8 @@ export function NoteEditor({
 	note,
 	actionData,
 }: {
-	note?: Info['loaderData']['note']
-	actionData?: Info['actionData']
+	note?: Route.ComponentProps['loaderData']['note']
+	actionData?: Route.ComponentProps['actionData']
 }) {
 	const isPending = useIsPending()
 

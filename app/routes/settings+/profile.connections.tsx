@@ -23,7 +23,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { pipeHeaders } from '#app/utils/headers.server.js'
 import { makeTimings } from '#app/utils/timing.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
-import { type Info, type Route } from './+types/profile.connections.ts'
+import { type Route } from './+types/profile.connections.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -150,7 +150,7 @@ function Connection({
 	connection,
 	canDelete,
 }: {
-	connection: Info['loaderData']['connections'][number]
+	connection: Route.ComponentProps['loaderData']['connections'][number]
 	canDelete: boolean
 }) {
 	const deleteFetcher = useFetcher<typeof action>()

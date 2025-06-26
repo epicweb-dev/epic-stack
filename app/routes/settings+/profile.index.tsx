@@ -15,7 +15,7 @@ import { getUserImgSrc, useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
-import { type Route, type Info } from './+types/profile.index.ts'
+import { type Route } from './+types/profile.index.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 export const handle: SEOHandle = {
@@ -219,7 +219,11 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 	}
 }
 
-function UpdateProfile({ loaderData }: { loaderData: Info['loaderData'] }) {
+function UpdateProfile({
+	loaderData,
+}: {
+	loaderData: Route.ComponentProps['loaderData']
+}) {
 	const fetcher = useFetcher<typeof profileUpdateAction>()
 
 	const [form, fields] = useForm({
@@ -293,9 +297,9 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 }
 
 function SignOutOfSessions({
-	loaderData: loaderData,
+	loaderData,
 }: {
-	loaderData: Info['loaderData']
+	loaderData: Route.ComponentProps['loaderData']
 }) {
 	const dc = useDoubleCheck()
 
