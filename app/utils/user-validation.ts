@@ -16,11 +16,8 @@ export const UsernameSchema = z
 export const PasswordSchema = z
 	.string({ required_error: 'Password is required' })
 	.min(6, { message: 'Password is too short' })
-	// NOTE: bcrypt has a limit of 72 bytes (which should be plenty long)
-	// https://github.com/epicweb-dev/epic-stack/issues/918
-	.refine((val) => new TextEncoder().encode(val).length <= 72, {
-		message: 'Password is too long',
-	})
+	// scrypt has no such limit unlike bcrypt which has 72 bytes limit
+	.max(100, { message: 'Password is too long' })
 
 export const NameSchema = z
 	.string({ required_error: 'Name is required' })
