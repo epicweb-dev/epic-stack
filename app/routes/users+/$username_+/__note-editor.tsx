@@ -201,7 +201,7 @@ function ImageChooser({
 						>
 							{previewImage ? (
 								<div className="relative">
-									{existingImage ? (
+									{existingImage && !previewImage.startsWith('data:') ? (
 										<Img
 											src={previewImage}
 											alt={altText ?? ''}
