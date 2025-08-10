@@ -4,7 +4,7 @@ import { cache } from '#app/utils/cache.server.ts'
 import {
 	getInstanceInfo,
 	getInternalInstanceDomain,
-} from '#app/utils/litefs.server'
+} from '#app/utils/litefs.server.ts'
 import { type Route } from './+types/sqlite.ts'
 
 export async function updatePrimaryCacheValue({
