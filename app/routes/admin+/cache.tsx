@@ -8,7 +8,7 @@ import {
 	useSearchParams,
 	useSubmit,
 } from 'react-router'
-import { GeneralErrorBoundary } from '#app/components/error-boundary'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
