@@ -102,7 +102,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 	expect(afterDeletionCredentials.credentials).toHaveLength(1)
 
 	// Logout again to test deleted passkey
-	await page.getByRole('link', { name: user.name ?? user.username }).click()
+	await page.getByRole('link', { name: 'User menu' }).click()
 	await page.getByRole('menuitem', { name: /logout/i }).click()
 	await expect(page).toHaveURL(`/`)
 
