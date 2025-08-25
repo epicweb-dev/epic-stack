@@ -1,9 +1,9 @@
 import { invariant } from '@epic-web/invariant'
 import { expect, test } from '#tests/playwright-utils.ts'
 
-test('Search from home page', async ({ page, insertNewUser }) => {
+test('Search from home page', async ({ page, navigate, insertNewUser }) => {
 	const newUser = await insertNewUser()
-	await page.goto('/')
+	await navigate('/')
 
 	await page.getByRole('searchbox', { name: /search/i }).fill(newUser.username)
 	await page.getByRole('button', { name: /search/i }).click()
