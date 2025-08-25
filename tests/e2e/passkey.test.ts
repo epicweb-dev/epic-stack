@@ -18,7 +18,11 @@ async function setupWebAuthn(page: any) {
 	return { client, authenticatorId: result.authenticatorId }
 }
 
-test('Users can register and use passkeys', async ({ page, login }) => {
+test('Users can register and use passkeys', async ({
+	page,
+	navigate,
+	login,
+}) => {
 	const user = await login()
 
 	const { client, authenticatorId } = await setupWebAuthn(page)
@@ -31,7 +35,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 		'No credentials should exist initially',
 	).toHaveLength(0)
 
-	await page.goto('/settings/profile/passkeys')
+	await navigate('/settings/profile/passkeys')
 
 	const passkeyRegisteredPromise = new Promise<void>((resolve) => {
 		client.once('WebAuthn.credentialAdded', () => resolve())
@@ -58,8 +62,8 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 	await expect(page).toHaveURL(`/`)
 
 	// Try logging in with passkey
-	await page.goto('/login')
-	const signCount1 = afterRegistrationCredentials.credentials[0].signCount
+	await navigate('/login')
+	const signCount1 = afterRegistrationCredentials.credentials[0]!.signCount
 
 	const passkeyAssertedPromise = new Promise<void>((resolve) => {
 		client.once('WebAuthn.credentialAsserted', () => resolve())
@@ -85,12 +89,12 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 		authenticatorId,
 	})
 	expect(afterLoginCredentials.credentials).toHaveLength(1)
-	expect(afterLoginCredentials.credentials[0].signCount).toBeGreaterThan(
+	expect(afterLoginCredentials.credentials[0]?.signCount).toBeGreaterThan(
 		signCount1,
 	)
 
 	// Go to passkeys page and delete the passkey
-	await page.goto('/settings/profile/passkeys')
+	await navigate('/settings/profile/passkeys')
 	await page.getByRole('button', { name: /delete/i }).click()
 
 	// Verify the passkey is no longer listed on the page
@@ -109,7 +113,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 	await expect(page).toHaveURL(`/`)
 
 	// Try logging in with the deleted passkey
-	await page.goto('/login')
+	await navigate('/login')
 	const deletedPasskeyAssertedPromise = new Promise<void>((resolve) => {
 		client.once('WebAuthn.credentialAsserted', () => resolve())
 	})
@@ -125,11 +129,15 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 	await expect(page).toHaveURL(`/login`)
 })
 
-test('Failed passkey verification shows error', async ({ page, login }) => {
+test('Failed passkey verification shows error', async ({
+	page,
+	navigate,
+	login,
+}) => {
 	const password = faker.internet.password()
 	await login({ password })
 	const { client, authenticatorId } = await setupWebAuthn(page)
-	await page.goto('/settings/profile/passkeys')
+	await navigate('/settings/profile/passkeys')
 
 	// Try to register with failed verification
 	await client.send('WebAuthn.setUserVerified', {
