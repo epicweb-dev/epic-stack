@@ -45,6 +45,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 									<Link
 										to={user.username}
 										className="bg-muted flex h-36 w-44 flex-col items-center justify-center rounded-lg px-5 py-3"
+										aria-label={`${user.name || user.username} profile`}
 									>
 										<Img
 											alt={user.name ?? user.username}
