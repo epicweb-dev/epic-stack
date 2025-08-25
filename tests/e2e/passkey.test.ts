@@ -60,7 +60,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 
 	// Try logging in with passkey
 	await page.goto('/login')
-	const signCount1 = afterRegistrationCredentials.credentials[0].signCount
+	const signCount1 = afterRegistrationCredentials.credentials[0]!.signCount
 
 	const passkeyAssertedPromise = new Promise<void>((resolve) => {
 		client.once('WebAuthn.credentialAsserted', () => resolve())
@@ -86,7 +86,7 @@ test('Users can register and use passkeys', async ({ page, login }) => {
 		authenticatorId,
 	})
 	expect(afterLoginCredentials.credentials).toHaveLength(1)
-	expect(afterLoginCredentials.credentials[0].signCount).toBeGreaterThan(
+	expect(afterLoginCredentials.credentials[0]?.signCount).toBeGreaterThan(
 		signCount1,
 	)
 
