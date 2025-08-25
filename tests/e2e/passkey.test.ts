@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker'
+import { type Page } from '@playwright/test'
 import { expect, test } from '#tests/playwright-utils.ts'
 
-async function setupWebAuthn(page: any) {
+async function setupWebAuthn(page: Page) {
 	const client = await page.context().newCDPSession(page)
 	// https://chromedevtools.github.io/devtools-protocol/tot/WebAuthn/
-	await client.send('WebAuthn.enable', { options: { enableUI: true } })
+	await client.send('WebAuthn.enable', { enableUI: true })
 	const result = await client.send('WebAuthn.addVirtualAuthenticator', {
 		options: {
 			protocol: 'ctap2',
