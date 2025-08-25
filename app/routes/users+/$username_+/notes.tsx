@@ -38,12 +38,12 @@ export default function NotesRoute({ loaderData }: Route.ComponentProps) {
 					<div className="absolute inset-0 flex flex-col">
 						<Link
 							to={`/users/${loaderData.owner.username}`}
-							className="bg-muted flex flex-col items-center justify-center gap-2 pt-12 pr-4 pb-4 pl-8 lg:flex-row lg:justify-start lg:gap-4"
+							className="bg-muted flex flex-col items-center justify-center gap-2 pt-12 pr-4 pb-4 pl-8 xl:flex-row xl:justify-start xl:gap-4"
 						>
 							<Img
 								src={getUserImgSrc(loaderData.owner.image?.objectKey)}
 								alt={ownerDisplayName}
-								className="size-16 rounded-full object-cover lg:h-24 lg:w-24"
+								className="size-16 rounded-full object-cover xl:size-24"
 								width={256}
 								height={256}
 							/>
