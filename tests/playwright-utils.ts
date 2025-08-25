@@ -1,5 +1,6 @@
-import { test as base } from '@playwright/test'
+import { test as base, type Response } from '@playwright/test'
 import { type User as UserModel } from '@prisma/client'
+import { href, type Register } from 'react-router'
 import * as setCookieParser from 'set-cookie-parser'
 import {
 	getPasswordHash,
@@ -63,11 +64,21 @@ async function getOrInsertUser({
 	}
 }
 
+export type AppPages = keyof Register['pages']
+
 export const test = base.extend<{
+	navigate: <Path extends AppPages>(
+		...args: Parameters<typeof href<Path>>
+	) => Promise<null | Response>
 	insertNewUser(options?: GetOrInsertUserOptions): Promise<User>
 	login(options?: GetOrInsertUserOptions): Promise<User>
 	prepareGitHubUser(): Promise<GitHubUser>
 }>({
+	navigate: async ({ page }, use) => {
+		await use((...args) => {
+			return page.goto(href(...args))
+		})
+	},
 	insertNewUser: async ({}, use) => {
 		let userId: string | undefined = undefined
 		await use(async (options) => {
