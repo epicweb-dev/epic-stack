@@ -80,6 +80,10 @@ app.use((_, res, next) => {
 
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares)
+	app.use(
+		'/_fonts',
+		express.static('build/client/_fonts', { immutable: true, maxAge: '1y' }),
+	)
 } else {
 	// Remix fingerprints its assets so we can cache forever.
 	app.use(

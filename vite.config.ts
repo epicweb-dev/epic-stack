@@ -3,6 +3,7 @@ import {
 	type SentryReactRouterBuildOptions,
 	sentryReactRouter,
 } from '@sentry/react-router'
+import { fontless } from 'fontless'
 import tailwindcss from '@tailwindcss/vite'
 import { reactRouterDevTools } from 'react-router-devtools'
 import { defineConfig } from 'vite'
@@ -55,6 +56,7 @@ export default defineConfig((config) => ({
 		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
+		fontless(),
 	],
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],

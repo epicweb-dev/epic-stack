@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.font-title {
+	font-family: "Panchang", sans-serif;
+}
+
 :root {
 	--radius: 0.5rem;
 
