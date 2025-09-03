@@ -28,7 +28,7 @@ const viteDevServer = IS_PROD
 				server: {
 					middlewareMode: true,
 				},
-				// We tell Vite we are running a custom app instead of 
+				// We tell Vite we are running a custom app instead of
 				// the SPA default so it doesn't run HTML middleware
 				appType: 'custom',
 			}),

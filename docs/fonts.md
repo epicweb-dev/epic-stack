@@ -6,7 +6,10 @@ easy to do so.
 
 ## Using Custom Fonts
 
-For custom fonts, Epic Stack uses [`fontless`](https://github.com/unjs/fontaine/tree/main/packages/fontless) for automatic font optimization. This provides zero-runtime font loading with proper fallbacks to reduce Cumulative Layout Shift (CLS).
+For custom fonts, Epic Stack uses
+[`fontless`](https://github.com/unjs/fontaine/tree/main/packages/fontless) for
+automatic font optimization. This provides zero-runtime font loading with proper
+fallbacks to reduce Cumulative Layout Shift (CLS).
 
 ## How it works
 
@@ -14,15 +17,16 @@ Simply use font families in your CSS and `fontless` handles the rest:
 
 ```css
 .font-title {
-  font-family: "Poppins", sans-serif;
+	font-family: 'Poppins', sans-serif;
 }
 
 .body-text {
-  font-family: "Inter", sans-serif;
+	font-family: 'Inter', sans-serif;
 }
 ```
 
 The plugin will:
+
 - Detect font-family declarations in your CSS
 - Resolve fonts from providers (Google Fonts, Bunny Fonts, etc.)
 - Generate optimized `@font-face` declarations
@@ -32,5 +36,7 @@ The plugin will:
 ## Troubleshooting
 
 ### Fonts not loading in development
-This is expected behavior. Fonts are only generated in the build files. To see fonts in development mode, build the application first and then run `npm run dev`.
 
+This is expected behavior. Fonts are only generated in the build files. To see
+fonts in development mode, build the application first and then run
+`npm run dev`.

@@ -3,8 +3,8 @@ import {
 	type SentryReactRouterBuildOptions,
 	sentryReactRouter,
 } from '@sentry/react-router'
-import { fontless } from 'fontless'
 import tailwindcss from '@tailwindcss/vite'
+import { fontless } from 'fontless'
 import { reactRouterDevTools } from 'react-router-devtools'
 import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
