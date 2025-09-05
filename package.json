@@ -84,6 +84,7 @@
     "execa": "^9.5.2",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
+    "fontless": "^0.0.2",
     "get-port": "^7.1.0",
     "glob": "^11.0.2",
     "input-otp": "^1.4.2",
