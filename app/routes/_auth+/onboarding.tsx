@@ -8,9 +8,6 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { checkIsCommonPassword, sessionKey, signup } from '#app/utils/auth.server.ts'
-export const unstable_middleware = [
-	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
-]
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'

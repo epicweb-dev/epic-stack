@@ -11,7 +11,7 @@ import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { getRedirectToUrl, type VerifyFunctionArgs } from './verify.server.ts'
 import { requireAnonymousMiddleware } from '#app/middleware.server.ts'
 
-export const unstable_middleware = [requireAnonymousMiddleware]
+export const middleware = [requireAnonymousMiddleware]
 
 const verifiedTimeKey = 'verified-time'
 const unverifiedSessionIdKey = 'unverified-session-id'

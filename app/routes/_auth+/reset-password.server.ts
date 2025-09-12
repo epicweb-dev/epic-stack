@@ -6,7 +6,7 @@ import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
 import { type VerifyFunctionArgs } from './verify.server.ts'
 import { requireAnonymousMiddleware } from '#app/middleware.server.ts'
 
-export const unstable_middleware = [requireAnonymousMiddleware]
+export const middleware = [requireAnonymousMiddleware]
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(
