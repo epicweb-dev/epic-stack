@@ -14,6 +14,7 @@ import {
 	type ServerBuild,
 	createContext,
 } from 'react-router'
+import { serverBuildContext } from './router-context'
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
@@ -200,11 +201,6 @@ if (!ALLOW_INDEXING) {
 		next()
 	})
 }
-
-const serverBuildContext = createContext<Promise<{
-	error: unknown
-	build: ServerBuild
-}> | null>(null)
 
 app.all(
 	'*',
