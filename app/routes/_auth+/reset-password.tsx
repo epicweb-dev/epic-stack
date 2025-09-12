@@ -5,11 +5,10 @@ import { data, redirect, Form } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import {
-	checkIsCommonPassword,
-	requireAnonymous,
-	resetUserPassword,
-} from '#app/utils/auth.server.ts'
+import { checkIsCommonPassword, resetUserPassword } from '#app/utils/auth.server.ts'
+export const unstable_middleware = [
+	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
+]
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -24,7 +23,6 @@ export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 const ResetPasswordSchema = PasswordAndConfirmPasswordSchema
 
 async function requireResetPasswordUsername(request: Request) {
-	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)

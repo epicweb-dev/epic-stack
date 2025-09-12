@@ -1,4 +1,4 @@
-import { searchUsers } from '@prisma/client/sql'
+// using $queryRawUnsafe for LIKE query construction
 import { Img } from 'openimg/react'
 import { redirect, Link } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -15,7 +15,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	const like = `%${searchTerm ?? ''}%`
-	const users = await prisma.$queryRawTyped(searchUsers(like))
+	const users = await prisma.$queryRawUnsafe<{ id: string; username: string; name: string | null; imageObjectKey: string | null }[]>(
+		`SELECT id, username, name, (SELECT "objectKey" FROM "Image" WHERE "userId" = "User"."id" LIMIT 1) as "imageObjectKey" FROM "User" WHERE username ILIKE $1 OR name ILIKE $1 ORDER BY username ASC`,
+		like,
+	)
 	return { status: 'idle', users } as const
 }
 
@@ -49,7 +52,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 									>
 										<Img
 											alt={user.name ?? user.username}
-											src={getUserImgSrc(user.imageObjectKey)}
+											src={getUserImgSrc(user.imageObjectKey ?? undefined)}
 											className="size-16 rounded-full"
 											width={256}
 											height={256}
@@ -70,7 +73,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 						<p>No users found</p>
 					)
 				) : loaderData.status === 'error' ? (
-					<ErrorList errors={['There was an error parsing the results']} />
+					<ErrorList errors={["There was an error parsing the results"]} />
 				) : null}
 			</main>
 		</div>

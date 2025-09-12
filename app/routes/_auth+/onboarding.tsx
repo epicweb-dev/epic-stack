@@ -7,12 +7,10 @@ import { z } from 'zod'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import {
-	checkIsCommonPassword,
-	requireAnonymous,
-	sessionKey,
-	signup,
-} from '#app/utils/auth.server.ts'
+import { checkIsCommonPassword, sessionKey, signup } from '#app/utils/auth.server.ts'
+export const unstable_middleware = [
+	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
+]
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -42,7 +40,6 @@ const SignupFormSchema = z
 	.and(PasswordAndConfirmPasswordSchema)
 
 async function requireOnboardingEmail(request: Request) {
-	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)

@@ -4,11 +4,15 @@ import { Link, Outlet, useMatches } from 'react-router'
 import { z } from 'zod'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { requireUserId } from '#app/utils/auth.server.ts'
+import { userIdContext } from '#app/context.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { type Route } from './+types/profile.ts'
+
+export const unstable_middleware = [
+	(await import('#app/middleware.server.ts')).requireUserMiddleware,
+]
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
 export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>
@@ -18,10 +22,11 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-	const userId = await requireUserId(request)
+export async function loader({ context }: Route.LoaderArgs) {
+	const userId = context.get(userIdContext) as string | null
+	invariantResponse(Boolean(userId), 'Unauthorized', { status: 401 })
 	const user = await prisma.user.findUnique({
-		where: { id: userId },
+		where: { id: userId as string },
 		select: { username: true },
 	})
 	invariantResponse(user, 'User not found', { status: 404 })

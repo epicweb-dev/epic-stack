@@ -11,7 +11,10 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { login, requireAnonymous } from '#app/utils/auth.server.ts'
+import { login } from '#app/utils/auth.server.ts'
+export const unstable_middleware = [
+	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
+]
 import {
 	ProviderConnectionForm,
 	providerNames,
@@ -38,12 +41,10 @@ const AuthenticationOptionsSchema = z.object({
 }) satisfies z.ZodType<{ options: PublicKeyCredentialRequestOptionsJSON }>
 
 export async function loader({ request }: Route.LoaderArgs) {
-	await requireAnonymous(request)
 	return {}
 }
 
 export async function action({ request }: Route.ActionArgs) {
-	await requireAnonymous(request)
 	const formData = await request.formData()
 	await checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {

@@ -9,7 +9,7 @@ import express from 'express'
 import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import morgan from 'morgan'
-import { type ServerBuild } from 'react-router'
+import { RouterContextProvider, type ServerBuild, createContext } from 'react-router'
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
@@ -197,10 +197,16 @@ if (!ALLOW_INDEXING) {
 	})
 }
 
+const serverBuildContext = createContext<Promise<{ error: unknown; build: ServerBuild }> | null>(null)
+
 app.all(
 	'*',
 	createRequestHandler({
-		getLoadContext: () => ({ serverBuild: getBuild() }),
+		getLoadContext: () => {
+			const ctx = new RouterContextProvider()
+			ctx.set(serverBuildContext, getBuild())
+			return ctx
+		},
 		mode: MODE,
 		build: async () => {
 			const { error, build } = await getBuild()
