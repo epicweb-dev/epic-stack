@@ -10,10 +10,6 @@ import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { type Route } from './+types/profile.ts'
 
-export const unstable_middleware = [
-	(await import('#app/middleware.server.ts')).requireUserMiddleware,
-]
-
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
 export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>
 

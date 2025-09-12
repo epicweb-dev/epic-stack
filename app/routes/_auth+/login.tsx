@@ -12,9 +12,6 @@ import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { login } from '#app/utils/auth.server.ts'
-export const unstable_middleware = [
-	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
-]
 import {
 	ProviderConnectionForm,
 	providerNames,
