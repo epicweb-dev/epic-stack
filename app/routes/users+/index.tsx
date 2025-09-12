@@ -70,7 +70,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 						<p>No users found</p>
 					)
 				) : loaderData.status === 'error' ? (
-					<ErrorList errors={["There was an error parsing the results"]} />
+					<ErrorList errors={['There was an error parsing the results']} />
 				) : null}
 			</main>
 		</div>

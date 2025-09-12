@@ -9,7 +9,11 @@ import express from 'express'
 import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import morgan from 'morgan'
-import { RouterContextProvider, type ServerBuild, createContext } from 'react-router'
+import {
+	RouterContextProvider,
+	type ServerBuild,
+	createContext,
+} from 'react-router'
 
 const MODE = process.env.NODE_ENV ?? 'development'
 const IS_PROD = MODE === 'production'
@@ -28,7 +32,7 @@ const viteDevServer = IS_PROD
 				server: {
 					middlewareMode: true,
 				},
-				// We tell Vite we are running a custom app instead of 
+				// We tell Vite we are running a custom app instead of
 				// the SPA default so it doesn't run HTML middleware
 				appType: 'custom',
 			}),
@@ -197,7 +201,10 @@ if (!ALLOW_INDEXING) {
 	})
 }
 
-const serverBuildContext = createContext<Promise<{ error: unknown; build: ServerBuild }> | null>(null)
+const serverBuildContext = createContext<Promise<{
+	error: unknown
+	build: ServerBuild
+}> | null>(null)
 
 app.all(
 	'*',
