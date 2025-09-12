@@ -3,6 +3,9 @@ import { redirect } from 'react-router'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { onboardingEmailSessionKey } from './onboarding.tsx'
 import { type VerifyFunctionArgs } from './verify.server.ts'
+import { requireAnonymousMiddleware } from '#app/middleware.server.ts'
+
+export const unstable_middleware = [requireAnonymousMiddleware]
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(

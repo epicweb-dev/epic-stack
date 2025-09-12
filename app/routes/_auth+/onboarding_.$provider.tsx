@@ -18,9 +18,6 @@ import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { sessionKey, signupWithConnection } from '#app/utils/auth.server.ts'
-export const unstable_middleware = [
-	(await import('#app/middleware.server.ts')).requireAnonymousMiddleware,
-]
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
