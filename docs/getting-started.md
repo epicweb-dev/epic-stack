@@ -45,6 +45,12 @@ set SKIP_SETUP=true && set SKIP_FORMAT=true && set SKIP_DEPLOYMENT=true && npx e
   npm run setup
   ```
 
+- Seed database:
+
+  ```sh
+  npx prisma db seed
+  ```
+
 - Start dev server:
 
   ```sh
