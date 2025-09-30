@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { type Connection, type Password, type User } from '#app/utils/prisma-generated.server'
+import { type Connection, type Password, type User } from '#app/utils/prisma-generated.server/client.ts'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'react-router'
 import { Authenticator } from 'remix-auth'

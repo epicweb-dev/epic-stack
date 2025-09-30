@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { type NoteImage, type Note } from '#app/utils/prisma-generated.server'
+import { type NoteImage, type Note } from '#app/utils/prisma-generated.server/client.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { expect, test } from '#tests/playwright-utils.ts'
 

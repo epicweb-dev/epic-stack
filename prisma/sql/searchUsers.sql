@@ -7,8 +7,8 @@ SELECT
   "UserImage".objectKey AS imageObjectKey
 FROM "User"
 LEFT JOIN "UserImage" ON "User".id = "UserImage".userId
-WHERE "User".username LIKE :like
-OR "User".name LIKE :like
+WHERE "User".username LIKE $1
+OR "User".name LIKE $1
 ORDER BY (
   SELECT "Note".updatedAt
   FROM "Note"

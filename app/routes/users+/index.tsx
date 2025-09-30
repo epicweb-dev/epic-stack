@@ -4,6 +4,7 @@ import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { SearchBar } from '#app/components/search-bar.tsx'
 import { prisma } from '#app/utils/db.server.ts'
+import { searchUsers } from '#app/utils/prisma-generated.server/sql/searchUsers.ts'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 import { type Route } from './+types/index.ts'
 
@@ -13,20 +14,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		return redirect('/users')
 	}
 
-	const users = await prisma.user.findMany({
-		where: {
-			OR: [
-				{ name: { contains: searchTerm ?? '' } },
-				{ username: { contains: searchTerm ?? '' } },
-			],
-		},
-		select: {
-			id: true,
-			name: true,
-			username: true,
-			image: { select: { objectKey: true } },
-		},
-	})
+	const users = await prisma.$queryRawTyped(searchUsers(`%${searchTerm ?? ''}%`))
 	return { status: 'idle', users } as const
 }
 
@@ -60,7 +48,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 									>
 										<Img
 											alt={user.name ?? user.username}
-            src={getUserImgSrc(user.image?.objectKey)}
+											src={getUserImgSrc(user.imageObjectKey)}
 											className="size-16 rounded-full"
 											width={256}
 											height={256}

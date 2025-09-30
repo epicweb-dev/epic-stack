@@ -53,6 +53,7 @@
     "@oslojs/encoding": "^1.1.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/adapter-better-sqlite3": "^6.16.3",
+    "@prisma/adapter-libsql": "^6.16.3",
     "@prisma/client": "^6.7.0",
     "@prisma/instrumentation": "^6.7.0",
     "@radix-ui/react-checkbox": "^1.2.3",
@@ -162,5 +163,8 @@
   "engines": {
     "node": "22"
   },
-  "prettier": "@epic-web/config/prettier"
+  "prettier": "@epic-web/config/prettier",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }
