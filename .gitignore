@@ -25,4 +25,5 @@ node_modules
 
 # generated files
 /app/components/ui/icons
+/app/utils/prisma-generated.server
 .react-router/

@@ -110,7 +110,7 @@ export async function action({ request }: Route.ActionArgs) {
 			data: {
 				id: credential.id,
 				aaguid,
-				publicKey: Buffer.from(credential.publicKey),
+				publicKey: new Uint8Array(credential.publicKey),
 				userId,
 				webauthnUserId,
 				counter: credential.counter,

@@ -52,6 +52,7 @@
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@prisma/adapter-better-sqlite3": "^6.16.3",
     "@prisma/client": "^6.7.0",
     "@prisma/instrumentation": "^6.7.0",
     "@radix-ui/react-checkbox": "^1.2.3",
@@ -73,6 +74,7 @@
     "@tusbar/cache-control": "1.0.2",
     "address": "^2.0.3",
     "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.4.1",
     "class-variance-authority": "^0.7.1",
     "close-with-grace": "^2.2.0",
     "clsx": "^2.1.1",
@@ -159,9 +161,6 @@
   },
   "engines": {
     "node": "22"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "prettier": "@epic-web/config/prettier"
 }

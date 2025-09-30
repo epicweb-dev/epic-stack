@@ -1,4 +1,3 @@
-import { searchUsers } from '@prisma/client/sql'
 import { Img } from 'openimg/react'
 import { redirect, Link } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -14,8 +13,20 @@ export async function loader({ request }: Route.LoaderArgs) {
 		return redirect('/users')
 	}
 
-	const like = `%${searchTerm ?? ''}%`
-	const users = await prisma.$queryRawTyped(searchUsers(like))
+	const users = await prisma.user.findMany({
+		where: {
+			OR: [
+				{ name: { contains: searchTerm ?? '' } },
+				{ username: { contains: searchTerm ?? '' } },
+			],
+		},
+		select: {
+			id: true,
+			name: true,
+			username: true,
+			image: { select: { objectKey: true } },
+		},
+	})
 	return { status: 'idle', users } as const
 }
 
@@ -49,7 +60,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 									>
 										<Img
 											alt={user.name ?? user.username}
-											src={getUserImgSrc(user.imageObjectKey)}
+            src={getUserImgSrc(user.image?.objectKey)}
 											className="size-16 rounded-full"
 											width={256}
 											height={256}

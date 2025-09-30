@@ -1,5 +1,5 @@
 import { test as base, type Response } from '@playwright/test'
-import { type User as UserModel } from '@prisma/client'
+import { type User as UserModel } from '#app/utils/prisma-generated.server'
 import { href, type Register } from 'react-router'
 import * as setCookieParser from 'set-cookie-parser'
 import {
