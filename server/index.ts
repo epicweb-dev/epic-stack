@@ -84,7 +84,7 @@ if (viteDevServer) {
 	// Remix fingerprints its assets so we can cache forever.
 	app.use(
 		'/assets',
-		express.static('build/client/assets', { immutable: true, maxAge: '1y' }),
+		express.static('build/client/assets', { immutable: true, maxAge: '1y', fallthrough: false }),
 	)
 
 	// Everything else (like favicon.ico) is cached for an hour. You may want to be
