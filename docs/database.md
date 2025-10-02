@@ -300,7 +300,6 @@ You've got a few options:
      re-generating the migration after fixing the error.
 3. If you do care about the data and don't have a backup, you can follow these
    steps:
-
    1. Comment out the
       [`exec` section from `litefs.yml` file](https://github.com/epicweb-dev/epic-stack/blob/main/other/litefs.yml#L31-L37).
 

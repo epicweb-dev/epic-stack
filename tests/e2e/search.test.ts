@@ -12,11 +12,9 @@ test('Search from home page', async ({ page, navigate, insertNewUser }) => {
 	const userList = page.getByRole('main').getByRole('list')
 	await expect(userList.getByRole('listitem')).toHaveCount(1)
 	await expect(
-		userList
-			.getByRole('listitem')
-			.getByRole('link', {
-				name: `${newUser.name || newUser.username} profile`,
-			}),
+		userList.getByRole('listitem').getByRole('link', {
+			name: `${newUser.name || newUser.username} profile`,
+		}),
 	).toBeVisible()
 
 	// Search for a non-existing user.
