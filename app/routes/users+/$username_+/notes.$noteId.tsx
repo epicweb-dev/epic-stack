@@ -32,6 +32,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 			updatedAt: true,
 			images: {
 				select: {
+					id: true,
 					altText: true,
 					objectKey: true,
 				},
@@ -123,7 +124,7 @@ export default function NoteRoute({
 			<div className={`${displayBar ? 'pb-24' : 'pb-12'} overflow-y-auto`}>
 				<ul className="flex flex-wrap gap-5 py-5">
 					{loaderData.note.images.map((image) => (
-						<li key={image.objectKey}>
+						<li key={image.id}>
 							<a href={getNoteImgSrc(image.objectKey)}>
 								<Img
 									src={getNoteImgSrc(image.objectKey)}
