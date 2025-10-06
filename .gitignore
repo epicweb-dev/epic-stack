@@ -1,6 +1,8 @@
 node_modules
 .DS_store
 
+mise.toml
+
 /build
 /server-build
 .env
