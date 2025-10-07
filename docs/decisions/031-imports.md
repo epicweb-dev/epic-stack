@@ -27,20 +27,13 @@ and manually modify.
 Despite the magic of Path aliases, they are actually a standard `package.json`
 supported feature. Sort of.
 [The `"imports"` field](https://nodejs.org/api/packages.html#imports) in
-`package.json` allows you to configure aliases for your imports. It's not
-exactly the same as TypeScript Path aliases, and using them doesn't give you
-autocomplete with TypeScript
-([yet](https://github.com/microsoft/TypeScript/pull/55015)), but if you
-configure both, then you can get the best of both worlds!
+`package.json` allows you to configure aliases for your imports.
+TypeScript also uses this for its own Path aliases since version 5.4
+so you get autocomplete and type checking for your imports.
 
 By using the `"imports"` field, you don't have to do any special configuration
 for `vitest` or `eslint` to be able to resolve imports. They just resolve them
 using the standard.
-
-And by using the `tsconfig.json` `paths` field configured in the same way as the
-`"imports"` field, you get autocomplete and type checking for your imports. This
-should hopefully be temporary until TypeScript supports the `"imports"` field
-directly.
 
 One interesting requirement for `imports` is that they _must_ start with the `#`
 character to disambiguate from other imports. This is a bit annoying, but it's
@@ -50,8 +43,7 @@ again it's just a matter of familiarity. So it's no big deal.
 
 ## Decision
 
-We're going to configure `"imports"` in the `package.json` and `paths` in the
-`tsconfig.json` to use path aliases for imports.
+We're going to configure `"imports"` in the `package.json` to use path aliases for imports.
 
 We'll set it to `"#*": "./*"` which will allow us to import anything in the root
 of the repo with `#<dirname>/<filepath>`.
@@ -59,10 +51,6 @@ of the repo with `#<dirname>/<filepath>`.
 ## Consequences
 
 This is unfortunately _very_ soon after making the decision to drop the alias.
-But I see this as slightly different because we're only using the alias to make
-up for a shortcoming in TypeScript temporarily. Once TypeScript supports the
-`"imports"` field, we can drop the `paths` field and just use the `"imports"`
-standard for Node.js.
 
 If someone wants to use the Epic Stack without Node.js, and their runtime
 doesn't support `package.json` imports (I'm not sure whether other runtimes do
