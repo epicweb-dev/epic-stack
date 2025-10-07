@@ -54,19 +54,21 @@ async function seed() {
 
 			// Add images to note
 			const noteImageCount = faker.number.int({ min: 1, max: 3 })
-			for (let imageIndex = 0; imageIndex < noteImageCount; imageIndex++) {
-				const imgNumber = faker.number.int({ min: 0, max: 9 })
-				const noteImage = noteImages[imgNumber]
-				if (noteImage) {
-					await prisma.noteImage.create({
+			const selectedImages = faker.helpers.arrayElements(
+				noteImages,
+				noteImageCount,
+			)
+			await Promise.all(
+				selectedImages.map((noteImage) =>
+					prisma.noteImage.create({
 						data: {
 							noteId: note.id,
 							altText: noteImage.altText,
 							objectKey: noteImage.objectKey,
 						},
-					})
-				}
-			}
+					}),
+				),
+			)
 		}
 	}
 	console.timeEnd(`👤 Created ${totalUsers} users...`)
