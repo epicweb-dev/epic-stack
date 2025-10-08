@@ -1,9 +1,12 @@
 import { invariant } from '@epic-web/invariant'
 import { data, redirect } from 'react-router'
+import { requireAnonymousMiddleware } from '#app/middleware.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
 import { type VerifyFunctionArgs } from './verify.server.ts'
+
+export const middleware = [requireAnonymousMiddleware]
 
 export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	invariant(

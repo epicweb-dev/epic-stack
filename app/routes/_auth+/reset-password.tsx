@@ -7,7 +7,6 @@ import { ErrorList, Field } from '#app/components/forms.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	checkIsCommonPassword,
-	requireAnonymous,
 	resetUserPassword,
 } from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -24,7 +23,6 @@ export const resetPasswordUsernameSessionKey = 'resetPasswordUsername'
 const ResetPasswordSchema = PasswordAndConfirmPasswordSchema
 
 async function requireResetPasswordUsername(request: Request) {
-	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)

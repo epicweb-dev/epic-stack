@@ -9,7 +9,6 @@ import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	checkIsCommonPassword,
-	requireAnonymous,
 	sessionKey,
 	signup,
 } from '#app/utils/auth.server.ts'
@@ -42,7 +41,6 @@ const SignupFormSchema = z
 	.and(PasswordAndConfirmPasswordSchema)
 
 async function requireOnboardingEmail(request: Request) {
-	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
 	)

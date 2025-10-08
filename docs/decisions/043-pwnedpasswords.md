@@ -22,14 +22,12 @@ However, we wanted to implement this in a way that:
 We will integrate the HaveIBeenPwned Password API with the following approach:
 
 1. **Progressive Enhancement**
-
    - The password check is implemented as a non-blocking enhancement
    - If the check fails or times out (>1s), we allow the password
    - This ensures users can still set passwords even if the service is
      unavailable
 
 2. **Development Experience**
-
    - The API calls are mocked during development and testing using MSW (Mock
      Service Worker)
    - This prevents unnecessary API calls during development
@@ -37,7 +35,6 @@ We will integrate the HaveIBeenPwned Password API with the following approach:
    - Follows our pattern of mocking external services
 
 3. **Error Handling**
-
    - Timeout after 1 second to prevent blocking users
    - Graceful fallback if the service is unavailable
    - Warning logs for monitoring service health
