@@ -4,6 +4,7 @@ import {
 	sentryReactRouter,
 } from '@sentry/react-router'
 import tailwindcss from '@tailwindcss/vite'
+import { fontless } from 'fontless'
 import { reactRouterDevTools } from 'react-router-devtools'
 import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
@@ -55,6 +56,7 @@ export default defineConfig((config) => ({
 		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
+		fontless(),
 	],
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],
