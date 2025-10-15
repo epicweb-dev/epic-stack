@@ -73,4 +73,4 @@ model NoteImage {
 For more details on customization, see the source code in:
 
 - `app/utils/storage.server.ts`
-- `app/routes/resources+/images.tsx`
+- `app/routes/resources/images.tsx`
