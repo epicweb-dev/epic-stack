@@ -26,7 +26,7 @@ import {
 	ThemeSwitch,
 	useOptionalTheme,
 	useTheme,
-} from './routes/resources+/theme-switch.tsx'
+} from './routes/resources/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -190,7 +190,7 @@ function App() {
 	const user = useOptionalUser()
 	const theme = useTheme()
 	const matches = useMatches()
-	const isOnSearchPage = matches.find((m) => m.id === 'routes/users+/index')
+	const isOnSearchPage = matches.find((m) => m.id === 'routes/users/index')
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 	useToast(data.toast)
 
