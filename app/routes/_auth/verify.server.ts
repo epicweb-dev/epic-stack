@@ -14,7 +14,7 @@ import {
 	handleVerification as handleLoginTwoFactorVerification,
 	shouldRequestTwoFA,
 } from './login.server.ts'
-import { handleVerification as handleOnboardingVerification } from './onboarding.server.ts'
+import { handleVerification as handleOnboardingVerification } from './onboarding/index.server.ts'
 import { handleVerification as handleResetPasswordVerification } from './reset-password.server.ts'
 import {
 	VerifySchema,
