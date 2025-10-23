@@ -6,7 +6,7 @@ import {
 	useParams,
 	useRouteError,
 } from 'react-router'
-import { getErrorMessage } from '#app/utils/misc'
+import { getErrorMessage } from '#app/utils/misc.tsx'
 
 type StatusHandler = (info: {
 	error: ErrorResponse
