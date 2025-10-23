@@ -2,7 +2,8 @@
 
 Date: 2023-08-16
 
-Status: accepted
+Status: superseded by [046-remove-path-aliases](./046-remove-path-aliases.md)
+due to TypeScript's native support for the `"imports"` field in package.json.
 
 ## Context
 
