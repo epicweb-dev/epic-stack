@@ -17,38 +17,41 @@ of the Epic Stack routes at the time of this writing:
 ```
 app/routes
 ├── $.tsx
+├── me.tsx
 ├── _auth
-│   ├── auth.$provider.callback.ts
-│   ├── auth_.$provider.ts
 │   ├── forgot-password.tsx
 │   ├── login.tsx
 │   ├── logout.tsx
-│   ├── onboarding.tsx
-│   ├── onboarding_.$provider.tsx
 │   ├── reset-password.tsx
 │   ├── signup.tsx
 │   ├── verify.tsx
+│   ├── auth.$provider
+│   │   ├── callback.ts
+│   │   └── index.ts
+│   ├── onboarding
+│   │   ├── $provider.tsx
+│   │   └── index.tsx
 │   └── webauthn
 │       ├── authentication.ts
 │       └── registration.ts
 ├── _marketing
-│   ├── +logos
-│   │   ├── logos.ts
-│   │   └── ...
 │   ├── about.tsx
 │   ├── index.tsx
 │   ├── privacy.tsx
 │   ├── support.tsx
-│   └── tos.tsx
+│   ├── tos.tsx
+│   └── +logos
+│       ├── logos.ts
+│       └── ...
 ├── _seo
 │   ├── robots[.]txt.ts
 │   └── sitemap[.]xml.ts
 ├── admin
-│   ├── cache.tsx
-│   ├── cache_.lru.$cacheKey.ts
-│   ├── cache_.sqlite.$cacheKey.ts
-│   └── cache_.sqlite.tsx
-├── me.tsx
+│   └── cache
+│       ├── index.tsx
+│       ├── lru.$cacheKey.ts
+│       ├── sqlite.$cacheKey.ts
+│       └── sqlite.tsx
 ├── resources
 │   ├── download-user-data.tsx
 │   ├── healthcheck.tsx
@@ -70,17 +73,17 @@ app/routes
 │           ├── index.tsx
 │           └── verify.tsx
 └── users
-    ├── $username_
-    │   ├── index.tsx
-    │   └── notes
-    │       ├── $noteId.tsx
-    │       ├── $noteId_.edit.tsx
-    │       ├── _layout.tsx
-    │       ├── index.tsx
-    │       └── new.tsx
-    └── index.tsx
+    ├── index.tsx
+    └── $username
+        ├── index.tsx
+        └── notes
+            ├── $noteId.tsx
+            ├── $noteId_.edit.tsx
+            ├── _layout.tsx
+            ├── index.tsx
+            └── new.tsx
 
-13 directories, 49 files
+17 directories, 72 files
 ```
 
 ```tsx
@@ -89,17 +92,21 @@ app/routes
 		<Route path="*" file="routes/$.tsx" />
 		<Route
 			path="auth/:provider/callback"
-			file="routes/_auth/auth.$provider.callback.ts"
+			file="routes/_auth/auth.$provider/callback.ts"
 		/>
-		<Route path="auth/:provider" file="routes/_auth/auth_.$provider.ts" />
+		<Route
+			path="auth/:provider"
+			index
+			file="routes/_auth/auth.$provider/index.ts"
+		/>
 		<Route path="forgot-password" file="routes/_auth/forgot-password.tsx" />
 		<Route path="login" file="routes/_auth/login.tsx" />
 		<Route path="logout" file="routes/_auth/logout.tsx" />
-		<Route path="onboarding" file="routes/_auth/onboarding.tsx" />
 		<Route
 			path="onboarding/:provider"
-			file="routes/_auth/onboarding_.$provider.tsx"
+			file="routes/_auth/onboarding/$provider.tsx"
 		/>
+		<Route path="onboarding" index file="routes/_auth/onboarding/index.tsx" />
 		<Route path="reset-password" file="routes/_auth/reset-password.tsx" />
 		<Route path="signup" file="routes/_auth/signup.tsx" />
 		<Route path="verify" file="routes/_auth/verify.tsx" />
@@ -118,13 +125,13 @@ app/routes
 		<Route path="tos" file="routes/_marketing/tos.tsx" />
 		<Route path="robots.txt" file="routes/_seo/robots[.]txt.ts" />
 		<Route path="sitemap.xml" file="routes/_seo/sitemap[.]xml.ts" />
-		<Route path="admin/cache" file="routes/admin/cache.tsx" />
+		<Route path="admin/cache" index file="routes/admin/cache/index.tsx" />
 		<Route
 			path="admin/cache/lru/:cacheKey"
-			file="routes/admin/cache_.lru.$cacheKey.ts"
+			file="routes/admin/cache/lru.$cacheKey.ts"
 		/>
-		<Route path="admin/cache/sqlite" file="routes/admin/cache_.sqlite.tsx">
-			<Route path=":cacheKey" file="routes/admin/cache_.sqlite.$cacheKey.ts" />
+		<Route path="admin/cache/sqlite" file="routes/admin/cache/sqlite.tsx">
+			<Route path=":cacheKey" file="routes/admin/cache/sqlite.$cacheKey.ts" />
 		</Route>
 		<Route path="me" file="routes/me.tsx" />
 		<Route
@@ -175,19 +182,19 @@ app/routes
 		<Route
 			path="users/:username"
 			index
-			file="routes/users/$username_/index.tsx"
+			file="routes/users/$username/index.tsx"
 		/>
 		<Route
 			path="users/:username/notes"
-			file="routes/users/$username_/notes/_layout.tsx"
+			file="routes/users/$username/notes/_layout.tsx"
 		>
-			<Route path=":noteId" file="routes/users/$username_/notes/$noteId.tsx" />
+			<Route path=":noteId" file="routes/users/$username/notes/$noteId.tsx" />
 			<Route
 				path=":noteId/edit"
-				file="routes/users/$username_/notes/$noteId_.edit.tsx"
+				file="routes/users/$username/notes/$noteId_.edit.tsx"
 			/>
-			<Route index file="routes/users/$username_/notes/index.tsx" />
-			<Route path="new" file="routes/users/$username_/notes/new.tsx" />
+			<Route index file="routes/users/$username/notes/index.tsx" />
+			<Route path="new" file="routes/users/$username/notes/new.tsx" />
 		</Route>
 		<Route path="users" index file="routes/users/index.tsx" />
 	</Route>

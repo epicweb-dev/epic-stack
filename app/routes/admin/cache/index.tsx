@@ -25,7 +25,7 @@ import {
 } from '#app/utils/litefs.server.ts'
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { type Route } from './+types/cache.ts'
+import { type Route } from './+types/index.ts'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,

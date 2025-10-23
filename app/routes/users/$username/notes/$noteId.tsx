@@ -205,7 +205,7 @@ export function DeleteNote({
 
 export const meta: Route.MetaFunction = ({ data, params, matches }) => {
 	const notesMatch = matches.find(
-		(m) => m?.id === 'routes/users/$username_/notes',
+		(m) => m?.id === 'routes/users/$username/notes',
 	) as { data: NotesRoute.ComponentProps['loaderData'] } | undefined
 
 	const displayName = notesMatch?.data?.owner.name ?? params.username
