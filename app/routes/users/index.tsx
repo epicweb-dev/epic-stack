@@ -1,4 +1,4 @@
-import { searchUsers } from '@prisma/client/sql'
+import { searchUsers } from '../../../prisma/generated/sql'
 import { Img } from 'openimg/react'
 import { redirect, Link } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'

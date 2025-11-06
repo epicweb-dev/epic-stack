@@ -9,6 +9,7 @@ node_modules
 /prisma/data.db
 /prisma/data.db-journal
 /tests/prisma
+/prisma/generated
 
 /test-results/
 /playwright-report/
