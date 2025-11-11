@@ -1,5 +1,5 @@
 import { test as base, type Response } from '@playwright/test'
-import { type User as UserModel } from '../prisma/generated/client'
+import { type User as UserModel } from '#prisma/generated/client.ts'
 import { href, type Register } from 'react-router'
 import * as setCookieParser from 'set-cookie-parser'
 import {
@@ -79,14 +79,14 @@ export const test = base.extend<{
 			return page.goto(href(...args))
 		})
 	},
-	insertNewUser: async ({ }, use) => {
+	insertNewUser: async ({}, use) => {
 		let userId: string | undefined = undefined
 		await use(async (options) => {
 			const user = await getOrInsertUser(options)
 			userId = user.id
 			return user
 		})
-		await prisma.user.delete({ where: { id: userId } }).catch(() => { })
+		await prisma.user.delete({ where: { id: userId } }).catch(() => {})
 	},
 	login: async ({ page }, use) => {
 		let userId: string | undefined = undefined

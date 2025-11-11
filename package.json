@@ -7,7 +7,8 @@
   "type": "module",
   "imports": {
     "#app/*": "./app/*",
-    "#tests/*": "./tests/*"
+    "#tests/*": "./tests/*",
+    "#prisma/*": "./prisma/*"
   },
   "scripts": {
     "build": "run-s build:*",

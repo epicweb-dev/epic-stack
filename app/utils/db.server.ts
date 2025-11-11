@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import { styleText } from 'node:util'
 import { remember } from '@epic-web/remember'
-import { PrismaClient } from '../../prisma/generated/client'
-import { PrismaBetterSQLite3 } from "@prisma/adapter-better-sqlite3"
+import { PrismaClient } from '#prisma/generated/client.ts'
+import { PrismaBetterSQLite3 } from '@prisma/adapter-better-sqlite3'
 
 export const prisma = remember('prisma', () => {
 	// NOTE: if you change anything in this function you'll need to restart
