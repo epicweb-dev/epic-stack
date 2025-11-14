@@ -1,4 +1,5 @@
 import { createCookieSessionStorage } from 'react-router'
+import { ENV } from 'varlock/env'
 
 export const verifySessionStorage = createCookieSessionStorage({
 	cookie: {
@@ -7,7 +8,7 @@ export const verifySessionStorage = createCookieSessionStorage({
 		path: '/',
 		httpOnly: true,
 		maxAge: 60 * 10, // 10 minutes
-		secrets: [process.env.SESSION_SECRET],
-		secure: process.env.NODE_ENV === 'production',
+		secrets: [ENV.SESSION_SECRET],
+		secure: ENV.NODE_ENV === 'production',
 	},
 })

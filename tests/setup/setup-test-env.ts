@@ -1,6 +1,5 @@
 import 'varlock/auto-load'
 import './db-setup.ts'
-import '#app/utils/env.server.ts'
 // we need these to be imported first 👆
 
 import { cleanup } from '@testing-library/react'

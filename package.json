@@ -70,6 +70,7 @@
     "@simplewebauthn/server": "^13.1.1",
     "@tailwindcss/vite": "^4.1.5",
     "@tusbar/cache-control": "1.0.2",
+    "@varlock/vite-integration": "^0.1.0",
     "address": "^2.0.3",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",

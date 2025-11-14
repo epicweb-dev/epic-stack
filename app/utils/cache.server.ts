@@ -14,12 +14,13 @@ import {
 } from '@epic-web/cachified'
 import { remember } from '@epic-web/remember'
 import { LRUCache } from 'lru-cache'
+import { ENV } from 'varlock/env'
 import { z } from 'zod'
 import { updatePrimaryCacheValue } from '#app/routes/admin/cache/sqlite.server.ts'
 import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
-const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
+const CACHE_DATABASE_PATH = ENV.CACHE_DATABASE_PATH
 
 const cacheDb = remember('cacheDb', createDatabase)
 

@@ -12,16 +12,13 @@ import {
 	type ActionFunctionArgs,
 	type HandleDocumentRequestFunction,
 } from 'react-router'
-import { getEnv } from './utils/env.server.ts'
+import { ENV } from 'varlock/env'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
 
 export const streamTimeout = 5000
 
-global.ENV = getEnv()
-
-const MODE = process.env.NODE_ENV
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
@@ -29,12 +26,12 @@ export default async function handleRequest(...args: DocRequestArgs) {
 	const [request, responseStatusCode, responseHeaders, reactRouterContext] =
 		args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
-	responseHeaders.set('fly-region', process.env.FLY_REGION ?? 'unknown')
-	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
+	responseHeaders.set('fly-region', ENV.FLY_REGION ?? 'unknown')
+	responseHeaders.set('fly-app', ENV.FLY_APP_NAME ?? 'unknown')
 	responseHeaders.set('fly-primary-instance', primaryInstance)
 	responseHeaders.set('fly-instance', currentInstance)
 
-	if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+	if (ENV.NODE_ENV === 'production' && ENV.SENTRY_DSN) {
 		responseHeaders.append('Document-Policy', 'js-profiling')
 	}
 
@@ -71,8 +68,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 							directives: {
 								fetch: {
 									'connect-src': [
-										MODE === 'development' ? 'ws:' : undefined,
-										process.env.SENTRY_DSN ? '*.sentry.io' : undefined,
+										ENV.MODE === 'development' ? 'ws:' : undefined,
+										ENV.SENTRY_DSN ? '*.sentry.io' : undefined,
 										"'self'",
 									],
 									'font-src': ["'self'"],
@@ -113,8 +110,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
 export async function handleDataRequest(response: Response) {
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
-	response.headers.set('fly-region', process.env.FLY_REGION ?? 'unknown')
-	response.headers.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
+	response.headers.set('fly-region', ENV.FLY_REGION ?? 'unknown')
+	response.headers.set('fly-app', ENV.FLY_APP_NAME ?? 'unknown')
 	response.headers.set('fly-primary-instance', primaryInstance)
 	response.headers.set('fly-instance', currentInstance)
 

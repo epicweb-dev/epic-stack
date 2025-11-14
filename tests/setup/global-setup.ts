@@ -2,7 +2,6 @@ import 'varlock/auto-load'
 import path from 'node:path'
 import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
-import '#app/utils/env.server.ts'
 import '#app/utils/cache.server.ts'
 
 export const BASE_DATABASE_PATH = path.join(

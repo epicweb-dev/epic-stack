@@ -1,6 +1,7 @@
 import { promises as fs, constants } from 'node:fs'
 import { invariantResponse } from '@epic-web/invariant'
 import { getImgResponse } from 'openimg/node'
+import { ENV } from 'varlock/env'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { getSignedGetRequestInfo } from '#app/utils/storage.server.ts'
 import { type Route } from './+types/images'
@@ -11,7 +12,7 @@ async function getCacheDir() {
 	if (cacheDir) return cacheDir
 
 	let dir = './tests/fixtures/openimg'
-	if (process.env.NODE_ENV === 'production') {
+	if (ENV.NODE_ENV === 'production') {
 		const isAccessible = await fs
 			.access('/data', constants.W_OK)
 			.then(() => true)
@@ -38,7 +39,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		headers,
 		allowlistedOrigins: [
 			getDomainUrl(request),
-			process.env.AWS_ENDPOINT_URL_S3,
+			ENV.AWS_ENDPOINT_URL_S3,
 		].filter(Boolean),
 		cacheFolder: await getCacheDir(),
 		getImgSource: () => {
