@@ -12,17 +12,16 @@ import {
 	type ActionFunctionArgs,
 	type HandleDocumentRequestFunction,
 } from 'react-router'
-import { getEnv, init } from './utils/env.server.ts'
+import { getEnv } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
 
 export const streamTimeout = 5000
 
-init()
 global.ENV = getEnv()
 
-const MODE = process.env.NODE_ENV ?? 'development'
+const MODE = process.env.NODE_ENV
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 

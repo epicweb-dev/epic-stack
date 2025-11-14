@@ -11,7 +11,7 @@ import getPort, { portNumbers } from 'get-port'
 import morgan from 'morgan'
 import { type ServerBuild } from 'react-router'
 
-const MODE = process.env.NODE_ENV ?? 'development'
+const MODE = process.env.NODE_ENV
 const IS_PROD = MODE === 'production'
 const IS_DEV = MODE === 'development'
 const ALLOW_INDEXING = process.env.ALLOW_INDEXING !== 'false'
@@ -213,7 +213,7 @@ app.all(
 	}),
 )
 
-const desiredPort = Number(process.env.PORT || 3000)
+const desiredPort = Number(process.env.PORT)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })

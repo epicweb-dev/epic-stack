@@ -1,7 +1,7 @@
 import 'varlock/auto-load'
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = process.env.PORT || '3000'
+const PORT = process.env.PORT
 
 export default defineConfig({
 	testDir: './tests/e2e',
