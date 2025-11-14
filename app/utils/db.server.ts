@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { styleText } from 'node:util'
 import { remember } from '@epic-web/remember'
 import { PrismaClient } from '#prisma/generated/client.ts'
-import { PrismaBetterSQLite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 
 export const prisma = remember('prisma', () => {
 	// NOTE: if you change anything in this function you'll need to restart
@@ -11,7 +11,7 @@ export const prisma = remember('prisma', () => {
 	// Feel free to change this log threshold to something that makes sense for you
 	const logThreshold = 20
 
-	const adapter = new PrismaBetterSQLite3({ url: process.env.DATABASE_URL })
+	const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL })
 	const client = new PrismaClient({
 		adapter,
 		log: [
