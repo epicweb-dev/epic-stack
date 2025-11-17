@@ -4,6 +4,7 @@ node_modules
 /public/build
 /server-build
 .env
+.env.*
 
 /test-results/
 /playwright-report/
@@ -11,5 +12,6 @@ node_modules
 /tests/fixtures/email/*.json
 /coverage
 /prisma/migrations
+/types/env-vars.d.ts
 
 package-lock.json

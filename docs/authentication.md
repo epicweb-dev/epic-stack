@@ -62,7 +62,7 @@ be redirected to the page with your newly created OAuth app's details. You will
 see your app has got `0` users and no client secrets just yet, but the Client ID
 has already been assigned to your app. Copy over this value to
 `GITHUB_CLIENT_ID` in your _.env_ file. Now hit `Generate client secret` button,
-and copy over the newly generted secret to `GITHUB_CLIENT_SECRET` in the dotenv
+and copy over the newly generated secret to `GITHUB_CLIENT_SECRET` in the .env
 file. Hit `Update application` button on your GitHub OAuth app page.
 
 Your `.env` file should resemble this (values have been redacted):

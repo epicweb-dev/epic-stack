@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'varlock/auto-load'
 import * as fs from 'node:fs'
 import sourceMapSupport from 'source-map-support'
 
