@@ -119,6 +119,9 @@ This page links to examples of how to implement some things with the Epic Stack.
 - [Epic Stack + Hono](https://github.com/hakimLyon/epic-stack-hono) by
   [@hakimLyon](https://github.com/hakimLyon): An example of Epic Stack with
   Hono.
+- [Varlock](https://github.com/dmno-dev/epic-stack-with-varlock) by
+  [@dmno-dev](https://github.com/dmno-dev): Using [Varlock](https://varlock.dev) and a
+  `.env.schema` file to to improve DX and security of configuration and secrets.
 
 ## How to contribute
 
