@@ -33,8 +33,7 @@ async function getEpicStackVersion() {
 
 export default async function main({ rootDirectory }) {
 	const FLY_TOML_PATH = path.join(rootDirectory, 'fly.toml')
-	const EXAMPLE_ENV_PATH = path.join(rootDirectory, '.env.example')
-	const ENV_PATH = path.join(rootDirectory, '.env')
+	const ENV_LOCAL_PATH = path.join(rootDirectory, '.env.local')
 	const PKG_PATH = path.join(rootDirectory, 'package.json')
 
 	const appNameRegex = escapeRegExp('epic-stack-template')
@@ -47,16 +46,16 @@ export default async function main({ rootDirectory }) {
 		.replace(/[^a-zA-Z0-9-_]/g, '-')
 		.toLowerCase()
 
-	const [flyTomlContent, env, packageJsonString] = await Promise.all([
+	const [flyTomlContent, packageJsonString] = await Promise.all([
 		fs.readFile(FLY_TOML_PATH, 'utf-8'),
-		fs.readFile(EXAMPLE_ENV_PATH, 'utf-8'),
 		fs.readFile(PKG_PATH, 'utf-8'),
 	])
 
-	const newEnv = env.replace(
-		/^SESSION_SECRET=.*$/m,
+	let newEnvLocal = [
+		`# Git-ignored env var overrides for local development`,
+		'',
 		`SESSION_SECRET="${getRandomString(16)}"`,
-	)
+	].join('\n')
 
 	const newFlyTomlContent = flyTomlContent.replace(
 		new RegExp(appNameRegex, 'g'),
@@ -82,7 +81,7 @@ export default async function main({ rootDirectory }) {
 
 	const fileOperationPromises = [
 		fs.writeFile(FLY_TOML_PATH, newFlyTomlContent),
-		fs.writeFile(ENV_PATH, newEnv),
+		fs.writeFile(ENV_LOCAL_PATH, newEnvLocal),
 		fs.writeFile(PKG_PATH, JSON.stringify(packageJson, null, 2) + '\n'),
 		fs.copyFile(
 			path.join(rootDirectory, 'remix.init', 'gitignore'),
@@ -363,3 +362,5 @@ async function makeFlyRequest({ query, variables }) {
 	}).then((response) => response.json())
 	return json.data
 }
+
+main({ rootDirectory: process.cwd() })

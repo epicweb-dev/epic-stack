@@ -18,10 +18,9 @@ instructions:
 
 1.  Fork repo
 2.  clone the repo
-3.  Copy `.env.example` into `.env`
-4.  Run `npm install && npm run setup -s` to install dependencies and run
+3.  Run `npm install && npm run setup -s` to install dependencies and run
     validation
-5.  Create a branch for your PR with `git checkout -b pr/your-branch-name`
+4.  Create a branch for your PR with `git checkout -b pr/your-branch-name`
 
 > Tip: Keep your `main` branch pointing at the original repository and make pull
 > requests from branches on your fork. To do this, run:
@@ -44,10 +43,10 @@ If the setup script doesn't work, you can try to run the commands manually:
 git clone <your-fork>
 cd ./epic-stack
 
-# copy the .env.example to .env
+# create a file for gitignored .env overrides
 #   everything's mocked out during development so you shouldn't need to
-#   change any of these values unless you want to hit real environments.
-cp .env.example .env
+#   set anything unless you want to hit real environments.
+touch .env.local
 
 # Install deps
 npm install

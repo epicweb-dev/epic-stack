@@ -56,9 +56,7 @@ when `npm run build` is run. You may also uncomment and hard code your
 You can do the same for any other secret (environment variable) you need at
 build time, just make sure those secrets (variables) are available on the CI
 runner: see the 'deploy' job from [`deploy`](../.github/workflows/deploy.yml)
-workflow. Note that these do not need to be added to the
-[`env.server`](../app/utils/env.server.ts) env vars schema, as they are only
-used during the build and not the runtime.
+workflow.
 
 The Sentry Vite plugin in [`vite.config.ts`](../vite.config.ts) will create
 sentry releases for you and automatically associate commits during the vite

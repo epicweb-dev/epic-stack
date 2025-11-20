@@ -2,6 +2,7 @@ import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { SetCookie } from '@mjackson/headers'
 import { http } from 'msw'
+import { ENV } from 'varlock/env'
 import { afterEach, expect, test } from 'vitest'
 import { twoFAVerificationType } from '#app/routes/settings/profile/two-factor/_layout.tsx'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
@@ -231,7 +232,7 @@ async function setupRequest({
 		sameSite: 'Lax',
 		httpOnly: true,
 		maxAge: 60 * 10,
-		secure: process.env.NODE_ENV === 'production' || undefined,
+		secure: ENV.NODE_ENV === 'production' || undefined,
 	})
 	const request = new Request(url.toString(), {
 		method: 'GET',

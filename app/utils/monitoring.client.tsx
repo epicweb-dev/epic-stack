@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-router'
+import { ENV } from 'varlock/env'
 
 export function init() {
 	Sentry.init({

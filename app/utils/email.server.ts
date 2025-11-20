@@ -1,5 +1,6 @@
 import { render } from '@react-email/components'
 import { type ReactElement } from 'react'
+import { ENV } from 'varlock/env'
 import { z } from 'zod'
 
 const resendErrorSchema = z.union([
@@ -40,7 +41,7 @@ export async function sendEmail({
 	}
 
 	// feel free to remove this condition once you've set up resend
-	if (!process.env.RESEND_API_KEY && !process.env.MOCKS) {
+	if (!ENV.RESEND_API_KEY && !ENV.MOCKS) {
 		console.error(`RESEND_API_KEY not set and we're not in mocks mode.`)
 		console.error(
 			`To send emails, set the RESEND_API_KEY environment variable.`,
@@ -56,7 +57,7 @@ export async function sendEmail({
 		method: 'POST',
 		body: JSON.stringify(email),
 		headers: {
-			Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+			Authorization: `Bearer ${ENV.RESEND_API_KEY}`,
 			'Content-Type': 'application/json',
 		},
 	})

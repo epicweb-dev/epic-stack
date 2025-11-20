@@ -1,5 +1,6 @@
 import closeWithGrace from 'close-with-grace'
 import { setupServer } from 'msw/node'
+import { ENV } from 'varlock/env';
 import { handlers as githubHandlers } from './github.ts'
 import { handlers as pwnedPasswordApiHandlers } from './pwned-passwords.ts'
 import { handlers as resendHandlers } from './resend.ts'
@@ -30,7 +31,7 @@ server.listen({
 	},
 })
 
-if (process.env.NODE_ENV !== 'test') {
+if (ENV.NODE_ENV !== 'test') {
 	console.info('🔶 Mock server installed')
 
 	closeWithGrace(() => {

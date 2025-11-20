@@ -1,4 +1,5 @@
 import { redirect } from 'react-router'
+import { ENV } from 'varlock/env'
 import { z } from 'zod'
 import { cache } from '#app/utils/cache.server.ts'
 import {
@@ -21,7 +22,7 @@ export async function updatePrimaryCacheValue({
 		)
 	}
 	const domain = getInternalInstanceDomain(primaryInstance)
-	const token = process.env.INTERNAL_COMMAND_TOKEN
+	const token = ENV.INTERNAL_COMMAND_TOKEN
 	return fetch(`${domain}/admin/cache/sqlite`, {
 		method: 'POST',
 		headers: {
@@ -39,7 +40,7 @@ export async function action({ request }: Route.ActionArgs) {
 			`${request.url} should only be called on the primary instance (${primaryInstance})}`,
 		)
 	}
-	const token = process.env.INTERNAL_COMMAND_TOKEN
+	const token = ENV.INTERNAL_COMMAND_TOKEN
 	const isAuthorized =
 		request.headers.get('Authorization') === `Bearer ${token}`
 	if (!isAuthorized) {

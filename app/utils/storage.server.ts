@@ -1,12 +1,7 @@
 import { createHash, createHmac } from 'crypto'
 import { type FileUpload } from '@mjackson/form-data-parser'
 import { createId } from '@paralleldrive/cuid2'
-
-const STORAGE_ENDPOINT = process.env.AWS_ENDPOINT_URL_S3
-const STORAGE_BUCKET = process.env.BUCKET_NAME
-const STORAGE_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID
-const STORAGE_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY
-const STORAGE_REGION = process.env.AWS_REGION
+import { ENV } from 'varlock/env'
 
 async function uploadToStorage(file: File | FileUpload, key: string) {
 	const { url, headers } = getSignedPutRequestInfo(file, key)
@@ -85,7 +80,7 @@ function getBaseSignedRequestInfo({
 	contentType?: string
 	uploadDate?: string
 }) {
-	const url = `${STORAGE_ENDPOINT}/${STORAGE_BUCKET}/${key}`
+	const url = `${ENV.AWS_ENDPOINT_URL_S3}/${ENV.BUCKET_NAME}/${key}`
 	const endpoint = new URL(url)
 
 	// Prepare date strings
@@ -106,7 +101,7 @@ function getBaseSignedRequestInfo({
 
 	const canonicalRequest = [
 		method,
-		`/${STORAGE_BUCKET}/${key}`,
+		`/${ENV.BUCKET_NAME}/${key}`,
 		'', // canonicalQueryString
 		canonicalHeaders,
 		signedHeaders,
@@ -115,7 +110,7 @@ function getBaseSignedRequestInfo({
 
 	// Prepare string to sign
 	const algorithm = 'AWS4-HMAC-SHA256'
-	const credentialScope = `${dateStamp}/${STORAGE_REGION}/s3/aws4_request`
+	const credentialScope = `${dateStamp}/${ENV.AWS_REGION}/s3/aws4_request`
 	const stringToSign = [
 		algorithm,
 		amzDate,
@@ -125,9 +120,9 @@ function getBaseSignedRequestInfo({
 
 	// Calculate signature
 	const signingKey = getSignatureKey(
-		STORAGE_SECRET_KEY,
+		ENV.AWS_SECRET_ACCESS_KEY,
 		dateStamp,
-		STORAGE_REGION,
+		ENV.AWS_REGION,
 		's3',
 	)
 	const signature = createHmac('sha256', signingKey)
@@ -138,7 +133,7 @@ function getBaseSignedRequestInfo({
 		'X-Amz-Date': amzDate,
 		'X-Amz-Content-SHA256': 'UNSIGNED-PAYLOAD',
 		Authorization: [
-			`${algorithm} Credential=${STORAGE_ACCESS_KEY}/${credentialScope}`,
+			`${algorithm} Credential=${ENV.AWS_ACCESS_KEY_ID}/${credentialScope}`,
 			`SignedHeaders=${signedHeaders}`,
 			`Signature=${signature}`,
 		].join(', '),
