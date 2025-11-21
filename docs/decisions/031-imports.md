@@ -28,9 +28,9 @@ and manually modify.
 Despite the magic of Path aliases, they are actually a standard `package.json`
 supported feature. Sort of.
 [The `"imports"` field](https://nodejs.org/api/packages.html#imports) in
-`package.json` allows you to configure aliases for your imports.
-TypeScript also uses this for its own Path aliases since version 5.4
-so you get autocomplete and type checking for your imports.
+`package.json` allows you to configure aliases for your imports. TypeScript also
+uses this for its own Path aliases since version 5.4 so you get autocomplete and
+type checking for your imports.
 
 By using the `"imports"` field, you don't have to do any special configuration
 for `vitest` or `eslint` to be able to resolve imports. They just resolve them
@@ -44,7 +44,8 @@ again it's just a matter of familiarity. So it's no big deal.
 
 ## Decision
 
-We're going to configure `"imports"` in the `package.json` to use path aliases for imports.
+We're going to configure `"imports"` in the `package.json` to use path aliases
+for imports.
 
 We'll set it to `"#*": "./*"` which will allow us to import anything in the root
 of the repo with `#<dirname>/<filepath>`.
