@@ -1,5 +1,6 @@
 import { execa } from 'execa'
 
+// using process.env because we have not loaded varlock yet
 if (process.env.NODE_ENV === 'production') {
 	await import('../server-build/index.js')
 } else {

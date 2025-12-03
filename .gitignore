@@ -4,6 +4,8 @@ node_modules
 /build
 /server-build
 .env
+.env.local
+.env.*.local
 .cache
 
 /prisma/data.db
@@ -26,3 +28,4 @@ node_modules
 # generated files
 /app/components/ui/icons
 .react-router/
+/types/env-vars.d.ts

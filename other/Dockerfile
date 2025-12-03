@@ -74,7 +74,7 @@ RUN echo "#!/bin/sh\nset -x\nsqlite3 \$CACHE_DATABASE_URL" > /usr/local/bin/cach
 
 WORKDIR /myapp
 
-# Generate random value and save it to .env file which will be loaded by dotenv
+# Generate random value and save it to .env file which will be loaded by varlock
 RUN INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) && \
   echo "INTERNAL_COMMAND_TOKEN=$INTERNAL_COMMAND_TOKEN" > .env
 

@@ -1,7 +1,6 @@
+import 'varlock/auto-load'
 import { defineConfig, devices } from '@playwright/test'
-import 'dotenv/config'
-
-const PORT = process.env.PORT || '3000'
+import { ENV } from 'varlock/env'
 
 export default defineConfig({
 	testDir: './tests/e2e',
@@ -10,12 +9,12 @@ export default defineConfig({
 		timeout: 5 * 1000,
 	},
 	fullyParallel: true,
-	forbidOnly: !!process.env.CI,
-	retries: process.env.CI ? 2 : 0,
-	workers: process.env.CI ? 1 : undefined,
+	forbidOnly: !!ENV.CI,
+	retries: ENV.CI ? 2 : 0,
+	workers: ENV.CI ? 1 : undefined,
 	reporter: 'html',
 	use: {
-		baseURL: `http://localhost:${PORT}/`,
+		baseURL: `http://localhost:${ENV.PORT}/`,
 		trace: 'on-first-retry',
 	},
 
@@ -29,13 +28,13 @@ export default defineConfig({
 	],
 
 	webServer: {
-		command: process.env.CI ? 'npm run start:mocks' : 'npm run dev',
-		port: Number(PORT),
+		command: ENV.CI ? 'npm run start:mocks' : 'npm run dev',
+		port: ENV.PORT,
 		reuseExistingServer: true,
 		stdout: 'pipe',
 		stderr: 'pipe',
 		env: {
-			PORT,
+			PORT: ENV.PORT.toString(),
 			NODE_ENV: 'test',
 		},
 	},

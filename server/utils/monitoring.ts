@@ -1,11 +1,12 @@
 import { PrismaInstrumentation } from '@prisma/instrumentation'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import * as Sentry from '@sentry/react-router'
+import { ENV } from 'varlock/env'
 
 export function init() {
 	Sentry.init({
-		dsn: process.env.SENTRY_DSN,
-		environment: process.env.NODE_ENV,
+		dsn: ENV.SENTRY_DSN,
+		environment: ENV.NODE_ENV,
 		denyUrls: [
 			/\/resources\/healthcheck/,
 			// TODO: be smarter about the public assets...
@@ -28,7 +29,7 @@ export function init() {
 			if (samplingContext.request?.url?.includes('/resources/healthcheck')) {
 				return 0
 			}
-			return process.env.NODE_ENV === 'production' ? 1 : 0
+			return ENV.NODE_ENV === 'production' ? 1 : 0
 		},
 		beforeSendTransaction(event) {
 			// ignore all healthcheck related transactions
