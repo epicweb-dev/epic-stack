@@ -28,7 +28,7 @@ const viteDevServer = IS_PROD
 				server: {
 					middlewareMode: true,
 				},
-				// We tell Vite we are running a custom app instead of 
+				// We tell Vite we are running a custom app instead of
 				// the SPA default so it doesn't run HTML middleware
 				appType: 'custom',
 			}),
@@ -84,7 +84,11 @@ if (viteDevServer) {
 	// Remix fingerprints its assets so we can cache forever.
 	app.use(
 		'/assets',
-		express.static('build/client/assets', { immutable: true, maxAge: '1y', fallthrough: false }),
+		express.static('build/client/assets', {
+			immutable: true,
+			maxAge: '1y',
+			fallthrough: false,
+		}),
 	)
 
 	// Everything else (like favicon.ico) is cached for an hour. You may want to be
