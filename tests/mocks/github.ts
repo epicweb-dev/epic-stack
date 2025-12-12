@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { faker } from '@faker-js/faker'
 import fsExtra from 'fs-extra'
 import { HttpResponse, passthrough, http, type HttpHandler } from 'msw'
+import { ENV } from 'varlock/env'
 import { USERNAME_MAX_LENGTH } from '#app/utils/user-validation.ts'
 
 const { json } = HttpResponse
@@ -129,8 +130,8 @@ async function getUser(request: Request) {
 }
 
 const passthroughGitHub =
-	!process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') &&
-	process.env.NODE_ENV !== 'test'
+	!ENV.GITHUB_CLIENT_ID?.startsWith('MOCK_') &&
+	ENV.NODE_ENV !== 'test'
 
 export const handlers: Array<HttpHandler> = [
 	http.post(

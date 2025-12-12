@@ -11,6 +11,7 @@ import {
 	useMatches,
 } from 'react-router'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { ENV } from 'varlock/env'
 import { type Route } from './+types/root.ts'
 import appleTouchIconAssetUrl from './assets/favicons/apple-touch-icon.png'
 import faviconAssetUrl from './assets/favicons/favicon.svg'
@@ -31,7 +32,6 @@ import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
-import { getEnv } from './utils/env.server.ts'
 import { pipeHeaders } from './utils/headers.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl, getImgSrc } from './utils/misc.tsx'
@@ -119,7 +119,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 					theme: getTheme(request),
 				},
 			},
-			ENV: getEnv(),
 			toast,
 			honeyProps,
 		},
@@ -138,14 +137,11 @@ function Document({
 	children,
 	nonce,
 	theme = 'light',
-	env = {},
 }: {
 	children: React.ReactNode
 	nonce: string
 	theme?: Theme
-	env?: Record<string, string | undefined>
 }) {
-	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (
 		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
 			<head>
@@ -153,19 +149,13 @@ function Document({
 				<Meta />
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
-				{allowIndexing ? null : (
+				{ENV.ALLOW_INDEXING ? null : (
 					<meta name="robots" content="noindex, nofollow" />
 				)}
 				<Links />
 			</head>
 			<body className="bg-background text-foreground">
 				{children}
-				<script
-					nonce={nonce}
-					dangerouslySetInnerHTML={{
-						__html: `window.ENV = ${JSON.stringify(env)}`,
-					}}
-				/>
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
 			</body>
@@ -174,12 +164,10 @@ function Document({
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-	// if there was an error running the loader, data could be missing
-	const data = useLoaderData<typeof loader | null>()
 	const nonce = useNonce()
 	const theme = useOptionalTheme()
 	return (
-		<Document nonce={nonce} theme={theme} env={data?.ENV}>
+		<Document nonce={nonce} theme={theme}>
 			{children}
 		</Document>
 	)

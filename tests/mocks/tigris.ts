@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { invariantResponse } from '@epic-web/invariant'
 import { lookup as getMimeType } from 'mime-types'
 import { http, HttpResponse } from 'msw'
+import { ENV } from 'varlock/env'
 
 // Ensure we have a valid URL by explicitly creating it from the import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -12,9 +13,9 @@ const __dirname = path.dirname(__filename)
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures')
 const MOCK_STORAGE_DIR = path.join(FIXTURES_DIR, 'uploaded')
 const FIXTURES_IMAGES_DIR = path.join(FIXTURES_DIR, 'images')
-const STORAGE_ENDPOINT = process.env.AWS_ENDPOINT_URL_S3
-const STORAGE_BUCKET = process.env.BUCKET_NAME
-const STORAGE_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID
+const STORAGE_ENDPOINT = ENV.AWS_ENDPOINT_URL_S3
+const STORAGE_BUCKET = ENV.BUCKET_NAME
+const STORAGE_ACCESS_KEY = ENV.AWS_ACCESS_KEY_ID
 
 function validateAuth(headers: Headers) {
 	const authHeader = headers.get('Authorization')
