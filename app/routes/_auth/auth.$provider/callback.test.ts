@@ -29,7 +29,7 @@ test('a new user goes to onboarding', async () => {
 	const response = await loader({
 		request,
 		params: PARAMS,
-		context: {} as AppLoadContext as AppLoadContext,
+		context: {} as AppLoadContext,
 	}).catch((e) => e)
 	expect(response).toHaveRedirect('/onboarding/github')
 })
