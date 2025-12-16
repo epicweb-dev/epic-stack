@@ -12,7 +12,7 @@ If you wish to change the Node.js version, you can do so by updating the
 ```json
 {
 	"engines": {
-		"node": "20.3.1"
+		"node": "^22.18.0"
 	}
 }
 ```
