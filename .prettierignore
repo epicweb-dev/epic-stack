@@ -2,7 +2,6 @@ node_modules
 
 /build
 /public/build
-/server-build
 .env
 
 /test-results/
