@@ -12,13 +12,10 @@ If you wish to change the Node.js version, you can do so by updating the
 ```json
 {
 	"engines": {
-		"node": "20.3.1"
+		"node": "^22.18.0"
 	}
 }
 ```
-
-Make certain you do not use a version range here because this is used in the
-`./other/build-server.ts` to compile the express server code.
 
 You will also want to update the `Dockerfile` to use the same version of Node.js
 as the `package.json` file.

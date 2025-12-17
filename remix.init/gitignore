@@ -2,7 +2,6 @@ node_modules
 .DS_store
 
 /build
-/server-build
 .env
 .cache
 

@@ -10,16 +10,14 @@
     "#tests/*": "./tests/*"
   },
   "scripts": {
-    "build": "run-s build:*",
-    "build:remix": "react-router build",
-    "build:server": "tsx ./other/build-server.ts",
-    "dev": "cross-env NODE_ENV=development MOCKS=true node ./server/dev-server.js",
-    "dev:no-mocks": "cross-env NODE_ENV=development node ./server/dev-server.js",
+    "build": "react-router build",
+    "dev": "cross-env NODE_ENV=development MOCKS=true node server/index.ts",
+    "dev:no-mocks": "cross-env NODE_ENV=development node ./server/index.ts",
     "format": "prettier --write .",
     "lint": "eslint .",
     "setup": "npm run build && prisma migrate deploy && prisma generate --sql && playwright install",
-    "start": "cross-env NODE_ENV=production node .",
-    "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
+    "start": "cross-env NODE_ENV=production node index.ts",
+    "start:mocks": "cross-env NODE_ENV=production MOCKS=true node index.ts",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "test:e2e": "npm run test:e2e:dev --silent",
@@ -34,8 +32,7 @@
     "/node_modules",
     "/build",
     "/public/build",
-    "/playwright-report",
-    "/server-build"
+    "/playwright-report"
   ],
   "dependencies": {
     "@conform-to/react": "^1.5.0",
@@ -157,7 +154,7 @@
     "vitest": "^3.1.3"
   },
   "engines": {
-    "node": "22"
+    "node": "^22.18.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
