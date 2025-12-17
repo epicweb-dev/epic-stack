@@ -51,7 +51,9 @@ for your project under `Organization > Projects > Project > Name`
 In the 'build' section of the [Dockerfile](../other/Dockerfile), there is an
 example of how to pass `SENTRY_AUTH_TOKEN` secret, so it is available to Vite
 when `npm run build` is run. You may also uncomment and hard code your
-`SENTRY_ORG` and `SENTRY_PROJECT` values. Setup up your secrets in
+`SENTRY_ORG` and `SENTRY_PROJECT` values, both in
+[Dockerfile](../other/Dockerfile) and in the "Create Sentry release" step of the
+[`deploy`](../.github/workflows/deploy.yml) script. Setup up your secrets in
 [GitHub Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 You can do the same for any other secret (environment variable) you need at
 build time, just make sure those secrets (variables) are available on the CI
@@ -61,7 +63,15 @@ workflow. Note that these do not need to be added to the
 used during the build and not the runtime.
 
 The Sentry Vite plugin in [`vite.config.ts`](../vite.config.ts) will create
-sentry releases for you and automatically associate commits during the vite
+sentry releases for you and automatically upload sourcemaps during the vite
 build once the `SENTRY_AUTH_TOKEN` is set. In this setup we have utilized a
 simple strategy for naming releases of using the commit sha, passed in as a
 build arg via the GitHub action workflow.
+
+Once the deploy is done, the "Create Sentry release" step in the
+[`deploy`](../.github/workflows/deploy.yml) script will associate commits to
+this release and mark the release as deployed and finalized.
+
+You can test Sentry, by visiting the deployed app and navigating to the
+`/sentry/example-page` route. Note that you need to be logged in as an admin
+user to visit it.

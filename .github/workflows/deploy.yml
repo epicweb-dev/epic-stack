@@ -215,6 +215,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
           flyctl deploy \
+            --env SENTRY_ENVIRONMENT=staging \
             --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
             --app ${{ steps.app_name.outputs.value }}-staging
         env:
@@ -224,6 +225,18 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
+            --env SENTRY_ENVIRONMENT=production \
             --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Create Sentry release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          # SENTRY_ORG: 'your sentry org id or slug'
+          # SENTRY_PROJECT: 'your sentry project id or slug'
+        if: ${{ env.SENTRY_AUTH_TOKEN }}
+        uses: getsentry/action-release@v3
+        with:
+          environment:
+            ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
