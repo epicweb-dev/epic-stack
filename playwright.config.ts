@@ -37,6 +37,7 @@ export default defineConfig({
 		env: {
 			PORT,
 			NODE_ENV: 'test',
+			SENTRY_ENVIRONMENT: 'test',
 		},
 	},
 })

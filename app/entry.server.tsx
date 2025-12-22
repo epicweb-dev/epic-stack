@@ -1,17 +1,11 @@
 import crypto from 'node:crypto'
 import { PassThrough } from 'node:stream'
-import { styleText } from 'node:util'
 import { contentSecurity } from '@nichtsam/helmet/content'
 import { createReadableStreamFromReadable } from '@react-router/node'
 import * as Sentry from '@sentry/react-router'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
-import {
-	ServerRouter,
-	type LoaderFunctionArgs,
-	type ActionFunctionArgs,
-	type HandleDocumentRequestFunction,
-} from 'react-router'
+import { type HandleDocumentRequestFunction, ServerRouter } from 'react-router'
 import { getEnv, init } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
@@ -26,7 +20,7 @@ const MODE = process.env.NODE_ENV ?? 'development'
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
-export default async function handleRequest(...args: DocRequestArgs) {
+async function handleRequest(...args: DocRequestArgs) {
 	const [request, responseStatusCode, responseHeaders, reactRouterContext] =
 		args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
@@ -74,6 +68,10 @@ export default async function handleRequest(...args: DocRequestArgs) {
 									'connect-src': [
 										MODE === 'development' ? 'ws:' : undefined,
 										process.env.SENTRY_DSN ? '*.sentry.io' : undefined,
+										// Spotlight (SSE to the sidecar)
+										MODE === 'development'
+											? 'http://localhost:8969'
+											: undefined,
 										"'self'",
 									],
 									'font-src': ["'self'"],
@@ -96,7 +94,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 							status: didError ? 500 : responseStatusCode,
 						}),
 					)
-					pipe(body)
+					// this enables distributed tracing between client and server!
+					pipe(Sentry.getMetaTagTransformer(body))
 				},
 				onShellError: (err: unknown) => {
 					reject(err)
@@ -122,21 +121,6 @@ export async function handleDataRequest(response: Response) {
 	return response
 }
 
-export function handleError(
-	error: unknown,
-	{ request }: LoaderFunctionArgs | ActionFunctionArgs,
-): void {
-	// Skip capturing if the request is aborted as Remix docs suggest
-	// Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
-	if (request.signal.aborted) {
-		return
-	}
+export const handleError = Sentry.createSentryHandleError({ logErrors: true })
 
-	if (error instanceof Error) {
-		console.error(styleText('red', String(error.stack)))
-	} else {
-		console.error(error)
-	}
-
-	Sentry.captureException(error)
-}
+export default Sentry.wrapSentryHandleRequest(handleRequest)
