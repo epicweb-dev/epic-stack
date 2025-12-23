@@ -40,6 +40,10 @@ exec:
   - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
+  # Seed staging database with test data
+  - cmd: sh -c '[ "$APP_ENV" = "staging" ] && npx prisma db execute --file ./prisma/seed.staging.sql --url $DATABASE_URL'
+    if-candidate: true
+
   # Generate Typed SQL files
   - cmd: npx prisma generate --sql
 

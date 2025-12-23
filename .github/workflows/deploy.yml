@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - main
-      - dev
-  pull_request: {}
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,6 +13,9 @@ concurrency:
 permissions:
   actions: write
   contents: read
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
 jobs:
   lint:
@@ -146,8 +149,7 @@ jobs:
   container:
     name: 📦 Prepare Container
     runs-on: ubuntu-24.04
-    # only prepare container on pushes
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -164,20 +166,7 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 📦 Build Staging Container
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --build-only \
-            --push \
-            --image-label ${{ github.sha }} \
-            --build-arg COMMIT_SHA=${{ github.sha }} \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
       - name: 📦 Build Production Container
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --build-only \
@@ -189,12 +178,17 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-  deploy:
-    name: 🚀 Deploy
+  deploy-staging:
+    name: 🚁 Deploy staging app for PR
     runs-on: ubuntu-24.04
-    needs: [lint, typecheck, vitest, playwright, container]
-    # only deploy on pushes
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'pull_request' }}
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    concurrency:
+      group: pr-${{ github.event.number }}
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -211,19 +205,63 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 🚀 Deploy Staging
-        if: ${{ github.ref == 'refs/heads/dev' }}
+      - name: 🏗️ Create Fly app and provision resources
+        if: github.event.action != 'closed'
         run: |
-          flyctl deploy \
-            --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_APP_NAME="${{ steps.app_name.outputs.value }}-pr-${{ github.event.number }}"
+          FLY_REGION=$(flyctl config show | jq -r '.primary_region')
+
+          # Create app if it doesn't exist
+          if ! flyctl status --app "$FLY_APP_NAME"; then
+            # change org name if needed
+            flyctl apps create $FLY_APP_NAME --org personal
+            flyctl secrets --app $FLY_APP_NAME set SESSION_SECRET=$(openssl rand -hex 32) HONEYPOT_SECRET=$(openssl rand -hex 32)
+            flyctl volumes create data --app $FLY_APP_NAME --region $FLY_REGION --size 1 --yes
+            flyctl consul attach --app $FLY_APP_NAME
+            # Don't log the created tigris secrets!
+            flyctl storage create --app $FLY_APP_NAME --name epic-stack-$FLY_APP_NAME --yes > /dev/null 2>&1
+          fi
+
+      - name: 🚁 Deploy PR app to Fly.io
+        id: deploy
+        uses: superfly/fly-pr-review-apps@1.5.0
+        with:
+          name: ${{ steps.app_name.outputs.value }}-pr-${{ github.event.number }}
+          secrets: |
+            APP_ENV=staging
+            ALLOW_INDEXING=false
+            SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          build_args: |
+            COMMIT_SHA=${{ github.sha }}
+          build_secrets: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  deploy:
+    name: 🚀 Deploy production
+    runs-on: ubuntu-24.04
+    needs: [lint, typecheck, vitest, playwright, container]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    environment:
+      name: production
+      url: https://epic-rsc-stack.fly.dev
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '50'
+
+      - name: 👀 Read app name
+        uses: SebRollen/toml-action@v1.2.0
+        id: app_name
+        with:
+          file: 'fly.toml'
+          field: 'app'
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: 🚀 Deploy Production
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
