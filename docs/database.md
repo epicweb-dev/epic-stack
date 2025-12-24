@@ -164,7 +164,7 @@ is the recommended approach to ensure it's reproducible.
 
 The trick is not all of us are really excited about writing raw SQL (especially
 if what you need to seed is a lot of data). You could look at `seed.staging.sql`
-for inpsiration or create a custom sql migration file with the following steps.
+for inspiration or create a custom sql migration file with the following steps.
 You can also use these steps to modify the seed.staging.sql file to your liking.
 
 1. Create a script very similar to our `prisma/seed.ts` file which creates all
