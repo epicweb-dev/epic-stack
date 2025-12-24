@@ -245,7 +245,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     environment:
       name: production
-      url: ${{ steps.app_name.outputs.value }}
+      url: https://${{ steps.app_name.outputs.value }}.fly.dev
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
