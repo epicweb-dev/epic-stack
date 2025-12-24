@@ -184,7 +184,7 @@ async function setupDeployment({ rootDirectory }) {
 	await $I`fly apps create ${APP_NAME}`
 
 	console.log(`🤫 Setting secrets in apps`)
-	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} INTERNAL_COMMAND_TOKEN=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
+	await $I`fly secrets set SESSION_SECRET=${getRandomString32()} HONEYPOT_SECRET=${getRandomString32()} --app ${APP_NAME}`
 
 	console.log(`🔊 Creating volumes.`)
 	await $I`fly volumes create data --region ${primaryRegion} --size 1 --yes --app ${APP_NAME}`
