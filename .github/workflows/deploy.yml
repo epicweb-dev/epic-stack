@@ -16,7 +16,8 @@ permissions:
 
 env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
+  # Change this if you want to deploy to a different org
+  FLY_ORG: personal
 jobs:
   lint:
     name: ⬣ ESLint
@@ -214,9 +215,9 @@ jobs:
           # Create app if it doesn't exist
           if ! flyctl status --app "$FLY_APP_NAME"; then
             # change org name if needed
-            flyctl apps create $FLY_APP_NAME --org personal
+            flyctl apps create $FLY_APP_NAME --org $FLY_ORG
             flyctl secrets --app $FLY_APP_NAME set SESSION_SECRET=$(openssl rand -hex 32) HONEYPOT_SECRET=$(openssl rand -hex 32)
-            flyctl volumes create data --app $FLY_APP_NAME --region $FLY_REGION --size 1 --yes
+            flyctl volumes create --app $FLY_APP_NAME --region $FLY_REGION --size 1 --yes
             flyctl consul attach --app $FLY_APP_NAME
             # Don't log the created tigris secrets!
             flyctl storage create --app $FLY_APP_NAME --name epic-stack-$FLY_APP_NAME --yes > /dev/null 2>&1
