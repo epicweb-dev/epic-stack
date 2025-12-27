@@ -148,14 +148,24 @@ migrations.
 ## Seeding Production
 
 In this application we have Role-based Access Control implemented. We initialize
-the database with `admin` and `user` roles with appropriate permissions.
+the database with `admin` and `user` roles with appropriate permissions. This is
+done in the `migration.sql` file that's included in the template.
 
-This is done in the `migration.sql` file that's included in the template. If you
-need to seed the production database, modifying migration files manually is the
-recommended approach to ensure it's reproducible.
+For staging we create a new database for each PR. To make sure that this
+database is already filled with some seed data we manually run the following
+command:
+
+```sh
+npx prisma db execute --file ./prisma/seed.staging.sql --url $DATABASE_URL
+```
+
+If you need to seed the production database, modifying migration files manually
+is the recommended approach to ensure it's reproducible.
 
 The trick is not all of us are really excited about writing raw SQL (especially
-if what you need to seed is a lot of data), so here's an easy way to help out:
+if what you need to seed is a lot of data). You could look at `seed.staging.sql`
+for inspiration or create a custom sql migration file with the following steps.
+You can also use these steps to modify the seed.staging.sql file to your liking.
 
 1. Create a script very similar to our `prisma/seed.ts` file which creates all
    the data you want to seed.
@@ -300,7 +310,6 @@ You've got a few options:
      re-generating the migration after fixing the error.
 3. If you do care about the data and don't have a backup, you can follow these
    steps:
-
    1. Comment out the
       [`exec` section from `litefs.yml` file](https://github.com/epicweb-dev/epic-stack/blob/main/other/litefs.yml#L31-L37).
 

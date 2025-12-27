@@ -3,17 +3,21 @@ on:
   push:
     branches:
       - main
-      - dev
-  pull_request: {}
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
   actions: write
   contents: read
 
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  # Change this if you want to deploy to a different org
+  FLY_ORG: personal
 jobs:
   lint:
     name: ⬣ ESLint
@@ -21,6 +25,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
@@ -45,6 +51,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
@@ -72,6 +80,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
@@ -97,6 +107,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
@@ -146,8 +158,7 @@ jobs:
   container:
     name: 📦 Prepare Container
     runs-on: ubuntu-24.04
-    # only prepare container on pushes
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -164,20 +175,7 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 📦 Build Staging Container
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --build-only \
-            --push \
-            --image-label ${{ github.sha }} \
-            --build-arg COMMIT_SHA=${{ github.sha }} \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
       - name: 📦 Build Production Container
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --build-only \
@@ -186,15 +184,65 @@ jobs:
             --build-arg COMMIT_SHA=${{ github.sha }} \
             --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
             --app ${{ steps.app_name.outputs.value }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
+  deploy-staging:
+    name: 🚁 Deploy staging app for PR
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'pull_request_target' }}
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '50'
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: 👀 Read app name
+        uses: SebRollen/toml-action@v1.2.0
+        id: app_name
+        with:
+          file: 'fly.toml'
+          field: 'app'
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 🏗️ Create Fly app and provision resources
+        if: github.event.action != 'closed'
+        run: |
+          FLY_APP_NAME="${{ steps.app_name.outputs.value }}-pr-${{ github.event.number }}"
+          FLY_REGION=$(flyctl config show | jq -r '.primary_region')
+
+          # Create app if it doesn't exist
+          if ! flyctl status --app "$FLY_APP_NAME"; then
+            # change org name if needed
+            flyctl apps create $FLY_APP_NAME --org $FLY_ORG
+            flyctl secrets --app $FLY_APP_NAME set SESSION_SECRET=$(openssl rand -hex 32) HONEYPOT_SECRET=$(openssl rand -hex 32) SENTRY_DSN=${{ secrets.SENTRY_DSN }} RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+            flyctl consul attach --app $FLY_APP_NAME
+            # Don't log the created tigris secrets!
+            flyctl storage create --app $FLY_APP_NAME --name epic-stack-$FLY_APP_NAME --yes > /dev/null 2>&1
+          fi
+
+          flyctl deploy . --ha=false --regions $FLY_REGION --vm-size shared-cpu-1x --env APP_ENV=staging --env ALLOW_INDEXING=false --app $FLY_APP_NAME --image-label ${{ github.sha }} --build-arg COMMIT_SHA=${{ github.sha }} --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: 🧹 Cleanup resources when PR is closed
+        if: github.event.action == 'closed'
+        run: |
+          FLY_APP_NAME="${{ steps.app_name.outputs.value }}-pr-${{ github.event.number }}"
+          flyctl storage destroy epic-stack-$FLY_APP_NAME --yes || true
+          flyctl apps destroy "$app" -y || true
   deploy:
-    name: 🚀 Deploy
+    name: 🚀 Deploy production
     runs-on: ubuntu-24.04
     needs: [lint, typecheck, vitest, playwright, container]
-    # only deploy on pushes
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    environment:
+      name: production
+      url: https://${{ steps.app_name.outputs.value }}.fly.dev
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -211,19 +259,7 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 🚀 Deploy Staging
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
       - name: 🚀 Deploy Production
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
