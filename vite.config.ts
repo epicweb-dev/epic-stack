@@ -17,7 +17,7 @@ export default defineConfig((config) => ({
 		cssMinify: MODE === 'production',
 
 		rollupOptions: {
-			input: config.isSsrBuild ? "./server/app.ts" : undefined,
+			input: config.isSsrBuild ? './server/app.ts' : undefined,
 			external: [/node:.*/, 'fsevents'],
 		},
 
@@ -37,7 +37,6 @@ export default defineConfig((config) => ({
 			ignored: ['**/playwright-report/**'],
 		},
 	},
-	sentryConfig,
 	plugins: [
 		envOnlyMacros(),
 		tailwindcss(),
@@ -70,19 +69,9 @@ export default defineConfig((config) => ({
 }))
 
 const sentryConfig: SentryReactRouterBuildOptions = {
-	authToken: process.env.SENTRY_AUTH_TOKEN,
-	org: process.env.SENTRY_ORG,
-	project: process.env.SENTRY_PROJECT,
-
-	unstable_sentryVitePluginOptions: {
-		release: {
-			name: process.env.COMMIT_SHA,
-			setCommits: {
-				auto: true,
-			},
-		},
-		sourcemaps: {
-			filesToDeleteAfterUpload: ['./build/**/*.map'],
-		},
+	reactComponentAnnotation: { enabled: true },
+	release: {
+		name: process.env.COMMIT_SHA,
+		inject: true,
 	},
 }
