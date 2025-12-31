@@ -11,7 +11,6 @@ username/password and OAuth providers. While these methods are widely used, they
 come with various security challenges:
 
 1. Password-based authentication:
-
    - Users often reuse passwords across services
    - Passwords can be phished or stolen
    - Password management is a burden for users
@@ -39,14 +38,12 @@ using:
 The authentication flow works as follows:
 
 1. Registration:
-
    - Server generates a challenge and sends registration options
    - Client creates a new key pair and signs the challenge with the private key
    - Public key and metadata are sent to the server for storage
    - Private key remains securely stored in the authenticator
 
 2. Authentication:
-
    - Server generates a new challenge
    - Client signs it with the stored private key
    - Server verifies the signature using the stored public key
@@ -64,19 +61,16 @@ While passkeys represent the future of authentication, we maintain support for
 password and OAuth authentication because:
 
 1. Adoption and Transition:
-
    - Passkey support is still rolling out across platforms and browsers
    - Users need time to become comfortable with the new technology
    - Organizations may have existing requirements for specific auth methods
 
 2. Fallback Options:
-
    - Some users may not have compatible devices
    - Enterprise environments might restrict biometric authentication
    - Backup authentication methods provide reliability
 
 3. User Choice:
-
    - Different users have different security/convenience preferences
    - Some scenarios may require specific authentication types
    - Supporting multiple methods maximizes accessibility
@@ -112,20 +106,17 @@ We chose SimpleWebAuthn because:
 ### Positive:
 
 1. Enhanced Security for Users:
-
    - Phishing-resistant authentication adds protection against common attacks
    - Hardware-backed security provides stronger guarantees than passwords alone
    - Biometric authentication reduces risk of credential sharing
 
 2. Improved User Experience Options:
-
    - Users can choose between password, OAuth, or passkey based on their needs
    - Native biometric flows provide fast and familiar authentication
    - Password manager integration enables seamless cross-device access
    - Multiple authentication methods increase accessibility
 
 3. Future-Proofing Authentication:
-
    - Adoption of web standard
    - Gradual transition path as passkey support grows
    - Meeting evolving security best practices
@@ -133,14 +124,12 @@ We chose SimpleWebAuthn because:
 ### Negative:
 
 1. Implementation Complexity:
-
    - WebAuthn is a complex specification
    - Need to handle various device capabilities
    - Must maintain backward compatibility
    - Need to maintain password-based auth as fallback
 
 2. User Education:
-
    - New technology requires user education
    - Some users may be hesitant to adopt
    - Need clear documentation and UI guidance
@@ -148,7 +137,6 @@ We chose SimpleWebAuthn because:
 ### Neutral:
 
 1. Data Storage:
-
    - New database model for passkeys
    - Additional storage requirements per user
    - Migration path for existing users

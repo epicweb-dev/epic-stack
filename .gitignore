@@ -1,5 +1,6 @@
 node_modules
 .DS_store
+.idea
 
 /build
 .env

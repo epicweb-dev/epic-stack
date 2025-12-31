@@ -22,6 +22,7 @@ import {
 	signupWithConnection,
 	requireAnonymous,
 } from '#app/utils/auth.server.ts'
+import { APP_TITLE } from '#app/utils/branding.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -160,7 +161,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export const meta: Route.MetaFunction = () => {
-	return [{ title: 'Setup Epic Notes Account' }]
+	return [{ title: `Setup ${APP_TITLE} Account` }]
 }
 
 export default function OnboardingProviderRoute({

@@ -10,6 +10,7 @@ import {
 	requireAnonymous,
 	resetUserPassword,
 } from '#app/utils/auth.server.ts'
+import { APP_TITLE } from '#app/utils/branding.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -76,7 +77,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export const meta: Route.MetaFunction = () => {
-	return [{ title: 'Reset Password | Epic Notes' }]
+	return [{ title: `Reset Password | ${APP_TITLE}` }]
 }
 
 export default function ResetPasswordPage({

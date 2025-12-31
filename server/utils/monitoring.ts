@@ -1,4 +1,3 @@
-import { PrismaInstrumentation } from '@prisma/instrumentation'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import * as Sentry from '@sentry/react-router'
 
@@ -17,9 +16,7 @@ export function init() {
 			/\/site\.webmanifest/,
 		],
 		integrations: [
-			Sentry.prismaIntegration({
-				prismaInstrumentation: new PrismaInstrumentation(),
-			}),
+			Sentry.prismaIntegration(),
 			Sentry.httpIntegration(),
 			nodeProfilingIntegration(),
 		],

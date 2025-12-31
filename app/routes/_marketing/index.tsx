@@ -4,11 +4,12 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
+import { APP_BASE_URL, APP_TITLE } from '#app/utils/branding.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { logos } from './+logos/logos.ts'
 import { type Route } from './+types/index.ts'
 
-export const meta: Route.MetaFunction = () => [{ title: 'Epic Notes' }]
+export const meta: Route.MetaFunction = () => [{ title: APP_TITLE }]
 
 // Tailwind Grid cell classes lookup
 const columnClasses: Record<(typeof logos)[number]['column'], string> = {
@@ -33,7 +34,7 @@ export default function Index() {
 			<div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
 				<div className="flex max-w-md flex-col items-center text-center xl:order-2 xl:items-start xl:text-left">
 					<a
-						href="https://www.epicweb.dev/stack"
+						href={APP_BASE_URL}
 						className="animate-slide-top xl:animate-slide-left [animation-fill-mode:backwards] xl:[animation-delay:0.5s] xl:[animation-fill-mode:backwards]"
 					>
 						<svg
@@ -52,7 +53,7 @@ export default function Index() {
 						data-heading
 						className="animate-slide-top text-foreground xl:animate-slide-left mt-8 text-4xl font-medium [animation-delay:0.3s] [animation-fill-mode:backwards] md:text-5xl xl:mt-4 xl:text-6xl xl:[animation-delay:0.8s] xl:[animation-fill-mode:backwards]"
 					>
-						<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
+						<a href={APP_BASE_URL}>{APP_TITLE}</a>
 					</h1>
 					<p
 						data-paragraph

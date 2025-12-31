@@ -43,13 +43,12 @@ is a precondition for a "Mock GitHub server" to be installed (with the help of
 [module](../tests/mocks/github.ts) for more details and pay attention to how the
 calls to `https://github.com/login/oauth/access_token` are being intercepted.
 But once deployed to an environment where `process.env.MOCKS` is not set to
-`'true'` (see how this is done when launching the
-[server](../server/index.ts) and checked in the
-[entrypoint](../index.ts)), or even when developing _locally_ but not setting
-`GITHUB_CLIENT_ID` to `MOCK_...`, the requests will actually reach the GitHub
-auth server. This is where you will want to have a GitHub OAuth application
-properly set up, otherwise the logging in with GitHub will fail and a
-corresponding toast will appear on the screen.
+`'true'` (see how this is done when launching the [server](../server/index.ts)
+and checked in the [entrypoint](../index.ts)), or even when developing _locally_
+but not setting `GITHUB_CLIENT_ID` to `MOCK_...`, the requests will actually
+reach the GitHub auth server. This is where you will want to have a GitHub OAuth
+application properly set up, otherwise the logging in with GitHub will fail and
+a corresponding toast will appear on the screen.
 
 To set up a real OAuth application, log in to GitHub, go to
 `Settings -> Developer settings -> OAuth Apps`, and hit the

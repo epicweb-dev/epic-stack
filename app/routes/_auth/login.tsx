@@ -12,6 +12,7 @@ import { Spacer } from '#app/components/spacer.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { login, requireAnonymous } from '#app/utils/auth.server.ts'
+import { APP_TITLE } from '#app/utils/branding.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,
@@ -299,7 +300,7 @@ function PasskeyLogin({
 }
 
 export const meta: Route.MetaFunction = () => {
-	return [{ title: 'Login to Epic Notes' }]
+	return [{ title: `Login to ${APP_TITLE}` }]
 }
 
 export function ErrorBoundary() {

@@ -13,6 +13,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { APP_TITLE } from '#app/utils/branding.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -215,7 +216,7 @@ export const meta: Route.MetaFunction = ({ data, params, matches }) => {
 			? data?.note.content.slice(0, 97) + '...'
 			: 'No content'
 	return [
-		{ title: `${noteTitle} | ${displayName}'s Notes | Epic Notes` },
+		{ title: `${noteTitle} | ${displayName}'s Notes | ${APP_TITLE}` },
 		{
 			name: 'description',
 			content: noteContentsSummary,

@@ -4,6 +4,7 @@ import { redirect, Link } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { SearchBar } from '#app/components/search-bar.tsx'
+import { APP_TITLE } from '#app/utils/branding.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 import { type Route } from './+types/index.ts'
@@ -27,7 +28,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 
 	return (
 		<div className="container mt-36 mb-48 flex flex-col items-center justify-center gap-6">
-			<h1 className="text-h1">Epic Notes Users</h1>
+			<h1 className="text-h1">{APP_TITLE} Users</h1>
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={loaderData.status} autoFocus autoSubmit />
 			</div>

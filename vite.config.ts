@@ -17,7 +17,7 @@ export default defineConfig((config) => ({
 		cssMinify: MODE === 'production',
 
 		rollupOptions: {
-			input: config.isSsrBuild ? "./server/app.ts" : undefined,
+			input: config.isSsrBuild ? './server/app.ts' : undefined,
 			external: [/node:.*/, 'fsevents'],
 		},
 

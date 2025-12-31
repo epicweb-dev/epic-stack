@@ -24,6 +24,10 @@ function extractUrl(text: string) {
 	return match?.groups?.url
 }
 
+// Delete the following comment after changing the email address
+// eslint-disable-next-line no-restricted-syntax
+const EMAIL_FROM = 'hello@epicstack.dev'
+
 const test = base.extend<{
 	getOnboardingData(): {
 		username: string
@@ -70,7 +74,7 @@ test('onboarding with link', async ({ page, navigate, getOnboardingData }) => {
 	const email = await readEmail(onboardingData.email)
 	invariant(email, 'Email not found')
 	expect(email.to).toBe(onboardingData.email.toLowerCase())
-	expect(email.from).toBe('hello@epicstack.dev')
+	expect(email.from).toBe(EMAIL_FROM)
 	expect(email.subject).toMatch(/welcome/i)
 	const onboardingUrl = extractUrl(email.text) as AppPages
 	invariant(onboardingUrl, 'Onboarding URL not found')
@@ -133,7 +137,7 @@ test('onboarding with a short code', async ({
 	const email = await readEmail(onboardingData.email)
 	invariant(email, 'Email not found')
 	expect(email.to).toBe(onboardingData.email.toLowerCase())
-	expect(email.from).toBe('hello@epicstack.dev')
+	expect(email.from).toBe(EMAIL_FROM)
 	expect(email.subject).toMatch(/welcome/i)
 	const codeMatch = email.text.match(CODE_REGEX)
 	const code = codeMatch?.groups?.code
@@ -371,7 +375,7 @@ test('reset password with a link', async ({
 	invariant(email, 'Email not found')
 	expect(email.subject).toMatch(/password reset/i)
 	expect(email.to).toBe(user.email.toLowerCase())
-	expect(email.from).toBe('hello@epicstack.dev')
+	expect(email.from).toBe(EMAIL_FROM)
 	const resetPasswordUrl = extractUrl(email.text) as AppPages
 	invariant(resetPasswordUrl, 'Reset password URL not found')
 	await navigate(resetPasswordUrl)
@@ -427,7 +431,7 @@ test('reset password with a short code', async ({
 	invariant(email, 'Email not found')
 	expect(email.subject).toMatch(/password reset/i)
 	expect(email.to).toBe(user.email)
-	expect(email.from).toBe('hello@epicstack.dev')
+	expect(email.from).toBe(EMAIL_FROM)
 	const codeMatch = email.text.match(CODE_REGEX)
 	const code = codeMatch?.groups?.code
 	invariant(code, 'Reset Password code not found')
