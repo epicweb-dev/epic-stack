@@ -146,7 +146,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react-router-auto-routes": "^0.7.1",
     "react-router-devtools": "^6.0.1",
-    "tsx": "^4.19.4",
+    "tsx": "^4.21.0",
     "tw-animate-css": "^1.2.9",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
