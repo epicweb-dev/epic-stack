@@ -81,7 +81,7 @@
     "express": "^4.21.2",
     "express-rate-limit": "^8.2.1",
     "get-port": "^7.1.0",
-    "glob": "^11.0.2",
+    "glob": "^13.0.0",
     "input-otp": "^1.4.2",
     "intl-parse-accept-language": "^1.0.0",
     "isbot": "^5.1.27",
