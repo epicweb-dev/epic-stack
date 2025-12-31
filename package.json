@@ -110,7 +110,7 @@
   },
   "devDependencies": {
     "@epic-web/config": "^1.21.3",
-    "@faker-js/faker": "^9.7.0",
+    "@faker-js/faker": "^10.1.0",
     "@playwright/test": "^1.52.0",
     "@react-router/dev": "^7.11.0",
     "@sly-cli/sly": "^2.1.1",
