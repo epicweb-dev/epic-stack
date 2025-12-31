@@ -123,7 +123,7 @@
     "@types/eslint": "^9.6.1",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
-    "@types/glob": "^8.1.0",
+    "@types/glob": "^9.0.0",
     "@types/mime-types": "^2.1.4",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.15.3",
