@@ -1,18 +1,19 @@
-name: 🧹 Fly Preview Cleanup
+name: 🧹 Preview Cleanup
 
 on:
   pull_request:
-    types:
-      - closed
+    types: [closed]
 
 jobs:
   destroy:
     name: 🗑 Remove Preview App
     runs-on: ubuntu-24.04
-    if: >
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.head.repo.fork == false && secrets.FLY_API_TOKEN
-      != ''
+    if: ${{ github.event.pull_request.head.repo.fork == false }}
+
+    permissions:
+      pull-requests: write
+      contents: read
+
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -21,26 +22,19 @@ jobs:
         id: base_app
         uses: SebRollen/toml-action@v1.2.0
         with:
-          file: 'fly.toml'
-          field: 'app'
-
-      - name: 🧮 Derive preview identifiers
-        id: meta
-        run: |
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
-          SLUG=$(echo "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g' | cut -c1-32)
-          if [ -z "$SLUG" ]; then
-            SLUG="preview"
-          fi
-          APP="${{ steps.base_app.outputs.value }}-preview-${SLUG}"
-          echo "app=${APP}" >> "$GITHUB_OUTPUT"
+          file: fly.toml
+          field: app
 
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: 🗑 Destroy preview app
+        shell: bash
         run: |
-          flyctl apps destroy "${{ steps.meta.outputs.app }}" --yes || echo "App already removed"
+          set -euo pipefail
+          preview_app_name="${{ steps.base_app.outputs.value }}-pr-${{ github.event.pull_request.number }}"
+
+          flyctl apps destroy "${preview_app_name}" --yes || echo "App already removed"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -49,4 +43,4 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ♻️ Preview environment `${{ steps.meta.outputs.app }}` has been destroyed after merge.
+            ♻️ Preview environment `${{ steps.base_app.outputs.value }}-pr-${{ github.event.pull_request.number }}` has been destroyed.

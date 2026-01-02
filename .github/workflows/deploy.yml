@@ -1,9 +1,8 @@
 name: 🚀 Deploy
+
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   pull_request: {}
 
 concurrency:
@@ -30,12 +29,6 @@ jobs:
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
 
-      - name: 🏄 Copy test env vars
-        run: cp .env.example .env
-
-      - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
-
       - name: 🔬 Lint
         run: npm run lint
 
@@ -53,15 +46,6 @@ jobs:
 
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
-
-      - name: 🏗 Build
-        run: npm run build
-
-      - name: 🏄 Copy test env vars
-        run: cp .env.example .env
-
-      - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
 
       - name: 🔎 Type check
         run: npm run typecheck --if-present
@@ -83,9 +67,6 @@ jobs:
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
-
-      - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
 
       - name: ⚡ Run vitest
         run: npm run test -- --coverage
@@ -113,7 +94,7 @@ jobs:
         run: npm run test:e2e:install
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
+        run: npx prisma migrate deploy
 
       - name: 🏦 Cache Database
         id: db-cache
@@ -143,11 +124,26 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  container:
-    name: 📦 Prepare Container
-    runs-on: ubuntu-24.04
-    # only prepare container on pushes
-    if: ${{ github.event_name == 'push' }}
+  prepare_deploy:
+    name: 🧰 Prepare deploy metadata
+    runs-on: ubuntu-22.04
+    needs: [lint, typecheck, vitest, playwright]
+    if: >-
+      (
+        github.event_name == 'push' &&
+        (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+      ) || (
+        github.event_name == 'pull_request' &&
+        (
+          github.event.action == 'opened' ||
+          github.event.action == 'reopened' ||
+          github.event.action == 'synchronize' ||
+          github.event.action == 'ready_for_review'
+        ) &&
+        github.event.pull_request.head.repo.fork == false
+      )
+    outputs:
+      base_app_name: ${{ steps.app_name.outputs.value }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -158,72 +154,123 @@ jobs:
         uses: SebRollen/toml-action@v1.2.0
         id: app_name
         with:
-          file: 'fly.toml'
-          field: 'app'
+          file: fly.toml
+          field: app
 
-      - name: 🎈 Setup Fly
-        uses: superfly/flyctl-actions/setup-flyctl@1.5
-
-      - name: 📦 Build Staging Container
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --build-only \
-            --push \
-            --image-label ${{ github.sha }} \
-            --build-arg COMMIT_SHA=${{ github.sha }} \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-      - name: 📦 Build Production Container
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          flyctl deploy \
-            --build-only \
-            --push \
-            --image-label ${{ github.sha }} \
-            --build-arg COMMIT_SHA=${{ github.sha }} \
-            --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
-            --app ${{ steps.app_name.outputs.value }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-  deploy:
-    name: 🚀 Deploy
-    runs-on: ubuntu-24.04
-    needs: [lint, typecheck, vitest, playwright, container]
-    # only deploy on pushes
-    if: ${{ github.event_name == 'push' }}
+  deploy_preview:
+    name: 👀 Deploy Preview
+    runs-on: ubuntu-22.04
+    needs: [prepare_deploy]
+    if: >-
+      github.event_name == 'pull_request' && (
+        github.event.action == 'opened' ||
+        github.event.action == 'reopened' ||
+        github.event.action == 'synchronize' ||
+        github.event.action == 'ready_for_review'
+      ) && github.event.pull_request.head.repo.fork == false
+    environment:
+      name: preview
+      url:
+        https://${{ needs.prepare_deploy.outputs.base_app_name }}-pr-${{
+        github.event.pull_request.number }}.fly.dev
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: '50'
-
-      - name: 👀 Read app name
-        uses: SebRollen/toml-action@v1.2.0
-        id: app_name
-        with:
-          file: 'fly.toml'
-          field: 'app'
+          fetch-depth: 50
 
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 🚀 Deploy Staging
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
-            --app ${{ steps.app_name.outputs.value }}-staging
+      - name: 🚀 Deploy Preview (remote build)
+        shell: bash
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
 
-      - name: 🚀 Deploy Production
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
           flyctl deploy \
-            --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
+            --remote-only \
+            --build-arg "COMMIT_SHA=${{ github.sha }}" \
+            --build-secret "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" \
+            --app "${{ needs.prepare_deploy.outputs.base_app_name }}-pr-${{ github.event.pull_request.number }}"
+
+      - name: 💬 Comment preview URL
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Preview deployed
+            🔗 https://${{ needs.prepare_deploy.outputs.base_app_name }}-pr-${{ github.event.pull_request.number }}.fly.dev
+
+  deploy_staging:
+    name: 🚀 Deploy Staging
+    runs-on: ubuntu-22.04
+    needs: [prepare_deploy]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/dev' }}
+    environment:
+      name: staging
+      url:
+        https://${{ needs.prepare_deploy.outputs.base_app_name
+        }}-staging.fly.dev
+    permissions:
+      contents: read
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 🚀 Deploy Staging (remote build)
+        shell: bash
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          flyctl deploy \
+            --remote-only \
+            --build-arg "COMMIT_SHA=${{ github.sha }}" \
+            --build-secret "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" \
+            --app "${{ needs.prepare_deploy.outputs.base_app_name }}-staging"
+
+  deploy_production:
+    name: 🚀 Deploy Production
+    runs-on: ubuntu-22.04
+    needs: [prepare_deploy]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    environment:
+      name: production
+      url: https://${{ needs.prepare_deploy.outputs.base_app_name }}.fly.dev
+    permissions:
+      contents: read
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 🚀 Deploy Production (remote build)
+        shell: bash
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          flyctl deploy \
+            --remote-only \
+            --build-arg "COMMIT_SHA=${{ github.sha }}" \
+            --build-secret "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}" \
+            --app "${{ needs.prepare_deploy.outputs.base_app_name }}"
