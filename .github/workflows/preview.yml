@@ -17,14 +17,15 @@ jobs:
     name: 🚀 Deploy Preview
     runs-on: ubuntu-24.04
     if: >
-      github.event.pull_request.head.repo.fork == false && secrets.FLY_API_TOKEN
-      != ''
+      github.event.pull_request.head.repo.fork == false &&
+      env.FLY_API_TOKEN != ''
     env:
       # Map any GitHub secrets you want in previews to env vars that start with
       # FLY_PREVIEW_. Example:
       # FLY_PREVIEW_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       # FLY_PREVIEW_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       PREVIEW_SECRET_PREFIX: FLY_PREVIEW_
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     permissions:
       pull-requests: write
       contents: read
@@ -72,8 +73,6 @@ jobs:
           if ! flyctl apps show "${{ steps.meta.outputs.app }}" >/dev/null 2>&1; then
             flyctl apps create "${{ steps.meta.outputs.app }}"
           fi
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 💾 Ensure preview volume
         run: |
@@ -84,8 +83,6 @@ jobs:
               --size 1 \
               --yes
           fi
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🔐 Set baseline preview secrets
         run: |
@@ -96,8 +93,6 @@ jobs:
             ALLOW_INDEXING=false \
             --stage \
             --app "${{ steps.meta.outputs.app }}"
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🔄 Import prefixed preview secrets
         shell: bash
@@ -118,8 +113,6 @@ jobs:
           else
             echo "No ${PREFIX}* variables found; skipping preview secret import."
           fi
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🚀 Deploy preview app
         run: |
@@ -127,8 +120,6 @@ jobs:
             --config fly.preview.toml \
             --build-arg COMMIT_SHA=${{ github.sha }} \
             --app "${{ steps.meta.outputs.app }}"
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 💬 Publish preview URL
         uses: peter-evans/create-or-update-comment@v4
