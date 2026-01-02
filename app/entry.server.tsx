@@ -13,6 +13,7 @@ import {
 	type HandleDocumentRequestFunction,
 } from 'react-router'
 import { getEnv, init } from './utils/env.server.ts'
+// noinspection ES6PreferShortImport litefs-js should be used server-side only.
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'

@@ -49,6 +49,18 @@ Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
 assets you can use in your material:
 [EpicWeb.dev/brand](https://epicweb.dev/brand)
 
+## App Branding Configuration
+
+- Update `app/utils/branding.ts` to change the app title, base URL, or email
+  sender (swap the defaults for `import.meta.env.*` / `process.env.*` when
+  you're ready to drive them from environment variables).
+
+## E2E Coverage
+
+- Run `npm run test:e2e:run` (or `npm run test:e2e:dev`) and open
+  `coverage/e2e/index.html` to explore the Monocart report and the
+  captured Chromium coverage.
+
 ## Thanks
 
 You rock 🪨

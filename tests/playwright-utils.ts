@@ -1,5 +1,6 @@
 import { test as base, type Response } from '@playwright/test'
 import { type User as UserModel } from '@prisma/client'
+import { addCoverageReport } from 'monocart-reporter'
 import { href, type Register } from 'react-router'
 import * as setCookieParser from 'set-cookie-parser'
 import {
@@ -73,7 +74,39 @@ export const test = base.extend<{
 	insertNewUser(options?: GetOrInsertUserOptions): Promise<User>
 	login(options?: GetOrInsertUserOptions): Promise<User>
 	prepareGitHubUser(): Promise<GitHubUser>
+	collectCoverage: void
 }>({
+	collectCoverage: [
+		async ({ page }, use, testInfo) => {
+			const isChromium =
+				testInfo.project.name?.toLowerCase().includes('chromium') ?? false
+
+			if (!isChromium) {
+				await use()
+				return
+			}
+
+			await Promise.all([
+				page.coverage.startJSCoverage({ resetOnNavigation: false }),
+				page.coverage.startCSSCoverage({ resetOnNavigation: false }),
+			])
+
+			await use()
+
+			const [javascriptCoverageEntries, stylesheetCoverageEntries] =
+				await Promise.all([
+					page.coverage.stopJSCoverage(),
+					page.coverage.stopCSSCoverage(),
+				])
+
+			await addCoverageReport(
+				[...javascriptCoverageEntries, ...stylesheetCoverageEntries],
+				testInfo,
+			)
+		},
+		{ scope: 'test', auto: true },
+	],
+
 	navigate: async ({ page }, use) => {
 		await use((...args) => {
 			return page.goto(href(...args))

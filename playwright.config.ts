@@ -4,6 +4,7 @@ import 'dotenv/config'
 const PORT = process.env.PORT || '3000'
 
 export default defineConfig({
+	globalTeardown: './tests/playwright-teardown.ts',
 	testDir: './tests/e2e',
 	timeout: 15 * 1000,
 	expect: {
@@ -13,7 +14,24 @@ export default defineConfig({
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
 	workers: process.env.CI ? 1 : undefined,
-	reporter: 'html',
+	reporter: [
+		['dot'],
+		['html'],
+		[
+			'monocart-reporter',
+			{
+				name: 'e2e Test Report',
+				outputFile: './playwright-report/monocart/index.html',
+				coverage: {
+					outputDir: './coverage/e2e',
+					reports: ['html', 'lcov', 'raw', 'console-summary'],
+					sourceFilter: (sourcePath: string) => {
+						return sourcePath.startsWith('app/')
+					},
+				},
+			},
+		],
+	],
 	use: {
 		baseURL: `http://localhost:${PORT}/`,
 		trace: 'on-first-retry',
@@ -37,6 +55,7 @@ export default defineConfig({
 		env: {
 			PORT,
 			NODE_ENV: 'test',
+			NODE_V8_COVERAGE: './coverage/e2e-node-v8',
 		},
 	},
 })
