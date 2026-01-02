@@ -1,0 +1,52 @@
+name: 🧹 Fly Preview Cleanup
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  destroy:
+    name: 🗑 Remove Preview App
+    runs-on: ubuntu-24.04
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.fork == false && secrets.FLY_API_TOKEN
+      != ''
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🔤 Read Fly app name
+        id: base_app
+        uses: SebRollen/toml-action@v1.2.0
+        with:
+          file: 'fly.toml'
+          field: 'app'
+
+      - name: 🧮 Derive preview identifiers
+        id: meta
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          SLUG=$(echo "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g' | cut -c1-32)
+          if [ -z "$SLUG" ]; then
+            SLUG="preview"
+          fi
+          APP="${{ steps.base_app.outputs.value }}-preview-${SLUG}"
+          echo "app=${APP}" >> "$GITHUB_OUTPUT"
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 🗑 Destroy preview app
+        run: |
+          flyctl apps destroy "${{ steps.meta.outputs.app }}" --yes || echo "App already removed"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 💬 Notify pull request
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ♻️ Preview environment `${{ steps.meta.outputs.app }}` has been destroyed after merge.

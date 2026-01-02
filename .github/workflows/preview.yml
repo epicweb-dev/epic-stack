@@ -1,0 +1,139 @@
+name: 🐣 Fly Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+concurrency:
+  group: preview-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: 🚀 Deploy Preview
+    runs-on: ubuntu-24.04
+    if: >
+      github.event.pull_request.head.repo.fork == false && secrets.FLY_API_TOKEN
+      != ''
+    env:
+      # Map any GitHub secrets you want in previews to env vars that start with
+      # FLY_PREVIEW_. Example:
+      # FLY_PREVIEW_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      # FLY_PREVIEW_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      PREVIEW_SECRET_PREFIX: FLY_PREVIEW_
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🔤 Read Fly app name
+        id: base_app
+        uses: SebRollen/toml-action@v1.2.0
+        with:
+          file: 'fly.toml'
+          field: 'app'
+
+      - name: 📍 Read Fly region
+        id: primary_region
+        uses: SebRollen/toml-action@v1.2.0
+        with:
+          file: 'fly.toml'
+          field: 'primary_region'
+
+      - name: 🧮 Derive preview identifiers
+        id: meta
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          SLUG=$(echo "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g' | cut -c1-32)
+          if [ -z "$SLUG" ]; then
+            SLUG="preview"
+          fi
+          APP="${{ steps.base_app.outputs.value }}-preview-${SLUG}"
+          echo "slug=${SLUG}" >> "$GITHUB_OUTPUT"
+          echo "app=${APP}" >> "$GITHUB_OUTPUT"
+          echo "url=https://${APP}.fly.dev" >> "$GITHUB_OUTPUT"
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
+
+      - name: 🗂 Prepare Fly config override
+        run: |
+          cp fly.toml fly.preview.toml
+          perl -0pi -e 's/app = ".*"/app = "${{ steps.meta.outputs.app }}"/' fly.preview.toml
+
+      - name: 🆕 Ensure preview app exists
+        run: |
+          if ! flyctl apps show "${{ steps.meta.outputs.app }}" >/dev/null 2>&1; then
+            flyctl apps create "${{ steps.meta.outputs.app }}"
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 💾 Ensure preview volume
+        run: |
+          if ! flyctl volumes list --app "${{ steps.meta.outputs.app }}" | grep -q 'data'; then
+            flyctl volumes create data \
+              --app "${{ steps.meta.outputs.app }}" \
+              --region "${{ steps.primary_region.outputs.value }}" \
+              --size 1 \
+              --yes
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 🔐 Set baseline preview secrets
+        run: |
+          flyctl secrets set \
+            SESSION_SECRET=$(openssl rand -hex 32) \
+            INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) \
+            HONEYPOT_SECRET=$(openssl rand -hex 32) \
+            ALLOW_INDEXING=false \
+            --stage \
+            --app "${{ steps.meta.outputs.app }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 🔄 Import prefixed preview secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          PREFIX="${PREVIEW_SECRET_PREFIX:-FLY_PREVIEW_}"
+          MATCHES=0
+          while IFS='=' read -r KEY VALUE; do
+            if [[ "$KEY" == ${PREFIX}* ]]; then
+              MATCHES=1
+              SHORT_KEY=${KEY#${PREFIX}}
+              printf '%s=%s\n' "$SHORT_KEY" "$VALUE" >> preview-secrets.env
+            fi
+          done < <(env)
+
+          if [[ $MATCHES -eq 1 ]]; then
+            flyctl secrets import --stage --app "${{ steps.meta.outputs.app }}" < preview-secrets.env
+          else
+            echo "No ${PREFIX}* variables found; skipping preview secret import."
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 🚀 Deploy preview app
+        run: |
+          flyctl deploy \
+            --config fly.preview.toml \
+            --build-arg COMMIT_SHA=${{ github.sha }} \
+            --app "${{ steps.meta.outputs.app }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 💬 Publish preview URL
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Preview updated for `${{ github.head_ref }}`  
+            🔗 https://${{ steps.meta.outputs.app }}.fly.dev

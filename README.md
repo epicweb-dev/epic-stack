@@ -54,6 +54,9 @@ assets you can use in your material:
 - Update `app/utils/branding.ts` to change the app title, base URL, or email
   sender (swap the defaults for `import.meta.env.*` / `process.env.*` when
   you're ready to drive them from environment variables).
+- Set `PREVIEW_BADGE_TEXT` (or `FLY_PREVIEW_PREVIEW_BADGE_TEXT` in the preview
+  workflow) to show a thin banner across the top of the app that reminds people
+  they're viewing a preview deploy.
 
 ## E2E Coverage
 

@@ -15,6 +15,7 @@
     "dev:no-mocks": "cross-env NODE_ENV=development node ./server/index.ts",
     "format": "prettier --write .",
     "lint": "eslint .",
+    "lint:branding": "node scripts/check-branding.mjs",
     "setup": "npm run build && prisma migrate deploy && prisma generate --sql && playwright install",
     "start": "cross-env NODE_ENV=production node index.ts",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true node index.ts",
@@ -26,7 +27,7 @@
     "test:e2e:run": "cross-env CI=true playwright test",
     "test:e2e:install": "npx playwright install --with-deps chromium",
     "typecheck": "react-router typegen && tsc",
-    "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
+    "validate": "run-p \"test -- --run\" lint lint:branding typecheck test:e2e:run"
   },
   "eslintIgnore": [
     "/node_modules",

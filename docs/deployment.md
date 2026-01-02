@@ -124,6 +124,41 @@ Prior to your first deployment, you'll need to do a few things:
 
 ---
 
+## Pull Request Preview Apps on Fly.io
+
+In addition to the standard `main`/`dev` deployments, this project now ships
+with a pair of GitHub Actions that spin up a Fly app for every pull request and
+tear it down automatically once the PR merges. To enable previews:
+
+1. Ensure the `FLY_API_TOKEN` secret (already required for prod/staging) exists
+   and has permissions to create/destroy apps in your Fly organization.
+2. (Optional) Map any GitHub secrets you want in preview apps to env vars that
+   start with `FLY_PREVIEW_` inside `.github/workflows/preview.yml`. The
+   workflow strips that prefix and imports the rest as Fly secrets for you. For
+   example:
+
+   ```yaml
+   env:
+     FLY_PREVIEW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+     FLY_PREVIEW_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     FLY_PREVIEW_PREVIEW_BADGE_TEXT: Preview for ${{ github.head_ref }}
+   ```
+
+3. Open a pull request from a branch in this repository (forks are skipped so
+   your secrets stay safe). GitHub will run `.github/workflows/preview.yml`,
+   which:
+   - Clones the base `fly.toml`, sets `app = "<base>-preview-<branch-slug>"`,
+     and deploys to that Fly app.
+   - Creates a volume and seeds new secrets (session, honeypot, etc.) for you.
+   - Copies every `FLY_PREVIEW_*` env var from the workflow into Fly secrets.
+   - Comments on the PR with the preview URL (`https://<app>.fly.dev`).
+4. When the PR is merged, `.github/workflows/preview-cleanup.yml` destroys the
+   preview Fly app and posts a confirmation comment.
+
+Because these workflows only touch the `<base>-preview-*` apps, your existing
+production and staging deployments (`[YOUR_APP_NAME]` / `...-staging`) remain
+unchanged.
+
 ### Optional: Email service setup
 
 Find instructions for this optional step in [the email docs](./email.md).

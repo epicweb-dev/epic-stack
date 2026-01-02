@@ -18,6 +18,7 @@ import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
 import { useToast } from './components/toaster.tsx'
+import { Badge } from './components/ui/badge.tsx'
 import { Button } from './components/ui/button.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { EpicToaster } from './components/ui/sonner.tsx'
@@ -37,7 +38,7 @@ import { pipeHeaders } from './utils/headers.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl, getImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
-import { type Theme, getTheme } from './utils/theme.server.ts'
+import { getTheme, type Theme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser } from './utils/user.ts'
@@ -195,38 +196,42 @@ function App() {
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />
 	useToast(data.toast)
 
+	const previewBadgeText = data.ENV.PREVIEW_BADGE_TEXT
+
 	return (
 		<OpenImgContextProvider
 			optimizerEndpoint="/resources/images"
 			getSrc={getImgSrc}
 		>
-			<div className="flex min-h-screen flex-col justify-between">
-				<header className="container py-6">
-					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
+			<div className="flex min-h-screen flex-col">
+				<div className="flex flex-1 flex-col justify-between">
+					<header className="container py-6">
+						<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
+							<Logo badge={previewBadgeText} />
+							<div className="ml-auto hidden max-w-sm flex-1 sm:block">
+								{searchBar}
+							</div>
+							<div className="flex items-center gap-10">
+								{user ? (
+									<UserDropdown />
+								) : (
+									<Button asChild variant="default" size="lg">
+										<Link to="/login">Log In</Link>
+									</Button>
+								)}
+							</div>
+							<div className="block w-full sm:hidden">{searchBar}</div>
+						</nav>
+					</header>
+
+					<div className="flex flex-1 flex-col">
+						<Outlet />
+					</div>
+
+					<div className="container flex justify-between pb-5">
 						<Logo />
-						<div className="ml-auto hidden max-w-sm flex-1 sm:block">
-							{searchBar}
-						</div>
-						<div className="flex items-center gap-10">
-							{user ? (
-								<UserDropdown />
-							) : (
-								<Button asChild variant="default" size="lg">
-									<Link to="/login">Log In</Link>
-								</Button>
-							)}
-						</div>
-						<div className="block w-full sm:hidden">{searchBar}</div>
-					</nav>
-				</header>
-
-				<div className="flex flex-1 flex-col">
-					<Outlet />
-				</div>
-
-				<div className="container flex justify-between pb-5">
-					<Logo />
-					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+						<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+					</div>
 				</div>
 			</div>
 			<EpicToaster closeButton position="top-center" theme={theme} />
@@ -235,16 +240,34 @@ function App() {
 	)
 }
 
-function Logo() {
+interface LogoProps {
+	badge?: string
+}
+
+function Logo({ badge }: LogoProps) {
+	const words = APP_TITLE.split(/\s+/).filter(Boolean)
+
 	return (
-		<Link to="/" className="group grid leading-snug">
-			<span className="font-light transition group-hover:-translate-x-1">
-				epic
-			</span>
-			<span className="font-bold transition group-hover:translate-x-1">
-				notes
-			</span>
-		</Link>
+		<>
+			<Link to="/" className="group grid leading-snug">
+				{words.map((word, index) => {
+					const isEven = index % 2 === 0
+					const fontClass = isEven ? 'font-light' : 'font-bold'
+					const hoverClass = isEven
+						? 'group-hover:-translate-x-1'
+						: 'group-hover:translate-x-1'
+					return (
+						<span
+							key={`${word}-${index}`}
+							className={`transition ${fontClass} ${hoverClass}`}
+						>
+							{word}
+						</span>
+					)
+				})}
+			</Link>
+			{badge && <Badge variant="destructive">{badge}</Badge>}
+		</>
 	)
 }
 

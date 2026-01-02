@@ -19,6 +19,7 @@ const schema = z.object({
 	GITHUB_TOKEN: z.string().optional(),
 
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
+	PREVIEW_BADGE_TEXT: z.string().optional(),
 
 	// Tigris Object Storage Configuration
 	AWS_ACCESS_KEY_ID: z.string(),
@@ -61,6 +62,7 @@ export function getEnv() {
 		MODE: process.env.NODE_ENV,
 		SENTRY_DSN: process.env.SENTRY_DSN,
 		ALLOW_INDEXING: process.env.ALLOW_INDEXING,
+		PREVIEW_BADGE_TEXT: process.env.PREVIEW_BADGE_TEXT,
 	}
 }
 
