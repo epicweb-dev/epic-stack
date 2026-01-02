@@ -58,8 +58,8 @@ assets you can use in your material:
 ## E2E Coverage
 
 - Run `npm run test:e2e:run` (or `npm run test:e2e:dev`) and open
-  `coverage/e2e/index.html` to explore the Monocart report and the
-  captured Chromium coverage.
+  `coverage/e2e/index.html` to explore the Monocart report and the captured
+  Chromium coverage.
 
 ## Thanks
 
