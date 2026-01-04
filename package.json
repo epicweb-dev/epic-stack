@@ -11,8 +11,8 @@
   },
   "scripts": {
     "build": "react-router build",
-    "dev": "cross-env NODE_ENV=development MOCKS=true node server/index.ts",
-    "dev:no-mocks": "cross-env NODE_ENV=development node ./server/index.ts",
+    "dev": "cross-env NODE_ENV=development MOCKS=true node index.ts",
+    "dev:no-mocks": "cross-env NODE_ENV=development node index.ts",
     "format": "prettier --write .",
     "lint": "eslint .",
     "setup": "npm run build && prisma migrate deploy && prisma generate --sql && playwright install",
