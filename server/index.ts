@@ -22,45 +22,6 @@ if (SENTRY_ENABLED) {
 
 const app = express()
 
-if (IS_DEV) {
-	console.log('Starting development server')
-	const viteDevServer = await import('vite').then((vite) =>
-		vite.createServer({
-			server: { middlewareMode: true },
-			// We tell Vite we are running a custom app instead of
-			// the SPA default so it doesn't run HTML middleware
-			appType: 'custom',
-		}),
-	)
-	app.use(viteDevServer.middlewares)
-	app.use(async (req, res, next) => {
-		try {
-			const source = await viteDevServer.ssrLoadModule('./server/app.ts')
-			return await source.app(req, res, next)
-		} catch (error) {
-			if (typeof error === 'object' && error instanceof Error) {
-				viteDevServer.ssrFixStacktrace(error)
-			}
-			next(error)
-		}
-	})
-} else {
-	console.log('Starting production server')
-	// React Router fingerprints its assets so we can cache forever.
-	app.use(
-		'/assets',
-		express.static('build/client/assets', {
-			immutable: true,
-			maxAge: '1y',
-			fallthrough: false,
-		}),
-	)
-	// Everything else (like favicon.ico) is cached for an hour. You may want to be
-	// more aggressive with this caching.
-	app.use(express.static('build/client', { maxAge: '1h' }))
-	app.use(await import(BUILD_PATH).then((mod) => mod.app))
-}
-
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
 
@@ -191,6 +152,45 @@ if (!ALLOW_INDEXING) {
 		res.set('X-Robots-Tag', 'noindex, nofollow')
 		next()
 	})
+}
+
+if (IS_DEV) {
+	console.log('Starting development server')
+	const viteDevServer = await import('vite').then((vite) =>
+		vite.createServer({
+			server: { middlewareMode: true },
+			// We tell Vite we are running a custom app instead of
+			// the SPA default so it doesn't run HTML middleware
+			appType: 'custom',
+		}),
+	)
+	app.use(viteDevServer.middlewares)
+	app.use(async (req, res, next) => {
+		try {
+			const source = await viteDevServer.ssrLoadModule('./server/app.ts')
+			return await source.app(req, res, next)
+		} catch (error) {
+			if (typeof error === 'object' && error instanceof Error) {
+				viteDevServer.ssrFixStacktrace(error)
+			}
+			next(error)
+		}
+	})
+} else {
+	console.log('Starting production server')
+	// React Router fingerprints its assets so we can cache forever.
+	app.use(
+		'/assets',
+		express.static('build/client/assets', {
+			immutable: true,
+			maxAge: '1y',
+			fallthrough: false,
+		}),
+	)
+	// Everything else (like favicon.ico) is cached for an hour. You may want to be
+	// more aggressive with this caching.
+	app.use(express.static('build/client', { maxAge: '1h' }))
+	app.use(await import(BUILD_PATH).then((mod) => mod.app))
 }
 
 const desiredPort = Number(process.env.PORT || 3000)
