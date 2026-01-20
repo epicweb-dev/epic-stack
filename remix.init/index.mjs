@@ -1,10 +1,10 @@
+import toml from '@iarna/toml'
+import { $ } from 'execa'
+import inquirer from 'inquirer'
 import { execSync } from 'node:child_process'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import toml from '@iarna/toml'
-import { $ } from 'execa'
-import inquirer from 'inquirer'
 import open from 'open'
 import parseGitHubURL from 'parse-github-url'
 
@@ -90,7 +90,6 @@ export default async function main({ rootDirectory }) {
 		),
 		fs.rm(path.join(rootDirectory, 'LICENSE.md')),
 		fs.rm(path.join(rootDirectory, 'CONTRIBUTING.md')),
-		fs.rm(path.join(rootDirectory, 'docs'), { recursive: true }),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/notes.test.ts')),
 		fs.rm(path.join(rootDirectory, 'tests/e2e/search.test.ts')),
 	]
