@@ -1,5 +1,5 @@
 ---
-name: epic-react-best-practices
+name: epic-react-patterns
 description: Guide on React patterns, performance optimization, and code quality for Epic Stack
 categories:
   - react
@@ -55,13 +55,13 @@ export default function UserRoute({ loaderData }: Route.ComponentProps) {
 // ❌ Don't do this
 export default function UserRoute({ params }: Route.ComponentProps) {
 	const [user, setUser] = useState(null)
-	
+
 	useEffect(() => {
 		fetch(`/api/users/${params.username}`)
 			.then(res => res.json())
 			.then(setUser)
 	}, [params.username])
-	
+
 	return user ? <div>{user.name}</div> : <div>Loading...</div>
 }
 ```
@@ -426,7 +426,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 		where: { username: params.username },
 		select: { id: true },
 	})
-	
+
 	if (!user) {
 		throw new Response('Not Found', { status: 404 })
 	}
@@ -542,7 +542,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 		where: { username: params.username },
 		select: { firstName: true, lastName: true },
 	})
-	
+
 	return {
 		user: {
 			...user,
