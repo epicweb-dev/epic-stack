@@ -302,7 +302,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 ### WebAuthn/Passkeys
 
-Epic Stack soporta autenticación con passkeys usando WebAuthn.
+Epic Stack supports authentication with passkeys using WebAuthn.
 
 **Loader to generate options:**
 ```typescript
