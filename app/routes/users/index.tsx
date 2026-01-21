@@ -1,4 +1,4 @@
-import { searchUsers } from '@prisma/client/sql'
+import { Prisma } from '@prisma/client'
 import { Img } from 'openimg/react'
 import { redirect, Link } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -8,6 +8,14 @@ import { prisma } from '#app/utils/db.server.ts'
 import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 import { type Route } from './+types/index.ts'
 
+type UserSearchResult = {
+	id: string
+	username: string
+	name: string | null
+	imageId: string | null
+	imageObjectKey: string | null
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
 	const searchTerm = new URL(request.url).searchParams.get('search')
 	if (searchTerm === '') {
@@ -15,7 +23,28 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	const like = `%${searchTerm ?? ''}%`
-	const users = await prisma.$queryRawTyped(searchUsers(like))
+	const users = await prisma.$queryRaw<UserSearchResult[]>(
+		Prisma.sql`
+			SELECT
+				"User".id,
+				"User".username,
+				"User".name,
+				"UserImage".id AS imageId,
+				"UserImage".objectKey AS imageObjectKey
+			FROM "User"
+			LEFT JOIN "UserImage" ON "User".id = "UserImage".userId
+			WHERE "User".username LIKE ${like}
+			OR "User".name LIKE ${like}
+			ORDER BY (
+				SELECT "Note".updatedAt
+				FROM "Note"
+				WHERE "Note".ownerId = "User".id
+				ORDER BY "Note".updatedAt DESC
+				LIMIT 1
+			) DESC
+			LIMIT 50
+		`,
+	)
 	return { status: 'idle', users } as const
 }
 

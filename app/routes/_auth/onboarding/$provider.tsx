@@ -40,11 +40,9 @@ const SignupFormSchema = z.object({
 	username: UsernameSchema,
 	name: NameSchema,
 	agreeToTermsOfServiceAndPrivacyPolicy: z
-		.string({
-			required_error:
-				'You must agree to the terms of service and privacy policy',
-		})
-		.refine((value) => value === 'on', {
+		.coerce
+		.boolean()
+		.refine((value) => value, {
 			message: 'You must agree to the terms of service and privacy policy',
 		}),
 	remember: z.boolean().optional(),
