@@ -32,6 +32,7 @@ export default defineConfig({
 		command: process.env.CI ? 'npm run start:mocks' : 'npm run dev',
 		port: Number(PORT),
 		reuseExistingServer: true,
+		timeout: 120 * 1000,
 		stdout: 'pipe',
 		stderr: 'pipe',
 		env: {
