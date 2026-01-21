@@ -1,4 +1,5 @@
 -- @param {String} $1:like
+-- @param {String} $2:like2
 SELECT 
   "User".id,
   "User".username,
@@ -7,8 +8,8 @@ SELECT
   "UserImage".objectKey AS imageObjectKey
 FROM "User"
 LEFT JOIN "UserImage" ON "User".id = "UserImage".userId
-WHERE "User".username LIKE ?1
-OR "User".name LIKE ?1
+WHERE "User".username LIKE ?
+OR "User".name LIKE ?
 ORDER BY (
   SELECT "Note".updatedAt
   FROM "Note"

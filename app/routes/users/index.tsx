@@ -15,7 +15,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	const like = `%${searchTerm ?? ''}%`
-	const users = await prisma.$queryRawTyped(searchUsers(like))
+	const users = await prisma.$queryRawTyped(searchUsers(like, like))
 	return { status: 'idle', users } as const
 }
 
