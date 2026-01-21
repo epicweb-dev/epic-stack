@@ -9,12 +9,15 @@ import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
 import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 
-const MODE = process.env.NODE_ENV
+export default defineConfig((config) => {
+	const mode = config.mode
+	const isTestMode = mode === 'test' && config.command !== 'build'
+	const isProdMode = mode === 'production'
 
-export default defineConfig((config) => ({
-	build: {
-		target: 'es2022',
-		cssMinify: MODE === 'production',
+	return {
+		build: {
+			target: 'es2022',
+			cssMinify: isProdMode,
 
 		rollupOptions: {
 			input: config.isSsrBuild ? "./server/app.ts" : undefined,
@@ -52,22 +55,23 @@ export default defineConfig((config) => ({
 		}),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		MODE === 'test' ? null : reactRouter(),
-		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
+		isTestMode ? null : reactRouter(),
+		isProdMode && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
 	],
-	test: {
-		include: ['./app/**/*.test.{ts,tsx}'],
-		setupFiles: ['./tests/setup/setup-test-env.ts'],
-		globalSetup: ['./tests/setup/global-setup.ts'],
-		restoreMocks: true,
-		coverage: {
-			include: ['app/**/*.{ts,tsx}'],
-			all: true,
+		test: {
+			include: ['./app/**/*.test.{ts,tsx}'],
+			setupFiles: ['./tests/setup/setup-test-env.ts'],
+			globalSetup: ['./tests/setup/global-setup.ts'],
+			restoreMocks: true,
+			coverage: {
+				include: ['app/**/*.{ts,tsx}'],
+				all: true,
+			},
 		},
-	},
-}))
+	}
+})
 
 const sentryConfig: SentryReactRouterBuildOptions = {
 	authToken: process.env.SENTRY_AUTH_TOKEN,
