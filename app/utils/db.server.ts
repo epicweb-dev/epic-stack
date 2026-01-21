@@ -18,7 +18,8 @@ export const prisma = remember('prisma', () => {
 	// Feel free to change this log threshold to something that makes sense for you
 	const logThreshold = 20
 
-	const adapter = new PrismaBetterSqlite3({ url: databaseUrl })
+const sqliteUrl = databaseUrl.split('?')[0]
+const adapter = new PrismaBetterSqlite3({ url: sqliteUrl })
 	const client = new PrismaClient({
 		adapter,
 		log: [
