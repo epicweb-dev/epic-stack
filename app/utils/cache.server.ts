@@ -1,6 +1,6 @@
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
-import { DatabaseSync } from 'node:sqlite'
 import {
 	cachified as baseCachified,
 	verboseReporter,
@@ -20,6 +20,8 @@ import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
+type DatabaseSync = import('node:sqlite').DatabaseSync
+const require = createRequire(import.meta.url)
 
 const cacheDb = remember('cacheDb', createDatabase)
 
@@ -27,6 +29,7 @@ function createDatabase(tryAgain = true): DatabaseSync {
 	const parentDir = path.dirname(CACHE_DATABASE_PATH)
 	fs.mkdirSync(parentDir, { recursive: true })
 
+	const { DatabaseSync } = require('node:sqlite') as typeof import('node:sqlite')
 	const db = new DatabaseSync(CACHE_DATABASE_PATH)
 	const { currentIsPrimary } = getInstanceInfoSync()
 	if (!currentIsPrimary) return db
