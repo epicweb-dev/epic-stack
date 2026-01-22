@@ -23,9 +23,12 @@ export async function setup() {
 		if (prismaSchemaLastModifiedAt < databaseLastModifiedAt) {
 			return
 		}
+		await fsExtra.remove(BASE_DATABASE_PATH)
+		await fsExtra.remove(`${BASE_DATABASE_PATH}-wal`).catch(() => {})
+		await fsExtra.remove(`${BASE_DATABASE_PATH}-shm`).catch(() => {})
 	}
 
-	await execaCommand('npx prisma migrate reset --force', {
+	await execaCommand('npx prisma migrate deploy', {
 		stdio: 'inherit',
 		env: {
 			...process.env,
