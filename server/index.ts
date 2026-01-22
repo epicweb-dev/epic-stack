@@ -103,7 +103,7 @@ const rateLimitDefault = {
 	// specific header such as cf-connecting-ip
 	keyGenerator: (req: express.Request) => {
 		const flyClientIp = req.get('fly-client-ip')
-		return flyClientIp ?? ipKeyGenerator(req)
+		return flyClientIp ?? ipKeyGenerator(req.ip)
 	},
 }
 
