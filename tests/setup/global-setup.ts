@@ -25,8 +25,7 @@ export async function setup() {
 		}
 	}
 
-	await execaCommand(
-		'npx prisma migrate reset --force --skip-generate',
+	await execaCommand('npx prisma migrate reset --force', {
 		{
 			stdio: 'inherit',
 			env: {
