@@ -20,10 +20,14 @@ import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
+const isTestEnv = process.env.NODE_ENV === 'test'
 type DatabaseSync = import('node:sqlite').DatabaseSync
 const require = createRequire(import.meta.url)
 
-const cacheDb = remember('cacheDb', createDatabase)
+const cacheDb = remember('cacheDb', () => {
+	if (isTestEnv) return null
+	return createDatabase()
+})
 
 function createDatabase(tryAgain = true): DatabaseSync {
 	const parentDir = path.dirname(CACHE_DATABASE_PATH)
@@ -55,6 +59,35 @@ function createDatabase(tryAgain = true): DatabaseSync {
 	}
 
 	return db
+}
+
+type CacheStatements = {
+	getStatement: ReturnType<DatabaseSync['prepare']>
+	setStatement: ReturnType<DatabaseSync['prepare']>
+	deleteStatement: ReturnType<DatabaseSync['prepare']>
+	getAllKeysStatement: ReturnType<DatabaseSync['prepare']>
+	searchKeysStatement: ReturnType<DatabaseSync['prepare']>
+}
+
+let cacheStatements: CacheStatements | null = null
+
+function getCacheStatements() {
+	if (!cacheDb) return null
+	if (cacheStatements) return cacheStatements
+	cacheStatements = {
+		getStatement: cacheDb.prepare(
+			'SELECT value, metadata FROM cache WHERE key = ?',
+		),
+		setStatement: cacheDb.prepare(
+			'INSERT OR REPLACE INTO cache (key, value, metadata) VALUES (?, ?, ?)',
+		),
+		deleteStatement: cacheDb.prepare('DELETE FROM cache WHERE key = ?'),
+		getAllKeysStatement: cacheDb.prepare('SELECT key FROM cache LIMIT ?'),
+		searchKeysStatement: cacheDb.prepare(
+			'SELECT key FROM cache WHERE key LIKE ? LIMIT ?',
+		),
+	}
+	return cacheStatements
 }
 
 const lru = remember(
@@ -114,22 +147,12 @@ const cacheQueryResultSchema = z.object({
 	value: z.string(),
 })
 
-const getStatement = cacheDb.prepare(
-	'SELECT value, metadata FROM cache WHERE key = ?',
-)
-const setStatement = cacheDb.prepare(
-	'INSERT OR REPLACE INTO cache (key, value, metadata) VALUES (?, ?, ?)',
-)
-const deleteStatement = cacheDb.prepare('DELETE FROM cache WHERE key = ?')
-const getAllKeysStatement = cacheDb.prepare('SELECT key FROM cache LIMIT ?')
-const searchKeysStatement = cacheDb.prepare(
-	'SELECT key FROM cache WHERE key LIKE ? LIMIT ?',
-)
-
-export const cache: CachifiedCache = {
+const sqliteCache: CachifiedCache = {
 	name: 'SQLite cache',
 	async get(key) {
-		const result = getStatement.get(key)
+		const statements = getCacheStatements()
+		if (!statements) return null
+		const result = statements.getStatement.get(key)
 		const parseResult = cacheQueryResultSchema.safeParse(result)
 		if (!parseResult.success) return null
 
@@ -143,11 +166,13 @@ export const cache: CachifiedCache = {
 		return { metadata, value }
 	},
 	async set(key, entry) {
+		const statements = getCacheStatements()
+		if (!statements) return
 		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
 
 		if (currentIsPrimary) {
 			const value = JSON.stringify(entry.value, bufferReplacer)
-			setStatement.run(key, value, JSON.stringify(entry.metadata))
+			statements.setStatement.run(key, value, JSON.stringify(entry.metadata))
 		} else {
 			// fire-and-forget cache update
 			void updatePrimaryCacheValue({
@@ -164,10 +189,12 @@ export const cache: CachifiedCache = {
 		}
 	},
 	async delete(key) {
+		const statements = getCacheStatements()
+		if (!statements) return
 		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
 
 		if (currentIsPrimary) {
-			deleteStatement.run(key)
+			statements.deleteStatement.run(key)
 		} else {
 			// fire-and-forget cache update
 			void updatePrimaryCacheValue({
@@ -184,20 +211,28 @@ export const cache: CachifiedCache = {
 	},
 }
 
+export const cache = (isTestEnv ? lruCache : sqliteCache) satisfies CachifiedCache
+
 export async function getAllCacheKeys(limit: number) {
+	const statements = getCacheStatements()
 	return {
-		sqlite: getAllKeysStatement
-			.all(limit)
-			.map((row) => (row as { key: string }).key),
+		sqlite: statements
+			? statements.getAllKeysStatement
+					.all(limit)
+					.map((row) => (row as { key: string }).key)
+			: [],
 		lru: [...lru.keys()],
 	}
 }
 
 export async function searchCacheKeys(search: string, limit: number) {
+	const statements = getCacheStatements()
 	return {
-		sqlite: searchKeysStatement
-			.all(`%${search}%`, limit)
-			.map((row) => (row as { key: string }).key),
+		sqlite: statements
+			? statements.searchKeysStatement
+					.all(`%${search}%`, limit)
+					.map((row) => (row as { key: string }).key)
+			: [],
 		lru: [...lru.keys()].filter((key) => key.includes(search)),
 	}
 }
