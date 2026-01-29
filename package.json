@@ -99,7 +99,7 @@
     "remix-auth-github": "^3.0.2",
     "remix-utils": "^9.0.1",
     "set-cookie-parser": "^3.0.1",
-    "sharp": "^0.34.2",
+    "sharp": "^0.34.5",
     "sonner": "^2.0.3",
     "source-map-support": "^0.5.21",
     "spin-delay": "^2.0.1",
