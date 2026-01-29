@@ -102,7 +102,8 @@ const rateLimitDefault = {
 	// When sitting behind a CDN such as cloudflare, replace fly-client-ip with the CDN
 	// specific header such as cf-connecting-ip
 	keyGenerator: (req: express.Request) => {
-		return req.get('fly-client-ip') ?? ipKeyGenerator(req.ip)
+		const ip = req.ip ?? req.socket?.remoteAddress
+		return req.get('fly-client-ip') ?? ipKeyGenerator(ip ?? '0.0.0.0')
 	},
 }
 
