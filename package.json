@@ -65,7 +65,7 @@
     "@sentry/react-router": "^10.38.0",
     "@simplewebauthn/browser": "^13.2.2",
     "@simplewebauthn/server": "^13.2.2",
-    "@tailwindcss/vite": "^4.1.5",
+    "@tailwindcss/vite": "^4.1.18",
     "@tusbar/cache-control": "1.0.2",
     "address": "^2.0.3",
     "bcryptjs": "^3.0.2",
