@@ -126,7 +126,7 @@
     "@types/glob": "^8.1.0",
     "@types/mime-types": "^3.0.1",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.19.7",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.3",
