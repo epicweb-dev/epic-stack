@@ -73,7 +73,7 @@
     "close-with-grace": "^2.4.0",
     "clsx": "^2.1.1",
     "compression": "^1.8.1",
-    "cookie": "^1.0.2",
+    "cookie": "^1.1.1",
     "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
