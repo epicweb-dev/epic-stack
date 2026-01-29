@@ -48,7 +48,7 @@
     "@nichtsam/helmet": "^0.3.1",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "@paralleldrive/cuid2": "^2.2.2",
+    "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/client": "^6.7.0",
     "@prisma/instrumentation": "^6.7.0",
     "@radix-ui/react-checkbox": "^1.2.3",
