@@ -2,6 +2,7 @@ import path from 'node:path'
 import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
 import 'dotenv/config'
+import './test-env.ts'
 import '#app/utils/env.server.ts'
 
 export const BASE_DATABASE_PATH = path.join(

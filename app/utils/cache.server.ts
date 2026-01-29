@@ -1,7 +1,5 @@
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
-import { threadId } from 'node:worker_threads'
 import { DatabaseSync } from 'node:sqlite'
 import {
 	cachified as baseCachified,
@@ -22,19 +20,11 @@ import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
-const IS_TEST = process.env.NODE_ENV === 'test' || process.env.CI === 'true'
-const TEST_WORKER_ID = process.env.VITEST_WORKER_ID ?? String(threadId)
-const CACHE_DATABASE_PATH_FOR_TESTS = IS_TEST
-	? path.join(
-			os.tmpdir(),
-			`epic-stack-cache-${process.pid}-${TEST_WORKER_ID}.db`,
-		)
-	: CACHE_DATABASE_PATH
 
 const cacheDb = remember('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): DatabaseSync {
-	const databasePath = CACHE_DATABASE_PATH_FOR_TESTS
+	const databasePath = CACHE_DATABASE_PATH
 	if (!databasePath) {
 		throw new Error('CACHE_DATABASE_PATH is not set')
 	}
@@ -57,7 +47,7 @@ function createDatabase(tryAgain = true): DatabaseSync {
 		`)
 	} catch (error: unknown) {
 		try {
-			fs.unlinkSync(databasePath)
+			fs.rmSync(databasePath, { force: true })
 		} catch (unlinkError) {
 			if (
 				typeof unlinkError !== 'object' ||

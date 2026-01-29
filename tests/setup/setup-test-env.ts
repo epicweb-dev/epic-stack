@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './test-env.ts'
 import './db-setup.ts'
 import '#app/utils/env.server.ts'
 // we need these to be imported first 👆
