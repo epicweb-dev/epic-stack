@@ -1,5 +1,7 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { threadId } from 'node:worker_threads'
 import { DatabaseSync } from 'node:sqlite'
 import {
 	cachified as baseCachified,
@@ -20,14 +22,27 @@ import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
+const IS_TEST = process.env.NODE_ENV === 'test' || process.env.CI === 'true'
+const TEST_WORKER_ID = process.env.VITEST_WORKER_ID ?? String(threadId)
+const CACHE_DATABASE_PATH_FOR_TESTS = IS_TEST
+	? path.join(
+			os.tmpdir(),
+			`epic-stack-cache-${process.pid}-${TEST_WORKER_ID}.db`,
+		)
+	: CACHE_DATABASE_PATH
 
 const cacheDb = remember('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): DatabaseSync {
-	const parentDir = path.dirname(CACHE_DATABASE_PATH)
+	const databasePath = CACHE_DATABASE_PATH_FOR_TESTS
+	if (!databasePath) {
+		throw new Error('CACHE_DATABASE_PATH is not set')
+	}
+
+	const parentDir = path.dirname(databasePath)
 	fs.mkdirSync(parentDir, { recursive: true })
 
-	const db = new DatabaseSync(CACHE_DATABASE_PATH)
+	const db = new DatabaseSync(databasePath)
 	const { currentIsPrimary } = getInstanceInfoSync()
 	if (!currentIsPrimary) return db
 
@@ -41,10 +56,21 @@ function createDatabase(tryAgain = true): DatabaseSync {
 			)
 		`)
 	} catch (error: unknown) {
-		fs.unlinkSync(CACHE_DATABASE_PATH)
+		try {
+			fs.unlinkSync(databasePath)
+		} catch (unlinkError) {
+			if (
+				typeof unlinkError !== 'object' ||
+				unlinkError === null ||
+				!('code' in unlinkError) ||
+				unlinkError.code !== 'ENOENT'
+			) {
+				throw unlinkError
+			}
+		}
 		if (tryAgain) {
 			console.error(
-				`Error creating cache database, deleting the file at "${CACHE_DATABASE_PATH}" and trying again...`,
+				`Error creating cache database, deleting the file at "${databasePath}" and trying again...`,
 			)
 			return createDatabase(false)
 		}
