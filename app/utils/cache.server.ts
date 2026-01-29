@@ -20,35 +20,14 @@ import { getInstanceInfo, getInstanceInfoSync } from './litefs.server.ts'
 import { cachifiedTimingReporter, type Timings } from './timing.server.ts'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH
-const IS_TEST = process.env.NODE_ENV === 'test' || process.env.CI === 'true'
-const CACHE_DATABASE_PATH_FOR_TESTS = IS_TEST
-	? ':memory:'
-	: CACHE_DATABASE_PATH
 
 const cacheDb = remember('cacheDb', createDatabase)
 
 function createDatabase(tryAgain = true): DatabaseSync {
-	const databasePath = CACHE_DATABASE_PATH_FOR_TESTS
-	if (!databasePath) {
-		throw new Error('CACHE_DATABASE_PATH is not set')
-	}
-	if (databasePath !== ':memory:') {
-		const parentDir = path.dirname(databasePath)
-		fs.mkdirSync(parentDir, { recursive: true })
-	}
+	const parentDir = path.dirname(CACHE_DATABASE_PATH)
+	fs.mkdirSync(parentDir, { recursive: true })
 
-	const db = new DatabaseSync(databasePath)
-	if (IS_TEST) {
-		db.exec(`
-			CREATE TABLE IF NOT EXISTS cache (
-				key TEXT PRIMARY KEY,
-				metadata TEXT,
-				value TEXT
-			)
-		`)
-		return db
-	}
-
+	const db = new DatabaseSync(CACHE_DATABASE_PATH)
 	const { currentIsPrimary } = getInstanceInfoSync()
 	if (!currentIsPrimary) return db
 
