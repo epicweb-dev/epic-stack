@@ -60,7 +60,7 @@
     "@react-email/components": "^1.0.6",
     "@react-router/express": "^7.13.0",
     "@react-router/node": "^7.13.0",
-    "@remix-run/server-runtime": "^2.16.5",
+    "@remix-run/server-runtime": "^2.17.4",
     "@sentry/profiling-node": "^9.32.0",
     "@sentry/react-router": "^9.32.0",
     "@simplewebauthn/browser": "^13.1.0",
