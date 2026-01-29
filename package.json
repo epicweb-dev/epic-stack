@@ -58,7 +58,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-email/components": "^1.0.6",
-    "@react-router/express": "^7.8.1",
+    "@react-router/express": "^7.13.0",
     "@react-router/node": "^7.8.1",
     "@remix-run/server-runtime": "^2.16.5",
     "@sentry/profiling-node": "^9.32.0",
