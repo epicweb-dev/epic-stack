@@ -112,7 +112,7 @@
     "@epic-web/config": "^1.21.3",
     "@faker-js/faker": "^10.2.0",
     "@playwright/test": "^1.58.0",
-    "@react-router/dev": "^7.8.1",
+    "@react-router/dev": "^7.13.0",
     "@sly-cli/sly": "^2.1.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
