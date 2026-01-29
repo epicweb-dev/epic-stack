@@ -63,7 +63,7 @@
     "@remix-run/server-runtime": "^2.17.4",
     "@sentry/profiling-node": "^10.38.0",
     "@sentry/react-router": "^10.38.0",
-    "@simplewebauthn/browser": "^13.1.0",
+    "@simplewebauthn/browser": "^13.2.2",
     "@simplewebauthn/server": "^13.1.1",
     "@tailwindcss/vite": "^4.1.5",
     "@tusbar/cache-control": "1.0.2",
