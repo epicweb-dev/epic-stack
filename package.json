@@ -70,7 +70,7 @@
     "address": "^2.0.3",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
-    "close-with-grace": "^2.2.0",
+    "close-with-grace": "^2.4.0",
     "clsx": "^2.1.1",
     "compression": "^1.8.0",
     "cookie": "^1.0.2",
