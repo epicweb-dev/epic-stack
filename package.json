@@ -42,7 +42,7 @@
     "@epic-web/invariant": "^1.0.0",
     "@epic-web/remember": "^1.1.0",
     "@epic-web/totp": "^4.0.1",
-    "@mjackson/form-data-parser": "^0.7.0",
+    "@mjackson/form-data-parser": "^0.9.1",
     "@mjackson/headers": "^0.10.0",
     "@nasa-gcn/remix-seo": "^2.0.1",
     "@nichtsam/helmet": "^0.3.1",
