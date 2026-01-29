@@ -3,6 +3,7 @@ import 'dotenv/config'
 
 const PORT = process.env.PORT || '3000'
 const envDefaults = {
+	LITEFS_DIR: '/litefs/data',
 	DATABASE_PATH: './prisma/data.db',
 	DATABASE_URL: 'file:./data.db?connection_limit=1',
 	CACHE_DATABASE_PATH: './other/cache.db',
