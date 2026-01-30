@@ -1,5 +1,14 @@
 # Testing
 
+## Prerequisites
+
+Before running tests locally, copy `.env.example` to `.env` so Playwright and
+Vitest load the required environment variables.
+
+```sh
+cp .env.example .env
+```
+
 ## Playwright
 
 We use Playwright for our End-to-End tests in this project. You'll find those in
