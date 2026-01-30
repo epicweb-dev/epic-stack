@@ -1,6 +1,7 @@
 ---
 name: epic-auth
-description: Guide on authentication, sessions, OAuth, 2FA, and passkeys for Epic Stack
+description:
+  Guide on authentication, sessions, OAuth, 2FA, and passkeys for Epic Stack
 categories:
   - authentication
   - sessions
@@ -13,6 +14,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Implement user authentication
 - Work with sessions and cookies
 - Configure OAuth providers (GitHub, Google, etc.)
@@ -28,11 +30,16 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Least privilege** - Users should only have access to what they need, when they need it. Sessions should have minimal permissions and expire appropriately. Don't grant more access than necessary.
+**Least privilege** - Users should only have access to what they need, when they
+need it. Sessions should have minimal permissions and expire appropriately.
+Don't grant more access than necessary.
 
-**Design to fail fast and early** - Validate authentication and authorization as early as possible. Check session validity immediately, verify permissions before processing requests, and return clear errors quickly.
+**Design to fail fast and early** - Validate authentication and authorization as
+early as possible. Check session validity immediately, verify permissions before
+processing requests, and return clear errors quickly.
 
 **Example - Least privilege in sessions:**
+
 ```typescript
 // ✅ Good - Minimal session data, explicit permissions
 const session = await prisma.session.create({
@@ -58,20 +65,21 @@ const session = await prisma.session.create({
 ```
 
 **Example - Fail fast authentication:**
+
 ```typescript
 // ✅ Good - Validate authentication early
 export async function loader({ request }: Route.LoaderArgs) {
 	// Check authentication immediately - fail fast
 	const userId = await requireUserId(request)
-	
+
 	// Check permissions early - fail fast
 	await requireUserWithPermission(request, 'read:note:own')
-	
+
 	// Only proceed if authenticated and authorized
 	const notes = await prisma.note.findMany({
 		where: { ownerId: userId },
 	})
-	
+
 	return { notes }
 }
 
@@ -79,7 +87,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function loader({ request }: Route.LoaderArgs) {
 	// Process request first...
 	const notes = await prisma.note.findMany()
-	
+
 	// Check authentication at the end - too late!
 	const userId = await getUserId(request)
 	if (!userId) {
@@ -91,9 +99,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 ### Cookie-based Sessions
 
-Epic Stack uses cookie-based sessions for authentication. Sessions are stored in the database and identified by signed cookies.
+Epic Stack uses cookie-based sessions for authentication. Sessions are stored in
+the database and identified by signed cookies.
 
 **Session configuration:**
+
 ```typescript
 // app/utils/session.server.ts
 import { createCookieSessionStorage } from 'react-router'
@@ -113,6 +123,7 @@ export const authSessionStorage = createCookieSessionStorage({
 ### Get current user
 
 **Server-side:**
+
 ```typescript
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
 
@@ -129,6 +140,7 @@ await requireAnonymous(request) // Redirects to / if authenticated
 ```
 
 **Client-side:**
+
 ```typescript
 import { useOptionalUser, useUser } from '#app/utils/user.ts'
 
@@ -142,6 +154,7 @@ const user = useUser()
 ### Login with Email/Password
 
 **Validation schema:**
+
 ```typescript
 const LoginSchema = z.object({
 	username: UsernameSchema,
@@ -152,13 +165,14 @@ const LoginSchema = z.object({
 ```
 
 **Login action (fail fast):**
+
 ```typescript
 import { login } from '#app/utils/auth.server.ts'
 import { handleNewSession } from './login.server.ts'
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	
+
 	// Validate input early - fail fast
 	const submission = await parseWithZod(formData, {
 		schema: LoginSchema,
@@ -198,14 +212,15 @@ export async function action({ request }: Route.ActionArgs) {
 ### Signup with Email/Password
 
 **Signup action:**
+
 ```typescript
 import { signup } from '#app/utils/auth.server.ts'
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	
+
 	// Validate form...
-	
+
 	const session = await signup({
 		email,
 		username,
@@ -222,6 +237,7 @@ export async function action({ request }: Route.ActionArgs) {
 Epic Stack uses `remix-auth` for OAuth providers.
 
 **Configure provider (GitHub example):**
+
 ```typescript
 // app/utils/providers/github.server.ts
 import { GitHubStrategy } from 'remix-auth-github'
@@ -249,12 +265,13 @@ export class GitHubProvider implements AuthProvider {
 ```
 
 **Callback handler:**
+
 ```typescript
 // app/routes/_auth/auth.$provider/callback.ts
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const providerName = ProviderNameSchema.parse(params.provider)
 	const authResult = await authenticator.authenticate(providerName, request)
-	
+
 	if (!authResult.success) {
 		throw redirectWithToast('/login', {
 			title: 'Auth Failed',
@@ -305,6 +322,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 Epic Stack supports authentication with passkeys using WebAuthn.
 
 **Loader to generate options:**
+
 ```typescript
 // app/routes/_auth/webauthn/authentication.ts
 import { generateAuthenticationOptions } from '@simplewebauthn/server'
@@ -320,19 +338,23 @@ export async function loader({ request }: Route.LoaderArgs) {
 		challenge: options.challenge,
 	})
 
-	return Response.json({ options }, {
-		headers: { 'Set-Cookie': cookieHeader }
-	})
+	return Response.json(
+		{ options },
+		{
+			headers: { 'Set-Cookie': cookieHeader },
+		},
+	)
 }
 ```
 
 **Action to verify authentication:**
+
 ```typescript
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 
 export async function action({ request }: Route.ActionArgs) {
 	const cookie = await passkeyCookie.parse(request.headers.get('Cookie'))
-	
+
 	if (!cookie?.challenge) {
 		throw new Error('Authentication challenge not found')
 	}
@@ -382,6 +404,7 @@ export async function action({ request }: Route.ActionArgs) {
 Epic Stack uses TOTP (Time-based One-Time Password) para 2FA.
 
 **Check if user has 2FA:**
+
 ```typescript
 const verification = await prisma.verification.findUnique({
 	where: {
@@ -395,6 +418,7 @@ const userHasTwoFactor = Boolean(verification)
 ```
 
 **Handle session with 2FA:**
+
 ```typescript
 export async function handleNewSession({
 	request,
@@ -422,7 +446,7 @@ export async function handleNewSession({
 		const verifySession = await verifySessionStorage.getSession()
 		verifySession.set(unverifiedSessionIdKey, session.id)
 		verifySession.set(rememberKey, remember)
-		
+
 		// Redirect to 2FA verification
 		const redirectUrl = getRedirectToUrl({
 			request,
@@ -453,6 +477,7 @@ export async function handleNewSession({
 ```
 
 **Verify 2FA code:**
+
 ```typescript
 import { prepareTOTP, verifyTOTP } from '@epic-web/totp'
 
@@ -520,6 +545,7 @@ export async function action({ request }: Route.ActionArgs) {
 Epic Stack uses TOTP codes sent via email for verification.
 
 **Prepare verification:**
+
 ```typescript
 import { prepareVerification } from './verify.server.ts'
 
@@ -541,6 +567,7 @@ return redirect(redirectTo.toString())
 ```
 
 **Verify code:**
+
 ```typescript
 export async function loader({ request }: Route.LoaderArgs) {
 	const verifySession = await verifySessionStorage.getSession(
@@ -565,6 +592,7 @@ export async function action({ request }: Route.ActionArgs) {
 ### Password Reset
 
 **Request reset:**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
@@ -598,6 +626,7 @@ export async function action({ request }: Route.ActionArgs) {
 ```
 
 **Reset password:**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	// Verify code first (similar to email verification)
@@ -636,6 +665,7 @@ export async function action({ request }: Route.ActionArgs) {
 ### Session Management
 
 **Create session:**
+
 ```typescript
 const session = await prisma.session.create({
 	data: {
@@ -647,6 +677,7 @@ const session = await prisma.session.create({
 ```
 
 **Session expiration:**
+
 ```typescript
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30 // 30 days
 
@@ -655,11 +686,13 @@ export const getSessionExpirationDate = () =>
 ```
 
 **Destroy session:**
+
 ```typescript
 await prisma.session.deleteMany({ where: { id: sessionId } })
 ```
 
 **Destroy all user sessions:**
+
 ```typescript
 await prisma.session.deleteMany({ where: { userId } })
 ```
@@ -712,11 +745,11 @@ export async function action({ request }: Route.ActionArgs) {
 // app/routes/protected.tsx
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	
+
 	const data = await prisma.something.findMany({
 		where: { userId },
 	})
-	
+
 	return { data }
 }
 
@@ -737,17 +770,27 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 ## Common mistakes to avoid
 
-- ❌ **Delayed authentication checks**: Validate authentication and authorization as early as possible - fail fast
-- ❌ **Granting excessive privileges**: Follow least privilege - only grant access to what's needed, when it's needed
-- ❌ **Storing too much in sessions**: Store minimal data in sessions (just user ID), check permissions from database
-- ❌ **Not verifying session on each request**: Always use `getUserId` or `requireUserId` in protected loaders/actions
-- ❌ **Not handling 2FA correctly**: Verify if user has 2FA before creating session
-- ❌ **Not destroying expired sessions**: Sessions must be verified against `expirationDate` - check early
-- ❌ **Not using `handleNewSession`**: This helper correctly handles 2FA and cookie creation
+- ❌ **Delayed authentication checks**: Validate authentication and
+  authorization as early as possible - fail fast
+- ❌ **Granting excessive privileges**: Follow least privilege - only grant
+  access to what's needed, when it's needed
+- ❌ **Storing too much in sessions**: Store minimal data in sessions (just user
+  ID), check permissions from database
+- ❌ **Not verifying session on each request**: Always use `getUserId` or
+  `requireUserId` in protected loaders/actions
+- ❌ **Not handling 2FA correctly**: Verify if user has 2FA before creating
+  session
+- ❌ **Not destroying expired sessions**: Sessions must be verified against
+  `expirationDate` - check early
+- ❌ **Not using `handleNewSession`**: This helper correctly handles 2FA and
+  cookie creation
 - ❌ **Forgetting to handle `remember`**: Make sure to respect user preference
-- ❌ **Not validating OAuth callbacks**: Always validate that provider exists and result is successful - fail fast
-- ❌ **Not linking OAuth accounts**: If email exists, link the account instead of creating duplicate
-- ❌ **Not updating counter in passkeys**: Always update counter after successful verification
+- ❌ **Not validating OAuth callbacks**: Always validate that provider exists
+  and result is successful - fail fast
+- ❌ **Not linking OAuth accounts**: If email exists, link the account instead
+  of creating duplicate
+- ❌ **Not updating counter in passkeys**: Always update counter after
+  successful verification
 
 ## References
 

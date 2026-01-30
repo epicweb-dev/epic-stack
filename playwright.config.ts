@@ -2,7 +2,6 @@ import { defineConfig, devices } from '@playwright/test'
 import 'dotenv/config'
 
 const PORT = process.env.PORT || '3000'
-
 export default defineConfig({
 	testDir: './tests/e2e',
 	timeout: 15 * 1000,
@@ -31,6 +30,7 @@ export default defineConfig({
 	webServer: {
 		command: process.env.CI ? 'npm run start:mocks' : 'npm run dev',
 		port: Number(PORT),
+		timeout: 60 * 1000,
 		reuseExistingServer: true,
 		stdout: 'pipe',
 		stderr: 'pipe',

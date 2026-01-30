@@ -13,6 +13,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Write unit tests for utilities and components
 - Create E2E tests with Playwright
 - Test forms and validation
@@ -27,35 +28,42 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Tests should resemble users** - Write tests that mirror how real users interact with your application. Test user workflows, not implementation details. If a user would click a button, your test should click that button. If a user would see an error message, your test should check for that specific message.
+**Tests should resemble users** - Write tests that mirror how real users
+interact with your application. Test user workflows, not implementation details.
+If a user would click a button, your test should click that button. If a user
+would see an error message, your test should check for that specific message.
 
-**Make assertions specific** - Be explicit about what you're testing. Instead of vague assertions, use specific, meaningful checks that clearly communicate the expected behavior. This makes tests easier to understand and debug when they fail.
+**Make assertions specific** - Be explicit about what you're testing. Instead of
+vague assertions, use specific, meaningful checks that clearly communicate the
+expected behavior. This makes tests easier to understand and debug when they
+fail.
 
 **Example - Tests that resemble users:**
+
 ```typescript
 // ✅ Good - Tests user workflow
 test('User can sign up and create their first note', async ({ page, navigate }) => {
 	// User visits signup page
 	await navigate('/signup')
-	
+
 	// User fills out form like a real person would
 	await page.getByRole('textbox', { name: /email/i }).fill('newuser@example.com')
 	await page.getByRole('textbox', { name: /username/i }).fill('newuser')
 	await page.getByRole('textbox', { name: /^password$/i }).fill('securepassword123')
 	await page.getByRole('textbox', { name: /confirm/i }).fill('securepassword123')
-	
+
 	// User submits form
 	await page.getByRole('button', { name: /sign up/i }).click()
-	
+
 	// User is redirected to onboarding
 	await expect(page).toHaveURL(/\/onboarding/)
-	
+
 	// User creates their first note
 	await navigate('/notes/new')
 	await page.getByRole('textbox', { name: /title/i }).fill('My First Note')
 	await page.getByRole('textbox', { name: /content/i }).fill('This is my first note!')
 	await page.getByRole('button', { name: /create/i }).click()
-	
+
 	// User sees their note
 	await expect(page.getByRole('heading', { name: 'My First Note' })).toBeVisible()
 	await expect(page.getByText('This is my first note!')).toBeVisible()
@@ -70,23 +78,28 @@ test('Signup form calls API endpoint', async ({ page }) => {
 ```
 
 **Example - Specific assertions:**
+
 ```typescript
 // ✅ Good - Specific assertions
 test('Form shows specific validation errors', async ({ page, navigate }) => {
 	await navigate('/signup')
 	await page.getByRole('button', { name: /sign up/i }).click()
-	
+
 	// Specific error messages that users would see
 	await expect(page.getByText(/email is required/i)).toBeVisible()
-	await expect(page.getByText(/username must be at least 3 characters/i)).toBeVisible()
-	await expect(page.getByText(/password must be at least 6 characters/i)).toBeVisible()
+	await expect(
+		page.getByText(/username must be at least 3 characters/i),
+	).toBeVisible()
+	await expect(
+		page.getByText(/password must be at least 6 characters/i),
+	).toBeVisible()
 })
 
 // ❌ Avoid - Vague assertions
 test('Form shows errors', async ({ page, navigate }) => {
 	await navigate('/signup')
 	await page.getByRole('button', { name: /sign up/i }).click()
-	
+
 	// Too vague - what errors? where?
 	expect(page.locator('.error')).toBeVisible()
 })
@@ -102,6 +115,7 @@ Epic Stack uses two types of tests:
 ### Unit Tests with Vitest
 
 **Basic setup:**
+
 ```typescript
 // app/utils/my-util.test.ts
 import { describe, expect, it } from 'vitest'
@@ -115,6 +129,7 @@ describe('myUtil', () => {
 ```
 
 **Testing con DOM:**
+
 ```typescript
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
@@ -131,6 +146,7 @@ describe('MyComponent', () => {
 ### E2E Tests with Playwright
 
 **Basic setup:**
+
 ```typescript
 // tests/e2e/my-feature.test.ts
 import { expect, test } from '#tests/playwright-utils.ts'
@@ -152,6 +168,7 @@ test('Users can do something', async ({ page, navigate, login }) => {
 Epic Stack provides a `login` fixture for authenticated tests.
 
 **Use login fixture:**
+
 ```typescript
 test('Protected route', async ({ page, navigate, login }) => {
 	const user = await login() // Creates user and session automatically
@@ -163,6 +180,7 @@ test('Protected route', async ({ page, navigate, login }) => {
 ```
 
 **Login with options:**
+
 ```typescript
 const user = await login({
 	username: 'testuser',
@@ -210,11 +228,13 @@ await navigate('/login')
 Epic Stack uses a separate test database.
 
 **Automatic configuration:**
+
 - The test database is configured automatically
 - It's cleaned between tests
 - Data created in tests is automatically deleted
 
 **Create data in tests:**
+
 ```typescript
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -244,6 +264,7 @@ test('User can see notes', async ({ page, navigate, login }) => {
 Epic Stack uses MSW to mock external services.
 
 **Mock example:**
+
 ```typescript
 // tests/mocks/github.ts
 import { http, HttpResponse } from 'msw'
@@ -259,12 +280,13 @@ export const handlers = [
 ]
 ```
 
-**Use in tests:**
-Mocks are automatically applied when `MOCKS=true` is configured.
+**Use in tests:** Mocks are automatically applied when `MOCKS=true` is
+configured.
 
 ### Testing Forms
 
 **Test form:**
+
 ```typescript
 test('User can submit form', async ({ page, navigate, login }) => {
 	const user = await login()
@@ -283,6 +305,7 @@ test('User can submit form', async ({ page, navigate, login }) => {
 ```
 
 **Test validation:**
+
 ```typescript
 test('Form shows validation errors', async ({ page, navigate }) => {
 	await navigate('/signup')
@@ -298,6 +321,7 @@ test('Form shows validation errors', async ({ page, navigate }) => {
 ### Testing Loaders
 
 **Test loader:**
+
 ```typescript
 // app/utils/my-util.test.ts
 import { describe, expect, it } from 'vitest'
@@ -330,6 +354,7 @@ describe('loader', () => {
 ### Testing Actions
 
 **Test action:**
+
 ```typescript
 // tests/e2e/notes.test.ts
 test('User can create note', async ({ page, navigate, login }) => {
@@ -354,8 +379,14 @@ test('User can create note', async ({ page, navigate, login }) => {
 ### Testing Permissions
 
 **Test permissions:**
+
 ```typescript
-test('Only owner can delete note', async ({ page, navigate, login, insertNewUser }) => {
+test('Only owner can delete note', async ({
+	page,
+	navigate,
+	login,
+	insertNewUser,
+}) => {
 	const owner = await login()
 	const otherUser = await insertNewUser()
 
@@ -384,6 +415,7 @@ test('Only owner can delete note', async ({ page, navigate, login, insertNewUser
 ### DB Helpers
 
 **Create user:**
+
 ```typescript
 import { createUser } from '#tests/db-utils.ts'
 
@@ -391,6 +423,7 @@ const userData = createUser() // Generates unique random data
 ```
 
 **Create password:**
+
 ```typescript
 import { createPassword } from '#tests/db-utils.ts'
 
@@ -404,18 +437,26 @@ To wait for async conditions:
 ```typescript
 import { waitFor } from '#tests/playwright-utils.ts'
 
-await waitFor(async () => {
-	const element = await page.getByText('Content loaded').first()
-	expect(element).toBeVisible()
-	return element
-}, { timeout: 5000, errorMessage: 'Content never loaded' })
+await waitFor(
+	async () => {
+		const element = await page.getByText('Content loaded').first()
+		expect(element).toBeVisible()
+		return element
+	},
+	{ timeout: 5000, errorMessage: 'Content never loaded' },
+)
 ```
 
 ### Testing GitHub OAuth
 
 **Prepare GitHub user:**
+
 ```typescript
-test('User can login with GitHub', async ({ page, navigate, prepareGitHubUser }) => {
+test('User can login with GitHub', async ({
+	page,
+	navigate,
+	prepareGitHubUser,
+}) => {
 	const ghUser = await prepareGitHubUser()
 
 	await navigate('/login')
@@ -436,7 +477,11 @@ import { expect, test } from '#tests/playwright-utils.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { faker } from '@faker-js/faker'
 
-test('Users can create, edit, and delete notes', async ({ page, navigate, login }) => {
+test('Users can create, edit, and delete notes', async ({
+	page,
+	navigate,
+	login,
+}) => {
 	// User logs in (realistic workflow)
 	const user = await login()
 	await navigate('/users/:username/notes', { username: user.username })
@@ -464,16 +509,20 @@ test('Users can create, edit, and delete notes', async ({ page, navigate, login 
 		content: faker.lorem.paragraphs(2),
 	}
 	await page.getByRole('textbox', { name: /title/i }).fill(updatedNote.title)
-	await page.getByRole('textbox', { name: /content/i }).fill(updatedNote.content)
+	await page
+		.getByRole('textbox', { name: /content/i })
+		.fill(updatedNote.content)
 	await page.getByRole('button', { name: /submit/i }).click()
 
 	// Specific assertions: user sees updated content
-	await expect(page.getByRole('heading', { name: updatedNote.title })).toBeVisible()
+	await expect(
+		page.getByRole('heading', { name: updatedNote.title }),
+	).toBeVisible()
 	await expect(page.getByText(updatedNote.content)).toBeVisible()
 
 	// User deletes the note (clicking delete button)
 	await page.getByRole('button', { name: /delete/i }).click()
-	
+
 	// Specific assertion: user is redirected back to notes list
 	await expect(page).toHaveURL(`/users/${user.username}/notes`)
 	await expect(page.getByText(updatedNote.title)).not.toBeVisible()
@@ -529,7 +578,12 @@ test('Signup form validation', async ({ page, navigate }) => {
 
 ```typescript
 // tests/e2e/permissions.test.ts
-test('Only admin can access admin routes', async ({ page, navigate, login, insertNewUser }) => {
+test('Only admin can access admin routes', async ({
+	page,
+	navigate,
+	login,
+	insertNewUser,
+}) => {
 	// Test with normal user
 	const normalUser = await login()
 
@@ -563,17 +617,25 @@ test('Only admin can access admin routes', async ({ page, navigate, login, inser
 
 ## Common mistakes to avoid
 
-- ❌ **Testing implementation details instead of user workflows**: Write tests that mirror how users actually use your app
-- ❌ **Vague assertions**: Use specific, meaningful assertions that clearly communicate expected behavior
-- ❌ **Not cleaning data after tests**: Epic Stack cleans automatically, but make sure not to depend on data between tests
+- ❌ **Testing implementation details instead of user workflows**: Write tests
+  that mirror how users actually use your app
+- ❌ **Vague assertions**: Use specific, meaningful assertions that clearly
+  communicate expected behavior
+- ❌ **Not cleaning data after tests**: Epic Stack cleans automatically, but
+  make sure not to depend on data between tests
 - ❌ **Assuming execution order**: Tests must be independent
-- ❌ **Not using fixtures**: Use `login`, `insertNewUser`, etc. instead of creating everything manually
+- ❌ **Not using fixtures**: Use `login`, `insertNewUser`, etc. instead of
+  creating everything manually
 - ❌ **Hardcoding data**: Use `faker` to generate unique data
-- ❌ **Not waiting for elements**: Use `expect` with `toBeVisible()` instead of assuming it exists
-- ❌ **Not using type-safe navigation**: Use `navigate` helper instead of `page.goto()` directly
-- ❌ **Forgetting MSW in tests**: External services are automatically mocked when `MOCKS=true`
+- ❌ **Not waiting for elements**: Use `expect` with `toBeVisible()` instead of
+  assuming it exists
+- ❌ **Not using type-safe navigation**: Use `navigate` helper instead of
+  `page.goto()` directly
+- ❌ **Forgetting MSW in tests**: External services are automatically mocked
+  when `MOCKS=true`
 - ❌ **Not testing error cases**: Test both happy path and errors
-- ❌ **Testing internal state instead of user-visible behavior**: Focus on what users see and do
+- ❌ **Testing internal state instead of user-visible behavior**: Focus on what
+  users see and do
 
 ## References
 

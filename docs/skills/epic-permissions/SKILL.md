@@ -12,6 +12,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Implement role-based access control (RBAC)
 - Validate permissions on server-side or client-side
 - Create new permissions or roles
@@ -24,17 +25,20 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Explicit is better than implicit** - Always explicitly check permissions. Don't assume a user has access based on implicit rules or hidden logic. Every permission check should be visible and clear in the code.
+**Explicit is better than implicit** - Always explicitly check permissions.
+Don't assume a user has access based on implicit rules or hidden logic. Every
+permission check should be visible and clear in the code.
 
 **Example - Explicit permission checks:**
+
 ```typescript
 // ✅ Good - Explicit permission check
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
-	
+
 	// Explicitly check permission - clear and visible
 	await requireUserWithPermission(request, 'delete:note:own')
-	
+
 	// Permission check is explicit and obvious
 	await prisma.note.delete({ where: { id: noteId } })
 }
@@ -43,7 +47,7 @@ export async function action({ request }: Route.ActionArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const note = await prisma.note.findUnique({ where: { id: noteId } })
-	
+
 	// Implicit check - not clear what permission is being checked
 	if (note.ownerId !== userId) {
 		throw new Response('Forbidden', { status: 403 })
@@ -53,6 +57,7 @@ export async function action({ request }: Route.ActionArgs) {
 ```
 
 **Example - Explicit permission strings:**
+
 ```typescript
 // ✅ Good - Explicit permission string
 const permission: PermissionString = 'delete:note:own'
@@ -68,6 +73,7 @@ const canDelete = checkUserCanDelete(user, note)
 ### RBAC Model
 
 Epic Stack uses an RBAC (Role-Based Access Control) model where:
+
 - **Users** have **Roles**
 - **Roles** have **Permissions**
 - A user's permissions are the union of all permissions from their roles
@@ -77,11 +83,13 @@ Epic Stack uses an RBAC (Role-Based Access Control) model where:
 Permissions follow the format: `action:entity:access`
 
 **Components:**
+
 - `action`: The allowed action (`create`, `read`, `update`, `delete`)
 - `entity`: The entity being acted upon (`user`, `note`, etc.)
 - `access`: The access level (`own`, `any`, `own,any`)
 
 **Examples:**
+
 - `create:note:own` - Can create own notes
 - `read:note:any` - Can read any note
 - `delete:user:any` - Can delete any user (admin)
@@ -90,6 +98,7 @@ Permissions follow the format: `action:entity:access`
 ### Prisma Schema
 
 **Models:**
+
 ```prisma
 model Permission {
   id          String @id @default(cuid())
@@ -97,9 +106,9 @@ model Permission {
   entity      String // e.g. note, user, etc.
   access      String // e.g. own or any
   description String @default("")
-  
+
   roles Role[]
-  
+
   @@unique([action, entity, access])
 }
 
@@ -107,7 +116,7 @@ model Role {
   id          String @id @default(cuid())
   name        String @unique
   description String @default("")
-  
+
   users       User[]
   permissions Permission[]
 }
@@ -122,6 +131,7 @@ model User {
 ### Validate Permissions Server-Side
 
 **Require specific permission:**
+
 ```typescript
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 
@@ -130,41 +140,43 @@ export async function action({ request }: Route.ActionArgs) {
 		request,
 		'delete:note:own', // Throws 403 error if doesn't have permission
 	)
-	
+
 	// User has the permission, continue...
 }
 ```
 
 **Require specific role:**
+
 ```typescript
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserWithRole(request, 'admin')
-	
+
 	// User has admin role, continue...
 }
 ```
 
 **Conditional permissions (own vs any) - explicit:**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
-	
+
 	// Explicitly determine ownership
 	const note = await prisma.note.findUnique({
 		where: { id: noteId },
 		select: { ownerId: true },
 	})
-	
+
 	const isOwner = note.ownerId === userId
-	
+
 	// Explicitly check the appropriate permission based on ownership
 	await requireUserWithPermission(
 		request,
 		isOwner ? 'delete:note:own' : 'delete:note:any', // Explicit permission string
 	)
-	
+
 	// Permission check is explicit and clear
 	// Proceed with deletion...
 }
@@ -173,18 +185,19 @@ export async function action({ request }: Route.ActionArgs) {
 ### Validate Permissions Client-Side
 
 **Check if user has permission:**
+
 ```typescript
 import { userHasPermission, useOptionalUser } from '#app/utils/user.ts'
 
 export default function NoteRoute({ loaderData }: Route.ComponentProps) {
 	const user = useOptionalUser()
 	const isOwner = user?.id === loaderData.note.ownerId
-	
+
 	const canDelete = userHasPermission(
 		user,
 		isOwner ? 'delete:note:own' : 'delete:note:any',
 	)
-	
+
 	return (
 		<div>
 			{canDelete && (
@@ -196,17 +209,18 @@ export default function NoteRoute({ loaderData }: Route.ComponentProps) {
 ```
 
 **Check if user has role:**
+
 ```typescript
 import { userHasRole } from '#app/utils/user.ts'
 
 export default function AdminRoute() {
 	const user = useOptionalUser()
 	const isAdmin = userHasRole(user, 'admin')
-	
+
 	if (!isAdmin) {
 		return <div>Access Denied</div>
 	}
-	
+
 	return <div>Admin Panel</div>
 }
 ```
@@ -214,6 +228,7 @@ export default function AdminRoute() {
 ### Create New Permissions
 
 **En Prisma Studio o seed:**
+
 ```typescript
 // prisma/seed.ts
 await prisma.permission.create({
@@ -230,6 +245,7 @@ await prisma.permission.create({
 ```
 
 **Permiso con múltiples niveles de acceso:**
+
 ```typescript
 await prisma.permission.createMany({
 	data: [
@@ -252,6 +268,7 @@ await prisma.permission.createMany({
 ### Assign Roles to Users
 
 **When creating user:**
+
 ```typescript
 const user = await prisma.user.create({
 	data: {
@@ -265,15 +282,13 @@ const user = await prisma.user.create({
 ```
 
 **Assign multiple roles:**
+
 ```typescript
 await prisma.user.update({
 	where: { id: userId },
 	data: {
 		roles: {
-			connect: [
-				{ name: 'user' },
-				{ name: 'moderator' },
-			],
+			connect: [{ name: 'user' }, { name: 'moderator' }],
 		},
 	},
 })
@@ -282,6 +297,7 @@ await prisma.user.update({
 ### Permissions and Roles Seed
 
 **Seed example:**
+
 ```typescript
 // prisma/seed.ts
 
@@ -337,7 +353,7 @@ const userRole = await prisma.role.create({
 		name: 'user',
 		description: 'Standard user',
 		permissions: {
-			connect: permissions.slice(0, 4).map(p => ({ id: p.id })),
+			connect: permissions.slice(0, 4).map((p) => ({ id: p.id })),
 		},
 	},
 })
@@ -347,7 +363,7 @@ const adminRole = await prisma.role.create({
 		name: 'admin',
 		description: 'Administrator',
 		permissions: {
-			connect: permissions.map(p => ({ id: p.id })),
+			connect: permissions.map((p) => ({ id: p.id })),
 		},
 	},
 })
@@ -356,6 +372,7 @@ const adminRole = await prisma.role.create({
 ### Permission Type
 
 **Type-safe permission strings:**
+
 ```typescript
 import { type PermissionString } from '#app/utils/user.ts'
 
@@ -364,6 +381,7 @@ const permission: PermissionString = 'delete:note:own'
 ```
 
 **Parsear permission string:**
+
 ```typescript
 import { parsePermissionString } from '#app/utils/user.ts'
 
@@ -383,26 +401,26 @@ export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 	const { noteId } = Object.fromEntries(formData)
-	
+
 	const note = await prisma.note.findFirst({
 		select: { id: true, ownerId: true, owner: { select: { username: true } } },
 		where: { id: noteId },
 	})
-	
+
 	if (!note) {
 		throw new Response('Not found', { status: 404 })
 	}
-	
+
 	const isOwner = note.ownerId === userId
-	
+
 	// Validate permiso según si es propietario o no
 	await requireUserWithPermission(
 		request,
 		isOwner ? 'delete:note:own' : 'delete:note:any',
 	)
-	
+
 	await prisma.note.delete({ where: { id: note.id } })
-	
+
 	return redirect(`/users/${note.owner.username}/notes`)
 }
 ```
@@ -413,7 +431,7 @@ export async function action({ request }: Route.ActionArgs) {
 export default function NoteRoute({ loaderData }: Route.ComponentProps) {
 	const user = useOptionalUser()
 	const isOwner = user?.id === loaderData.note.ownerId
-	
+
 	const canDelete = userHasPermission(
 		user,
 		isOwner ? 'delete:note:own' : 'delete:note:any',
@@ -422,12 +440,12 @@ export default function NoteRoute({ loaderData }: Route.ComponentProps) {
 		user,
 		isOwner ? 'update:note:own' : 'update:note:any',
 	)
-	
+
 	return (
 		<div>
 			<h1>{loaderData.note.title}</h1>
 			<p>{loaderData.note.content}</p>
-			
+
 			{(canEdit || canDelete) && (
 				<div className="flex gap-2">
 					{canEdit && (
@@ -451,7 +469,7 @@ export default function NoteRoute({ loaderData }: Route.ComponentProps) {
 // app/routes/admin/users.tsx
 export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithRole(request, 'admin')
-	
+
 	const users = await prisma.user.findMany({
 		select: {
 			id: true,
@@ -459,7 +477,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			username: true,
 		},
 	})
-	
+
 	return { users }
 }
 
@@ -489,7 +507,7 @@ async function setupPostPermissions() {
 			description: 'Can create own posts',
 		},
 	})
-	
+
 	const readAny = await prisma.permission.create({
 		data: {
 			action: 'read',
@@ -498,16 +516,13 @@ async function setupPostPermissions() {
 			description: 'Can read any post',
 		},
 	})
-	
+
 	// Assign to user role
 	await prisma.role.update({
 		where: { name: 'user' },
 		data: {
 			permissions: {
-				connect: [
-					{ id: createOwn.id },
-					{ id: readAny.id },
-				],
+				connect: [{ id: createOwn.id }, { id: readAny.id }],
 			},
 		},
 	})
@@ -516,15 +531,24 @@ async function setupPostPermissions() {
 
 ## Common mistakes to avoid
 
-- ❌ **Implicit permission checks**: Always explicitly check permissions - make permission requirements visible in code
-- ❌ **Not validating permissions on server-side**: Always validate permissions in action/loader, never trust client-side only
-- ❌ **Forgetting to verify `own` vs `any`**: Explicitly determine if user is owner before validating permission
-- ❌ **Not using correct helpers**: Use `requireUserWithPermission` for server-side and `userHasPermission` for client-side - explicit helpers
-- ❌ **Not creating unique permissions**: Use `@@unique([action, entity, access])` in schema - explicit permission structure
-- ❌ **Assuming permissions instead of verifying**: Always verify explicitly, even if you think user has the permission
-- ❌ **Not handling 403 errors**: Helpers throw errors that must be handled by ErrorBoundary
-- ❌ **Not using types**: Use `PermissionString` type for type-safety - explicit types
-- ❌ **Hidden permission logic**: Don't hide permission checks in utility functions - make them explicit at the call site
+- ❌ **Implicit permission checks**: Always explicitly check permissions - make
+  permission requirements visible in code
+- ❌ **Not validating permissions on server-side**: Always validate permissions
+  in action/loader, never trust client-side only
+- ❌ **Forgetting to verify `own` vs `any`**: Explicitly determine if user is
+  owner before validating permission
+- ❌ **Not using correct helpers**: Use `requireUserWithPermission` for
+  server-side and `userHasPermission` for client-side - explicit helpers
+- ❌ **Not creating unique permissions**: Use
+  `@@unique([action, entity, access])` in schema - explicit permission structure
+- ❌ **Assuming permissions instead of verifying**: Always verify explicitly,
+  even if you think user has the permission
+- ❌ **Not handling 403 errors**: Helpers throw errors that must be handled by
+  ErrorBoundary
+- ❌ **Not using types**: Use `PermissionString` type for type-safety - explicit
+  types
+- ❌ **Hidden permission logic**: Don't hide permission checks in utility
+  functions - make them explicit at the call site
 
 ## References
 

@@ -13,6 +13,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Create forms in an Epic Stack application
 - Implement form validation with Zod
 - Work with Conform for progressively enhanced forms
@@ -27,11 +28,18 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Explicit is better than implicit** - Make validation rules clear and explicit using Zod schemas. Every validation rule should be visible in the schema, not hidden in business logic. Error messages should be specific and helpful, telling users exactly what went wrong and how to fix it.
+**Explicit is better than implicit** - Make validation rules clear and explicit
+using Zod schemas. Every validation rule should be visible in the schema, not
+hidden in business logic. Error messages should be specific and helpful, telling
+users exactly what went wrong and how to fix it.
 
-**Design to fail fast and early** - Validate input as early as possible, ideally on the client side before submission, and always on the server side. Return clear, specific error messages immediately so users can fix issues without frustration.
+**Design to fail fast and early** - Validate input as early as possible, ideally
+on the client side before submission, and always on the server side. Return
+clear, specific error messages immediately so users can fix issues without
+frustration.
 
 **Example - Explicit validation:**
+
 ```typescript
 // ✅ Good - Explicit validation with clear error messages
 const SignupSchema = z.object({
@@ -55,6 +63,7 @@ const SignupSchema = z.object({
 ```
 
 **Example - Fail fast validation:**
+
 ```typescript
 // ✅ Good - Validate early and return specific errors immediately
 export async function action({ request }: Route.ActionArgs) {
@@ -95,9 +104,11 @@ export async function action({ request }: Route.ActionArgs) {
 
 ### Basic setup with Conform
 
-Epic Stack uses [Conform](https://conform.guide/) to handle forms with progressive enhancement.
+Epic Stack uses [Conform](https://conform.guide/) to handle forms with
+progressive enhancement.
 
 **Basic setup:**
+
 ```typescript
 import { getFormProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
@@ -133,25 +144,29 @@ export default function SignupRoute({ actionData }: Route.ComponentProps) {
 Conform integrates seamlessly with Zod for validation.
 
 **Define schema:**
+
 ```typescript
 import { z } from 'zod'
 
-const SignupSchema = z.object({
-	email: z.string().email('Invalid email'),
-	password: z.string().min(6, 'Password must be at least 6 characters'),
-	confirmPassword: z.string(),
-}).superRefine(({ confirmPassword, password }, ctx) => {
-	if (confirmPassword !== password) {
-		ctx.addIssue({
-			path: ['confirmPassword'],
-			code: 'custom',
-			message: 'Passwords must match',
-		})
-	}
-})
+const SignupSchema = z
+	.object({
+		email: z.string().email('Invalid email'),
+		password: z.string().min(6, 'Password must be at least 6 characters'),
+		confirmPassword: z.string(),
+	})
+	.superRefine(({ confirmPassword, password }, ctx) => {
+		if (confirmPassword !== password) {
+			ctx.addIssue({
+				path: ['confirmPassword'],
+				code: 'custom',
+				message: 'Passwords must match',
+			})
+		}
+	})
 ```
 
 **Validation in action (fail fast):**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
@@ -216,6 +231,7 @@ export async function action({ request }: Route.ActionArgs) {
 Epic Stack provides pre-built field components:
 
 **Basic Field:**
+
 ```typescript
 import { Field, ErrorList } from '#app/components/forms.tsx'
 import { getInputProps } from '@conform-to/react'
@@ -235,6 +251,7 @@ import { getInputProps } from '@conform-to/react'
 ```
 
 **TextareaField:**
+
 ```typescript
 import { TextareaField } from '#app/components/forms.tsx'
 import { getTextareaProps } from '@conform-to/react'
@@ -253,6 +270,7 @@ import { getTextareaProps } from '@conform-to/react'
 ```
 
 **CheckboxField:**
+
 ```typescript
 import { CheckboxField } from '#app/components/forms.tsx'
 import { getInputProps } from '@conform-to/react'
@@ -268,6 +286,7 @@ import { getInputProps } from '@conform-to/react'
 ```
 
 **OTPField:**
+
 ```typescript
 import { OTPField } from '#app/components/forms.tsx'
 
@@ -287,6 +306,7 @@ import { OTPField } from '#app/components/forms.tsx'
 ### Error Handling
 
 **Display field errors:**
+
 ```typescript
 <Field
 	// ... props
@@ -295,6 +315,7 @@ import { OTPField } from '#app/components/forms.tsx'
 ```
 
 **Display form errors:**
+
 ```typescript
 import { ErrorList } from '#app/components/forms.tsx'
 
@@ -302,6 +323,7 @@ import { ErrorList } from '#app/components/forms.tsx'
 ```
 
 **Error structure:**
+
 - `fields.fieldName.errors` - Errors for a specific field
 - `form.errors` - General form errors (like `formErrors`)
 
@@ -310,6 +332,7 @@ import { ErrorList } from '#app/components/forms.tsx'
 Epic Stack includes spam protection with honeypot fields.
 
 **In the form:**
+
 ```typescript
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
@@ -320,6 +343,7 @@ import { HoneypotInputs } from 'remix-utils/honeypot/react'
 ```
 
 **In the action:**
+
 ```typescript
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 
@@ -337,6 +361,7 @@ export async function action({ request }: Route.ActionArgs) {
 For forms with file uploads, use `encType="multipart/form-data"`.
 
 **Schema for files:**
+
 ```typescript
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
 
@@ -359,6 +384,7 @@ const NoteEditorSchema = z.object({
 ```
 
 **Form with file upload:**
+
 ```typescript
 <Form
 	method="POST"
@@ -370,6 +396,7 @@ const NoteEditorSchema = z.object({
 ```
 
 **Process files in action:**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
@@ -400,6 +427,7 @@ export async function action({ request }: Route.ActionArgs) {
 For forms with repetitive fields (like multiple images):
 
 **Schema:**
+
 ```typescript
 const ImageFieldsetSchema = z.object({
 	id: z.string().optional(),
@@ -413,6 +441,7 @@ const FormSchema = z.object({
 ```
 
 **In the component:**
+
 ```typescript
 import { FormProvider, getFieldsetProps } from '@conform-to/react'
 
@@ -520,8 +549,12 @@ export const PasswordAndConfirmPasswordSchema = z
 ```
 
 **Use in forms:**
+
 ```typescript
-import { EmailSchema, PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
+import {
+	EmailSchema,
+	PasswordAndConfirmPasswordSchema,
+} from '#app/utils/user-validation.ts'
 
 const SignupSchema = z
 	.object({
@@ -712,17 +745,24 @@ export default function NewNoteRoute({ actionData }: Route.ComponentProps) {
 
 ## Common mistakes to avoid
 
-- ❌ **Implicit validation**: Always use explicit Zod schemas with clear error messages, not hidden validation logic
-- ❌ **Delayed validation**: Validate input immediately and fail fast - don't wait until the end of the function
-- ❌ **Generic error messages**: Use specific, helpful error messages that tell users exactly what's wrong
-- ❌ **Forgetting `async: true` in async validation**: Always include `async: true` when using `superRefine` with async
-- ❌ **Not including `HoneypotInputs` in public forms**: Always include honeypot in forms accessible without authentication
+- ❌ **Implicit validation**: Always use explicit Zod schemas with clear error
+  messages, not hidden validation logic
+- ❌ **Delayed validation**: Validate input immediately and fail fast - don't
+  wait until the end of the function
+- ❌ **Generic error messages**: Use specific, helpful error messages that tell
+  users exactly what's wrong
+- ❌ **Forgetting `async: true` in async validation**: Always include
+  `async: true` when using `superRefine` with async
+- ❌ **Not including `HoneypotInputs` in public forms**: Always include honeypot
+  in forms accessible without authentication
 - ❌ **Forgetting `encType="multipart/form-data"`**: Required for file uploads
 - ❌ **Not validating file sizes**: Always validate size in the schema
 - ❌ **Not using `getZodConstraint`**: Required for native HTML5 validation
 - ❌ **Forgetting `lastResult` in `useForm`**: Required to display server errors
-- ❌ **Not using `shouldRevalidate: 'onBlur'`**: Improves UX by validating on field blur
-- ❌ **Not using pre-built field components**: `Field`, `TextareaField`, etc. already handle accessibility and errors
+- ❌ **Not using `shouldRevalidate: 'onBlur'`**: Improves UX by validating on
+  field blur
+- ❌ **Not using pre-built field components**: `Field`, `TextareaField`, etc.
+  already handle accessibility and errors
 
 ## References
 
@@ -732,6 +772,7 @@ export default function NewNoteRoute({ actionData }: Route.ComponentProps) {
 - `app/components/forms.tsx` - Field components
 - `app/routes/_auth/signup.tsx` - Complete signup example
 - `app/routes/_auth/onboarding/index.tsx` - Complex form example
-- `app/routes/users/$username/notes/+shared/note-editor.tsx` - File uploads example
+- `app/routes/users/$username/notes/+shared/note-editor.tsx` - File uploads
+  example
 - `app/utils/user-validation.ts` - Reusable schemas
 - `docs/decisions/033-honeypot.md` - Honeypot documentation

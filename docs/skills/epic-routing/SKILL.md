@@ -1,6 +1,7 @@
 ---
 name: epic-routing
-description: Guide on routing with React Router and react-router-auto-routes for Epic Stack
+description:
+  Guide on routing with React Router and react-router-auto-routes for Epic Stack
 categories:
   - routing
   - react-router
@@ -12,6 +13,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Create new routes or pages in an Epic Stack application
 - Implement nested layouts
 - Configure resource routes (routes without UI)
@@ -25,11 +27,16 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Do as little as possible** - Keep your route structure simple. Don't create complex nested routes unless you actually need them. Start simple and add complexity only when there's a clear benefit.
+**Do as little as possible** - Keep your route structure simple. Don't create
+complex nested routes unless you actually need them. Start simple and add
+complexity only when there's a clear benefit.
 
-**Avoid over-engineering** - Don't create abstractions or complex route structures "just in case". Use the simplest structure that works for your current needs.
+**Avoid over-engineering** - Don't create abstractions or complex route
+structures "just in case". Use the simplest structure that works for your
+current needs.
 
 **Example - Simple route structure:**
+
 ```typescript
 // ✅ Good - Simple, straightforward route
 // app/routes/users/$username.tsx
@@ -54,6 +61,7 @@ export default function UserRoute({ loaderData }: Route.ComponentProps) {
 ```
 
 **Example - Add complexity only when needed:**
+
 ```typescript
 // ✅ Good - Add nested routes only when you actually need them
 // If you have user notes, then nested routes make sense:
@@ -67,9 +75,11 @@ export default function UserRoute({ loaderData }: Route.ComponentProps) {
 
 ### File-based routing with react-router-auto-routes
 
-Epic Stack uses `react-router-auto-routes` instead of React Router's standard convention. This enables better organization and code co-location.
+Epic Stack uses `react-router-auto-routes` instead of React Router's standard
+convention. This enables better organization and code co-location.
 
 **Basic structure:**
+
 ```
 app/routes/
 ├── _layout.tsx        # Layout for child routes
@@ -83,6 +93,7 @@ app/routes/
 ```
 
 **Configuration in `app/routes.ts`:**
+
 ```typescript
 import { type RouteConfig } from '@react-router/dev/routes'
 import { autoRoutes } from 'react-router-auto-routes'
@@ -93,22 +104,25 @@ export default autoRoutes({
 		'**/*.css',
 		'**/*.test.{js,jsx,ts,tsx}',
 		'**/__*.*',
-		'**/*.server.*',  // Co-located server utilities
-		'**/*.client.*',  // Co-located client utilities
+		'**/*.server.*', // Co-located server utilities
+		'**/*.client.*', // Co-located client utilities
 	],
 }) satisfies RouteConfig
 ```
 
 ### Route Groups
 
-Route groups are folders that start with `_` and don't affect the URL but help organize related code.
+Route groups are folders that start with `_` and don't affect the URL but help
+organize related code.
 
 **Common examples:**
+
 - `_auth/` - Authentication routes (login, signup, etc.)
 - `_marketing/` - Marketing pages (home, about, etc.)
 - `_seo/` - SEO routes (sitemap, robots.txt)
 
 **Example:**
+
 ```
 app/routes/
 ├── _auth/
@@ -125,19 +139,21 @@ app/routes/
 Use `$` to indicate route parameters:
 
 **Syntax:**
+
 - `$param.tsx` → `:param` in URL
 - `$username.tsx` → `:username` in URL
 
 **Example route with parameter:**
+
 ```typescript
 // app/routes/users/$username/index.tsx
 export async function loader({ params }: Route.LoaderArgs) {
 	const username = params.username // Type-safe!
-	
+
 	const user = await prisma.user.findUnique({
 		where: { username },
 	})
-	
+
 	return { user }
 }
 ```
@@ -147,6 +163,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 Use `_layout.tsx` to create shared layouts for child routes.
 
 **Example:**
+
 ```typescript
 // app/routes/users/$username/notes/_layout.tsx
 export async function loader({ params }: Route.LoaderArgs) {
@@ -166,24 +183,28 @@ export default function NotesLayout({ loaderData }: Route.ComponentProps) {
 }
 ```
 
-Child routes (`$noteId.tsx`, `index.tsx`, etc.) will render where `<Outlet />` is.
+Child routes (`$noteId.tsx`, `index.tsx`, etc.) will render where `<Outlet />`
+is.
 
 ### Resource Routes (Routes without UI)
 
 Resource routes don't render UI; they only return data or perform actions.
 
 **Characteristics:**
+
 - Don't export a `default` component
 - Export `loader` or `action` or both
 - Useful for APIs, downloads, webhooks, etc.
 
 **Example:**
+
 ```typescript
 // app/routes/resources/healthcheck.tsx
 export async function loader({ request }: Route.LoaderArgs) {
 	// Check application health
-	const host = request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
-	
+	const host =
+		request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
+
 	try {
 		await Promise.all([
 			prisma.user.count(), // Check DB
@@ -201,18 +222,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 ### Loaders and Actions
 
-**Loaders** - Load data before rendering (GET requests)
-**Actions** - Handle data mutations (POST, PUT, DELETE)
+**Loaders** - Load data before rendering (GET requests) **Actions** - Handle
+data mutations (POST, PUT, DELETE)
 
 **Loader pattern:**
+
 ```typescript
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	
+
 	const data = await prisma.something.findMany({
 		where: { userId },
 	})
-	
+
 	return { data }
 }
 
@@ -222,16 +244,17 @@ export default function RouteComponent({ loaderData }: Route.ComponentProps) {
 ```
 
 **Action pattern:**
+
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
-	
+
 	// Validate and process data
 	await prisma.something.create({
 		data: { /* ... */ },
 	})
-	
+
 	return redirect('/success')
 }
 
@@ -255,7 +278,7 @@ export default function SearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const query = searchParams.get('q') || ''
 	const page = Number(searchParams.get('page') || '1')
-	
+
 	return (
 		<div>
 			<input
@@ -273,6 +296,7 @@ export default function SearchPage() {
 Epic Stack encourages placing related code close to where it's used.
 
 **Typical structure:**
+
 ```
 app/routes/users/$username/notes/
 ├── _layout.tsx              # Layout with loader
@@ -334,11 +358,11 @@ export async function loader({ params }: Route.LoaderArgs) {
 	const product = await prisma.product.findUnique({
 		where: { slug: params.slug },
 	})
-	
+
 	if (!product) {
 		throw new Response('Not Found', { status: 404 })
 	}
-	
+
 	return { product }
 }
 
@@ -370,9 +394,9 @@ export function ErrorBoundary() {
 // app/routes/resources/download-report.tsx
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	
+
 	const report = await generateReport(userId)
-	
+
 	return new Response(report, {
 		headers: {
 			'Content-Type': 'application/pdf',
@@ -396,23 +420,33 @@ export async function loader({ params }: Route.LoaderArgs) {
 			},
 		},
 	})
-	
+
 	return { comment }
 }
 ```
 
 ## Common mistakes to avoid
 
-- ❌ **Over-engineering route structure**: Keep routes simple - don't create complex nested structures unless you actually need them
-- ❌ **Creating abstractions prematurely**: Start with simple routes, add complexity only when there's a clear benefit
-- ❌ **Using React Router's standard convention**: Epic Stack uses `react-router-auto-routes`, not the standard convention
-- ❌ **Exporting default component in resource routes**: Resource routes should not export components
-- ❌ **Not using nested layouts when needed**: Use `_layout.tsx` when you have shared UI, but don't create layouts unnecessarily
-- ❌ **Forgetting `<Outlet />` in layouts**: Without `<Outlet />`, child routes won't render
-- ❌ **Using incorrect names for parameters**: Should be `$param.tsx`, not `:param.tsx` or `[param].tsx`
-- ❌ **Mixing route groups with URLs**: Groups (`_auth/`) don't appear in the URL
-- ❌ **Not validating params**: Always validate that parameters exist before using them
-- ❌ **Duplicating route logic**: Use layouts and shared components, but only when it reduces duplication
+- ❌ **Over-engineering route structure**: Keep routes simple - don't create
+  complex nested structures unless you actually need them
+- ❌ **Creating abstractions prematurely**: Start with simple routes, add
+  complexity only when there's a clear benefit
+- ❌ **Using React Router's standard convention**: Epic Stack uses
+  `react-router-auto-routes`, not the standard convention
+- ❌ **Exporting default component in resource routes**: Resource routes should
+  not export components
+- ❌ **Not using nested layouts when needed**: Use `_layout.tsx` when you have
+  shared UI, but don't create layouts unnecessarily
+- ❌ **Forgetting `<Outlet />` in layouts**: Without `<Outlet />`, child routes
+  won't render
+- ❌ **Using incorrect names for parameters**: Should be `$param.tsx`, not
+  `:param.tsx` or `[param].tsx`
+- ❌ **Mixing route groups with URLs**: Groups (`_auth/`) don't appear in the
+  URL
+- ❌ **Not validating params**: Always validate that parameters exist before
+  using them
+- ❌ **Duplicating route logic**: Use layouts and shared components, but only
+  when it reduces duplication
 
 ## References
 
