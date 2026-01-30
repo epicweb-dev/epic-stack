@@ -34,5 +34,9 @@ export default defineConfig({
 		reuseExistingServer: true,
 		stdout: 'pipe',
 		stderr: 'pipe',
+		env: {
+			PORT,
+			NODE_ENV: 'test',
+		},
 	},
 })
