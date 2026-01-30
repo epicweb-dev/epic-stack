@@ -13,6 +13,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Design database schema with Prisma
 - Create migrations
 - Work with SQLite and LiteFS
@@ -27,11 +28,16 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Do as little as possible** - Only fetch the data you actually need. Use `select` to fetch specific fields instead of entire models. Avoid over-fetching data "just in case" - fetch what you need, when you need it.
+**Do as little as possible** - Only fetch the data you actually need. Use
+`select` to fetch specific fields instead of entire models. Avoid over-fetching
+data "just in case" - fetch what you need, when you need it.
 
-**Pragmatism over purity** - Optimize queries when there's a measurable benefit, but don't over-optimize prematurely. Simple, readable queries are often better than complex optimized ones. Add indexes when queries are slow, not before.
+**Pragmatism over purity** - Optimize queries when there's a measurable benefit,
+but don't over-optimize prematurely. Simple, readable queries are often better
+than complex optimized ones. Add indexes when queries are slow, not before.
 
 **Example - Fetch only what you need:**
+
 ```typescript
 // ✅ Good - Fetch only needed fields
 const user = await prisma.user.findUnique({
@@ -52,6 +58,7 @@ const user = await prisma.user.findUnique({
 ```
 
 **Example - Pragmatic optimization:**
+
 ```typescript
 // ✅ Good - Simple query first, optimize if needed
 const notes = await prisma.note.findMany({
@@ -73,6 +80,7 @@ const notes = await prisma.note.findMany({
 Epic Stack uses Prisma with SQLite as the database.
 
 **Basic configuration:**
+
 ```prisma
 // prisma/schema.prisma
 generator client {
@@ -87,16 +95,17 @@ datasource db {
 ```
 
 **Basic model:**
+
 ```prisma
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   username  String   @unique
   name      String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   notes     Note[]
   roles     Role[]
 }
@@ -105,13 +114,13 @@ model Note {
   id      String @id @default(cuid())
   title   String
   content String
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String
-  
+
   @@index([ownerId])
   @@index([ownerId, updatedAt])
 }
@@ -122,12 +131,14 @@ model Note {
 Epic Stack uses CUID2 to generate unique IDs.
 
 **Advantages:**
+
 - Globally unique
 - Sortable
 - Secure (no exposed information)
 - URL-friendly
 
 **Example:**
+
 ```prisma
 model User {
   id String @id @default(cuid()) // Automatically generates CUID2
@@ -137,6 +148,7 @@ model User {
 ### Timestamps
 
 **Standard fields:**
+
 ```prisma
 model User {
   createdAt DateTime @default(now())
@@ -147,6 +159,7 @@ model User {
 ### Relationships
 
 **One-to-Many:**
+
 ```prisma
 model User {
   id    String @id @default(cuid())
@@ -157,12 +170,13 @@ model Note {
   id      String @id @default(cuid())
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String
-  
+
   @@index([ownerId])
 }
 ```
 
 **One-to-One:**
+
 ```prisma
 model User {
   id      String  @id @default(cuid())
@@ -177,6 +191,7 @@ model UserImage {
 ```
 
 **Many-to-Many:**
+
 ```prisma
 model User {
   id    String @id @default(cuid())
@@ -192,18 +207,20 @@ model Role {
 ### Indexes
 
 **Create indexes:**
+
 ```prisma
 model Note {
   id      String @id @default(cuid())
   ownerId String
   updatedAt DateTime
-  
+
   @@index([ownerId])              // Simple index
   @@index([ownerId, updatedAt])   // Composite index
 }
 ```
 
 **Best practices:**
+
 - Index foreign keys
 - Index fields used in `where` frequently
 - Index fields used in `orderBy`
@@ -212,6 +229,7 @@ model Note {
 ### Cascade Delete
 
 **Configure cascade:**
+
 ```prisma
 model User {
   id    String @id @default(cuid())
@@ -226,6 +244,7 @@ model Note {
 ```
 
 **Options:**
+
 - `onDelete: Cascade` - Deletes children when parent is deleted
 - `onDelete: SetNull` - Sets to null when parent is deleted
 - `onDelete: Restrict` - Prevents deletion if there are children
@@ -233,17 +252,19 @@ model Note {
 ### Migrations
 
 **Create migration:**
+
 ```bash
 npx prisma migrate dev --name add_user_field
 ```
 
 **Apply migrations in production:**
+
 ```bash
 npx prisma migrate deploy
 ```
 
-**Automatic migrations:**
-Migrations are automatically applied on deploy via `litefs.yml`.
+**Automatic migrations:** Migrations are automatically applied on deploy via
+`litefs.yml`.
 
 **"Widen then Narrow" strategy for zero-downtime:**
 
@@ -279,11 +300,13 @@ ALTER TABLE User DROP COLUMN name;
 ### Prisma Client
 
 **Import Prisma Client:**
+
 ```typescript
 import { prisma } from '#app/utils/db.server.ts'
 ```
 
 **Basic query:**
+
 ```typescript
 const user = await prisma.user.findUnique({
 	where: { id: userId },
@@ -291,6 +314,7 @@ const user = await prisma.user.findUnique({
 ```
 
 **Specific select:**
+
 ```typescript
 const user = await prisma.user.findUnique({
 	where: { id: userId },
@@ -304,6 +328,7 @@ const user = await prisma.user.findUnique({
 ```
 
 **Include relations:**
+
 ```typescript
 const user = await prisma.user.findUnique({
 	where: { id: userId },
@@ -321,6 +346,7 @@ const user = await prisma.user.findUnique({
 ```
 
 **Complex queries:**
+
 ```typescript
 const notes = await prisma.note.findMany({
 	where: {
@@ -341,6 +367,7 @@ const notes = await prisma.note.findMany({
 ### Transactions
 
 **Use transactions:**
+
 ```typescript
 await prisma.$transaction(async (tx) => {
 	const user = await tx.user.create({
@@ -350,7 +377,7 @@ await prisma.$transaction(async (tx) => {
 			roles: { connect: { name: 'user' } },
 		},
 	})
-	
+
 	await tx.note.create({
 		data: {
 			title: 'Welcome',
@@ -358,7 +385,7 @@ await prisma.$transaction(async (tx) => {
 			ownerId: user.id,
 		},
 	})
-	
+
 	return user
 })
 ```
@@ -366,24 +393,31 @@ await prisma.$transaction(async (tx) => {
 ### SQLite con LiteFS
 
 **Multi-region with LiteFS:**
+
 - Only the primary instance can write
 - Replicas can only read
 - Writes are automatically replicated
 
 **Check primary instance:**
+
 ```typescript
 import { ensurePrimary, getInstanceInfo } from '#app/utils/litefs.server.ts'
 
 export async function action({ request }: Route.ActionArgs) {
 	// Ensure we're on primary instance for writes
 	await ensurePrimary()
-	
+
 	// Now we can write safely
-	await prisma.user.create({ data: { /* ... */ } })
+	await prisma.user.create({
+		data: {
+			/* ... */
+		},
+	})
 }
 ```
 
 **Get instance information:**
+
 ```typescript
 import { getInstanceInfo } from '#app/utils/litefs.server.ts'
 
@@ -399,6 +433,7 @@ if (currentIsPrimary) {
 ### Seed Scripts
 
 **Create seed:**
+
 ```typescript
 // prisma/seed.ts
 import { prisma } from '#app/utils/db.server.ts'
@@ -411,7 +446,7 @@ async function seed() {
 			{ name: 'admin', description: 'Administrator' },
 		],
 	})
-	
+
 	// Create users
 	const user = await prisma.user.create({
 		data: {
@@ -420,7 +455,7 @@ async function seed() {
 			roles: { connect: { name: 'user' } },
 		},
 	})
-	
+
 	console.log('Seed complete!')
 }
 
@@ -435,6 +470,7 @@ seed()
 ```
 
 **Run seed:**
+
 ```bash
 npx prisma db seed
 # Or directly:
@@ -444,14 +480,17 @@ npx tsx prisma/seed.ts
 ### Query Optimization
 
 **Guidelines (pragmatic approach):**
+
 - Use `select` to fetch only needed fields - do as little as possible
 - Use selective `include` - only include relations you actually use
 - Index fields used in `where` and `orderBy` - but only if queries are slow
-- Use composite indexes for complex queries - when you have a real performance problem
+- Use composite indexes for complex queries - when you have a real performance
+  problem
 - Avoid `select: true` (fetches everything) - be explicit about what you need
 - Measure first, optimize second - don't pre-optimize
 
 **Optimized example (do as little as possible):**
+
 ```typescript
 // ❌ Avoid: Fetches everything unnecessarily
 const user = await prisma.user.findUnique({
@@ -490,6 +529,7 @@ const user = await prisma.user.findUnique({
 ### Prisma Query Logging
 
 **Configure logging:**
+
 ```typescript
 // app/utils/db.server.ts
 const client = new PrismaClient({
@@ -502,7 +542,7 @@ const client = new PrismaClient({
 
 client.$on('query', async (e) => {
 	if (e.duration < 20) return // Only log slow queries
-	
+
 	console.info(`prisma:query - ${e.duration}ms - ${e.query}`)
 })
 ```
@@ -510,11 +550,13 @@ client.$on('query', async (e) => {
 ### Database URL
 
 **Development:**
+
 ```bash
 DATABASE_URL=file:./data/db.sqlite
 ```
 
 **Production (Fly.io):**
+
 ```bash
 DATABASE_URL=file:/litefs/data/sqlite.db
 ```
@@ -522,16 +564,19 @@ DATABASE_URL=file:/litefs/data/sqlite.db
 ### Connecting to DB in Production
 
 **SSH to Fly instance:**
+
 ```bash
 fly ssh console --app [YOUR_APP_NAME]
 ```
 
 **Connect to DB CLI:**
+
 ```bash
 fly ssh console -C database-cli --app [YOUR_APP_NAME]
 ```
 
 **Prisma Studio:**
+
 ```bash
 # Terminal 1: Start Prisma Studio
 fly ssh console -C "npx prisma studio" -s --app [YOUR_APP_NAME]
@@ -553,16 +598,16 @@ model Post {
   title     String
   content   String
   published Boolean  @default(false)
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
-  
+
   comments Comment[]
   tags     Tag[]
-  
+
   @@index([authorId])
   @@index([authorId, published])
   @@index([published, updatedAt])
@@ -571,15 +616,15 @@ model Post {
 model Comment {
   id      String @id @default(cuid())
   content String
-  
+
   createdAt DateTime @default(now())
-  
+
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
-  
+
   author   User   @relation(fields: [authorId], references: [id])
   authorId String
-  
+
   @@index([postId])
   @@index([authorId])
 }
@@ -600,14 +645,14 @@ export async function getPosts({
 	published?: boolean
 }) {
 	const where: Prisma.PostWhereInput = {}
-	
+
 	if (userId) {
 		where.authorId = userId
 	}
 	if (published !== undefined) {
 		where.published = published
 	}
-	
+
 	const [posts, total] = await Promise.all([
 		prisma.post.findMany({
 			where,
@@ -628,7 +673,7 @@ export async function getPosts({
 		}),
 		prisma.post.count({ where }),
 	])
-	
+
 	return {
 		posts,
 		total,
@@ -662,7 +707,7 @@ export async function createPostWithTags({
 				}),
 			),
 		)
-		
+
 		// Create post
 		const post = await tx.post.create({
 			data: {
@@ -674,7 +719,7 @@ export async function createPostWithTags({
 				},
 			},
 		})
-		
+
 		return post
 	})
 }
@@ -703,18 +748,18 @@ async function seed() {
 			},
 		}),
 	])
-	
+
 	// Create roles with permissions
 	const userRole = await prisma.role.create({
 		data: {
 			name: 'user',
 			description: 'Standard user',
 			permissions: {
-				connect: permissions.map(p => ({ id: p.id })),
+				connect: permissions.map((p) => ({ id: p.id })),
 			},
 		},
 	})
-	
+
 	// Create user with role
 	const user = await prisma.user.create({
 		data: {
@@ -725,25 +770,37 @@ async function seed() {
 			},
 		},
 	})
-	
+
 	console.log('Seed complete!')
 }
 ```
 
 ## Common mistakes to avoid
 
-- ❌ **Fetching unnecessary data**: Use `select` to fetch only what you need - do as little as possible
-- ❌ **Over-optimizing prematurely**: Measure first, then optimize. Don't add indexes "just in case"
-- ❌ **Not using indexes when needed**: Index foreign keys and fields used in frequent queries, but only if they're actually slow
-- ❌ **N+1 queries**: Use `include` to fetch relations in a single query when you need them
-- ❌ **Not using transactions for related operations**: Always use transactions when multiple operations must be atomic
-- ❌ **Writing from replicas**: Verify `ensurePrimary()` before writes in production
-- ❌ **Breaking migrations without strategy**: Use "widen then narrow" for zero-downtime
-- ❌ **Not validating data before inserting**: Always validate with Zod before create/update
-- ❌ **Forgetting `onDelete` in relations**: Explicitly decide what to do when parent is deleted
-- ❌ **Not using CUID2**: Epic Stack uses CUID2 by default, don't use UUID or others
-- ❌ **Not closing Prisma Client**: Prisma handles this automatically, but ensure in scripts
-- ❌ **Complex queries when simple ones work**: Prefer simple, readable queries over complex optimized ones unless there's a real problem
+- ❌ **Fetching unnecessary data**: Use `select` to fetch only what you need -
+  do as little as possible
+- ❌ **Over-optimizing prematurely**: Measure first, then optimize. Don't add
+  indexes "just in case"
+- ❌ **Not using indexes when needed**: Index foreign keys and fields used in
+  frequent queries, but only if they're actually slow
+- ❌ **N+1 queries**: Use `include` to fetch relations in a single query when
+  you need them
+- ❌ **Not using transactions for related operations**: Always use transactions
+  when multiple operations must be atomic
+- ❌ **Writing from replicas**: Verify `ensurePrimary()` before writes in
+  production
+- ❌ **Breaking migrations without strategy**: Use "widen then narrow" for
+  zero-downtime
+- ❌ **Not validating data before inserting**: Always validate with Zod before
+  create/update
+- ❌ **Forgetting `onDelete` in relations**: Explicitly decide what to do when
+  parent is deleted
+- ❌ **Not using CUID2**: Epic Stack uses CUID2 by default, don't use UUID or
+  others
+- ❌ **Not closing Prisma Client**: Prisma handles this automatically, but
+  ensure in scripts
+- ❌ **Complex queries when simple ones work**: Prefer simple, readable queries
+  over complex optimized ones unless there's a real problem
 
 ## References
 

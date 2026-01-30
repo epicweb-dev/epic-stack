@@ -1,6 +1,7 @@
 ---
 name: epic-deployment
-description: Guide on deployment with Fly.io, multi-region setup, and CI/CD for Epic Stack
+description:
+  Guide on deployment with Fly.io, multi-region setup, and CI/CD for Epic Stack
 categories:
   - deployment
   - fly-io
@@ -13,6 +14,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Configure deployment on Fly.io
 - Setup multi-region deployment
 - Configure CI/CD with GitHub Actions
@@ -28,6 +30,7 @@ Use this skill when you need to:
 Epic Stack uses Fly.io for hosting with configuration in `fly.toml`.
 
 **Basic configuration:**
+
 ```toml
 # fly.toml
 app = "your-app-name"
@@ -47,11 +50,13 @@ destination = "/data"
 ### Primary Region
 
 **Configure primary region:**
+
 ```toml
 primary_region = "sjc" # Change according to your location
 ```
 
 **Important:** The primary region must be the same for:
+
 - `primary_region` en `fly.toml`
 - Region del volume `data`
 - `PRIMARY_REGION` en variables de entorno
@@ -59,6 +64,7 @@ primary_region = "sjc" # Change according to your location
 ### LiteFS Configuration
 
 **Configuration in `other/litefs.yml`:**
+
 ```yaml
 fuse:
   dir: '${LITEFS_DIR}'
@@ -94,6 +100,7 @@ exec:
 ### Healthchecks
 
 **Configuration in `fly.toml`:**
+
 ```toml
 [[services.http_checks]]
 interval = "10s"
@@ -106,10 +113,12 @@ tls_skip_verify = false
 ```
 
 **Healthcheck implementation:**
+
 ```typescript
 // app/routes/resources/healthcheck.tsx
 export async function loader({ request }: Route.LoaderArgs) {
-	const host = request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
+	const host =
+		request.headers.get('X-Forwarded-Host') ?? request.headers.get('host')
 
 	try {
 		await Promise.all([
@@ -130,6 +139,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 ### Environment Variables
 
 **Secrets in Fly.io:**
+
 ```bash
 # Generate secrets
 fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app [YOUR_APP_NAME]
@@ -143,6 +153,7 @@ fly secrets unset SECRET_NAME --app [YOUR_APP_NAME]
 ```
 
 **Common secrets:**
+
 - `SESSION_SECRET` - Secret for signing session cookies
 - `HONEYPOT_SECRET` - Secret for honeypot fields
 - `DATABASE_URL` - Automatically configured by LiteFS
@@ -154,16 +165,19 @@ fly secrets unset SECRET_NAME --app [YOUR_APP_NAME]
 ### Volumes
 
 **Create volume:**
+
 ```bash
 fly volumes create data --region sjc --size 1 --app [YOUR_APP_NAME]
 ```
 
 **List volumes:**
+
 ```bash
 fly volumes list --app [YOUR_APP_NAME]
 ```
 
 **Expand volume:**
+
 ```bash
 fly volumes extend <volume-id> --size 10 --app [YOUR_APP_NAME]
 ```
@@ -171,6 +185,7 @@ fly volumes extend <volume-id> --size 10 --app [YOUR_APP_NAME]
 ### Multi-Region Deployment
 
 **Deploy to multiple regions:**
+
 ```bash
 # Deploy in primary region (more instances)
 fly scale count 2 --region sjc --app [YOUR_APP_NAME]
@@ -181,6 +196,7 @@ fly scale count 1 --region syd --app [YOUR_APP_NAME]
 ```
 
 **Verify instances:**
+
 ```bash
 fly status --app [YOUR_APP_NAME]
 # The ROLE column will show "primary" or "replica"
@@ -189,11 +205,13 @@ fly status --app [YOUR_APP_NAME]
 ### Consul Setup
 
 **Attach Consul:**
+
 ```bash
 fly consul attach --app [YOUR_APP_NAME]
 ```
 
 **Consul manages:**
+
 - Which instance is primary
 - Automatic failover
 - Data replication
@@ -201,6 +219,7 @@ fly consul attach --app [YOUR_APP_NAME]
 ### GitHub Actions CI/CD
 
 **Basic workflow:**
+
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy
@@ -222,6 +241,7 @@ jobs:
 ```
 
 **Complete configuration:**
+
 - Deploy to `production` from `main` branch
 - Deploy to `staging` from `dev` branch
 - Tests before deploy (optional)
@@ -230,13 +250,16 @@ jobs:
 
 Following Epic Web principles:
 
-**Deployable commits** - Every commit to the main branch should be deployable. This means:
+**Deployable commits** - Every commit to the main branch should be deployable.
+This means:
+
 - The code should be in a working state
 - Tests should pass
 - The application should build successfully
 - No "WIP" or "TODO" commits that break the build
 
 **Example - Deployable commit workflow:**
+
 ```bash
 # ✅ Good - Each commit is deployable
 git commit -m "Add user profile page"
@@ -254,6 +277,7 @@ git commit -m "Add feature (tests failing)"
 ```
 
 **Benefits:**
+
 - Easy rollback - any commit can be deployed
 - Continuous deployment - deploy any time
 - Clear history - each commit represents a working state
@@ -263,15 +287,18 @@ git commit -m "Add feature (tests failing)"
 
 Following Epic Web principles:
 
-**Small and short lived merge requests** - Keep PRs small and merge them quickly. Large PRs are hard to review, risky to merge, and slow down the team.
+**Small and short lived merge requests** - Keep PRs small and merge them
+quickly. Large PRs are hard to review, risky to merge, and slow down the team.
 
 **Guidelines:**
+
 - **Small PRs** - Focus on one feature or fix per PR
 - **Short-lived** - Merge within a day or two, not weeks
 - **Reviewable** - PRs should be reviewable in 30 minutes or less
 - **Independent** - Each PR should be independently deployable
 
 **Example - Small, focused PR:**
+
 ```bash
 # ✅ Good - Small, focused PR
 # PR: "Add email validation to signup form"
@@ -289,6 +316,7 @@ Following Epic Web principles:
 ```
 
 **Benefits:**
+
 - Faster reviews - easier to understand and review
 - Lower risk - smaller changes are less risky
 - Faster feedback - get feedback sooner
@@ -296,6 +324,7 @@ Following Epic Web principles:
 - Better collaboration - team can work in parallel on different small PRs
 
 **When PRs get too large:**
+
 - Split into multiple smaller PRs
 - Use feature flags to merge incrementally
 - Break down into logical pieces
@@ -303,11 +332,13 @@ Following Epic Web principles:
 ### Tigris Object Storage
 
 **Create storage:**
+
 ```bash
 fly storage create --app [YOUR_APP_NAME]
 ```
 
 **This creates:**
+
 - Tigris bucket
 - Automatic environment variables:
   - `TIGRIS_ENDPOINT`
@@ -317,8 +348,8 @@ fly storage create --app [YOUR_APP_NAME]
 
 ### Database Migrations
 
-**Automatic migrations:**
-Migrations are automatically applied on deploy via `litefs.yml`:
+**Automatic migrations:** Migrations are automatically applied on deploy via
+`litefs.yml`:
 
 ```yaml
 exec:
@@ -331,6 +362,7 @@ exec:
 ### Database Backups
 
 **Create backup:**
+
 ```bash
 # SSH to instance
 fly ssh console --app [YOUR_APP_NAME]
@@ -345,6 +377,7 @@ fly ssh sftp get /backups/backup-2024-01-01.db --app [YOUR_APP_NAME]
 ```
 
 **Restore backup:**
+
 ```bash
 # Upload backup
 fly ssh sftp shell --app [YOUR_APP_NAME]
@@ -360,11 +393,13 @@ exit
 ### Deployment Local
 
 **Deploy con Fly CLI:**
+
 ```bash
 fly deploy
 ```
 
 **Deploy con Docker:**
+
 ```bash
 # Build
 docker build -t epic-stack . -f other/Dockerfile \
@@ -383,12 +418,14 @@ docker run -d \
 ### Zero-Downtime Deploys
 
 **Strategy:**
+
 - Deploy to multiple instances
 - Automatic blue-green deployment
 - Healthchecks verify app is ready
 - Auto-rollback if healthcheck fails
 
 **Configuration:**
+
 ```toml
 [experimental]
 auto_rollback = true
@@ -397,17 +434,20 @@ auto_rollback = true
 ### Monitoring
 
 **View logs:**
+
 ```bash
 fly logs --app [YOUR_APP_NAME]
 ```
 
 **View metrics:**
+
 ```bash
 fly dashboard --app [YOUR_APP_NAME]
 # Or visit: https://fly.io/apps/[YOUR_APP_NAME]/monitoring
 ```
 
 **Sentry (opcional):**
+
 ```bash
 fly secrets set SENTRY_DSN=your-sentry-dsn --app [YOUR_APP_NAME]
 ```
@@ -514,15 +554,20 @@ git push origin main
 
 ## Common mistakes to avoid
 
-- ❌ **Non-deployable commits**: Every commit to main should be deployable - no WIP or broken commits
-- ❌ **Large, long-lived PRs**: Keep PRs small and merge quickly - large PRs are hard to review and risky
-- ❌ **Inconsistent primary region**: Make sure `primary_region` in `fly.toml` matches the volume region
+- ❌ **Non-deployable commits**: Every commit to main should be deployable - no
+  WIP or broken commits
+- ❌ **Large, long-lived PRs**: Keep PRs small and merge quickly - large PRs are
+  hard to review and risky
+- ❌ **Inconsistent primary region**: Make sure `primary_region` in `fly.toml`
+  matches the volume region
 - ❌ **Secrets not configured**: Configure all secrets before first deploy
 - ❌ **Volume not created**: Create the `data` volume before deploy
 - ❌ **Consul not attached**: Attach Consul before first deploy
 - ❌ **Migrations on replicas**: Only the primary instance should run migrations
-- ❌ **Not using healthchecks**: Healthchecks are critical for zero-downtime deploys
-- ❌ **Deploy breaking changes without strategy**: Use "widen then narrow" for migrations
+- ❌ **Not using healthchecks**: Healthchecks are critical for zero-downtime
+  deploys
+- ❌ **Deploy breaking changes without strategy**: Use "widen then narrow" for
+  migrations
 - ❌ **Secrets in code**: Never commit secrets, use `fly secrets`
 - ❌ **Not making backups**: Make regular database backups
 - ❌ **FLY_API_TOKEN exposed**: Never commit the token, only in GitHub Secrets
@@ -541,9 +586,11 @@ git push origin main
 
 ### Preview Deployments (Inspired by Vercel Deploy Claimable)
 
-Epic Stack can implement preview deployments similar to Vercel's deploy claimable pattern.
+Epic Stack can implement preview deployments similar to Vercel's deploy
+claimable pattern.
 
 **✅ Good - Preview deployments for pull requests:**
+
 ```yaml
 # .github/workflows/preview-deploy.yml
 name: Preview Deploy
@@ -563,7 +610,7 @@ jobs:
           # Create or reuse preview app
           PREVIEW_APP="my-app-pr-${{ github.event.pull_request.number }}"
           flyctl apps list | grep "$PREVIEW_APP" || flyctl apps create "$PREVIEW_APP"
-          
+
           # Deploy to preview app
           flyctl deploy --app "$PREVIEW_APP" --remote-only
         env:
@@ -581,6 +628,7 @@ jobs:
 ```
 
 **✅ Good - Auto-cleanup preview deployments:**
+
 ```yaml
 # .github/workflows/cleanup-preview.yml
 name: Cleanup Preview
@@ -605,9 +653,14 @@ jobs:
 ### Environment Detection
 
 **✅ Good - Detect deployment environment:**
+
 ```typescript
 // app/utils/env.server.ts
-export function getDeploymentEnv(): 'production' | 'staging' | 'preview' | 'development' {
+export function getDeploymentEnv():
+	| 'production'
+	| 'staging'
+	| 'preview'
+	| 'development' {
 	if (process.env.NODE_ENV === 'development') {
 		return 'development'
 	}
@@ -628,6 +681,7 @@ export function getDeploymentEnv(): 'production' | 'staging' | 'preview' | 'deve
 ```
 
 **✅ Good - Environment-specific configuration:**
+
 ```typescript
 const env = getDeploymentEnv()
 
@@ -636,7 +690,7 @@ export const config = {
 	staging: env === 'staging',
 	preview: env === 'preview',
 	development: env === 'development',
-	
+
 	// Preview deployments might have limited features
 	features: {
 		analytics: env === 'production',
@@ -649,6 +703,7 @@ export const config = {
 ### Build Artifact Exclusion
 
 **✅ Good - Optimize Docker builds:**
+
 ```dockerfile
 # other/Dockerfile
 # Multi-stage build for smaller image size
@@ -687,6 +742,7 @@ CMD ["npm", "start"]
 ```
 
 **✅ Good - Docker ignore file:**
+
 ```dockerignore
 # .dockerignore (in other/)
 node_modules
@@ -710,6 +766,7 @@ build
 ### Deployment Status and Monitoring
 
 **✅ Good - Deployment status tracking:**
+
 ```typescript
 // app/routes/admin/deployment-status.tsx
 export async function loader({ request }: Route.LoaderArgs) {
@@ -728,6 +785,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 ### Rollback Strategies
 
 **✅ Good - Quick rollback with Fly.io:**
+
 ```bash
 # List recent releases
 fly releases list --app my-app
@@ -737,6 +795,7 @@ fly releases rollback --app my-app
 ```
 
 **✅ Good - Automated rollback on failure:**
+
 ```toml
 # fly.toml
 [experimental]

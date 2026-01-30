@@ -1,6 +1,7 @@
 ---
 name: epic-ui-guidelines
-description: Guide on UI/UX guidelines, accessibility, and component usage for Epic Stack
+description:
+  Guide on UI/UX guidelines, accessibility, and component usage for Epic Stack
 categories:
   - ui
   - accessibility
@@ -13,6 +14,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Create accessible UI components
 - Follow Epic Stack design patterns
 - Use Tailwind CSS effectively
@@ -28,11 +30,18 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Software is built for people, by people** - Accessibility isn't about checking boxes or meeting standards. It's about creating software that works for real people with diverse needs, abilities, and contexts. Every UI decision should prioritize the human experience over technical convenience.
+**Software is built for people, by people** - Accessibility isn't about checking
+boxes or meeting standards. It's about creating software that works for real
+people with diverse needs, abilities, and contexts. Every UI decision should
+prioritize the human experience over technical convenience.
 
-Accessibility is not optional - it's how we ensure our software serves all users, not just some. When you make UI accessible, you're making it better for everyone: clearer labels help all users, keyboard navigation helps power users, and semantic HTML helps search engines.
+Accessibility is not optional - it's how we ensure our software serves all
+users, not just some. When you make UI accessible, you're making it better for
+everyone: clearer labels help all users, keyboard navigation helps power users,
+and semantic HTML helps search engines.
 
 **Example - Human-centered approach:**
+
 ```typescript
 // ✅ Good - Built for people
 function NoteForm() {
@@ -67,6 +76,7 @@ function NoteForm() {
 ### Semantic HTML
 
 **✅ Good - Use semantic elements:**
+
 ```typescript
 function UserCard({ user }: { user: User }) {
 	return (
@@ -84,6 +94,7 @@ function UserCard({ user }: { user: User }) {
 ```
 
 **❌ Avoid - Generic divs:**
+
 ```typescript
 // ❌ Don't use divs for everything
 <div>
@@ -96,6 +107,7 @@ function UserCard({ user }: { user: User }) {
 ### Form Accessibility
 
 **✅ Good - Always use labels:**
+
 ```typescript
 import { Field } from '#app/components/forms.tsx'
 
@@ -114,12 +126,14 @@ import { Field } from '#app/components/forms.tsx'
 ```
 
 The `Field` component automatically:
+
 - Associates labels with inputs using `htmlFor` and `id`
 - Adds `aria-invalid` when there are errors
 - Adds `aria-describedby` pointing to error messages
 - Ensures proper error announcement
 
 **❌ Avoid - Unlabeled inputs:**
+
 ```typescript
 // ❌ Don't forget labels
 <input type="email" name="email" />
@@ -128,6 +142,7 @@ The `Field` component automatically:
 ### ARIA Attributes
 
 **✅ Good - Use ARIA appropriately:**
+
 ```typescript
 // Epic Stack's Field component handles this automatically
 <Field
@@ -140,6 +155,7 @@ The `Field` component automatically:
 ```
 
 **✅ Good - ARIA for custom components:**
+
 ```typescript
 function LoadingButton({ isLoading, children }: { isLoading: boolean; children: React.ReactNode }) {
 	return (
@@ -155,6 +171,7 @@ function LoadingButton({ isLoading, children }: { isLoading: boolean; children: 
 Epic Stack uses Radix UI for accessible, unstyled components.
 
 **✅ Good - Use Radix primitives:**
+
 ```typescript
 import * as Dialog from '@radix-ui/react-dialog'
 import { Button } from '#app/components/ui/button.tsx'
@@ -181,6 +198,7 @@ function MyDialog() {
 ```
 
 Radix components automatically handle:
+
 - Keyboard navigation
 - Focus management
 - ARIA attributes
@@ -189,6 +207,7 @@ Radix components automatically handle:
 ### Tailwind CSS Patterns
 
 **✅ Good - Use Tailwind utility classes:**
+
 ```typescript
 function Card({ children }: { children: React.ReactNode }) {
 	return (
@@ -200,6 +219,7 @@ function Card({ children }: { children: React.ReactNode }) {
 ```
 
 **✅ Good - Use Tailwind responsive utilities:**
+
 ```typescript
 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 	{items.map(item => (
@@ -209,6 +229,7 @@ function Card({ children }: { children: React.ReactNode }) {
 ```
 
 **✅ Good - Use Tailwind dark mode:**
+
 ```typescript
 <div className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">
 	{content}
@@ -218,6 +239,7 @@ function Card({ children }: { children: React.ReactNode }) {
 ### Error Handling in Forms
 
 **✅ Good - Display errors accessibly:**
+
 ```typescript
 import { Field, ErrorList } from '#app/components/forms.tsx'
 
@@ -231,6 +253,7 @@ import { Field, ErrorList } from '#app/components/forms.tsx'
 ```
 
 Errors are automatically:
+
 - Associated with inputs via `aria-describedby`
 - Announced to screen readers
 - Visually distinct with error styling
@@ -238,6 +261,7 @@ Errors are automatically:
 ### Focus Management
 
 **✅ Good - Visible focus indicators:**
+
 ```typescript
 // Tailwind's default focus:ring handles this
 <button className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
@@ -246,6 +270,7 @@ Errors are automatically:
 ```
 
 **✅ Good - Focus on form errors:**
+
 ```typescript
 import { useEffect, useRef } from 'react'
 
@@ -265,6 +290,7 @@ function FormWithErrorFocus() {
 ### Keyboard Navigation
 
 **✅ Good - Keyboard accessible components:**
+
 ```typescript
 // Radix components handle keyboard navigation automatically
 <Dialog.Trigger asChild>
@@ -286,6 +312,7 @@ function FormWithErrorFocus() {
 ### Color Contrast
 
 **✅ Good - Use accessible color combinations:**
+
 ```typescript
 // Use Tailwind's semantic colors that meet WCAG AA
 <div className="bg-white text-gray-900"> // High contrast
@@ -293,6 +320,7 @@ function FormWithErrorFocus() {
 ```
 
 **❌ Avoid - Low contrast text:**
+
 ```typescript
 // ❌ Don't use low contrast
 <div className="bg-gray-100 text-gray-200"> // Very low contrast
@@ -301,6 +329,7 @@ function FormWithErrorFocus() {
 ### Responsive Design
 
 **✅ Good - Mobile-first approach:**
+
 ```typescript
 <div className="
 	flex flex-col gap-4
@@ -312,6 +341,7 @@ function FormWithErrorFocus() {
 ```
 
 **✅ Good - Responsive typography:**
+
 ```typescript
 <h1 className="text-2xl md:text-3xl lg:text-4xl">
 	Responsive Heading
@@ -321,6 +351,7 @@ function FormWithErrorFocus() {
 ### Loading States
 
 **✅ Good - Accessible loading indicators:**
+
 ```typescript
 import { useNavigation } from 'react-router'
 
@@ -343,6 +374,7 @@ function SubmitButton() {
 ### Icon Usage
 
 **✅ Good - Decorative icons:**
+
 ```typescript
 import { Icon } from '#app/components/ui/icon.tsx'
 
@@ -353,6 +385,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 ```
 
 **✅ Good - Semantic icons:**
+
 ```typescript
 <button>
 	<Icon name="check" aria-hidden="true" />
@@ -363,6 +396,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 ### Skip Links
 
 **✅ Good - Add skip to main content:**
+
 ```typescript
 // In your root layout
 <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white">
@@ -377,6 +411,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 ### Progressive Enhancement
 
 **✅ Good - Forms work without JavaScript:**
+
 ```typescript
 // Conform forms work without JavaScript
 <Form method="POST" {...getFormProps(form)}>
@@ -386,6 +421,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 ```
 
 Forms automatically:
+
 - Submit via native HTML forms if JavaScript is disabled
 - Validate server-side
 - Show errors appropriately
@@ -393,6 +429,7 @@ Forms automatically:
 ### Screen Reader Best Practices
 
 **✅ Good - Use semantic HTML first:**
+
 ```typescript
 // ✅ Semantic HTML provides context automatically
 <nav aria-label="Main navigation">
@@ -404,6 +441,7 @@ Forms automatically:
 ```
 
 **✅ Good - Announce dynamic content:**
+
 ```typescript
 import { useNavigation } from 'react-router'
 
@@ -425,6 +463,7 @@ function SearchResults({ results }: { results: Result[] }) {
 ```
 
 **✅ Good - Live regions for important updates:**
+
 ```typescript
 function ToastContainer({ toasts }: { toasts: Toast[] }) {
 	return (
@@ -440,7 +479,9 @@ function ToastContainer({ toasts }: { toasts: Toast[] }) {
 ```
 
 **ARIA live region options:**
-- `aria-live="polite"` - For non-critical updates (search results, status messages)
+
+- `aria-live="polite"` - For non-critical updates (search results, status
+  messages)
 - `aria-live="assertive"` - For critical updates (errors, confirmations)
 - `aria-atomic="true"` - Screen reader reads entire region on update
 - `aria-atomic="false"` - Screen reader reads only changed parts
@@ -448,6 +489,7 @@ function ToastContainer({ toasts }: { toasts: Toast[] }) {
 ### Keyboard Navigation Patterns
 
 **✅ Good - Tab order follows visual order:**
+
 ```typescript
 // Elements appear in logical tab order
 <nav>
@@ -458,6 +500,7 @@ function ToastContainer({ toasts }: { toasts: Toast[] }) {
 ```
 
 **✅ Good - Keyboard shortcuts:**
+
 ```typescript
 import { useEffect } from 'react'
 
@@ -478,6 +521,7 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
 ```
 
 **✅ Good - Focus trap in modals:**
+
 ```typescript
 // Radix Dialog automatically handles focus trap
 <Dialog.Root>
@@ -491,6 +535,7 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
 ### Focus Management for React Router
 
 **✅ Good - Focus on route changes:**
+
 ```typescript
 import { useEffect } from 'react'
 import { useNavigation } from 'react-router'
@@ -514,6 +559,7 @@ function RouteComponent() {
 ```
 
 **✅ Good - Focus on errors:**
+
 ```typescript
 import { useEffect, useRef } from 'react'
 
@@ -536,6 +582,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ### Typography and Readability
 
 **✅ Good - Readable text sizes:**
+
 ```typescript
 // Use Tailwind's text size scale
 <p className="text-base md:text-lg">Readable body text</p>
@@ -543,12 +590,14 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ```
 
 **✅ Good - Sufficient line height:**
+
 ```typescript
 // Tailwind defaults provide good line height
 <p className="leading-relaxed">Comfortable reading</p>
 ```
 
 **❌ Avoid - Small or hard-to-read text:**
+
 ```typescript
 // ❌ Don't use very small text
 <p className="text-xs">Hard to read</p>
@@ -557,6 +606,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ### Touch Target Sizes
 
 **✅ Good - Sufficient touch targets:**
+
 ```typescript
 // Buttons should be at least 44x44px (touch target size)
 <button className="min-h-[44px] min-w-[44px] px-4 py-2">
@@ -565,6 +615,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ```
 
 **✅ Good - Spacing between interactive elements:**
+
 ```typescript
 <div className="flex gap-4">
 	<Button>Save</Button>
@@ -575,6 +626,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ### Internationalization (i18n) Considerations
 
 **✅ Good - Use semantic HTML for dates/times:**
+
 ```typescript
 <time dateTime={note.createdAt.toISOString()}>
 	{formatDate(note.createdAt)}
@@ -582,12 +634,14 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ```
 
 **✅ Good - Use semantic HTML for numbers:**
+
 ```typescript
 // Screen readers can pronounce numbers correctly
 <p>Total: <span aria-label={`${count} items`}>{count}</span></p>
 ```
 
 **✅ Good - Language attributes:**
+
 ```typescript
 // In root.tsx
 <html lang="en">
@@ -600,6 +654,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ### Dark Mode Accessibility
 
 **✅ Good - Maintain contrast in dark mode:**
+
 ```typescript
 // Ensure sufficient contrast in both modes
 <div className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
@@ -608,6 +663,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ```
 
 **✅ Good - Respect user preference:**
+
 ```typescript
 // Epic Stack automatically handles theme preference
 // Use semantic colors that work in both modes
@@ -619,6 +675,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ### Animation and Motion
 
 **✅ Good - Respect reduced motion:**
+
 ```typescript
 // Tailwind automatically respects prefers-reduced-motion
 <div className="transition-transform duration-200 hover:scale-105 motion-reduce:transition-none">
@@ -627,6 +684,7 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 ```
 
 **✅ Good - Use CSS for animations:**
+
 ```typescript
 // ✅ CSS animations can be disabled via prefers-reduced-motion
 <div className="animate-fade-in">
@@ -638,21 +696,35 @@ function FormWithErrorFocus({ actionData }: Route.ComponentProps) {
 
 ## Common mistakes to avoid
 
-- ❌ **Treating accessibility as a checklist**: Accessibility is about serving real people, not just meeting standards
-- ❌ **Missing form labels**: Always use `Field` component which includes labels - helps all users, not just screen reader users
-- ❌ **Using divs for semantic elements**: Use `<article>`, `<header>`, `<nav>`, etc. - helps all users understand content structure
-- ❌ **Ignoring keyboard navigation**: Ensure all interactive elements are keyboard accessible - helps power users and those who can't use a mouse
-- ❌ **Low color contrast**: Test color combinations for WCAG AA compliance - helps users with visual impairments and in bright sunlight
-- ❌ **Missing ARIA attributes**: Use Epic Stack components which handle this automatically
+- ❌ **Treating accessibility as a checklist**: Accessibility is about serving
+  real people, not just meeting standards
+- ❌ **Missing form labels**: Always use `Field` component which includes
+  labels - helps all users, not just screen reader users
+- ❌ **Using divs for semantic elements**: Use `<article>`, `<header>`, `<nav>`,
+  etc. - helps all users understand content structure
+- ❌ **Ignoring keyboard navigation**: Ensure all interactive elements are
+  keyboard accessible - helps power users and those who can't use a mouse
+- ❌ **Low color contrast**: Test color combinations for WCAG AA compliance -
+  helps users with visual impairments and in bright sunlight
+- ❌ **Missing ARIA attributes**: Use Epic Stack components which handle this
+  automatically
 - ❌ **Breaking focus management**: Let Radix components handle focus
-- ❌ **Not testing with screen readers**: Test with VoiceOver, NVDA, or JAWS - understand how real users experience your UI
-- ❌ **Hiding content from screen readers**: Use `sr-only` instead of `display: none` for screen reader only content
-- ❌ **Ignoring mobile users**: Always test on mobile devices - many users only have mobile access
-- ❌ **Not using Tailwind's responsive utilities**: Use mobile-first responsive design
-- ❌ **Not using live regions**: Use `aria-live` for dynamic content announcements
-- ❌ **Small touch targets**: Ensure interactive elements are at least 44x44px - helps users with motor impairments and on mobile
-- ❌ **Ignoring reduced motion**: Respect `prefers-reduced-motion` media query - helps users with vestibular disorders
-- ❌ **Poor focus indicators**: Ensure focus is always visible - helps keyboard users navigate
+- ❌ **Not testing with screen readers**: Test with VoiceOver, NVDA, or JAWS -
+  understand how real users experience your UI
+- ❌ **Hiding content from screen readers**: Use `sr-only` instead of
+  `display: none` for screen reader only content
+- ❌ **Ignoring mobile users**: Always test on mobile devices - many users only
+  have mobile access
+- ❌ **Not using Tailwind's responsive utilities**: Use mobile-first responsive
+  design
+- ❌ **Not using live regions**: Use `aria-live` for dynamic content
+  announcements
+- ❌ **Small touch targets**: Ensure interactive elements are at least 44x44px -
+  helps users with motor impairments and on mobile
+- ❌ **Ignoring reduced motion**: Respect `prefers-reduced-motion` media query -
+  helps users with vestibular disorders
+- ❌ **Poor focus indicators**: Ensure focus is always visible - helps keyboard
+  users navigate
 - ❌ **Missing skip links**: Add skip to main content links for keyboard users
 
 ## References

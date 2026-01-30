@@ -1,6 +1,8 @@
 ---
 name: epic-react-patterns
-description: Guide on React patterns, performance optimization, and code quality for Epic Stack
+description:
+  Guide on React patterns, performance optimization, and code quality for Epic
+  Stack
 categories:
   - react
   - performance
@@ -13,6 +15,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Write efficient React components in Epic Stack applications
 - Optimize performance and bundle size
 - Follow React Router patterns and conventions
@@ -24,10 +27,15 @@ Use this skill when you need to:
 ## Philosophy
 
 Following Epic Web principles:
-- **Make it work, make it right, make it fast** - In that order. First make it functional, then refactor for clarity, then optimize for performance.
-- **Pragmatism over purity** - Choose practical solutions that work well in your context rather than theoretically perfect ones.
-- **Optimize for sustainable velocity** - Write code that's easy to maintain and extend, not just fast to write initially.
-- **Do as little as possible** - Only add complexity when it provides real value.
+
+- **Make it work, make it right, make it fast** - In that order. First make it
+  functional, then refactor for clarity, then optimize for performance.
+- **Pragmatism over purity** - Choose practical solutions that work well in your
+  context rather than theoretically perfect ones.
+- **Optimize for sustainable velocity** - Write code that's easy to maintain and
+  extend, not just fast to write initially.
+- **Do as little as possible** - Only add complexity when it provides real
+  value.
 
 ## Patterns and conventions
 
@@ -36,6 +44,7 @@ Following Epic Web principles:
 Epic Stack uses React Router loaders for data fetching, not `useEffect`.
 
 **✅ Good - Use loaders:**
+
 ```typescript
 // app/routes/users/$username.tsx
 export async function loader({ params }: Route.LoaderArgs) {
@@ -51,6 +60,7 @@ export default function UserRoute({ loaderData }: Route.ComponentProps) {
 ```
 
 **❌ Avoid - Don't fetch in useEffect:**
+
 ```typescript
 // ❌ Don't do this
 export default function UserRoute({ params }: Route.ComponentProps) {
@@ -70,9 +80,11 @@ export default function UserRoute({ params }: Route.ComponentProps) {
 
 [You Might Not Need `useEffect`](https://react.dev/learn/you-might-not-need-an-effect)
 
-Instead of using `useEffect`, use event handlers, CSS, ref callbacks, or `useSyncExternalStore`.
+Instead of using `useEffect`, use event handlers, CSS, ref callbacks, or
+`useSyncExternalStore`.
 
 **✅ Good - Use event handlers:**
+
 ```typescript
 function ProductPage({ product, addToCart }: Route.ComponentProps) {
 	function buyProduct() {
@@ -99,6 +111,7 @@ function ProductPage({ product, addToCart }: Route.ComponentProps) {
 ```
 
 **❌ Avoid - Side effects in useEffect:**
+
 ```typescript
 // ❌ Don't do this
 function ProductPage({ product, addToCart }: Route.ComponentProps) {
@@ -117,6 +130,7 @@ function ProductPage({ product, addToCart }: Route.ComponentProps) {
 ```
 
 **✅ Appropriate use of useEffect:**
+
 ```typescript
 // ✅ Good - Event listeners are appropriate
 useEffect(() => {
@@ -139,9 +153,11 @@ useEffect(() => {
 
 ### Code Splitting with React Router
 
-React Router automatically code-splits by route. Use dynamic imports for heavy components.
+React Router automatically code-splits by route. Use dynamic imports for heavy
+components.
 
 **✅ Good - Dynamic imports:**
+
 ```typescript
 // app/routes/admin/dashboard.tsx
 import { lazy } from 'react'
@@ -160,6 +176,7 @@ export default function AdminDashboard() {
 ### Optimizing Re-renders
 
 **✅ Good - Memoize expensive computations:**
+
 ```typescript
 import { useMemo } from 'react'
 
@@ -179,6 +196,7 @@ function UserList({ users }: { users: User[] }) {
 ```
 
 **✅ Good - Memoize callbacks:**
+
 ```typescript
 import { useCallback } from 'react'
 
@@ -192,6 +210,7 @@ function NoteEditor({ noteId, onSave }: { noteId: string; onSave: (note: Note) =
 ```
 
 **❌ Avoid - Unnecessary memoization:**
+
 ```typescript
 // ❌ Don't memoize simple values
 const count = useMemo(() => items.length, [items]) // Just use items.length directly
@@ -205,6 +224,7 @@ const handleClick = useCallback(() => {
 ### Bundle Size Optimization
 
 **✅ Good - Import only what you need:**
+
 ```typescript
 // ✅ Import specific functions
 import { useSearchParams } from 'react-router'
@@ -212,6 +232,7 @@ import { parseWithZod } from '@conform-to/zod'
 ```
 
 **❌ Avoid - Barrel imports:**
+
 ```typescript
 // ❌ Don't import entire libraries if you only need one thing
 import * as ReactRouter from 'react-router'
@@ -221,6 +242,7 @@ import * as Conform from '@conform-to/zod'
 ### Form Handling with Conform
 
 **✅ Good - Use Conform for forms:**
+
 ```typescript
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
@@ -251,6 +273,7 @@ export default function SignupRoute({ actionData }: Route.ComponentProps) {
 ### Component Composition
 
 **✅ Good - Compose components:**
+
 ```typescript
 function UserProfile({ user }: { user: User }) {
 	return (
@@ -264,6 +287,7 @@ function UserProfile({ user }: { user: User }) {
 ```
 
 **❌ Avoid - Large monolithic components:**
+
 ```typescript
 // ❌ Don't put everything in one component
 function UserProfile({ user }: { user: User }) {
@@ -289,6 +313,7 @@ function UserProfile({ user }: { user: User }) {
 ### Error Boundaries
 
 **✅ Good - Use error boundaries:**
+
 ```typescript
 // app/routes/users/$username.tsx
 export function ErrorBoundary() {
@@ -307,6 +332,7 @@ export function ErrorBoundary() {
 ### TypeScript Guidelines
 
 **✅ Good - Type props explicitly:**
+
 ```typescript
 interface UserCardProps {
 	user: {
@@ -329,6 +355,7 @@ function UserCard({ user, onEdit }: UserCardProps) {
 ```
 
 **✅ Good - Use Route types:**
+
 ```typescript
 import type { Route } from './+types/users.$username'
 
@@ -349,6 +376,7 @@ export default function UserRoute({ loaderData }: Route.ComponentProps) {
 ### Loading States
 
 **✅ Good - Use React Router's pending states:**
+
 ```typescript
 import { useNavigation } from 'react-router'
 
@@ -371,6 +399,7 @@ function NoteForm() {
 React Router loaders can prevent waterfalls by fetching data in parallel.
 
 **❌ Avoid - Sequential data fetching (waterfall):**
+
 ```typescript
 // ❌ Don't do this - creates a waterfall
 export async function loader({ params }: Route.LoaderArgs) {
@@ -386,6 +415,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 ```
 
 **✅ Good - Parallel data fetching:**
+
 ```typescript
 // ✅ Fetch data in parallel
 export async function loader({ params }: Route.LoaderArgs) {
@@ -396,11 +426,15 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 	// Fetch notes in parallel with user data
 	const [notes, stats] = await Promise.all([
-		user ? prisma.note.findMany({
-			where: { ownerId: user.id },
-			select: { id: true, title: true, updatedAt: true },
-		}) : Promise.resolve([]),
-		user ? prisma.note.count({ where: { ownerId: user.id } }) : Promise.resolve(0),
+		user
+			? prisma.note.findMany({
+					where: { ownerId: user.id },
+					select: { id: true, title: true, updatedAt: true },
+				})
+			: Promise.resolve([]),
+		user
+			? prisma.note.count({ where: { ownerId: user.id } })
+			: Promise.resolve(0),
 	])
 
 	return { user, notes, stats }
@@ -408,6 +442,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 ```
 
 **✅ Good - Nested route parallel loading:**
+
 ```typescript
 // Parent route loader
 // app/routes/users/$username.tsx
@@ -445,6 +480,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 React Router provides SSR by default. Optimize by:
 
 **✅ Good - Selective data fetching:**
+
 ```typescript
 export async function loader({ request }: Route.LoaderArgs) {
 	// Only fetch what's needed for initial render
@@ -465,6 +501,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 ```
 
 **✅ Good - Use caching for expensive operations:**
+
 ```typescript
 import { cachified, cache } from '#app/utils/cache.server.ts'
 
@@ -491,6 +528,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 ### Rendering Performance
 
 **✅ Good - Use React.memo for expensive components:**
+
 ```typescript
 import { memo } from 'react'
 
@@ -506,6 +544,7 @@ export default function Dashboard({ chartData }: { chartData: Data[] }) {
 ```
 
 **✅ Good - Optimize list rendering:**
+
 ```typescript
 import { memo } from 'react'
 
@@ -530,6 +569,7 @@ function UserList({ users }: { users: User[] }) {
 ```
 
 **❌ Avoid - Creating new objects/arrays in render:**
+
 ```typescript
 // ❌ Don't create new objects on every render
 function UserProfile({ user }: { user: User }) {
@@ -554,8 +594,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 ### Bundle Size Optimization Strategies
 
-**✅ Good - Route-based code splitting:**
-React Router automatically splits code by route. Leverage this:
+**✅ Good - Route-based code splitting:** React Router automatically splits code
+by route. Leverage this:
 
 ```typescript
 // Heavy dependencies are automatically split by route
@@ -564,6 +604,7 @@ import { Chart } from 'chart.js' // Only loaded on /admin/dashboard route
 ```
 
 **✅ Good - Dynamic imports for heavy components:**
+
 ```typescript
 import { lazy, Suspense } from 'react'
 
@@ -579,6 +620,7 @@ export default function Route() {
 ```
 
 **✅ Good - Tree-shakeable imports:**
+
 ```typescript
 // ✅ Tree-shakeable - only imports what you use
 import { format } from 'date-fns/format'
@@ -591,6 +633,7 @@ import * as dateFns from 'date-fns'
 ### React 18+ Features for Performance
 
 **✅ Good - Use transitions for non-urgent updates:**
+
 ```typescript
 import { useTransition } from 'react'
 import { useNavigation } from 'react-router'
@@ -619,18 +662,25 @@ function SearchInput() {
 
 - ❌ **Fetching data in useEffect**: Use React Router loaders instead
 - ❌ **Overusing useEffect**: Prefer event handlers, CSS, or ref callbacks
-- ❌ **Premature memoization**: Only memoize when there's a measurable performance benefit
+- ❌ **Premature memoization**: Only memoize when there's a measurable
+  performance benefit
 - ❌ **Barrel imports**: Import only what you need
 - ❌ **Ignoring TypeScript types**: Use Route types for type safety
 - ❌ **Not handling loading states**: Use React Router's navigation states
-- ❌ **Large monolithic components**: Break components into smaller, focused pieces
+- ❌ **Large monolithic components**: Break components into smaller, focused
+  pieces
 - ❌ **Not using error boundaries**: Always add error boundaries to routes
-- ❌ **Client-side routing when server-side works**: Prefer server-side data fetching
+- ❌ **Client-side routing when server-side works**: Prefer server-side data
+  fetching
 - ❌ **Data fetching waterfalls**: Use `Promise.all()` to fetch data in parallel
-- ❌ **Fetching unnecessary data**: Only fetch what's needed for the initial render
-- ❌ **Creating new objects in render**: Compute derived data in loaders or memoize
-- ❌ **Not using React.memo for expensive lists**: Memoize list items for better performance
-- ❌ **Not leveraging route-based code splitting**: React Router splits by route automatically
+- ❌ **Fetching unnecessary data**: Only fetch what's needed for the initial
+  render
+- ❌ **Creating new objects in render**: Compute derived data in loaders or
+  memoize
+- ❌ **Not using React.memo for expensive lists**: Memoize list items for better
+  performance
+- ❌ **Not leveraging route-based code splitting**: React Router splits by route
+  automatically
 
 ## References
 

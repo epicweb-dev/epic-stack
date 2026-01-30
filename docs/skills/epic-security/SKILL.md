@@ -1,6 +1,8 @@
 ---
 name: epic-security
-description: Guide on security practices including CSP, rate limiting, and session security for Epic Stack
+description:
+  Guide on security practices including CSP, rate limiting, and session security
+  for Epic Stack
 categories:
   - security
   - csp
@@ -13,6 +15,7 @@ categories:
 ## When to use this skill
 
 Use this skill when you need to:
+
 - Configure Content Security Policy (CSP)
 - Implement spam protection (honeypot)
 - Configure rate limiting
@@ -27,30 +30,37 @@ Use this skill when you need to:
 
 Following Epic Web principles:
 
-**Design to fail fast and early** - Validate security constraints as early as possible. Check authentication, authorization, and input validation before processing requests. Fail immediately with clear error messages rather than allowing potentially malicious data to flow through the system.
+**Design to fail fast and early** - Validate security constraints as early as
+possible. Check authentication, authorization, and input validation before
+processing requests. Fail immediately with clear error messages rather than
+allowing potentially malicious data to flow through the system.
 
-**Optimize for the debugging experience** - When security checks fail, provide clear, actionable error messages that help developers understand what went wrong. Log security events with enough context to debug issues without exposing sensitive information.
+**Optimize for the debugging experience** - When security checks fail, provide
+clear, actionable error messages that help developers understand what went
+wrong. Log security events with enough context to debug issues without exposing
+sensitive information.
 
 **Example - Fail fast validation:**
+
 ```typescript
 // ✅ Good - Validate security constraints early
 export async function action({ request }: Route.ActionArgs) {
 	// 1. Authenticate immediately - fail fast if not authenticated
 	const userId = await requireUserId(request)
-	
+
 	// 2. Validate input early - fail fast if invalid
 	const formData = await request.formData()
 	const submission = await parseWithZod(formData, {
 		schema: NoteSchema,
 	})
-	
+
 	if (submission.status !== 'success') {
 		return data({ result: submission.reply() }, { status: 400 })
 	}
-	
+
 	// 3. Check permissions early - fail fast if unauthorized
 	await requireUserWithPermission(request, 'create:note:own')
-	
+
 	// Only proceed if all security checks pass
 	const { title, content } = submission.value
 	// ... create note
@@ -60,7 +70,7 @@ export async function action({ request }: Route.ActionArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	// ... process data first
-	
+
 	// Security check at the end - too late!
 	const userId = await getUserId(request)
 	if (!userId) {
@@ -71,6 +81,7 @@ export async function action({ request }: Route.ActionArgs) {
 ```
 
 **Example - Debugging-friendly error messages:**
+
 ```typescript
 // ✅ Good - Clear error messages for debugging
 export async function checkHoneypot(formData: FormData) {
@@ -106,6 +117,7 @@ export async function checkHoneypot(formData: FormData) {
 Epic Stack uses CSP to prevent XSS and other attacks.
 
 **Configuration in `server/index.ts`:**
+
 ```typescript
 import { helmet } from '@nichtsam/helmet/node-http'
 
@@ -115,13 +127,15 @@ app.use((_, res, next) => {
 })
 ```
 
-**Note:** By default, CSP is in `report-only` mode to avoid blocking resources during development. In production, remove `reportOnly: true` to enable it fully.
+**Note:** By default, CSP is in `report-only` mode to avoid blocking resources
+during development. In production, remove `reportOnly: true` to enable it fully.
 
 ### Honeypot Fields
 
 Epic Stack uses honeypot fields to protect against spam bots.
 
 **En formularios públicos:**
+
 ```typescript
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
@@ -132,21 +146,23 @@ import { HoneypotInputs } from 'remix-utils/honeypot/react'
 ```
 
 **En el action (fail fast):**
+
 ```typescript
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	
+
 	// Check honeypot first - fail fast if spam detected
 	await checkHoneypot(formData) // Lanza error si es spam
-	
+
 	// Only proceed if honeypot check passes
 	// ... resto del código
 }
 ```
 
 **Configuration:**
+
 ```typescript
 // app/utils/honeypot.server.ts
 import { Honeypot, SpamError } from 'remix-utils/honeypot/server'
@@ -177,11 +193,12 @@ export async function checkHoneypot(formData: FormData) {
 Epic Stack uses `express-rate-limit` para prevenir abuso.
 
 **Basic configuration:**
+
 ```typescript
 // server/index.ts
 import rateLimit from 'express-rate-limit'
 
-	const rateLimitDefault = {
+const rateLimitDefault = {
 	windowMs: 60 * 1000, // 1 minute
 	limit: 1000, // 1000 requests per minute
 	standardHeaders: true,
@@ -196,6 +213,7 @@ const generalRateLimit = rateLimit(rateLimitDefault)
 ```
 
 **Different levels of rate limiting:**
+
 ```typescript
 // Stricter rate limit for sensitive routes
 const strongestRateLimit = rateLimit({
@@ -211,6 +229,7 @@ const strongRateLimit = rateLimit({
 ```
 
 **Apply to specific routes:**
+
 ```typescript
 app.use((req, res, next) => {
 	const strongPaths = [
@@ -220,23 +239,25 @@ app.use((req, res, next) => {
 		'/admin',
 		'/reset-password',
 	]
-	
+
 	if (req.method !== 'GET' && req.method !== 'HEAD') {
 		if (strongPaths.some((p) => req.path.includes(p))) {
 			return strongestRateLimit(req, res, next)
 		}
 		return strongRateLimit(req, res, next)
 	}
-	
+
 	return generalRateLimit(req, res, next)
 })
 ```
 
-**Note:** In tests and development, rate limiting is effectively disabled to allow fast tests.
+**Note:** In tests and development, rate limiting is effectively disabled to
+allow fast tests.
 
 ### Session Security
 
 **Secure session configuration:**
+
 ```typescript
 // app/utils/session.server.ts
 export const authSessionStorage = createCookieSessionStorage({
@@ -252,6 +273,7 @@ export const authSessionStorage = createCookieSessionStorage({
 ```
 
 **Security features:**
+
 - `httpOnly: true` - Prevents access from JavaScript (XSS protection)
 - `secure: true` - Only sends cookies over HTTPS in production
 - `sameSite: 'lax'` - CSRF protection
@@ -260,6 +282,7 @@ export const authSessionStorage = createCookieSessionStorage({
 ### Password Security
 
 **Hashing de passwords:**
+
 ```typescript
 import bcrypt from 'bcryptjs'
 
@@ -287,6 +310,7 @@ export async function verifyUserPassword(
 ```
 
 **Check common passwords (Have I Been Pwned):**
+
 ```typescript
 import { checkIsCommonPassword } from '#app/utils/auth.server.ts'
 
@@ -303,12 +327,22 @@ if (isCommonPassword) {
 ### Input Validation y Sanitization
 
 **Always validate inputs with Zod:**
+
 ```typescript
 import { z } from 'zod'
 
 const UserSchema = z.object({
-	email: z.string().email().min(3).max(100).transform(val => val.toLowerCase()),
-	username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_]+$/),
+	email: z
+		.string()
+		.email()
+		.min(3)
+		.max(100)
+		.transform((val) => val.toLowerCase()),
+	username: z
+		.string()
+		.min(3)
+		.max(20)
+		.regex(/^[a-zA-Z0-9_]+$/),
 	password: z.string().min(6).max(72), // bcrypt limit
 })
 
@@ -320,6 +354,7 @@ if (!result.success) {
 ```
 
 **Sanitization:**
+
 - Use `.transform()` from Zod to sanitize data
 - Normalize emails to lowercase
 - Normalize usernames to lowercase
@@ -330,6 +365,7 @@ if (!result.success) {
 React prevents XSS automatically by escaping all values.
 
 **Never use `dangerouslySetInnerHTML` with user data:**
+
 ```typescript
 // ❌ NEVER do this with user data
 <div dangerouslySetInnerHTML={{ __html: userContent }} />
@@ -343,6 +379,7 @@ React prevents XSS automatically by escaping all values.
 Epic Stack uses Helmet for secure headers.
 
 **Configuration:**
+
 ```typescript
 import { helmet } from '@nichtsam/helmet/node-http'
 
@@ -353,6 +390,7 @@ app.use((_, res, next) => {
 ```
 
 **Included headers:**
+
 - X-Content-Type-Options: nosniff
 - X-Frame-Options: DENY
 - X-XSS-Protection: 1; mode=block
@@ -361,6 +399,7 @@ app.use((_, res, next) => {
 ### HTTPS Only
 
 **Redirect HTTP to HTTPS:**
+
 ```typescript
 app.use((req, res, next) => {
 	if (req.method !== 'GET') return next()
@@ -378,6 +417,7 @@ app.use((req, res, next) => {
 ### Secrets Management
 
 **Variables de entorno:**
+
 ```bash
 # .env
 SESSION_SECRET=secret1,secret2,secret3 # Secret rotation
@@ -386,12 +426,14 @@ DATABASE_URL=file:./data/db.sqlite
 ```
 
 **En Fly.io:**
+
 ```bash
 fly secrets set SESSION_SECRET="secret1,secret2,secret3"
 fly secrets set HONEYPOT_SECRET="your-secret"
 ```
 
 **Never commit secrets:**
+
 - Use `.env.example` to document required variables
 - `.env` is in `.gitignore`
 - Use `fly secrets` for production
@@ -399,16 +441,17 @@ fly secrets set HONEYPOT_SECRET="your-secret"
 ### Validación de Session Expiration (Fail Fast)
 
 **Always verify expiration early:**
+
 ```typescript
 export async function getUserId(request: Request) {
 	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const sessionId = authSession.get(sessionKey)
-	
+
 	// Fail fast - return null immediately if no session
 	if (!sessionId) return null
-	
+
 	// Verify expiration early - fail fast if expired
 	const session = await prisma.session.findUnique({
 		select: { userId: true },
@@ -417,7 +460,7 @@ export async function getUserId(request: Request) {
 			expirationDate: { gt: new Date() }, // Verify expiration
 		},
 	})
-	
+
 	// Fail fast - destroy invalid session immediately
 	if (!session?.userId) {
 		throw redirect('/', {
@@ -441,13 +484,13 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	
+
 	await checkHoneypot(formData) // Spam protection
-	
+
 	const submission = await parseWithZod(formData, {
 		schema: SignupSchema,
 	})
-	
+
 	// ... rest of code
 }
 
@@ -513,32 +556,41 @@ export const PasswordSchema = z
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
-	
+
 	// Validate that user has permission
 	await requireUserWithPermission(request, 'delete:note:own')
-	
+
 	// Only after validating permissions
 	await prisma.note.delete({ where: { id: noteId } })
-	
+
 	return redirect('/notes')
 }
 ```
 
 ## Common mistakes to avoid
 
-- ❌ **Delayed security checks**: Validate authentication, authorization, and input as early as possible - fail fast
-- ❌ **Generic error messages**: Provide clear, actionable error messages that help with debugging (without exposing sensitive data)
-- ❌ **Forgetting honeypot in public forms**: Always include `HoneypotInputs` in forms accessible without authentication
-- ❌ **Not validating session expiration**: Always verify `expirationDate` when getting sessions - check early
-- ❌ **Using `dangerouslySetInnerHTML` with user data**: Never render user HTML without sanitizing
+- ❌ **Delayed security checks**: Validate authentication, authorization, and
+  input as early as possible - fail fast
+- ❌ **Generic error messages**: Provide clear, actionable error messages that
+  help with debugging (without exposing sensitive data)
+- ❌ **Forgetting honeypot in public forms**: Always include `HoneypotInputs` in
+  forms accessible without authentication
+- ❌ **Not validating session expiration**: Always verify `expirationDate` when
+  getting sessions - check early
+- ❌ **Using `dangerouslySetInnerHTML` with user data**: Never render user HTML
+  without sanitizing
 - ❌ **Not using rate limiting**: Protect sensitive routes with rate limiting
 - ❌ **Secrets in code**: Never hardcode secrets, use environment variables
-- ❌ **Not sanitizing inputs**: Always sanitize inputs with `.transform()` from Zod
-- ❌ **Not validating common passwords**: Check passwords against Have I Been Pwned
-- ❌ **Sessions without httpOnly**: Always use `httpOnly: true` in session cookies
+- ❌ **Not sanitizing inputs**: Always sanitize inputs with `.transform()` from
+  Zod
+- ❌ **Not validating common passwords**: Check passwords against Have I Been
+  Pwned
+- ❌ **Sessions without httpOnly**: Always use `httpOnly: true` in session
+  cookies
 - ❌ **Not using HTTPS in production**: Make sure to redirect HTTP to HTTPS
 - ❌ **CSP too permissive**: Review and adjust CSP according to your needs
-- ❌ **Not logging security events**: Log security failures with context for debugging (without sensitive data)
+- ❌ **Not logging security events**: Log security failures with context for
+  debugging (without sensitive data)
 
 ## References
 
