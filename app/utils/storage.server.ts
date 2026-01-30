@@ -14,7 +14,7 @@ async function uploadToStorage(file: File | FileUpload, key: string) {
 	const uploadResponse = await fetch(url, {
 		method: 'PUT',
 		headers,
-		body: file,
+		body: file instanceof File ? file : (file as FileUpload).stream(),
 	})
 
 	if (!uploadResponse.ok) {
