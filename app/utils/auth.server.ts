@@ -267,7 +267,7 @@ export async function logout(
 		await prisma.session
 			.deleteMany({ where: { id: sessionId } })
 			.catch(() => {})
-		await invalidateSessionCache(sessionId)
+		await invalidateSessionCache(sessionId).catch(() => {})
 	}
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,
