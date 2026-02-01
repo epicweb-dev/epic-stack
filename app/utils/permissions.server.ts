@@ -51,7 +51,7 @@ export async function requireUserWithPermission(
 			{ status: 403 },
 		)
 	}
-	return user.id
+	return userId
 }
 
 export async function requireUserWithRole(request: Request, name: string) {
@@ -78,5 +78,5 @@ export async function requireUserWithRole(request: Request, name: string) {
 			{ status: 403 },
 		)
 	}
-	return user.id
+	return userId
 }
