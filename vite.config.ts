@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { reactRouter } from '@react-router/dev/vite'
 import {
 	type SentryReactRouterBuildOptions,
@@ -9,12 +10,24 @@ import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
 import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 
-const MODE = process.env.NODE_ENV
-
-export default defineConfig((config) => ({
+export default defineConfig((config) => {
+	const mode = config.mode ?? process.env.NODE_ENV
+	const isTest = mode === 'test' || Boolean(process.env.VITEST)
+	const cacheServerStubPlugin = {
+		name: 'vitest-cache-server-stub',
+		enforce: 'pre' as const,
+		resolveId(source: string) {
+			if (!process.env.VITEST) return null
+			if (source.endsWith('cache.server.ts')) {
+				return path.resolve('tests/mocks/cache-server.ts')
+			}
+			return null
+		},
+	}
+	return {
 	build: {
 		target: 'es2022',
-		cssMinify: MODE === 'production',
+		cssMinify: mode === 'production',
 
 		rollupOptions: {
 			input: config.isSsrBuild ? './server/app.ts' : undefined,
@@ -39,6 +52,7 @@ export default defineConfig((config) => ({
 	},
 	sentryConfig,
 	plugins: [
+		cacheServerStubPlugin,
 		envOnlyMacros(),
 		tailwindcss(),
 		reactRouterDevTools(),
@@ -52,8 +66,8 @@ export default defineConfig((config) => ({
 		}),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		MODE === 'test' ? null : reactRouter(),
-		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
+		isTest ? null : reactRouter(),
+		mode === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
 	],
@@ -67,7 +81,8 @@ export default defineConfig((config) => ({
 			all: true,
 		},
 	},
-}))
+	}
+})
 
 const sentryConfig: SentryReactRouterBuildOptions = {
 	authToken: process.env.SENTRY_AUTH_TOKEN,
