@@ -12,6 +12,7 @@ import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 
 export default defineConfig((config) => {
 	const mode = config.mode ?? process.env.NODE_ENV
+	const isTest = mode === 'test' || Boolean(process.env.VITEST)
 	return {
 	build: {
 		target: 'es2022',
@@ -40,7 +41,7 @@ export default defineConfig((config) => {
 	},
 	resolve: {
 		alias:
-			mode === 'test'
+			isTest
 				? {
 						'#app/utils/cache.server.ts': path.resolve(
 							'tests/mocks/cache-server.ts',
@@ -63,7 +64,7 @@ export default defineConfig((config) => {
 		}),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		mode === 'test' ? null : reactRouter(),
+		isTest ? null : reactRouter(),
 		mode === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
