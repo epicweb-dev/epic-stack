@@ -22,6 +22,10 @@ export const authenticator = new Authenticator<ProviderUser>()
 
 const sessionCacheKey = (sessionId: string) => `session-user-id:${sessionId}`
 
+export function invalidateSessionCache(sessionId: string) {
+	lruCache.delete(sessionCacheKey(sessionId))
+}
+
 type SessionUserIdCacheEntry = {
 	userId: string
 	expirationDate: string
@@ -37,7 +41,10 @@ async function getCachedSessionEntry(sessionId: string) {
 				select: { userId: true, expirationDate: true },
 				where: { id: sessionId },
 			})
-			if (!session) return null
+			if (!session) {
+				context.metadata.ttl = 0
+				return null
+			}
 			const now = Date.now()
 			const expiresAt = session.expirationDate.getTime()
 			if (expiresAt <= now) {
@@ -76,7 +83,7 @@ export async function getUserId(request: Request) {
 	}
 	const expirationDate = new Date(cachedSession.expirationDate)
 	if (expirationDate <= new Date()) {
-		lruCache.delete(sessionCacheKey(sessionId))
+		invalidateSessionCache(sessionId)
 		throw redirect('/', {
 			headers: {
 				'set-cookie': await authSessionStorage.destroySession(authSession),
@@ -257,7 +264,7 @@ export async function logout(
 	// if this fails, we still need to delete the session from the user's browser
 	// and it doesn't do any harm staying in the db anyway.
 	if (sessionId) {
-		lruCache.delete(sessionCacheKey(sessionId))
+		invalidateSessionCache(sessionId)
 		// the .catch is important because that's what triggers the query.
 		// learn more about PrismaPromise: https://www.prisma.io/docs/orm/reference/prisma-client-reference#prismapromise-behavior
 		void prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {})

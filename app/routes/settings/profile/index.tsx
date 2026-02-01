@@ -9,7 +9,11 @@ import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
+import {
+	invalidateSessionCache,
+	requireUserId,
+	sessionKey,
+} from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { getUserImgSrc, useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
@@ -287,12 +291,22 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 		sessionId,
 		'You must be authenticated to sign out of other sessions',
 	)
+	const sessionsToInvalidate = await prisma.session.findMany({
+		select: { id: true },
+		where: {
+			userId,
+			id: { not: sessionId },
+		},
+	})
 	await prisma.session.deleteMany({
 		where: {
 			userId,
 			id: { not: sessionId },
 		},
 	})
+	for (const session of sessionsToInvalidate) {
+		invalidateSessionCache(session.id)
+	}
 	return { status: 'success' } as const
 }
 
