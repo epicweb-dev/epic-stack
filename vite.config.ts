@@ -13,6 +13,17 @@ import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 export default defineConfig((config) => {
 	const mode = config.mode ?? process.env.NODE_ENV
 	const isTest = mode === 'test' || Boolean(process.env.VITEST)
+	const cacheServerStubPlugin = isTest
+		? {
+				name: 'vitest-cache-server-stub',
+				resolveId(source: string) {
+					if (source.endsWith('cache.server.ts')) {
+						return path.resolve('tests/mocks/cache-server.ts')
+					}
+					return null
+				},
+			}
+		: null
 	return {
 	build: {
 		target: 'es2022',
@@ -39,19 +50,9 @@ export default defineConfig((config) => {
 			ignored: ['**/playwright-report/**'],
 		},
 	},
-	resolve: {
-		alias:
-			isTest
-				? [
-						{
-							find: /cache\.server\.ts$/,
-							replacement: path.resolve('tests/mocks/cache-server.ts'),
-						},
-					]
-				: undefined,
-	},
 	sentryConfig,
 	plugins: [
+		cacheServerStubPlugin,
 		envOnlyMacros(),
 		tailwindcss(),
 		reactRouterDevTools(),
@@ -71,12 +72,6 @@ export default defineConfig((config) => {
 			: null,
 	],
 	test: {
-		alias: [
-			{
-				find: /cache\.server\.ts$/,
-				replacement: path.resolve('tests/mocks/cache-server.ts'),
-			},
-		],
 		include: ['./app/**/*.test.{ts,tsx}'],
 		setupFiles: ['./tests/setup/setup-test-env.ts'],
 		globalSetup: ['./tests/setup/global-setup.ts'],
