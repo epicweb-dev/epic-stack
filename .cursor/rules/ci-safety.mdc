@@ -1,0 +1,12 @@
+---
+description: CI safety checks before shipping
+globs: "*"
+alwaysApply: true
+---
+### CI safety checklist
+
+- Run `npm run typecheck` after TypeScript changes.
+- Run `npx prisma generate --sql` if Prisma SQL imports fail.
+- Run `npm run test:e2e:run` for auth/session/permission changes.
+- If a check cannot run due to environment limits, document the reason and
+  avoid declaring the change ready without CI confirmation.
