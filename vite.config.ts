@@ -10,12 +10,12 @@ import { defineConfig } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
 import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 
-const MODE = process.env.NODE_ENV
-
-export default defineConfig((config) => ({
+export default defineConfig((config) => {
+	const mode = config.mode ?? process.env.NODE_ENV
+	return {
 	build: {
 		target: 'es2022',
-		cssMinify: MODE === 'production',
+		cssMinify: mode === 'production',
 
 		rollupOptions: {
 			input: config.isSsrBuild ? './server/app.ts' : undefined,
@@ -40,7 +40,7 @@ export default defineConfig((config) => ({
 	},
 	resolve: {
 		alias:
-			MODE === 'test'
+			mode === 'test'
 				? {
 						'#app/utils/cache.server.ts': path.resolve(
 							'tests/mocks/cache-server.ts',
@@ -63,8 +63,8 @@ export default defineConfig((config) => ({
 		}),
 		// it would be really nice to have this enabled in tests, but we'll have to
 		// wait until https://github.com/remix-run/remix/issues/9871 is fixed
-		MODE === 'test' ? null : reactRouter(),
-		MODE === 'production' && process.env.SENTRY_AUTH_TOKEN
+		mode === 'test' ? null : reactRouter(),
+		mode === 'production' && process.env.SENTRY_AUTH_TOKEN
 			? sentryReactRouter(sentryConfig, config)
 			: null,
 	],
@@ -78,7 +78,8 @@ export default defineConfig((config) => ({
 			all: true,
 		},
 	},
-}))
+	}
+})
 
 const sentryConfig: SentryReactRouterBuildOptions = {
 	authToken: process.env.SENTRY_AUTH_TOKEN,
