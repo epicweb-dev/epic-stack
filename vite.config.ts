@@ -13,17 +13,17 @@ import { iconsSpritesheet } from 'vite-plugin-icons-spritesheet'
 export default defineConfig((config) => {
 	const mode = config.mode ?? process.env.NODE_ENV
 	const isTest = mode === 'test' || Boolean(process.env.VITEST)
-	const cacheServerStubPlugin = isTest
-		? {
-				name: 'vitest-cache-server-stub',
-				resolveId(source: string) {
-					if (source.endsWith('cache.server.ts')) {
-						return path.resolve('tests/mocks/cache-server.ts')
-					}
-					return null
-				},
+	const cacheServerStubPlugin = {
+		name: 'vitest-cache-server-stub',
+		enforce: 'pre' as const,
+		resolveId(source: string) {
+			if (!process.env.VITEST) return null
+			if (source.endsWith('cache.server.ts')) {
+				return path.resolve('tests/mocks/cache-server.ts')
 			}
-		: null
+			return null
+		},
+	}
 	return {
 	build: {
 		target: 'es2022',
