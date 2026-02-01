@@ -70,6 +70,9 @@ export default defineConfig((config) => {
 			: null,
 	],
 	test: {
+		alias: {
+			'#app/utils/cache.server.ts': path.resolve('tests/mocks/cache-server.ts'),
+		},
 		include: ['./app/**/*.test.{ts,tsx}'],
 		setupFiles: ['./tests/setup/setup-test-env.ts'],
 		globalSetup: ['./tests/setup/global-setup.ts'],
