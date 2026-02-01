@@ -1,11 +1,10 @@
 import crypto from 'node:crypto'
-import { remember } from '@epic-web/remember'
 import { type Connection, type Password, type User } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { LRUCache } from 'lru-cache'
 import { redirect } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
+import { cachified, lruCache } from './cache.server.ts'
 import { providers } from './connections.server.ts'
 import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
@@ -21,30 +20,37 @@ export const sessionKey = 'sessionId'
 
 export const authenticator = new Authenticator<ProviderUser>()
 
-const sessionUserIdCache = remember(
-	'session-user-id-cache',
-	() => new LRUCache<string, { userId: string; expiresAt: number }>({ max: 10000 }),
-)
+const sessionCacheKey = (sessionId: string) => `session-user-id:${sessionId}`
 
-function getCachedSessionUserId(sessionId: string) {
-	const cached = sessionUserIdCache.get(sessionId)
-	if (!cached) return null
-	if (cached.expiresAt <= Date.now()) {
-		sessionUserIdCache.delete(sessionId)
-		return null
-	}
-	return cached.userId
+type SessionUserIdCacheEntry = {
+	userId: string
+	expirationDate: string
 }
 
-function cacheSessionUserId(
-	sessionId: string,
-	userId: string,
-	expirationDate: Date,
-) {
-	const expiresAt = expirationDate.getTime()
-	const ttl = expiresAt - Date.now()
-	if (ttl <= 0) return
-	sessionUserIdCache.set(sessionId, { userId, expiresAt }, { ttl })
+async function getCachedSessionEntry(sessionId: string) {
+	return cachified<SessionUserIdCacheEntry | null>({
+		key: sessionCacheKey(sessionId),
+		cache: lruCache,
+		ttl: SESSION_EXPIRATION_TIME,
+		async getFreshValue(context) {
+			const session = await prisma.session.findUnique({
+				select: { userId: true, expirationDate: true },
+				where: { id: sessionId },
+			})
+			if (!session) return null
+			const now = Date.now()
+			const expiresAt = session.expirationDate.getTime()
+			if (expiresAt <= now) {
+				context.metadata.ttl = 0
+				return null
+			}
+			context.metadata.ttl = expiresAt - now
+			return {
+				userId: session.userId,
+				expirationDate: session.expirationDate.toISOString(),
+			}
+		},
+	})
 }
 
 for (const [providerName, provider] of Object.entries(providers)) {
@@ -60,21 +66,24 @@ export async function getUserId(request: Request) {
 	)
 	const sessionId = authSession.get(sessionKey)
 	if (!sessionId) return null
-	const cachedUserId = getCachedSessionUserId(sessionId)
-	if (cachedUserId) return cachedUserId
-	const session = await prisma.session.findUnique({
-		select: { userId: true, expirationDate: true },
-		where: { id: sessionId },
-	})
-	if (!session || session.expirationDate <= new Date()) {
+	const cachedSession = await getCachedSessionEntry(sessionId)
+	if (!cachedSession) {
 		throw redirect('/', {
 			headers: {
 				'set-cookie': await authSessionStorage.destroySession(authSession),
 			},
 		})
 	}
-	cacheSessionUserId(sessionId, session.userId, session.expirationDate)
-	return session.userId
+	const expirationDate = new Date(cachedSession.expirationDate)
+	if (expirationDate <= new Date()) {
+		lruCache.delete(sessionCacheKey(sessionId))
+		throw redirect('/', {
+			headers: {
+				'set-cookie': await authSessionStorage.destroySession(authSession),
+			},
+		})
+	}
+	return cachedSession.userId
 }
 
 export async function requireUserId(
@@ -248,7 +257,7 @@ export async function logout(
 	// if this fails, we still need to delete the session from the user's browser
 	// and it doesn't do any harm staying in the db anyway.
 	if (sessionId) {
-		sessionUserIdCache.delete(sessionId)
+		lruCache.delete(sessionCacheKey(sessionId))
 		// the .catch is important because that's what triggers the query.
 		// learn more about PrismaPromise: https://www.prisma.io/docs/orm/reference/prisma-client-reference#prismapromise-behavior
 		void prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {})

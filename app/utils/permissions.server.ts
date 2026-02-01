@@ -1,19 +1,13 @@
-import { remember } from '@epic-web/remember'
-import { LRUCache } from 'lru-cache'
 import { data } from 'react-router'
+import { cachified, lruCache } from './cache.server.ts'
 import { requireUserId } from './auth.server.ts'
 import { prisma } from './db.server.ts'
 import { type PermissionString, parsePermissionString } from './user.ts'
 
-const permissionCheckCache = remember(
-	'permission-check-cache',
-	() => new LRUCache<string, boolean>({ max: 10000, ttl: 1000 * 60 * 2 }),
-)
-
-const roleCheckCache = remember(
-	'role-check-cache',
-	() => new LRUCache<string, boolean>({ max: 10000, ttl: 1000 * 60 * 2 }),
-)
+const permissionCacheKey = (userId: string, permission: PermissionString) =>
+	`permission-check:${userId}:${permission}`
+const roleCacheKey = (userId: string, name: string) =>
+	`role-check:${userId}:${name}`
 
 export async function requireUserWithPermission(
 	request: Request,
@@ -21,39 +15,33 @@ export async function requireUserWithPermission(
 ) {
 	const userId = await requireUserId(request)
 	const permissionData = parsePermissionString(permission)
-	const cacheKey = `${userId}:${permission}`
-	const cached = permissionCheckCache.get(cacheKey)
-	if (cached === true) return userId
-	if (cached === false) {
-		throw data(
-			{
-				error: 'Unauthorized',
-				requiredPermission: permissionData,
-				message: `Unauthorized: required permissions: ${permission}`,
-			},
-			{ status: 403 },
-		)
-	}
-	const user = await prisma.user.findFirst({
-		select: { id: true },
-		where: {
-			id: userId,
-			roles: {
-				some: {
-					permissions: {
+	const allowed = await cachified({
+		key: permissionCacheKey(userId, permission),
+		cache: lruCache,
+		ttl: 1000 * 60 * 2,
+		async getFreshValue() {
+			const user = await prisma.user.findFirst({
+				select: { id: true },
+				where: {
+					id: userId,
+					roles: {
 						some: {
-							...permissionData,
-							access: permissionData.access
-								? { in: permissionData.access }
-								: undefined,
+							permissions: {
+								some: {
+									...permissionData,
+									access: permissionData.access
+										? { in: permissionData.access }
+										: undefined,
+								},
+							},
 						},
 					},
 				},
-			},
+			})
+			return Boolean(user)
 		},
 	})
-	permissionCheckCache.set(cacheKey, Boolean(user))
-	if (!user) {
+	if (!allowed) {
 		throw data(
 			{
 				error: 'Unauthorized',
@@ -68,25 +56,19 @@ export async function requireUserWithPermission(
 
 export async function requireUserWithRole(request: Request, name: string) {
 	const userId = await requireUserId(request)
-	const cacheKey = `${userId}:${name}`
-	const cached = roleCheckCache.get(cacheKey)
-	if (cached === true) return userId
-	if (cached === false) {
-		throw data(
-			{
-				error: 'Unauthorized',
-				requiredRole: name,
-				message: `Unauthorized: required role: ${name}`,
-			},
-			{ status: 403 },
-		)
-	}
-	const user = await prisma.user.findFirst({
-		select: { id: true },
-		where: { id: userId, roles: { some: { name } } },
+	const allowed = await cachified({
+		key: roleCacheKey(userId, name),
+		cache: lruCache,
+		ttl: 1000 * 60 * 2,
+		async getFreshValue() {
+			const user = await prisma.user.findFirst({
+				select: { id: true },
+				where: { id: userId, roles: { some: { name } } },
+			})
+			return Boolean(user)
+		},
 	})
-	roleCheckCache.set(cacheKey, Boolean(user))
-	if (!user) {
+	if (!allowed) {
 		throw data(
 			{
 				error: 'Unauthorized',
