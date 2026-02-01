@@ -46,7 +46,7 @@ export default defineConfig((config) => ({
 							'tests/mocks/cache-server.ts',
 						),
 					}
-				: {},
+				: undefined,
 	},
 	sentryConfig,
 	plugins: [
