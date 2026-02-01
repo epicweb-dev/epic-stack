@@ -49,8 +49,10 @@ export async function searchCacheKeys(search: string, limit: number) {
 
 export async function cachified<Value>(
 	options: {
-		getFreshValue: () => Promise<Value> | Value
+		getFreshValue: (context: { metadata: CacheEntry<unknown>['metadata'] }) => Promise<Value> | Value
 	},
 ): Promise<Value> {
-	return options.getFreshValue()
+	return options.getFreshValue({
+		metadata: { createdTime: Date.now(), ttl: null, swr: null },
+	})
 }
