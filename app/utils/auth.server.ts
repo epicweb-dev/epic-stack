@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 import { redirect } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { cachified, lruCache } from './cache.server.ts'
+import { cache, cachified } from './cache.server.ts'
 import { providers } from './connections.server.ts'
 import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
@@ -22,8 +22,8 @@ export const authenticator = new Authenticator<ProviderUser>()
 
 const sessionCacheKey = (sessionId: string) => `session-user-id:${sessionId}`
 
-export function invalidateSessionCache(sessionId: string) {
-	lruCache.delete(sessionCacheKey(sessionId))
+export async function invalidateSessionCache(sessionId: string) {
+	await cache.delete(sessionCacheKey(sessionId))
 }
 
 type SessionUserIdCacheEntry = {
@@ -34,7 +34,7 @@ type SessionUserIdCacheEntry = {
 async function getCachedSessionEntry(sessionId: string) {
 	return cachified<SessionUserIdCacheEntry | null>({
 		key: sessionCacheKey(sessionId),
-		cache: lruCache,
+		cache,
 		ttl: SESSION_EXPIRATION_TIME,
 		async getFreshValue(context) {
 			const session = await prisma.session.findUnique({
@@ -83,7 +83,7 @@ export async function getUserId(request: Request) {
 	}
 	const expirationDate = new Date(cachedSession.expirationDate)
 	if (expirationDate <= new Date()) {
-		invalidateSessionCache(sessionId)
+		await invalidateSessionCache(sessionId)
 		throw redirect('/', {
 			headers: {
 				'set-cookie': await authSessionStorage.destroySession(authSession),
@@ -264,10 +264,10 @@ export async function logout(
 	// if this fails, we still need to delete the session from the user's browser
 	// and it doesn't do any harm staying in the db anyway.
 	if (sessionId) {
-		invalidateSessionCache(sessionId)
-		// the .catch is important because that's what triggers the query.
-		// learn more about PrismaPromise: https://www.prisma.io/docs/orm/reference/prisma-client-reference#prismapromise-behavior
-		void prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {})
+		await prisma.session
+			.deleteMany({ where: { id: sessionId } })
+			.catch(() => {})
+		await invalidateSessionCache(sessionId)
 	}
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,

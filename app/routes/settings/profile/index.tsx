@@ -304,9 +304,9 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 			id: { not: sessionId },
 		},
 	})
-	for (const session of sessionsToInvalidate) {
-		invalidateSessionCache(session.id)
-	}
+	await Promise.all(
+		sessionsToInvalidate.map((session) => invalidateSessionCache(session.id)),
+	)
 	return { status: 'success' } as const
 }
 
@@ -351,7 +351,14 @@ function SignOutOfSessions({
 }
 
 async function deleteDataAction({ userId }: ProfileActionArgs) {
+	const sessionsToInvalidate = await prisma.session.findMany({
+		select: { id: true },
+		where: { userId },
+	})
 	await prisma.user.delete({ where: { id: userId } })
+	await Promise.all(
+		sessionsToInvalidate.map((session) => invalidateSessionCache(session.id)),
+	)
 	return redirectWithToast('/', {
 		type: 'success',
 		title: 'Data Deleted',

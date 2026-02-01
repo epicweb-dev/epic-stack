@@ -1,5 +1,5 @@
 import { data } from 'react-router'
-import { cachified, lruCache } from './cache.server.ts'
+import { cache, cachified } from './cache.server.ts'
 import { requireUserId } from './auth.server.ts'
 import { prisma } from './db.server.ts'
 import { type PermissionString, parsePermissionString } from './user.ts'
@@ -9,6 +9,17 @@ const permissionCacheKey = (userId: string, permission: PermissionString) =>
 const roleCacheKey = (userId: string, name: string) =>
 	`role-check:${userId}:${name}`
 
+export async function invalidatePermissionCache(
+	userId: string,
+	permission: PermissionString,
+) {
+	await cache.delete(permissionCacheKey(userId, permission))
+}
+
+export async function invalidateRoleCache(userId: string, name: string) {
+	await cache.delete(roleCacheKey(userId, name))
+}
+
 export async function requireUserWithPermission(
 	request: Request,
 	permission: PermissionString,
@@ -17,7 +28,7 @@ export async function requireUserWithPermission(
 	const permissionData = parsePermissionString(permission)
 	const allowed = await cachified({
 		key: permissionCacheKey(userId, permission),
-		cache: lruCache,
+		cache,
 		ttl: 1000 * 60 * 2,
 		async getFreshValue() {
 			const user = await prisma.user.findFirst({
@@ -58,7 +69,7 @@ export async function requireUserWithRole(request: Request, name: string) {
 	const userId = await requireUserId(request)
 	const allowed = await cachified({
 		key: roleCacheKey(userId, name),
-		cache: lruCache,
+		cache,
 		ttl: 1000 * 60 * 2,
 		async getFreshValue() {
 			const user = await prisma.user.findFirst({
