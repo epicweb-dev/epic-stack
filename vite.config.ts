@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { reactRouter } from '@react-router/dev/vite'
 import {
 	type SentryReactRouterBuildOptions,
@@ -36,6 +37,16 @@ export default defineConfig((config) => ({
 		watch: {
 			ignored: ['**/playwright-report/**'],
 		},
+	},
+	resolve: {
+		alias:
+			MODE === 'test'
+				? {
+						'#app/utils/cache.server.ts': path.resolve(
+							'tests/mocks/cache-server.ts',
+						),
+					}
+				: {},
 	},
 	sentryConfig,
 	plugins: [
