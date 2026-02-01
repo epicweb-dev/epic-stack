@@ -152,7 +152,6 @@ export const cache: CachifiedCache = {
 		})
 		if (!parsedEntry.success) return null
 		const { metadata, value } = parsedEntry.data
-		if (!value) return null
 		return { metadata, value }
 	},
 	async set(key, entry) {
