@@ -25,13 +25,23 @@ so you can interact with the real service if you need to during development.
 
 ## Production secrets
 
-To publish a secret to your production and staging applications, you can use the
-`fly secrets set` command. For example, if you were integrating with the `tito`
-API, to set the `TITO_API_SECRET` secret, you would run the following command:
+To publish a secret to your production application, you can use the
+`fly secrets set` command. For staging, use GitHub environment secrets. For
+example, if you were integrating with the `tito` API, to set the
+`TITO_API_SECRET` secret, you would run the following commands:
 
 ```sh
-fly secrets set TITO_API_SECRET=some_secret_value
-fly secrets set TITO_API_SECRET=some_secret_value --app [YOUR_STAGING_APP_NAME]
+fly secrets set TITO_API_SECRET=some_secret_value --app [YOUR_APP_NAME]
+# See how to install gh: https://cli.github.com/
+gh secret set TITO_API_SECRET -e staging --body "some_secret_value"
 ```
 
-This will redeploy your app with that environment variable set.
+Also add the secret to the staging `secrets` section in
+.github/workflows/deploy.yml
+
+```yaml
+secrets: |
+  TITO_API_SECRET=${{ secrets.TITO_API_SECRET }}
+```
+
+This will make the secret available to your production and staging environments.
