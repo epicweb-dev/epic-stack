@@ -1,5 +1,5 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'

@@ -4,7 +4,7 @@ import {
 	useForm,
 	type SubmissionResult,
 } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import {
 	redirect,
 	data,
@@ -40,7 +40,7 @@ const SignupFormSchema = z.object({
 	username: UsernameSchema,
 	name: NameSchema,
 	agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
-		required_error: 'You must agree to the terms of service and privacy policy',
+		error: 'You must agree to the terms of service and privacy policy',
 	}),
 	remember: z.boolean().optional(),
 	redirectTo: z.string().optional(),

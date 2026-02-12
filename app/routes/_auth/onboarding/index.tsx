@@ -1,5 +1,5 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { data, redirect, Form, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
@@ -33,7 +33,7 @@ const SignupFormSchema = z
 		username: UsernameSchema,
 		name: NameSchema,
 		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
-			required_error:
+			error:
 				'You must agree to the terms of service and privacy policy',
 		}),
 		remember: z.boolean().optional(),

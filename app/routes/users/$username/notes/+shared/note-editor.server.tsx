@@ -1,4 +1,4 @@
-import { parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod/v4'
 import { parseFormData } from '@mjackson/form-data-parser'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { data, redirect, type ActionFunctionArgs } from 'react-router'

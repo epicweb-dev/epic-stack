@@ -1,5 +1,5 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, redirect, Form } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'

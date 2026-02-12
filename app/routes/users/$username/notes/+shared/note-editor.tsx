@@ -7,7 +7,7 @@ import {
 	useForm,
 	type FieldMetadata,
 } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { Img } from 'openimg/react'
 import { useState } from 'react'
 import { Form } from 'react-router'

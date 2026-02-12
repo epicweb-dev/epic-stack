@@ -4,7 +4,7 @@ export const USERNAME_MIN_LENGTH = 3
 export const USERNAME_MAX_LENGTH = 20
 
 export const UsernameSchema = z
-	.string({ required_error: 'Username is required' })
+	.string({ error: 'Username is required' })
 	.min(USERNAME_MIN_LENGTH, { message: 'Username is too short' })
 	.max(USERNAME_MAX_LENGTH, { message: 'Username is too long' })
 	.regex(/^[a-zA-Z0-9_]+$/, {
@@ -14,7 +14,7 @@ export const UsernameSchema = z
 	.transform((value) => value.toLowerCase())
 
 export const PasswordSchema = z
-	.string({ required_error: 'Password is required' })
+	.string({ error: 'Password is required' })
 	.min(6, { message: 'Password is too short' })
 	// NOTE: bcrypt has a limit of 72 bytes (which should be plenty long)
 	// https://github.com/epicweb-dev/epic-stack/issues/918
@@ -23,12 +23,12 @@ export const PasswordSchema = z
 	})
 
 export const NameSchema = z
-	.string({ required_error: 'Name is required' })
+	.string({ error: 'Name is required' })
 	.min(3, { message: 'Name is too short' })
 	.max(40, { message: 'Name is too long' })
 
 export const EmailSchema = z
-	.string({ required_error: 'Email is required' })
+	.string({ error: 'Email is required' })
 	.email({ message: 'Email is invalid' })
 	.min(3, { message: 'Email is too short' })
 	.max(100, { message: 'Email is too long' })
