@@ -68,9 +68,11 @@ test('Users can update their profile photo', async ({
 	await page.getByRole('link', { name: /change profile photo/i }).click()
 
 	await expect(page).toHaveURL(`/settings/profile/photo`)
-
+	// eslint-disable-next-line playwright/no-raw-locators
+	await expect(page.locator('form#profile-photo')).toBeAttached()
+	// eslint-disable-next-line playwright/no-raw-locators
 	await page
-		.getByRole('button', { name: /change/i })
+		.locator('form#profile-photo input[type="file"]')
 		.setInputFiles('./tests/fixtures/images/user/kody.png')
 
 	await page.getByRole('button', { name: /save/i }).click()
