@@ -48,7 +48,7 @@ set SKIP_SETUP=true && set SKIP_FORMAT=true && set SKIP_DEPLOYMENT=true && npx e
 - Seed database:
 
   ```sh
-  npx prisma@6 db seed
+  npx prisma migrate reset --force
   ```
 
 - Start dev server:

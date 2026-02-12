@@ -165,7 +165,7 @@ if what you need to seed is a lot of data), so here's an easy way to help out:
    Then modify that file to create the data you want to seed.
 1. Create a temporary database file to seed the data into.
    ```sh
-   DATABASE_URL=file:./seed.local.db npx prisma migrate reset --skip-seed --force
+   DATABASE_URL=file:./seed.local.db npx prisma migrate reset --force
    ```
 1. Run the custom seed script locally to generate the data you want to seed.
    ```sh
@@ -186,7 +186,7 @@ If your app has already applied all migrations, then the changes to the
 you can run the following command to apply the migration:
 
 ```sh nonumber
-fly ssh console -C "npx prisma migrate reset --skip-seed --force" --app [YOUR_APP_NAME]
+fly ssh console -C "npx prisma migrate reset --force" --app [YOUR_APP_NAME]
 ```
 
 > **WARNING**: This will reset your database and apply all migrations. Continue
