@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 22
 
@@ -44,10 +44,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 22
 
@@ -71,10 +71,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 22
 
@@ -96,13 +96,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 22
 
@@ -117,7 +117,7 @@ jobs:
 
       - name: 🏦 Cache Database
         id: db-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v5.0.3
         with:
           path: prisma/data.db
           key:
@@ -136,7 +136,7 @@ jobs:
         run: npx playwright test
 
       - name: 📊 Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v6.0.0
         if: always()
         with:
           name: playwright-report
@@ -150,7 +150,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 50
 
@@ -197,7 +197,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: '50'
 
