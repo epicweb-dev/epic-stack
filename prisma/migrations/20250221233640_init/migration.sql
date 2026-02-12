@@ -192,7 +192,7 @@ CREATE INDEX "_RoleToUser_B_index" ON "_RoleToUser"("B");
 
 -- The user Roles and Permissions are seeded here.
 -- If you'd like to customise roles and permissions, you can edit and add the code below to your `prisma/seed.ts` file.
--- Seed your development database with `npx prisma db seed`
+-- Seed your development database with `npx prisma migrate reset --force`
 -- Create a sql dump of your database with `sqlite3 prisma/data.db .dump > seed.sql`
 -- Replace the SQL below with your new Roles & Permissions related SQL from `seed.sql`
 

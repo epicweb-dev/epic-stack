@@ -157,8 +157,5 @@
   "engines": {
     "node": "^22.18.0"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "prettier": "@epic-web/config/prettier"
 }

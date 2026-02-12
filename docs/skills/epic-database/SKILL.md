@@ -472,7 +472,7 @@ seed()
 **Run seed:**
 
 ```bash
-npx prisma db seed
+npx prisma migrate reset --force
 # Or directly:
 npx tsx prisma/seed.ts
 ```
