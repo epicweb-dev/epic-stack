@@ -124,7 +124,6 @@
     "@types/eslint": "^9.6.1",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
-    "@types/glob": "^9.0.0",
     "@types/mime-types": "^3.0.1",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.2.3",
