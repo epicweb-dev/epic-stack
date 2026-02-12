@@ -77,7 +77,7 @@
     "cookie": "^1.1.1",
     "cross-env": "^10.1.0",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.3.0",
+    "dotenv": "^17.3.1",
     "execa": "^9.6.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
