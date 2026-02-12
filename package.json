@@ -158,7 +158,8 @@
   },
   "overrides": {
     "hono": "^4.11.7",
-    "@mrleebo/prisma-ast": "^0.14.0"
+    "@mrleebo/prisma-ast": "^0.14.0",
+    "lodash": "^4.17.23"
   },
   "prettier": "@epic-web/config/prettier"
 }
