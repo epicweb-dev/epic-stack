@@ -157,5 +157,8 @@
   "engines": {
     "node": "^22.18.0"
   },
+  "overrides": {
+    "hono": "^4.11.7"
+  },
   "prettier": "@epic-web/config/prettier"
 }
