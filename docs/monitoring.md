@@ -23,11 +23,13 @@ filling out the signup form.
 ## Setting up the sentry-vite plugin
 
 Once you see the onboarding page which has the DSN, copy that somewhere (this
-becomes `SENTRY_DSN`). Now, set the sentry dsn secret in Fly.io to be used as an
-env var during runtime:
+becomes `SENTRY_DSN`). Now, set the sentry dsn secret for production and
+staging:
 
 ```sh
-fly secrets set SENTRY_DSN=<your_dsn>
+fly secrets set SENTRY_DSN=<your_dsn> --app [YOUR_APP_NAME]
+# See how to install gh: https://cli.github.com/
+gh secret set SENTRY_DSN -e staging --body "<your_dsn>"
 ```
 
 See the guides for React Router v7
