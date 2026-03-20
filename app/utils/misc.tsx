@@ -242,12 +242,15 @@ export function useDoubleCheck() {
 function debounce<Callback extends (...args: Parameters<Callback>) => void>(
 	fn: Callback,
 	delay: number,
-) {
+): (this: ThisParameterType<Callback>, ...args: Parameters<Callback>) => void {
 	let timer: ReturnType<typeof setTimeout> | null = null
-	return (...args: Parameters<Callback>) => {
+	return function (
+		this: ThisParameterType<Callback>,
+		...args: Parameters<Callback>
+	) {
 		if (timer) clearTimeout(timer)
 		timer = setTimeout(() => {
-			fn(...args)
+			fn.apply(this, args)
 		}, delay)
 	}
 }
