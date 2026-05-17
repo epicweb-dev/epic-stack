@@ -1,6 +1,7 @@
 {
   "name": "remix.init",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "main": "index.js",
   "dependencies": {
     "@iarna/toml": "^2.2.5",

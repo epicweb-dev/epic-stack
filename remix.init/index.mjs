@@ -1,10 +1,11 @@
-import toml from '@iarna/toml'
-import { $ } from 'execa'
-import inquirer from 'inquirer'
 import { execSync } from 'node:child_process'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+
+import toml from '@iarna/toml'
+import { $ } from 'execa'
+import inquirer from 'inquirer'
 import open from 'open'
 import parseGitHubURL from 'parse-github-url'
 
@@ -14,6 +15,14 @@ const escapeRegExp = (string) =>
 
 const getRandomString = (length) => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
+
+function getSetupEnv(parentEnv = process.env) {
+	const setupEnv = { ...parentEnv }
+	delete setupEnv.DATABASE_URL
+	delete setupEnv.DATABASE_PATH
+	delete setupEnv.CACHE_DATABASE_PATH
+	return setupEnv
+}
 
 async function getEpicStackVersion() {
 	const response = await fetch(
@@ -97,11 +106,22 @@ export default async function main({ rootDirectory }) {
 	await Promise.all(fileOperationPromises)
 
 	if (!process.env.SKIP_SETUP) {
-		execSync('npm run setup', { cwd: rootDirectory, stdio: 'inherit' })
+		try {
+			execSync('corepack pnpm run setup', {
+				cwd: rootDirectory,
+				stdio: 'inherit',
+				env: getSetupEnv(),
+			})
+		} catch (error) {
+			console.error(
+				'Project setup failed. Check that the generated .env still has a SQLite DATABASE_URL that starts with "file:".',
+			)
+			throw error
+		}
 	}
 
 	if (!process.env.SKIP_FORMAT) {
-		execSync('npm run format -- --log-level warn', {
+		execSync('corepack pnpm run format -- --log-level warn', {
 			cwd: rootDirectory,
 			stdio: 'inherit',
 		})
@@ -123,8 +143,8 @@ Setup is complete. You're now ready to rock and roll 🐨
 
 What's next?
 
-- Start development with \`npm run dev\`
-- Run tests with \`npm run test\` and \`npm run test:e2e\`
+- Start development with \`pnpm run dev\`
+- Run tests with \`pnpm run test\` and \`pnpm run test:e2e\`
 		`.trim(),
 	)
 }

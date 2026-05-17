@@ -10,8 +10,8 @@ instructions:
 
 ### System Requirements
 
-- [Node.js](https://nodejs.org/) >= 20.0.0
-- [npm](https://npmjs.com/) >= 8.18.0
+- [Node.js](https://nodejs.org/) ^22.18.0
+- [pnpm](https://pnpm.io/) 11.1.2 (via Corepack recommended)
 - [git](https://git-scm.com/) >= 2.38.0
 
 ### Setup steps
@@ -19,9 +19,16 @@ instructions:
 1.  Fork repo
 2.  clone the repo
 3.  Copy `.env.example` into `.env`
-4.  Run `npm install && npm run setup -s` to install dependencies and run
-    validation
+4.  Run `corepack enable && pnpm install && pnpm run setup -s` to install
+    dependencies and set up the local database, Prisma client, and Playwright
+    browsers
 5.  Create a branch for your PR with `git checkout -b pr/your-branch-name`
+
+> Important: `DATABASE_PATH` and `DATABASE_URL` are not interchangeable.
+> `DATABASE_PATH` is the sqlite/LiteFS filesystem path, while Prisma requires
+> `DATABASE_URL` to stay a SQLite URL that starts with `file:`. If you export a
+> global `DATABASE_URL` in your shell, the setup script now prefers the value in
+> the project's `.env` file.
 
 > Tip: Keep your `main` branch pointing at the original repository and make pull
 > requests from branches on your fork. To do this, run:
@@ -50,29 +57,30 @@ cd ./epic-stack
 cp .env.example .env
 
 # Install deps
-npm install
+corepack enable
+pnpm install
 
 # Run the build
-npm run build
+pnpm run build
 
 # setup the database
-npx prisma migrate deploy
+pnpm exec prisma migrate deploy
 
 # generate the prisma client
-npx prisma generate --sql
+pnpm exec prisma generate --sql
 
 # Install playwright browsers
-npm run test:e2e:install
+pnpm run test:e2e:install
 
 # run build, typecheck, linting
-npm run validate
+pnpm run validate
 ```
 
 If that all worked without trouble, you should be able to start development
 with:
 
 ```sh
-npm run dev
+pnpm run dev
 ```
 
 And open up `http://localhost:3000` and rock!

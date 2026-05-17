@@ -22,22 +22,28 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - name: ⎔ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+      - name: 📥 Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
+        run: pnpm exec prisma migrate deploy && pnpm exec prisma generate --sql
 
       - name: 🔬 Lint
-        run: npm run lint
+        run: pnpm run lint
 
   typecheck:
     name: ʦ TypeScript
@@ -46,25 +52,31 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - name: ⎔ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-
-      - name: 🏗 Build
-        run: npm run build
+      - name: 📥 Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
+        run: pnpm exec prisma migrate deploy && pnpm exec prisma generate --sql
+
+      - name: 🏗 Build
+        run: pnpm run build
 
       - name: 🔎 Type check
-        run: npm run typecheck --if-present
+        run: pnpm run typecheck --if-present
 
   vitest:
     name: ⚡ Vitest
@@ -73,22 +85,28 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - name: ⎔ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+      - name: 📥 Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
+        run: pnpm exec prisma migrate deploy && pnpm exec prisma generate --sql
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: pnpm run test -- --coverage
 
   playwright:
     name: 🎭 Playwright
@@ -101,19 +119,25 @@ jobs:
       - name: 🏄 Copy test env vars
         run: cp .env.example .env
 
+      - name: ⎔ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+      - name: 📥 Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: 📥 Install Playwright Browsers
-        run: npm run test:e2e:install
+        run: pnpm run test:e2e:install
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate deploy && npx prisma generate --sql
+        run: pnpm exec prisma migrate deploy && pnpm exec prisma generate --sql
 
       - name: 🏦 Cache Database
         id: db-cache
@@ -123,17 +147,18 @@ jobs:
           key:
             db-cache-schema_${{ hashFiles('./prisma/schema.prisma')
             }}-migrations_${{ hashFiles('./prisma/migrations/*/migration.sql')
+            }}-seed_${{ hashFiles('./prisma/seed.ts', './prisma.config.ts')
             }}
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
-        run: npx prisma migrate reset --force
+        run: pnpm exec prisma migrate reset --force
 
       - name: 🏗 Build
-        run: npm run build
+        run: pnpm run build
 
       - name: 🎭 Playwright tests
-        run: npx playwright test
+        run: pnpm exec playwright test
 
       - name: 📊 Upload report
         uses: actions/upload-artifact@v4

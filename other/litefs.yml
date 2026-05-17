@@ -29,7 +29,7 @@ lease:
     key: 'epic-stack-litefs_20250222/${FLY_APP_NAME}'
 
 exec:
-  - cmd: npx prisma migrate deploy
+  - cmd: pnpm exec prisma migrate deploy
     if-candidate: true
 
   # Set the journal mode for the database to WAL. This reduces concurrency deadlock issues
@@ -41,6 +41,6 @@ exec:
     if-candidate: true
 
   # Generate Typed SQL files
-  - cmd: npx prisma generate --sql
+  - cmd: pnpm exec prisma generate --sql
 
-  - cmd: npm start
+  - cmd: pnpm start

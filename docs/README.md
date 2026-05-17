@@ -32,4 +32,4 @@ in the coming weeks. Stay tuned!
   Most new feature requests people have for the Epic Stack start as examples
   before being integrated into the framework.
 - [Managing Updates](./managing-updates.md) - How to manage updates to the Epic
-  Stack for both the generated stack code as well as npm dependencies.
+  Stack for both the generated stack code as well as pnpm dependencies.
