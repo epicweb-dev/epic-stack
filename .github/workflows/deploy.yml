@@ -76,7 +76,7 @@ jobs:
         run: pnpm run build
 
       - name: 🔎 Type check
-        run: pnpm run typecheck --if-present
+        run: pnpm run typecheck
 
   vitest:
     name: ⚡ Vitest
