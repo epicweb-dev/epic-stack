@@ -162,6 +162,5 @@
   },
   "engines": {
     "node": "^22.18.0"
-  },
-  "prettier": "@epic-web/config/prettier"
+  }
 }
