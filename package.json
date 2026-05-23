@@ -14,7 +14,7 @@
     "build": "react-router build",
     "dev": "cross-env NODE_ENV=development MOCKS=true node index.ts",
     "dev:no-mocks": "cross-env NODE_ENV=development node index.ts",
-    "format": "prettier --write .",
+    "format": "node ./scripts/format.js",
     "lint": "eslint . --ignore-pattern 'app/generated/prisma/**'",
     "setup": "node ./scripts/setup.js",
     "start": "cross-env NODE_ENV=production node index.ts",
