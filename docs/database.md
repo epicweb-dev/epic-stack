@@ -59,7 +59,7 @@ you can utilize Fly's `ssh` and `proxy` commands.
 
 - Run in one terminal the command to start Prisma Studio on your desired Fly app
   ```sh
-  fly ssh console -C "npx prisma studio" --app [YOUR_APP_NAME]
+  fly ssh console -C "pnpm exec prisma studio" --app [YOUR_APP_NAME]
   ```
 - Run in a second terminal the command to proxy your local port 5556 to Prisma
   Studio
@@ -68,7 +68,7 @@ you can utilize Fly's `ssh` and `proxy` commands.
   ```
 
 If you have multiple instances of your app running, and you'd like to make edits
-to your database, you will need to run `npx prisma studio` on the primary
+to your database, you will need to run `pnpm exec prisma studio` on the primary
 instance.
 
 - Get a list of your app instances, the `ROLE` column will show which instance
@@ -78,7 +78,7 @@ instance.
   ```
 - Run the console command with the `-s` select flag
   ```sh
-  fly ssh console -C "npx prisma studio" -s --app [YOUR_APP_NAME]
+  fly ssh console -C "pnpm exec prisma studio" -s --app [YOUR_APP_NAME]
   ```
 - Use your arrow keys to select the primary instance
 
@@ -165,11 +165,11 @@ if what you need to seed is a lot of data), so here's an easy way to help out:
    Then modify that file to create the data you want to seed.
 1. Create a temporary database file to seed the data into.
    ```sh
-   DATABASE_URL=file:./seed.local.db npx prisma migrate reset --skip-seed --force
+   DATABASE_URL=file:./seed.local.db pnpm exec prisma migrate reset --skip-seed --force
    ```
 1. Run the custom seed script locally to generate the data you want to seed.
    ```sh
-   DATABASE_URL=file:./seed.local.db npx tsx ./prod-seed.local.ts
+   DATABASE_URL=file:./seed.local.db pnpm exec tsx ./prod-seed.local.ts
    ```
 1. Create a "dump" of the seed database using the `sqlite3` command line tool.
    ```sh nonumber
@@ -186,7 +186,7 @@ If your app has already applied all migrations, then the changes to the
 you can run the following command to apply the migration:
 
 ```sh nonumber
-fly ssh console -C "npx prisma migrate reset --skip-seed --force" --app [YOUR_APP_NAME]
+fly ssh console -C "pnpm exec prisma migrate reset --skip-seed --force" --app [YOUR_APP_NAME]
 ```
 
 > **WARNING**: This will reset your database and apply all migrations. Continue
@@ -305,15 +305,15 @@ You've got a few options:
 
    ```yml
    # exec:
-   #   - cmd: npx prisma migrate deploy
+   #   - cmd: pnpm exec prisma migrate deploy
    #     if-candidate: true
 
-   #   - cmd: npm start
+   #   - cmd: pnpm start
    ```
 
    2. Commit this change and deploy the app to fly.
       - This will make sure that after building the dockerfile and deploying it
-        to the fly machine, `npx prisma migrate deploy` and `npm start` commands
+        to the fly machine, `pnpm exec prisma migrate deploy` and `pnpm start` commands
         won't be executed.
    3. Now that the main machine is up and running, you can SSH into it by
       running `fly ssh console --app [YOUR_APP_NAME]` in the terminal.
@@ -343,10 +343,10 @@ You've got a few options:
 
    ```yml
    exec:
-     - cmd: npx prisma migrate deploy
+     - cmd: pnpm exec prisma migrate deploy
        if-candidate: true
 
-     - cmd: npm start
+     - cmd: pnpm start
    ```
 
    10. Commit this change and deploy the app to fly :tada:

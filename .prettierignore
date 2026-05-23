@@ -10,5 +10,10 @@ node_modules
 /tests/fixtures/email/*.json
 /coverage
 /prisma/migrations
+/prisma/sql
+/app/generated/prisma
+.pi
+.pi-lens
 
 package-lock.json
+.cursor
