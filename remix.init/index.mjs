@@ -16,6 +16,15 @@ const escapeRegExp = (string) =>
 const getRandomString = (length) => crypto.randomBytes(length).toString('hex')
 const getRandomString32 = () => getRandomString(32)
 
+function getPnpmCommand() {
+	try {
+		execSync('pnpm --version', { stdio: 'ignore' })
+		return 'pnpm'
+	} catch {
+		return 'corepack pnpm'
+	}
+}
+
 function getSetupEnv(parentEnv = process.env) {
 	const setupEnv = { ...parentEnv }
 	delete setupEnv.DATABASE_URL
@@ -105,9 +114,11 @@ export default async function main({ rootDirectory }) {
 
 	await Promise.all(fileOperationPromises)
 
+	const pnpmCommand = getPnpmCommand()
+
 	if (!process.env.SKIP_SETUP) {
 		try {
-			execSync('corepack pnpm run setup', {
+			execSync(`${pnpmCommand} run setup`, {
 				cwd: rootDirectory,
 				stdio: 'inherit',
 				env: getSetupEnv(),
@@ -121,7 +132,7 @@ export default async function main({ rootDirectory }) {
 	}
 
 	if (!process.env.SKIP_FORMAT) {
-		execSync('corepack pnpm run format -- --log-level warn', {
+		execSync(`${pnpmCommand} run format -- --log-level warn`, {
 			cwd: rootDirectory,
 			stdio: 'inherit',
 		})
