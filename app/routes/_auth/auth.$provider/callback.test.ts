@@ -23,8 +23,8 @@ const PARAMS = { provider: 'github' }
 const LOADER_ARGS_BASE = {
 	params: PARAMS,
 	context: {} as AppLoadContext,
-	matches: [] as unknown as Route.LoaderArgs['matches'],
-	unstable_pattern: ROUTE_PATH,
+	url: new URL(ROUTE_PATH, BASE_URL),
+	pattern: ROUTE_PATH,
 } satisfies Omit<Route.LoaderArgs, 'request'>
 
 afterEach(async () => {
