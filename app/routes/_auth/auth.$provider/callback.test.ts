@@ -15,6 +15,7 @@ import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
 import { consoleError } from '#tests/setup/setup-test-env.ts'
 import { BASE_URL, convertSetCookieToCookie } from '#tests/utils.ts'
+import { type Route } from './+types/callback.ts'
 import { loader } from './callback.ts'
 
 const ROUTE_PATH = '/auth/github/callback'
@@ -22,8 +23,9 @@ const PARAMS = { provider: 'github' }
 const LOADER_ARGS_BASE = {
 	params: PARAMS,
 	context: {} as AppLoadContext,
+	matches: [] as unknown as Route.LoaderArgs['matches'],
 	unstable_pattern: ROUTE_PATH,
-}
+} satisfies Omit<Route.LoaderArgs, 'request'>
 
 afterEach(async () => {
 	await deleteGitHubUsers()
