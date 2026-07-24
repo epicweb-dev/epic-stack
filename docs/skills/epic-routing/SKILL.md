@@ -207,7 +207,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	try {
 		await Promise.all([
-			prisma.user.count(), // Check DB
+			prisma.$queryRaw`SELECT 1`, // Check DB
 			fetch(`${new URL(request.url).protocol}${host}`, {
 				method: 'HEAD',
 				headers: { 'X-Healthcheck': 'true' },
