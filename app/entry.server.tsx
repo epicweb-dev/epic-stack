@@ -15,6 +15,7 @@ import {
 import { getEnv, init } from './utils/env.server.ts'
 import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
+import { isExpectedReactRouterErrorMessage } from './utils/sentry-event-filters.ts'
 import { makeTimings } from './utils/timing.server.ts'
 
 export const streamTimeout = 5000
@@ -129,6 +130,15 @@ export function handleError(
 	// Skip capturing if the request is aborted as Remix docs suggest
 	// Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
 	if (request.signal.aborted) {
+		return
+	}
+
+	// Expected React Router responses to unsupported methods / missing handlers
+	// (common from bots and scanners on the public demo). Don't alert.
+	if (
+		error instanceof Error &&
+		isExpectedReactRouterErrorMessage(error.message)
+	) {
 		return
 	}
 
