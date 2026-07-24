@@ -9,8 +9,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 	try {
 		// if we can connect to the database and make a simple query
 		// and make a HEAD request to ourselves, then we're good.
+		// Prefer SELECT 1 over User.count(): count() was producing Slow DB Query
+		// Sentry insights on the tiny Fly demo VM without indicating app issues.
 		await Promise.all([
-			prisma.user.count(),
+			prisma.$queryRaw`SELECT 1`,
 			fetch(`${new URL(request.url).protocol}${host}`, {
 				method: 'HEAD',
 				headers: { 'X-Healthcheck': 'true' },
