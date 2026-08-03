@@ -43,7 +43,9 @@ export default defineConfig((config) => {
 			}
 		},
 
-		sourcemap: true,
+		// 'hidden' emits maps for Sentry upload but omits //# sourceMappingURL=
+		// so public /assets never advertise map URLs (esp. when auth token is unset)
+		sourcemap: 'hidden',
 	},
 	server: {
 		watch: {
@@ -84,20 +86,20 @@ export default defineConfig((config) => {
 	}
 })
 
+// Keep release on the supported top-level fields. Do not pass `sourcemaps`
+// through `unstable_sentryVitePluginOptions` — that overwrites the plugin's
+// `sourcemaps.disable: true` and injects a second debug ID per chunk
+// (getsentry/sentry-javascript#22929). sentryOnBuildEnd deletes maps via its
+// default `${buildDirectory}/**/*.map` glob.
 const sentryConfig: SentryReactRouterBuildOptions = {
 	authToken: process.env.SENTRY_AUTH_TOKEN,
 	org: process.env.SENTRY_ORG,
 	project: process.env.SENTRY_PROJECT,
 
-	unstable_sentryVitePluginOptions: {
-		release: {
-			name: process.env.COMMIT_SHA,
-			setCommits: {
-				auto: true,
-			},
-		},
-		sourcemaps: {
-			filesToDeleteAfterUpload: ['./build/**/*.map'],
+	release: {
+		name: process.env.COMMIT_SHA,
+		setCommits: {
+			auto: true,
 		},
 	},
 }
