@@ -123,6 +123,10 @@ This page links to examples of how to implement some things with the Epic Stack.
   [@dmno-dev](https://github.com/dmno-dev): Using [Varlock](https://varlock.dev)
   and a `.env.schema` file to to improve DX and security of configuration and
   secrets.
+- [Mailtrap Local](https://github.com/tsokolovs/epic-stack-with-mailtrap-local)
+  by [@tsokolovs](https://github.com/tsokolovs): Sending mail through a local
+  SMTP server in development, so the emails the app sends can be opened and read
+  in a browser instead of the terminal.
 
 ## How to contribute
 
