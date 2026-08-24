@@ -127,6 +127,11 @@ This page links to examples of how to implement some things with the Epic Stack.
   by [@tsokolovs](https://github.com/tsokolovs): Sending mail through a local
   SMTP server in development, so the emails the app sends can be opened and read
   in a browser instead of the terminal.
+- [Epic Stack + Xquik public X research](https://github.com/kriptoburak/epic-stack-with-xquik)
+  by [@kriptoburak](https://github.com/kriptoburak): An authenticated,
+  server-only public X search example using the published TypeScript SDK. It
+  validates untrusted results, mocks the external request with MSW, and includes
+  unit and Playwright tests.
 
 ## How to contribute
 
