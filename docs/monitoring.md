@@ -33,7 +33,7 @@ fly secrets set SENTRY_DSN=<your_dsn>
 See the guides for React Router v7
 [here(library)](https://docs.sentry.io/platforms/javascript/guides/react/features/react-router/v7/)
 and
-[here(framwork)](https://docs.sentry.io/platforms/javascript/guides/react-router/).
+[here(framework)](https://docs.sentry.io/platforms/javascript/guides/react-router/).
 Note that the dedicated SDK for React Router is under development and features
 are lacking.
 
