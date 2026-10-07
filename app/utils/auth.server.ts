@@ -108,6 +108,8 @@ export async function resetUserPassword({
 					hash: hashedPassword,
 				},
 			},
+			// a password reset should sign out anyone using the old password
+			sessions: { deleteMany: {} },
 		},
 	})
 }
