@@ -75,6 +75,17 @@ Prior to your first deployment, you'll need to do a few things:
   fly secrets set ALLOW_INDEXING=false --app [YOUR_APP_NAME]-staging
   ```
 
+- If you serve your app from a custom domain, add an `ALLOWED_HOSTS` secret with
+  a comma-separated list of the hostnames your app is served from. The first one
+  is the canonical host. Links in emails (like password reset links) and
+  passkeys only use hostnames in this list, `[YOUR_APP_NAME].fly.dev`, or
+  `localhost` (learn more in [the security docs](./security.md#host-headers)):
+
+  ```sh
+  fly secrets set ALLOWED_HOSTS=example.com,www.example.com --app [YOUR_APP_NAME]
+  fly secrets set ALLOWED_HOSTS=staging.example.com --app [YOUR_APP_NAME]-staging
+  ```
+
 6. Create production database:
 
    Create a persistent volume for the sqlite database for both your staging and

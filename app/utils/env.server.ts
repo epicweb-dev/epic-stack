@@ -19,6 +19,11 @@ const schema = z.object({
 	GITHUB_TOKEN: z.string().optional(),
 
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
+	// Comma-separated hostnames the app is served from (like
+	// "example.com,www.example.com"). The first is the canonical host used for
+	// links in emails when a request's Host header isn't one of these.
+	// `${FLY_APP_NAME}.fly.dev` and localhost are always allowed.
+	ALLOWED_HOSTS: z.string().optional(),
 
 	// Tigris Object Storage Configuration
 	AWS_ACCESS_KEY_ID: z.string(),

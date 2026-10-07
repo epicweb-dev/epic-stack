@@ -75,6 +75,26 @@ The Epic Stack has built-in support for honeypot fields. We use the
 [honeypot-related utilities](https://github.com/sergiodxa/remix-utils#form-honeypot)
 to do this.
 
+## Host Headers
+
+The `Host` and `X-Forwarded-Host` request headers are controlled by the client,
+so `getDomainUrl` in `app/utils/misc.tsx` only uses them if they match a trusted
+hostname. Otherwise it falls back to the canonical host. This matters because
+the result is used to build the links we email to users (like password reset
+links), the passkey relying party, and the image optimizer's allowed origins.
+
+Trusted hostnames are:
+
+- The comma-separated hostnames in the `ALLOWED_HOSTS` environment variable (the
+  first one is the canonical host)
+- `${FLY_APP_NAME}.fly.dev` (`FLY_APP_NAME` is set automatically by Fly)
+- `localhost`, `127.0.0.1`, and `[::1]` (on any port)
+
+If you serve your app from a custom domain, set `ALLOWED_HOSTS` (see
+[the deployment docs](./deployment.md)). If you don't, requests to your custom
+domain will get links to `[YOUR_APP_NAME].fly.dev` in emails and passkeys won't
+work on your custom domain.
+
 ## Rate Limiting
 
 The Epic Stack uses a rate limiter to prevent abuse of the API. This is

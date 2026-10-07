@@ -1,7 +1,7 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
 import { SetCookie } from '@mjackson/headers'
-import { http } from 'msw'
+import { HttpResponse, http } from 'msw'
 import { type AppLoadContext } from 'react-router'
 import { afterEach, expect, test } from 'vitest'
 import { twoFAVerificationType } from '#app/routes/settings/profile/two-factor/_layout.tsx'
@@ -154,6 +154,38 @@ test('when a user exists with the same email, create connection and make session
 	).toBeTruthy()
 
 	await expect(response).toHaveSessionForUser(userId)
+})
+
+test('does not sign in to an existing user when the GitHub primary email is unverified', async () => {
+	consoleError.mockImplementation(() => {})
+	const githubUser = await insertGitHubUser()
+	const email = githubUser.primaryEmail.toLowerCase()
+	const { userId } = await setupUser({ ...createUser(), email })
+	server.use(
+		http.get('https://api.github.com/user/emails', () =>
+			HttpResponse.json(
+				githubUser.emails.map((e) =>
+					e.primary ? { ...e, verified: false } : e,
+				),
+			),
+		),
+	)
+	const request = await setupRequest({ code: githubUser.code })
+	const response = await loader({
+		request,
+		...LOADER_ARGS_BASE,
+	}).catch((e) => e)
+
+	invariant(response instanceof Response, 'response should be a Response')
+	expect(response).toHaveRedirect('/login')
+	await expect(response).toSendToast(
+		expect.objectContaining({ title: 'Auth Failed', type: 'error' }),
+	)
+	expect(response.headers.get('set-cookie')).not.toContain('en_session=')
+	const connection = await prisma.connection.findFirst({
+		where: { userId, providerId: githubUser.profile.id.toString() },
+	})
+	expect(connection, 'a connection should not have been created').toBeNull()
 })
 
 test('gives an error if the account is already connected to another user', async () => {
