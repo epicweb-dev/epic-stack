@@ -96,14 +96,13 @@ export async function handleVerification({
 	)
 
 	const remember = verifySession.get(rememberKey)
-	const { redirectTo } = submission.value
+	const { redirectTo, target } = submission.value
 	const headers = new Headers()
-	authSession.set(verifiedTimeKey, Date.now())
 
 	const unverifiedSessionId = verifySession.get(unverifiedSessionIdKey)
 	if (unverifiedSessionId) {
 		const session = await prisma.session.findUnique({
-			select: { expirationDate: true },
+			select: { expirationDate: true, userId: true },
 			where: { id: unverifiedSessionId },
 		})
 		if (!session) {
@@ -113,6 +112,14 @@ export async function handleVerification({
 				description: 'Could not find session to verify. Please try again.',
 			})
 		}
+		if (session.userId !== target) {
+			throw await redirectWithToast('/login', {
+				type: 'error',
+				title: 'Invalid verification',
+				description: 'Something went wrong verifying your account.',
+			})
+		}
+		authSession.set(verifiedTimeKey, Date.now())
 		authSession.set(sessionKey, unverifiedSessionId)
 
 		headers.append(
@@ -122,6 +129,15 @@ export async function handleVerification({
 			}),
 		)
 	} else {
+		const userId = await getUserId(request)
+		if (userId !== target) {
+			throw await redirectWithToast('/login', {
+				type: 'error',
+				title: 'Invalid verification',
+				description: 'Something went wrong verifying your account.',
+			})
+		}
+		authSession.set(verifiedTimeKey, Date.now())
 		headers.append(
 			'set-cookie',
 			await authSessionStorage.commitSession(authSession),
@@ -153,6 +169,6 @@ export async function shouldRequestTwoFA(request: Request) {
 	})
 	if (!userHasTwoFA) return false
 	const verifiedTime = authSession.get(verifiedTimeKey) ?? new Date(0)
-	const twoHours = 1000 * 60 * 2
+	const twoHours = 1000 * 60 * 60 * 2
 	return Date.now() - verifiedTime > twoHours
 }
