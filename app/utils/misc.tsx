@@ -61,12 +61,46 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
 }
 
+/**
+ * Hosts we trust to appear in the Host/X-Forwarded-Host headers. The first one
+ * is the canonical host used when the request's host is not trusted.
+ */
+function getAllowedHosts() {
+	const hosts = (process.env.ALLOWED_HOSTS ?? '')
+		.split(',')
+		.map((host) => host.trim().toLowerCase())
+		.filter(Boolean)
+	if (process.env.FLY_APP_NAME) {
+		hosts.push(`${process.env.FLY_APP_NAME}.fly.dev`.toLowerCase())
+	}
+	return hosts
+}
+
+function isLocalhost(host: string) {
+	const hostname = host.replace(/:\d+$/, '')
+	return ['localhost', '127.0.0.1', '[::1]'].includes(hostname)
+}
+
+/**
+ * Returns the origin of the app (like https://example.com). Host headers are
+ * client-controlled, so the request's host is only used if it is in
+ * ALLOWED_HOSTS, is the Fly.io app hostname, or is localhost. Otherwise we fall
+ * back to the canonical host. This is important because we use this to
+ * generate links we email to users (like password reset links).
+ */
 export function getDomainUrl(request: Request) {
-	const host =
+	const requestHost = (
 		request.headers.get('X-Forwarded-Host') ??
 		request.headers.get('host') ??
 		new URL(request.url).host
-	const protocol = request.headers.get('X-Forwarded-Proto') ?? 'http'
+	).toLowerCase()
+	const allowedHosts = getAllowedHosts()
+	const host =
+		allowedHosts.includes(requestHost) || isLocalhost(requestHost)
+			? requestHost
+			: (allowedHosts[0] ?? `localhost:${process.env.PORT || 3000}`)
+	const protocol =
+		request.headers.get('X-Forwarded-Proto') === 'https' ? 'https' : 'http'
 	return `${protocol}://${host}`
 }
 
