@@ -64,12 +64,6 @@ app.use((_, res, next) => {
 	next()
 })
 
-app.get([/^\/img\/.*/, /^\/favicons\/.*/], (_req, res) => {
-	// if we made it past the express.static for these, then we're missing something.
-	// So we'll just send a 404 and won't bother calling other middleware.
-	return res.status(404).send('Not found')
-})
-
 morgan.token('url', (req) => {
 	try {
 		return decodeURIComponent(req.url ?? '')
@@ -156,6 +150,13 @@ if (!ALLOW_INDEXING) {
 	})
 }
 
+// Requests for files in /img and /favicons that made it past the static file
+// middleware are missing something. So we'll just send a 404 and won't bother
+// calling other middleware.
+const missingFileHandler: express.RequestHandler = (_req, res) => {
+	res.status(404).send('Not found')
+}
+
 if (IS_DEV) {
 	console.log('Starting development server')
 	const viteDevServer = await import('vite').then((vite) =>
@@ -167,6 +168,7 @@ if (IS_DEV) {
 		}),
 	)
 	app.use(viteDevServer.middlewares)
+	app.get([/^\/img\/.*/, /^\/favicons\/.*/], missingFileHandler)
 	app.use(async (req, res, next) => {
 		try {
 			const source = await viteDevServer.ssrLoadModule('./server/app.ts')
@@ -192,6 +194,7 @@ if (IS_DEV) {
 	// Everything else (like favicon.ico) is cached for an hour. You may want to be
 	// more aggressive with this caching.
 	app.use(express.static('build/client', { maxAge: '1h' }))
+	app.get([/^\/img\/.*/, /^\/favicons\/.*/], missingFileHandler)
 	app.use(await import(BUILD_PATH).then((mod) => mod.app))
 }
 
