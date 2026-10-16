@@ -17,7 +17,6 @@ permissions:
 jobs:
   lint:
     name: ⬣ ESLint
-    runs-on: warp-ubuntu-latest-x64-4x
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -41,7 +40,6 @@ jobs:
 
   typecheck:
     name: ʦ TypeScript
-    runs-on: warp-ubuntu-latest-x64-4x
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -68,7 +66,6 @@ jobs:
 
   vitest:
     name: ⚡ Vitest
-    runs-on: warp-ubuntu-latest-x64-4x
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -92,7 +89,6 @@ jobs:
 
   playwright:
     name: 🎭 Playwright
-    runs-on: warp-ubuntu-latest-x64-4x
     timeout-minutes: 60
     steps:
       - name: ⬇️ Checkout repo
@@ -145,7 +141,6 @@ jobs:
 
   container:
     name: 📦 Prepare Container
-    runs-on: warp-ubuntu-latest-x64-4x
     # only prepare container on pushes
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -191,7 +186,6 @@ jobs:
 
   deploy:
     name: 🚀 Deploy
-    runs-on: warp-ubuntu-latest-x64-4x
     needs: [lint, typecheck, vitest, playwright, container]
     # only deploy on pushes
     if: ${{ github.event_name == 'push' }}
