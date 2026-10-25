@@ -28,7 +28,7 @@ expect.extend({
 							? ` to ${this.utils.printExpected(redirectTo)}`
 							: ''
 					} but got ${
-						location ? 'no redirect' : this.utils.printReceived(location)
+						location ? this.utils.printReceived(location) : 'no redirect'
 					}`,
 			}
 		}
