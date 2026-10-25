@@ -17,6 +17,7 @@ permissions:
 jobs:
   lint:
     name: ⬣ ESLint
+    runs-on: ubuntu-24.04
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -40,6 +41,7 @@ jobs:
 
   typecheck:
     name: ʦ TypeScript
+    runs-on: ubuntu-24.04
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -66,6 +68,7 @@ jobs:
 
   vitest:
     name: ⚡ Vitest
+    runs-on: ubuntu-24.04
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -89,6 +92,7 @@ jobs:
 
   playwright:
     name: 🎭 Playwright
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: ⬇️ Checkout repo
@@ -141,6 +145,7 @@ jobs:
 
   container:
     name: 📦 Prepare Container
+    runs-on: ubuntu-24.04
     # only prepare container on pushes
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -186,6 +191,7 @@ jobs:
 
   deploy:
     name: 🚀 Deploy
+    runs-on: ubuntu-24.04
     needs: [lint, typecheck, vitest, playwright, container]
     # only deploy on pushes
     if: ${{ github.event_name == 'push' }}
