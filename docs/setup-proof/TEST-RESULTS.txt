@@ -1,0 +1,19 @@
+Date: 2026-10-29
+Node: v22.23.4
+npm: 10.9.9
+CWD: /Users/happyhome/Desktop/epic-stack
+
+vitest (npm test -- --run)
+  Test Files  11 passed (11)
+  Tests       42 passed (42)
+  Duration    4.71s
+
+playwright (npx playwright test, chromium, reuseExistingServer)
+  26 passed (30.7s)
+
+typecheck (npm run typecheck)
+  passed (react-router typegen && tsc)
+
+lint (npm run lint)
+  0 errors
+  3 warnings in remix.init/index.mjs (import/order) — upstream, unchanged
