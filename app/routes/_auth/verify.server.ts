@@ -137,6 +137,18 @@ export async function isCodeValid({
 	return true
 }
 
+async function consumeVerification({
+	type,
+	target,
+}: {
+	type: VerificationTypes
+	target: string
+}) {
+	await prisma.verification.deleteMany({
+		where: { type, target },
+	})
+}
+
 export async function validateRequest(
 	request: Request,
 	body: URLSearchParams | FormData,
@@ -168,33 +180,28 @@ export async function validateRequest(
 	}
 
 	const { value: submissionValue } = submission
+	const type = submissionValue[typeQueryParam]
+	const target = submissionValue[targetQueryParam]
 
-	async function deleteVerification() {
-		await prisma.verification.delete({
-			where: {
-				target_type: {
-					type: submissionValue[typeQueryParam],
-					target: submissionValue[targetQueryParam],
-				},
-			},
-		})
-	}
-
-	switch (submissionValue[typeQueryParam]) {
+	switch (type) {
 		case 'reset-password': {
-			await deleteVerification()
+			await consumeVerification({ type, target })
 			return handleResetPasswordVerification({ request, body, submission })
 		}
 		case 'onboarding': {
-			await deleteVerification()
+			await consumeVerification({ type, target })
 			return handleOnboardingVerification({ request, body, submission })
 		}
 		case 'change-email': {
-			await deleteVerification()
+			await consumeVerification({ type, target })
 			return handleChangeEmailVerification({ request, body, submission })
 		}
 		case '2fa': {
 			return handleLoginTwoFactorVerification({ request, body, submission })
+		}
+		default: {
+			const exhaustive: never = type
+			throw new Error(`Unhandled verification type: ${exhaustive}`)
 		}
 	}
 }
